@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="2.5dp"
+    android:background="#f5f5f5"
+    android:elevation="2dp"
+    android:orientation="vertical">
+
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:lines="1"
+        android:text="Prace"
+        android:textAlignment="textStart"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:textStyle="normal|bold"
+        app:layout_constraintBottom_toBottomOf="@+id/chip_progress"
+        app:layout_constraintEnd_toStartOf="@+id/chip_progress"
+        app:layout_constraintStart_toEndOf="@+id/btn_act"
+        app:layout_constraintTop_toTopOf="@+id/chip_progress" />
+
+    <ImageButton
+        android:id="@+id/btn_act"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/ic_play_circle_filled_green_45dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/indicator_1"
+        android:layout_width="40dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/dr_activity_metric_indicator_completed"
+        android:gravity="center"
+        android:text="06:12"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/indicator_2"
+        app:layout_constraintEnd_toStartOf="@+id/indicator_2"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toEndOf="@+id/btn_act"
+        app:layout_constraintTop_toTopOf="@+id/indicator_2" />
+
+    <TextView
+        android:id="@+id/indicator_4"
+        android:layout_width="40dp"
+        android:layout_height="20dp"
+        android:background="@drawable/dr_activity_metric_indicator_completed"
+        android:gravity="center"
+        android:text="28"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/indicator_5"
+        app:layout_constraintEnd_toStartOf="@+id/indicator_5"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/indicator_3"
+        app:layout_constraintTop_toTopOf="@+id/indicator_5" />
+
+    <TextView
+        android:id="@+id/indicator_3"
+        android:layout_width="40dp"
+        android:layout_height="20dp"
+        android:background="@drawable/dr_activity_metric_indicator_completed"
+        android:gravity="center"
+        android:text="27"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/indicator_4"
+        app:layout_constraintEnd_toStartOf="@+id/indicator_4"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/indicator_2"
+        app:layout_constraintTop_toTopOf="@+id/indicator_4" />
+
+    <TextView
+        android:id="@+id/indicator_2"
+        android:layout_width="40dp"
+        android:layout_height="20dp"
+        android:background="@drawable/dr_activity_metric_indicator_completed"
+        android:gravity="center"
+        android:text="07:02"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/indicator_3"
+        app:layout_constraintEnd_toStartOf="@+id/indicator_3"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/indicator_1"
+        app:layout_constraintTop_toTopOf="@+id/indicator_3" />
+
+    <TextView
+        android:id="@+id/indicator_5"
+        android:layout_width="40dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/dr_activity_metric_indicator_completed"
+        android:gravity="center"
+        android:text="ANO"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/indicator_4"
+        app:layout_constraintTop_toBottomOf="@+id/chip_progress" />
+
+    <com.google.android.material.chip.Chip
+        android:minWidth="130dp"
+        android:id="@+id/chip_progress"
+        style="@style/Widget.MaterialComponents.Chip.Action"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginEnd="8dp"
+        android:text="000:00 / 000:00"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+    </com.google.android.material.chip.Chip>
+
+    <TextView
+        android:id="@+id/indicator_label_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TÝDEN"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/indicator_1"
+        app:layout_constraintEnd_toEndOf="@+id/indicator_1"
+        app:layout_constraintStart_toStartOf="@+id/indicator_1" />
+
+    <TextView
+        android:id="@+id/indicator_label_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TÝDEN"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/indicator_2"
+        app:layout_constraintEnd_toEndOf="@+id/indicator_2"
+        app:layout_constraintStart_toStartOf="@+id/indicator_2" />
+
+    <TextView
+        android:id="@+id/indicator_label_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TÝDEN"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/indicator_3"
+        app:layout_constraintEnd_toEndOf="@+id/indicator_3"
+        app:layout_constraintStart_toStartOf="@+id/indicator_3" />
+
+    <TextView
+        android:id="@+id/indicator_label_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:text="TÝDEN"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/indicator_4"
+        app:layout_constraintEnd_toEndOf="@+id/indicator_4"
+        app:layout_constraintStart_toStartOf="@+id/indicator_4" />
+
+    <TextView
+        android:id="@+id/indicator_label_5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Čvc"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/indicator_5"
+        app:layout_constraintEnd_toEndOf="@+id/indicator_5"
+        app:layout_constraintStart_toStartOf="@+id/indicator_5" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
