@@ -15,6 +15,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -46,7 +47,8 @@ interface Tick{
 class TrackedActivityAdapter(
     val vm: ActivitiesViewModel,
     val context: Context,
-    val drag: ItemTouchHelper
+    val drag: ItemTouchHelper,
+    val nav: NavController
 ) : ListAdapter<TrackedActivityWithMetric, TrackedActivityAdapter.ViewHolder>(
     TrackedActivityWithMetricDiff
 ), ItemTouchHelperAdapter {
@@ -181,8 +183,6 @@ class TrackedActivityAdapter(
                 }
             }
 
-
-
             act.setOnClickListener {
                 when(item.activity.type){
                     TrackedActivity.Type.SESSION -> {
@@ -209,7 +209,7 @@ class TrackedActivityAdapter(
 
             view.setOnClickListener {
                 //FragmentBaseTrackedTask.navigate(navController, item.task.id)
-                TODO()
+                nav.navigate(R.id.action_navigation_dashboard_to_activityFragment)
             }
         }
 
