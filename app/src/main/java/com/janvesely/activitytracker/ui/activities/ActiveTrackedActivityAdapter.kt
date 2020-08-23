@@ -109,6 +109,7 @@ class ActiveTrackedActivityAdapter(
 
             progress.setTypeface(null, Typeface.BOLD)
             name.text = item.name
+
             setTime(item.in_session_since!!)
 
 

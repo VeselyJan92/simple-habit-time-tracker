@@ -26,3 +26,14 @@ fun RecyclerView.setDivider(@DrawableRes drawableRes: Int) {
         addItemDecoration(divider)
     }
 }
+
+fun <T> Array<T>.leftShift(d: Int): Array<T> {
+    val newList = this.copyOf()
+    var shift = d
+    if (shift > size) shift %= size
+    forEachIndexed { index, value ->
+        val newIndex = (index + (size - shift)) % size
+        newList[newIndex] = value
+    }
+    return newList
+}

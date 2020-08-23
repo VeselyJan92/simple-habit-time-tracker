@@ -62,7 +62,7 @@ data class TrackedActivity(
     fun formatGoal() : String{
         return when(type){
             Type.SCORE -> expected.toString()
-            Type.SESSION ->"${expected / 60}:${expected % 60}"
+            Type.SESSION ->String.format("%02d:%02d", expected / (60*60), (expected/60) % 60)
             Type.COMPLETED -> ""
         }
     }

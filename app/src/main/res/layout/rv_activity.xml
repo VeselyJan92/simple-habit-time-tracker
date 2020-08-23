@@ -37,8 +37,9 @@
         android:layout_centerVertical="true"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="8dp"
+        android:layout_marginBottom="22dp"
         android:background="@drawable/ic_play_circle_filled_green_45dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/historyChart"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -46,7 +47,6 @@
         android:id="@+id/indicator_1"
         android:layout_width="40dp"
         android:layout_height="20dp"
-        android:layout_marginStart="8dp"
         android:background="@drawable/dr_activity_metric_indicator_completed"
         android:gravity="center"
         android:text="06:12"
@@ -110,25 +110,23 @@
         android:layout_height="20dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
         android:background="@drawable/dr_activity_metric_indicator_completed"
         android:gravity="center"
         android:text="ANO"
         android:textSize="10sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/indicator_4"
         app:layout_constraintTop_toBottomOf="@+id/chip_progress" />
 
     <com.google.android.material.chip.Chip
-        android:minWidth="130dp"
         android:id="@+id/chip_progress"
         style="@style/Widget.MaterialComponents.Chip.Action"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginEnd="8dp"
+        android:minWidth="130dp"
         android:text="000:00 / 000:00"
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
@@ -192,6 +190,22 @@
         app:layout_constraintBottom_toTopOf="@+id/indicator_5"
         app:layout_constraintEnd_toEndOf="@+id/indicator_5"
         app:layout_constraintStart_toStartOf="@+id/indicator_5" />
+
+
+    <com.janvesely.activitytracker.ui.views.HistoryChart
+        android:id="@+id/historyChart"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/indicator_3">
+
+    </com.janvesely.activitytracker.ui.views.HistoryChart>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

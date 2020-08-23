@@ -17,7 +17,7 @@ class RepositoryTrackedActivity(
 
 
     suspend fun getAllActivities(pastRanges: Int) =  AppDatabase.db.withTransaction {
-        AppDatabase.db.trackedActivity.getAll().map { activity ->
+        AppDatabase.db.trackedActivity.getAllWithoutInSession().map { activity ->
 
             val groupedMetric = activity.metric_range.getPastRanges(pastRanges).map {
                 it.apply { metric = getMetric(activity.id, activity.type, it.from, it.to) }

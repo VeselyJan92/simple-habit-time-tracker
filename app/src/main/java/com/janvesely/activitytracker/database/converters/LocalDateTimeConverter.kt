@@ -1,4 +1,4 @@
-package com.janvesely.getitdone.database.entities.converters
+package com.janvesely.activitytracker.database.converters
 
 import android.annotation.SuppressLint
 import androidx.room.TypeConverter
@@ -12,12 +12,11 @@ import java.util.*
 object LocalDateTimeConverter {
 
     @TypeConverter
-    @JvmStatic
     fun from(datetime: LocalDateTime?): String? {
         return datetime?.format(ISO_DATE_TIME)
     }
 
-    @TypeConverter @JvmStatic
+    @TypeConverter
     fun to(date: String?): LocalDateTime? {
         return if (date != null) LocalDateTime.parse(date, ISO_DATE_TIME) else null
     }

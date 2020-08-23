@@ -15,6 +15,7 @@ import android.widget.Scroller;
 
 public abstract class ScrollableChart extends View implements OnGestureListener, AnimatorUpdateListener {
     private int dataOffset;
+
     private GestureDetector detector;
     private int direction = 1;
     private int maxDataOffset = 10000;
@@ -25,9 +26,9 @@ public abstract class ScrollableChart extends View implements OnGestureListener,
 
     public interface ScrollController {
 
-        /* renamed from: org.isoron.uhabits.activities.common.views.ScrollableChart$ScrollController$-CC reason: invalid class name */
-        public final /* synthetic */ class CC {
+        public final  class CC {
             public static void $default$onDataOffsetChanged(ScrollController scrollController, int i) {
+
             }
         }
 

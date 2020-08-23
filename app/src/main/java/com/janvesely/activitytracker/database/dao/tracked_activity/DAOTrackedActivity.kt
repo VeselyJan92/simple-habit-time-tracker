@@ -21,12 +21,26 @@ abstract class DAOTrackedActivity :
 
 
 interface DAOTrackedActivitySelectable {
+    @Query("""
+        SELECT * FROM tracked_activity 
+        order by position
+   """)
+    fun getAllx(): List<TrackedActivity>
 
-    @Query("SELECT * FROM tracked_activity WHERE in_session='' or in_session=NULL or type != 'SESSION' order by position")
-    fun getAll(): List<TrackedActivity>
+
+    @Query("""
+        SELECT * FROM tracked_activity 
+        WHERE (type = 'SESSION' AND in_session is NULL) OR (type != 'SESSION') 
+        order by position
+   """)
+    fun getAllWithoutInSession(): List<TrackedActivity>
 
 
-    @Query("SELECT * FROM tracked_activity WHERE in_session!='' order by in_session")
+    @Query("""
+        SELECT * FROM tracked_activity 
+        WHERE in_session IS NOT NULL
+        order by in_session
+    """)
     fun liveActive(): LiveData<List<TrackedActivity>>
 
 

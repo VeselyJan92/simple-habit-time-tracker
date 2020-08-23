@@ -9,20 +9,28 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.MotionEvent
 import androidx.recyclerview.widget.ItemTouchHelper
-import java.text.SimpleDateFormat
+import com.janvesely.activitytracker.core.leftShift
+import java.text.DateFormatSymbols
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.math.min
 
-class HistoryChart : ScrollableChart {
-    private var baseDate: Calendar? = null
-    private var baseLocation: RectF? = null
+class HistoryChart(context: Context, attr: AttributeSet?) : ScrollableChart(context, attr) {
+
+    constructor(context: Context): this(context, null)
+
+    lateinit var baseDate: LocalDate
+    lateinit var baseLocation: RectF
     private lateinit var checkmarks: IntArray
     private lateinit var colors: IntArray
     private var columnHeight = 0f
     private var columnWidth = 0f
-    private var dfMonth: SimpleDateFormat? = null
-    private var dfYear: SimpleDateFormat? = null
+    private var dfMonth = DateTimeFormatter.ofPattern("MMM")
+    private var dfYear =  DateTimeFormatter.ofPattern("yyyy")
+
     private var firstWeekday = 1
+
     private var headerOverflow = 0.0f
     private var headerTextOffset = 0f
     private var isBackgroundTransparent = false
@@ -30,9 +38,11 @@ class HistoryChart : ScrollableChart {
     private var isNumerical = false
     private var nColumns = 0
     private var nDays = 0
-    private var pSquareBg: Paint? = null
-    private var pSquareFg: Paint? = null
-    private var pTextHeader: Paint? = null
+
+    lateinit var pSquareBg: Paint
+    lateinit var pSquareFg: Paint
+    lateinit var pTextHeader: Paint
+
     private var previousMonth: String? = null
     private var previousYear: String? = null
     private var primaryColor = 0
@@ -44,14 +54,9 @@ class HistoryChart : ScrollableChart {
     private var todayPositionInColumn = 0
 
 
-    constructor(context: Context?) : super(context) {
-        init()
-    }
 
-    constructor(
-        context: Context?,
-        attributeSet: AttributeSet?
-    ) : super(context, attributeSet) {
+
+    init{
         init()
     }
 
@@ -67,8 +72,9 @@ class HistoryChart : ScrollableChart {
         performHapticFeedback(3)
         return try {
             val pointerId = motionEvent.getPointerId(0)
-            positionToTimestamp(motionEvent.getX(pointerId), motionEvent.getY(pointerId))
-                ?: return false
+
+            positionToDate(motionEvent.getX(pointerId), motionEvent.getY(pointerId)) ?: return false
+
             val daysUntil: Int = 1
             val iArr = checkmarks
             if (daysUntil < iArr.size) {
@@ -119,8 +125,6 @@ class HistoryChart : ScrollableChart {
         postInvalidate()
     }
 
-
-
     fun setNumerical(z: Boolean) {
         isNumerical = z
     }
@@ -144,38 +148,40 @@ class HistoryChart : ScrollableChart {
         postInvalidate()
     }
 
-    /* access modifiers changed from: protected */
     fun initPaints() {
         pTextHeader = Paint()
-        pTextHeader!!.textAlign = Align.LEFT
-        pTextHeader!!.isAntiAlias = true
+        pTextHeader.textAlign = Align.LEFT
+        pTextHeader.isAntiAlias = true
         pSquareBg = Paint()
         pSquareFg = Paint()
-        pSquareFg!!.isAntiAlias = true
-        pSquareFg!!.textAlign = Align.CENTER
+        pSquareFg.isAntiAlias = true
+        pSquareFg.textAlign = Align.CENTER
     }
 
-    /* access modifiers changed from: protected */
     public override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val rectF = baseLocation
-        val f = columnWidth
-        val f2 = squareSpacing
-        rectF!![0.0f, 0.0f, f - f2] = f - f2
-        baseLocation!!.offset(paddingLeft.toFloat(), paddingTop.toFloat())
+        val width = columnWidth
+        val spacing = squareSpacing
+
+        rectF.set(0.0f, 0.0f, width - spacing,  width - spacing)
+
+        baseLocation.offset(paddingLeft.toFloat(), paddingTop.toFloat())
         headerOverflow = 0.0f
-        val str = ""
-        previousMonth = str
-        previousYear = str
-        pTextHeader!!.color = textColor
+
+        previousMonth = ""
+        previousYear = ""
+
+        pTextHeader.color = textColor
         updateDate()
-        val gregorianCalendar =
-            baseDate!!.clone() as GregorianCalendar
+
         for (i in 0 until nColumns - 1) {
-            drawColumn(canvas, baseLocation, gregorianCalendar, i)
-            baseLocation!!.offset(columnWidth, -columnHeight)
+            drawColumn(canvas, baseLocation, baseDate, i)
+            baseLocation.offset(columnWidth, -columnHeight)
+            baseDate = baseDate.plusDays(7)
         }
-        drawAxis(canvas, baseLocation)
+
+        drawWeekdays(canvas, baseLocation)
     }
 
     /* access modifiers changed from: protected */
@@ -183,130 +189,127 @@ class HistoryChart : ScrollableChart {
         setMeasuredDimension(MeasureSpec.getSize(i), MeasureSpec.getSize(i2))
     }
 
-    /* access modifiers changed from: protected */
-    public override fun onSizeChanged(i: Int, i2: Int, i3: Int, i4: Int) {
-        var i2 = i2
-        if (i2 < 8) {
-            i2 = ItemTouchHelper.Callback.DEFAULT_DRAG_ANIMATION_DURATION
-        }
-        val f = i2.toFloat()
-        val f2 = f / 8.0f
-        setScrollerBucketSize(f2.toInt())
+
+    public override fun onSizeChanged(width: Int, height: Int, ow: Int, oh: Int) {
+
+        val f = if (height < 8)
+            ItemTouchHelper.Callback.DEFAULT_DRAG_ANIMATION_DURATION.toFloat()
+        else
+            height.toFloat()
+
+
+        val vWidth = (f / 8.0f)
+        setScrollerBucketSize(vWidth.toInt())
         squareSpacing = InterfaceUtils.dpToPixels(context, 1.0f)
 
         val min = min(f * 0.06f, 30f)
 
-        pSquareFg!!.textSize = min
-        pTextHeader!!.textSize = min
-        squareTextOffset = pSquareFg!!.fontSpacing * 0.4f
-        headerTextOffset = pTextHeader!!.fontSpacing * 0.3f
+        pSquareFg.textSize = min
+        pTextHeader.textSize = min
+        squareTextOffset = pSquareFg.fontSpacing * 0.4f
+        headerTextOffset = pTextHeader.fontSpacing * 0.3f
+
         val weekdayLabelWidth = weekdayLabelWidth + headerTextOffset
         val paddingRight = (paddingRight + paddingLeft).toFloat()
-        columnWidth = f2
-        columnHeight = 8.0f * f2
-        nColumns = ((i.toFloat() - weekdayLabelWidth - paddingRight) / f2).toInt() + 1
+        columnWidth = vWidth
+        columnHeight = 8.0f * vWidth
+        nColumns = ((width.toFloat() - weekdayLabelWidth - paddingRight) / vWidth).toInt() + 1
         updateDate()
     }
 
-    private fun drawAxis(canvas: Canvas, rectF: RectF?) {
-        val fontSpacing = pTextHeader!!.fontSpacing * 0.4f
-        for (str in DateUtils.getShortWeekdayNames(firstWeekday)) {
-            rectF!!.offset(0.0f, columnWidth)
+    private fun drawWeekdays(canvas: Canvas, rectF: RectF) {
+        val fontSpacing = pTextHeader.fontSpacing * 0.4f
+
+
+        for (str in getWeekdays()) {
+            rectF.offset(0.0f, columnWidth)
             canvas.drawText(
                 str,
                 rectF.left + headerTextOffset,
                 rectF.centerY() + fontSpacing,
-                pTextHeader!!
+                pTextHeader
             )
         }
     }
 
-    private fun drawColumn(
-        canvas: Canvas,
-        rectF: RectF?,
-        gregorianCalendar: GregorianCalendar,
-        i: Int
-    ) {
-        drawColumnHeader(canvas, rectF, gregorianCalendar)
-        rectF!!.offset(0.0f, columnWidth)
-        for (i2 in 0..6) {
-            if (i != nColumns - 2 || dataOffset != 0 || i2 <= todayPositionInColumn) {
+    fun getWeekdays() = DateFormatSymbols.getInstance().shortWeekdays.sliceArray(1..7).leftShift( firstWeekday);
+
+    private fun drawColumn(canvas: Canvas, rectangle: RectF, _date: LocalDate, position: Int) {
+        var date = _date
+        drawColumnHeader(canvas, rectangle, date)
+
+        rectangle.offset(0.0f, columnWidth)
+        for (row in 0..6) {
+            if (position != nColumns - 2 || dataOffset != 0 || row <= todayPositionInColumn) {
                 drawSquare(
                     canvas,
-                    rectF,
-                    gregorianCalendar,
-                    dataOffset * 7 + nDays - (i + 1) * 7 + todayPositionInColumn - i2
+                    rectangle,
+                    date,
+                    dataOffset * 7 + nDays - (position + 1) * 7 + todayPositionInColumn - row
                 )
             }
-            gregorianCalendar.add(5, 1)
-            rectF.offset(0.0f, columnWidth)
+            date = date.plusDays(1L)
+            rectangle.offset(0.0f, columnWidth)
         }
     }
 
-    private fun drawColumnHeader(
-        canvas: Canvas,
-        rectF: RectF?,
-        gregorianCalendar: GregorianCalendar
-    ) {
-        var format = dfMonth!!.format(gregorianCalendar.time)
-        val format2 = dfYear!!.format(gregorianCalendar.time)
-        if (format != previousMonth) {
-            previousMonth = format
-        } else if (format2 != previousYear) {
-            previousYear = format2
-            format = format2
-        } else {
-            format = null
+    private fun drawColumnHeader(canvas: Canvas, rectF: RectF, date: LocalDate) {
+        var format = dfMonth.format(date)
+        val format2 = dfYear.format(date)
+
+        when {
+            format != previousMonth -> {
+                previousMonth = format
+            }
+            format2 != previousYear -> {
+                previousYear = format2
+                format = format2
+            }
+            else -> {
+                format = ""
+            }
         }
 
+
         canvas.drawText(
-            format,
-            rectF!!.left + headerOverflow,
+            format ?: "",
+            rectF.left + headerOverflow,
             rectF.bottom - headerTextOffset,
-            pTextHeader!!
+            pTextHeader
         )
-        headerOverflow += pTextHeader!!.measureText(format) + columnWidth * 0.2f
+        headerOverflow += pTextHeader.measureText(format) + columnWidth * 0.2f
         headerOverflow = Math.max(0.0f, headerOverflow - columnWidth)
     }
 
     private fun drawSquare(
         canvas: Canvas,
-        rectF: RectF?,
-        gregorianCalendar: GregorianCalendar,
+        rectangle: RectF,
+        date: LocalDate,
         i: Int
     ) {
-        val iArr = checkmarks
-        if (i >= iArr.size) {
-            pSquareBg!!.color = colors[0]
-        } else {
-            val i2 = iArr[i]
-            when {
-                i2 == 0 -> {
-                    pSquareBg!!.color = colors[0]
-                }
-                i2 < target -> {
-                    pSquareBg!!.color = if (isNumerical) textColor else colors[1]
-                }
-                else -> {
-                    pSquareBg!!.color = colors[2]
-                }
-            }
+        pSquareBg.color = when {
+            i >= checkmarks.size      -> colors[0]
+            checkmarks[i] == 0        -> colors[0]
+            checkmarks[i] < target    -> if (isNumerical) textColor else colors[1]
+            else                      -> colors[2]
         }
-        pSquareFg!!.color = reverseTextColor
-        canvas.drawRect(rectF!!, pSquareBg!!)
+
+        pSquareFg.color = reverseTextColor
+
+        canvas.drawRect(rectangle, pSquareBg)
         canvas.drawText(
-            Integer.toString(gregorianCalendar[5]),
-            rectF.centerX(),
-            rectF.centerY() + squareTextOffset,
-            pSquareFg!!
+            date.dayOfMonth.toString(),
+            rectangle.centerX(),
+            rectangle.centerY() + squareTextOffset,
+            pSquareFg
         )
     }
 
     private val weekdayLabelWidth: Float
         get() {
             var f = 0.0f
-            for (measureText in DateUtils.getShortWeekdayNames(firstWeekday)) {
-                f = Math.max(f, pSquareFg!!.measureText(measureText))
+            for (measureText in DateFormatSymbols.getInstance().shortWeekdays) {
+                f = Math.max(f, pSquareFg.measureText(measureText))
             }
             return f
         }
@@ -318,7 +321,6 @@ class HistoryChart : ScrollableChart {
         target = 2
         initColors()
         initPaints()
-        initDateFormats()
         initRects()
         populateWithRandomData()
     }
@@ -352,44 +354,33 @@ class HistoryChart : ScrollableChart {
         reverseTextColor = Color.GREEN
     }
 
-    private fun initDateFormats() {
-        val str = "yyyy"
-        val str2 = "MMM"
-        if (isInEditMode) {
-            dfMonth = SimpleDateFormat(str2, Locale.getDefault())
-            dfYear = SimpleDateFormat(str, Locale.getDefault())
-            return
-        }
-        dfMonth = SimpleDateFormat("dd")
-        dfYear = SimpleDateFormat("yyyy")
-    }
 
     private fun initRects() {
         baseLocation = RectF()
     }
 
-    private fun positionToTimestamp(f: Float, f2: Float): Timestamp? {
-        val f3 = columnWidth
-        val i = (f / f3).toInt()
-        val i2 = (f2 / f3).toInt()
-        if (i2 == 0 || i == nColumns - 1) {
+    private fun positionToDate(x: Float, y: Float): LocalDate? {
+        val weeks = (x / columnWidth).toInt()
+        val days = (y / columnWidth).toInt()
+
+        if (days == 0 || weeks == nColumns - 1)
             return null
-        }
-        val i3 = i * 7 + (i2 - 1)
-        val calendar = baseDate!!.clone() as Calendar
-        calendar.add(6, i3)
-        return if (DateUtils.getStartOfDay(calendar.timeInMillis) > DateUtils.getStartOfToday()) {
+
+
+        return if (baseDate.atStartOfDay() > LocalDate.now().atStartOfDay())
             null
-        } else Timestamp(calendar.timeInMillis)
+        else
+            baseDate.plusDays(weeks * 7L + (days - 1))
+
     }
 
     private fun updateDate() {
-        baseDate = DateUtils.getStartOfTodayCalendar()
-        baseDate!!.add(6, -(dataOffset - 1) * 7)
         nDays = (nColumns - 1) * 7
-        todayPositionInColumn =
-            (DateUtils.getStartOfTodayCalendar().get(7) + 7 - firstWeekday) % 7
-        baseDate!!.add(6, -nDays)
-        baseDate!!.add(6, -todayPositionInColumn)
+        todayPositionInColumn = (LocalDate.now().dayOfWeek.value + 7 - firstWeekday) % 7
+
+        val x = -(dataOffset - 1) * 7 - nDays - todayPositionInColumn
+        baseDate = LocalDate.now().plusDays(x.toLong())
+
+
     }
 }

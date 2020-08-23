@@ -18,7 +18,7 @@ import com.janvesely.activitytracker.database.entities.TrackedActivitySession
 import com.janvesely.activitytracker.database.converters.TimeRangeConverter
 import com.janvesely.activitytracker.database.converters.LocalDateConverter
 import com.janvesely.activitytracker.database.embedable.TimeRange
-import com.janvesely.getitdone.database.entities.converters.LocalDateTimeConverter
+import com.janvesely.activitytracker.database.converters.LocalDateTimeConverter
 import com.janvesely.getitdone.database.entities.converters.LocalTimeConverter
 import com.janvesely.getitdone.database.entities.converters.TrackedActivityTypeConverter
 import kotlinx.coroutines.GlobalScope
@@ -124,8 +124,8 @@ abstract class AppDatabase : RoomDatabase() {
                 range = TimeRange.MONTHLY
             ))
 
-            val start = LocalTime.of(9, 0)
-            val end = LocalTime.of(15, 0)
+            val start = LocalTime.of(9, 21)
+            val end = LocalTime.of(11, 32)
 
             db.trackedActivitySession.insert(s.getTrackedTaskSession(
                 activityId = id,
@@ -140,13 +140,11 @@ abstract class AppDatabase : RoomDatabase() {
             ))
 
 
-
-
-     /*       id = db.trackedActivity.insert(s.getTrackedActivity(
+            id = db.trackedActivity.insert(s.getTrackedActivity(
                 type = TrackedActivity.Type.SESSION,
                 name = "Zajímavosti",
                 position = 4,
-                inSession = LocalDateTime.now(),
+                inSession = null,
                 goal = 0,
                 range = TimeRange.DAILY
             ))
@@ -162,12 +160,10 @@ abstract class AppDatabase : RoomDatabase() {
                 activityId = id,
                 start = LocalDate.now().minusDays(1).atTime(start),
                 end = LocalDate.now().minusDays(1).atTime(end)
-            ))*/
+            ))
 
 
-            val xx = db.trackedActivityCompletion.getAll()
-
-            print("X")
+            val xx = db.trackedActivity.getAllx()
 
         }
 
