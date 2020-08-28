@@ -22,7 +22,7 @@ class ActivityFragment : Fragment() {
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-    )  = inflater.inflate(R.layout.fragment_activity, container, false)
+    )  = inflater.inflate(R.layout.rv_activity_test, container, false)
 
 
 

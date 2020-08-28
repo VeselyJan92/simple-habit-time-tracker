@@ -211,8 +211,11 @@ class HistoryChart(context: Context, attr: AttributeSet?) : ScrollableChart(cont
 
         val weekdayLabelWidth = weekdayLabelWidth + headerTextOffset
         val paddingRight = (paddingRight + paddingLeft).toFloat()
+
         columnWidth = vWidth
         columnHeight = 8.0f * vWidth
+
+
         nColumns = ((width.toFloat() - weekdayLabelWidth - paddingRight) / vWidth).toInt() + 1
         updateDate()
     }

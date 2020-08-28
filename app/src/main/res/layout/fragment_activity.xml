@@ -6,6 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
+    <include layout="@layout/rv_activity_test" />
+
+
     <com.janvesely.activitytracker.ui.views.HistoryChart
         android:layout_width="match_parent"
         android:layout_height="200dp"
