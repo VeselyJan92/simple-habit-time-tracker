@@ -16,7 +16,7 @@ typealias RangeInterval = List<Pair<LocalDateTime, LocalDateTime>>
 enum class TimeRange {
     DAILY, WEEKLY, MONTHLY;
 
-    fun getLabel(context: Context, datetime: LocalDateTime) = when(this){
+    fun getLabel( datetime: LocalDateTime): String = when(this){
         DAILY -> datetime.dayOfMonth.toString()
         WEEKLY -> "WEEK"
         MONTHLY ->  datetime.format(DateTimeFormatter.ofPattern("MMM"))
@@ -25,7 +25,7 @@ enum class TimeRange {
 
     fun getCurrent() = getPastRanges(0).first()
 
-    fun getPastRanges(periods: Int) = when(this){
+    fun getPastRanges(periods: Int = 5) = when(this){
         DAILY -> getDays(periods)
         WEEKLY -> getWeeks(periods)
         MONTHLY -> getMonths(periods)

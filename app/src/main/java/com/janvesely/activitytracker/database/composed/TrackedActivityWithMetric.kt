@@ -1,14 +1,9 @@
 package com.janvesely.activitytracker.database.composed
 
-import android.content.Context
 import androidx.recyclerview.widget.DiffUtil
-import androidx.room.ColumnInfo
-import androidx.room.Embedded
 import com.janvesely.activitytracker.database.embedable.TimeRange
 import com.janvesely.activitytracker.database.entities.TrackedActivity
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 
 data class ViewRangeData(
@@ -16,9 +11,21 @@ data class ViewRangeData(
     val from: LocalDateTime,
     val to: LocalDateTime
 ) {
+    var goal = 0
     var metric: Int = 0
 
-    fun getLabel(context: Context) = type.getLabel(context, from)
+    lateinit var format: TrackedActivity.Type
+
+
+    fun getLabel() = type.getLabel(from)
+
+    fun formatMetric() = format.format(metric)
+
+    fun formatGoal() = format.format(goal)
+
+    fun progress() = if (goal == 0 || format == TrackedActivity.Type.COMPLETED) formatMetric() else "${formatMetric()} / ${formatGoal()}"
+
+    fun isCompleted() = metric >= goal
 
 }
 
@@ -28,6 +35,12 @@ data class TrackedActivityWithMetric(
 ) {
     var completed = past[0].metric >= activity.expected
 
+    init {
+        past.forEach {
+            it.format = activity.type
+            it.goal = activity.expected
+        }
+    }
 
 }
 

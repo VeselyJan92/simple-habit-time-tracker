@@ -1,3 +1,4 @@
+/*
 
 package com.janvesely.activitytracker.ui.activities
 
@@ -5,15 +6,12 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
-import android.graphics.drawable.ShapeDrawable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -28,16 +26,12 @@ import com.janvesely.activitytracker.database.entities.TrackedActivity
 import com.janvesely.activitytracker.ui.other.dragandrop.ItemTouchHelperAdapter
 import com.janvesely.activitytracker.ui.other.dragandrop.ItemTouchHelperViewHolder
 import kotlinx.android.synthetic.main.rv_activity.view.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.TickerMode
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.ticker
 import kotlinx.coroutines.launch
-import java.lang.Exception
 import java.time.Duration
 import java.time.LocalDateTime
-import kotlin.math.log
 
 interface Tick{
     fun onTick();
@@ -124,6 +118,28 @@ class TrackedActivityAdapter(
         val indicator_label_5: TextView = view.indicator_label_5
 
 
+    */
+/*    val act: ImageButton = TODO()
+        val name: TextView = TODO()
+        val progress: Chip = TODO()
+
+        val indicator_1: TextView = TODO()
+        val indicator_label_1: TextView = TODO()
+
+        val indicator_2: TextView = TODO()
+        val indicator_label_2: TextView = TODO()
+
+        val indicator_3: TextView =TODO()
+        val indicator_label_3: TextView = TODO()
+
+        val indicator_4: TextView = TODO()
+        val indicator_label_4: TextView =TODO()
+
+        val indicator_5: TextView = TODO()
+        val indicator_label_5: TextView = TODO()*//*
+
+
+
 
 
         override fun onItemSelected() = itemView.setBackgroundColor(Color.parseColor("#BDBDBD"))
@@ -193,9 +209,11 @@ class TrackedActivityAdapter(
                     }
                     TrackedActivity.Type.SCORE -> TODO()
                     TrackedActivity.Type.COMPLETED -> {
-                       /* if ()
+                       */
+/* if ()
 
-                        vm.completeTask()*/
+                        vm.completeTask()*//*
+
                     }
                 }
             }
@@ -269,3 +287,4 @@ class TrackedActivityAdapter(
 
 
 }
+*/

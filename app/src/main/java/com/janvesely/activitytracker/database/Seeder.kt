@@ -1,29 +1,28 @@
 package com.janvesely.activitytracker.database
 
-import android.content.Context
-import com.janvesely.activitytracker.R
+import androidx.compose.ui.graphics.Color
+import com.janvesely.activitytracker.database.composed.TrackedActivityWithMetric
 import com.janvesely.activitytracker.database.embedable.TimeRange
 import com.janvesely.activitytracker.database.entities.TrackedActivity
 import com.janvesely.activitytracker.database.entities.TrackedActivityCompletion
 import com.janvesely.activitytracker.database.entities.TrackedActivityScore
 import com.janvesely.activitytracker.database.entities.TrackedActivitySession
-import java.text.FieldPosition
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 import kotlin.random.Random.Default.nextInt
 
-class Seeder(private val context: Context) {
+class Seeder {
 
     private fun randomWord(): String{
         val words = arrayOf("Lorem", "Ipsum", "dolor", "sit", "amet")
         return words[Random().nextInt(words.size)]
     }
 
-    private fun randomColor(): String{
+/*    private fun randomColor(): String{
         val colors = context.resources.getStringArray(R.array.tracked_task_colors)
         return colors[Random().nextInt(colors.size)]
-    }
+    }*/
 
    /* private fun randomIcon(): String {
         val icons = context.resources.getStringArray(R.array.tracked_task_icons)
@@ -46,8 +45,8 @@ class Seeder(private val context: Context) {
         type: TrackedActivity.Type = TrackedActivity.Type.COMPLETED,
         inSession: LocalDateTime? = null,
         range: TimeRange = TimeRange.DAILY,
-        goal: Int = 10,
-        color: String = randomColor(),
+        goal: Int = 0,
+        color: String = Color.Blue.toString(),
         icon: String = ""
     ) = TrackedActivity(id, name, position, type, inSession, range, goal, color, icon)
 
@@ -72,5 +71,35 @@ class Seeder(private val context: Context) {
         start: LocalDateTime = shiftDateTime(nextInt(0, 2), nextInt(-1, 1)),
         end: LocalDateTime = start.plusHours(1)
     )  = TrackedActivitySession(id, activityId, start, end)
+
+
+    fun getTrackedActivityWithMetric(
+        activity: TrackedActivity = getTrackedActivity()
+    ): TrackedActivityWithMetric {
+
+        val data =  activity.metric_range.getPastRanges()
+
+        when(activity.type){
+            TrackedActivity.Type.SESSION -> data.apply {
+                this[1].metric = 60 * 124
+                this[2].metric = 60 * 124
+                this[4].metric = 60 * 124
+            }
+
+            TrackedActivity.Type.SCORE -> data.apply {
+                this[1].metric = 2
+                this[2].metric = 3
+                this[4].metric = 2
+            }
+
+            TrackedActivity.Type.COMPLETED -> data.apply {
+                this[1].metric = 0
+                this[2].metric = 1
+                this[4].metric = 1
+            }
+        }
+
+        return TrackedActivityWithMetric(activity, data)
+    }
 
 }

@@ -1,3 +1,4 @@
+/*
 
 package com.janvesely.activitytracker.ui.activities
 
@@ -149,3 +150,4 @@ class ActiveTrackedActivityAdapter(
 
 
 }
+*/

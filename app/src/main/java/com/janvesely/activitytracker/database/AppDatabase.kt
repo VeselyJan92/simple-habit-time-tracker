@@ -80,7 +80,7 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         private suspend fun seed(db: AppDatabase, context: Context){
-            val s = Seeder(context)
+            val s = Seeder()
 
             var id = db.trackedActivity.insert(s.getTrackedActivity(
                 type = TrackedActivity.Type.SCORE,

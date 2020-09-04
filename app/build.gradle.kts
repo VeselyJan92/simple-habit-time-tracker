@@ -2,13 +2,35 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    id("kotlin-android-extensions")
     id("kotlin-kapt")
+    id("kotlin-android-extensions")
 }
 
 android {
     compileSdkVersion(30)
-    buildToolsVersion = "30.0.1"
+    buildToolsVersion = "30.0.2"
+
+    buildFeatures {
+        // Enables Jetpack Compose for this module
+        compose =  true
+    }
+
+    composeOptions {
+        kotlinCompilerVersion = "1.4.0"
+        kotlinCompilerExtensionVersion ="1.0.0-alpha01"
+
+    }
+
+    compileOptions {
+        sourceCompatibility =  JavaVersion.VERSION_1_8
+        targetCompatibility  = JavaVersion.VERSION_1_8
+    }
+
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+        useIR = true
+    }
 
     defaultConfig {
         applicationId ="com.janvesely.activitytracker"
@@ -27,22 +49,18 @@ android {
         }
     }
 
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-
 }
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.3.72")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.0")
     implementation("androidx.core:core-ktx:1.3.1")
 
-    implementation("androidx.appcompat:appcompat:1.1.0")
+    implementation("androidx.appcompat:appcompat:1.2.0")
 
-    implementation("com.google.android.material:material:1.1.0")
+    implementation("com.google.android.material:material:1.2.0")
 
-    implementation("androidx.constraintlayout:constraintlayout:1.1.3")
+    implementation("androidx.constraintlayout:constraintlayout:2.0.1")
 
 
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
@@ -51,6 +69,15 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.3.0")
     implementation("androidx.navigation:navigation-ui:2.3.0")
     implementation("androidx.navigation:navigation-ui-ktx:2.3.0")
+
+
+
+    implementation("androidx.compose.ui:ui:1.0.0-alpha01")
+    implementation("androidx.compose.material:material:1.0.0-alpha01")
+    implementation("androidx.ui:ui-tooling:1.0.0-alpha01")
+    implementation("androidx.compose.runtime:runtime-livedata:1.0.0-alpha01")
+    implementation("androidx.compose.foundation:foundation:1.0.0-alpha01")
+
 
 
 
@@ -64,4 +91,14 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
 
+}
+
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class.java).configureEach {
+    kotlinOptions {
+        jvmTarget = "1.8"
+        freeCompilerArgs += "-Xallow-jvm-ir-dependencies"
+        freeCompilerArgs += "-Xskip-prerelease-check"
+        freeCompilerArgs += "-Xopt-in=androidx.compose.ui.node.ExperimentalLayoutNodeApi"
+    }
 }

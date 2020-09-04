@@ -1,29 +1,38 @@
 package com.janvesely.activitytracker.ui.activities
 
+import android.content.res.Resources
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Recomposer
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.setContent
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.janvesely.activitytracker.R
-import com.janvesely.activitytracker.core.setDivider
-import com.janvesely.activitytracker.ui.other.dragandrop.SimpleItemTouchHelperCallback
-import kotlinx.android.synthetic.main.fragment_activities.*
+import com.janvesely.activitytracker.ui.activities.composable.BaseRow
 
 class ActivityFragment : Fragment() {
 
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-    )  = inflater.inflate(R.layout.rv_activity_test, container, false)
-
-
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                BaseRow()
+            }
+        }
+    }
 
 }
+
+
+

@@ -5,6 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+<!--
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
 
 
@@ -128,1556 +138,752 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/cardView">
 
-
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    android:orientation="vertical">
-
+                    android:layout_height="300dp">
 
                     <TextView
-                        android:layout_width="match_parent"
+                        android:id="@+id/textView"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Leden 2020"
-                        android:textAlignment="center"
-                        android:textSize="24sp"
-                        android:textStyle="bold">
+                        android:layout_marginStart="8dp"
+                        android:text="Poslední aktivita"
+                        android:textAlignment="viewStart"
+                        android:textColor="@android:color/black"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="@+id/button"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/button">
 
                     </TextView>
 
+                    <Button
+                        android:id="@+id/button"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:text="Historie"
+                        app:icon="@drawable/ic_baseline_calendar_today_24"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-                    <LinearLayout
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/constraintLayout"
+                        :android="http://schemas.android.com/apk/res/android"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp">
+                        android:orientation="vertical"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/button">
+
+
+                        <TextView
+                            android:id="@+id/indicator_1"
+                            android:layout_width="40dp"
+                            android:layout_height="20dp"
+                            android:background="@drawable/dr_activity_metric_indicator_completed"
+                            android:gravity="center"
+                            android:text="06:12"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="@+id/indicator_5"
+                            app:layout_constraintEnd_toStartOf="@+id/indicator_4"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintStart_toEndOf="@+id/indicator_5"
+                            app:layout_constraintTop_toTopOf="@+id/indicator_5" />
+
+                        <TextView
+                            android:id="@+id/indicator_4"
+                            android:layout_width="40dp"
+                            android:layout_height="20dp"
+                            android:background="@drawable/dr_activity_metric_indicator_completed"
+                            android:gravity="center"
+                            android:text="28"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="@+id/indicator_1"
+                            app:layout_constraintEnd_toStartOf="@+id/indicator_3"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintStart_toEndOf="@+id/indicator_1"
+                            app:layout_constraintTop_toTopOf="@+id/indicator_1" />
+
+                        <TextView
+                            android:id="@+id/indicator_3"
+                            android:layout_width="40dp"
+                            android:layout_height="20dp"
+                            android:background="@drawable/dr_activity_metric_indicator_completed"
+                            android:gravity="center"
+                            android:text="27"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="@+id/indicator_4"
+                            app:layout_constraintEnd_toStartOf="@+id/indicator_2"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintStart_toEndOf="@+id/indicator_4"
+                            app:layout_constraintTop_toTopOf="@+id/indicator_4" />
+
+                        <TextView
+                            android:id="@+id/indicator_2"
+                            android:layout_width="40dp"
+                            android:layout_height="20dp"
+                            android:layout_marginEnd="8dp"
+                            android:background="@drawable/dr_activity_metric_indicator_completed"
+                            android:gravity="center"
+                            android:text="07:02"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="@+id/indicator_3"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintStart_toEndOf="@+id/indicator_3"
+                            app:layout_constraintTop_toTopOf="@+id/indicator_3" />
+
+                        <TextView
+                            android:id="@+id/indicator_5"
+                            android:layout_width="40dp"
+                            android:layout_height="20dp"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="16dp"
+                            android:background="@drawable/dr_activity_metric_indicator_completed"
+                            android:gravity="center"
+                            android:text="ANO"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toStartOf="@+id/indicator_1"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintHorizontal_chainStyle="spread_inside"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/indicator_label_1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="TÝDEN"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                            android:textSize="10sp"
+                            app:layout_constraintBottom_toTopOf="@+id/indicator_1"
+                            app:layout_constraintEnd_toEndOf="@+id/indicator_1"
+                            app:layout_constraintStart_toStartOf="@+id/indicator_1"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/indicator_label_2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="TÝDEN"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                            android:textSize="10sp"
+                            app:layout_constraintBottom_toTopOf="@+id/indicator_2"
+                            app:layout_constraintEnd_toEndOf="@+id/indicator_2"
+                            app:layout_constraintStart_toStartOf="@+id/indicator_2"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/indicator_label_3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="TÝDEN"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                            android:textSize="10sp"
+                            app:layout_constraintBottom_toTopOf="@+id/indicator_3"
+                            app:layout_constraintEnd_toEndOf="@+id/indicator_3"
+                            app:layout_constraintStart_toStartOf="@+id/indicator_3"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/indicator_label_4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="2dp"
+                            android:text="TÝDEN"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                            android:textSize="10sp"
+                            app:layout_constraintBottom_toTopOf="@+id/indicator_4"
+                            app:layout_constraintEnd_toEndOf="@+id/indicator_4"
+                            app:layout_constraintStart_toStartOf="@+id/indicator_4"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/indicator_label_5"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Čvc"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                            android:textSize="10sp"
+                            app:layout_constraintBottom_toTopOf="@+id/indicator_5"
+                            app:layout_constraintEnd_toEndOf="@+id/indicator_5"
+                            app:layout_constraintStart_toStartOf="@+id/indicator_5"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <LinearLayout
+                        android:id="@+id/linearLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
+                        android:orientation="vertical"
+                        app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
+                        tools:layout_editor_absoluteX="0dp">
+
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:layout_marginBottom="8dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
 
 
-                            <TextView
-                                android:layout_width="40dp"
+                                <TextView
+                                    android:layout_width="40dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
+                                    android:gravity="center"
+                                    android:text="PO"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1" />
+
+                                <TextView
+                                    android:layout_width="40dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
+                                    android:gravity="center"
+                                    android:text="ÚT"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1" />
+
+                                <TextView
+                                    android:layout_width="40dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
+                                    android:gravity="center"
+                                    android:text="ST"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1" />
+
+                                <TextView
+                                    android:layout_width="40dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
+                                    android:gravity="center"
+                                    android:text="ČT"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1" />
+
+                                <TextView
+                                    android:layout_width="40dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
+                                    android:gravity="center"
+                                    android:text="PA"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1" />
+
+                                <TextView
+                                    android:layout_width="40dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
+                                    android:gravity="center"
+                                    android:text="SO"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1" />
+
+                                <TextView
+                                    android:layout_width="40dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
+                                    android:gravity="center"
+                                    android:text="NE"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+
+
+                            </LinearLayout>
+
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp">
+
+                            <LinearLayout
+
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="PO"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical"
+                                android:visibility="visible">
+
+                                <TextView
+                                    android:layout_width="20dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_gravity="center_horizontal"
+                                    android:gravity="center"
+                                    android:text="1"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                    android:textSize="10sp" />
+
+                                <TextView
+                                    android:layout_width="40dp"
+                                    android:layout_height="20dp"
+                                    android:background="@drawable/dr_activity_metric_indicator_table"
+                                    android:gravity="center"
+                                    android:text="06:12"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold"
+                                    tools:visibility="visible" />
+
+                            </LinearLayout>
 
                             <TextView
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1" />
 
-                            <TextView
-                                android:layout_width="40dp"
+                            <LinearLayout
+
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="PO"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical"
+                                android:visibility="visible">
+
+                                <TextView
+                                    android:layout_width="20dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_gravity="center_horizontal"
+                                    android:gravity="center"
+                                    android:text="1"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                    android:textSize="10sp" />
+
+                                <TextView
+                                    android:layout_width="40dp"
+                                    android:layout_height="20dp"
+                                    android:background="@drawable/dr_activity_metric_indicator_table"
+                                    android:gravity="center"
+                                    android:text="06:12"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+
+                            </LinearLayout>
 
                             <TextView
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1" />
 
-                            <TextView
-                                android:layout_width="40dp"
+                            <LinearLayout
+
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="PO"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical"
+                                android:visibility="visible">
+
+                                <TextView
+                                    android:layout_width="20dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_gravity="center_horizontal"
+                                    android:gravity="center"
+                                    android:text="1"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                    android:textSize="10sp" />
+
+                                <TextView
+                                    android:layout_width="40dp"
+                                    android:layout_height="20dp"
+                                    android:background="@drawable/dr_activity_metric_indicator_table"
+                                    android:gravity="center"
+                                    android:text="06:12"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+
+                            </LinearLayout>
 
                             <TextView
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1" />
 
-                            <TextView
-                                android:layout_width="40dp"
+                            <LinearLayout
+
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="PO"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical"
+                                android:visibility="visible">
+
+                                <TextView
+                                    android:layout_width="20dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_gravity="center_horizontal"
+                                    android:gravity="center"
+                                    android:text="1"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                    android:textSize="10sp" />
+
+                                <TextView
+                                    android:layout_width="40dp"
+                                    android:layout_height="20dp"
+                                    android:background="@drawable/dr_activity_metric_indicator_table"
+                                    android:gravity="center"
+                                    android:text="06:12"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+
+                            </LinearLayout>
 
                             <TextView
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1" />
 
-                            <TextView
-                                android:layout_width="40dp"
+                            <LinearLayout
+
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="PO"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical"
+                                android:visibility="visible">
+
+                                <TextView
+                                    android:layout_width="20dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_gravity="center_horizontal"
+                                    android:gravity="center"
+                                    android:text="1"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                    android:textSize="10sp" />
+
+                                <TextView
+                                    android:layout_width="40dp"
+                                    android:layout_height="20dp"
+                                    android:background="@drawable/dr_activity_metric_indicator_table"
+                                    android:gravity="center"
+                                    android:text="06:12"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+
+                            </LinearLayout>
 
                             <TextView
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1" />
 
-                            <TextView
-                                android:layout_width="40dp"
+                            <LinearLayout
+
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="PO"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical"
+                                android:visibility="invisible">
+
+                                <TextView
+                                    android:layout_width="20dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_gravity="center_horizontal"
+                                    android:gravity="center"
+                                    android:text="1"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                    android:textSize="10sp" />
+
+                                <TextView
+                                    android:layout_width="40dp"
+                                    android:layout_height="20dp"
+                                    android:background="@drawable/dr_activity_metric_indicator_table"
+                                    android:gravity="center"
+                                    android:text="06:12"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+
+                            </LinearLayout>
 
                             <TextView
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1" />
 
-                            <TextView
-                                android:layout_width="40dp"
+                            <LinearLayout
+
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="PO"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical"
+                                android:visibility="invisible">
+
+                                <TextView
+                                    android:layout_width="20dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_gravity="center_horizontal"
+                                    android:gravity="center"
+                                    android:text="1"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                    android:textSize="10sp" />
+
+                                <TextView
+                                    android:layout_width="40dp"
+                                    android:layout_height="20dp"
+                                    android:background="@drawable/dr_activity_metric_indicator_table"
+                                    android:gravity="center"
+                                    android:text="06:12"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+
+                            </LinearLayout>
 
 
                         </LinearLayout>
 
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/constraintLayout"
+                            :android="http://schemas.android.com/apk/res/android"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/button">
+
+
+                            <TextView
+                                android:id="@+id/indicator_1"
+                                android:layout_width="40dp"
+                                android:layout_height="20dp"
+                                android:background="@drawable/dr_activity_metric_indicator_completed"
+                                android:gravity="center"
+                                android:text="06:12"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="@+id/indicator_5"
+                                app:layout_constraintEnd_toStartOf="@+id/indicator_4"
+                                app:layout_constraintHorizontal_bias="0.5"
+                                app:layout_constraintStart_toEndOf="@+id/indicator_5"
+                                app:layout_constraintTop_toTopOf="@+id/indicator_5" />
+
+                            <TextView
+                                android:id="@+id/indicator_4"
+                                android:layout_width="40dp"
+                                android:layout_height="20dp"
+                                android:background="@drawable/dr_activity_metric_indicator_completed"
+                                android:gravity="center"
+                                android:text="28"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="@+id/indicator_1"
+                                app:layout_constraintEnd_toStartOf="@+id/indicator_3"
+                                app:layout_constraintHorizontal_bias="0.5"
+                                app:layout_constraintStart_toEndOf="@+id/indicator_1"
+                                app:layout_constraintTop_toTopOf="@+id/indicator_1" />
+
+                            <TextView
+                                android:id="@+id/indicator_3"
+                                android:layout_width="40dp"
+                                android:layout_height="20dp"
+                                android:background="@drawable/dr_activity_metric_indicator_completed"
+                                android:gravity="center"
+                                android:text="27"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="@+id/indicator_4"
+                                app:layout_constraintEnd_toStartOf="@+id/indicator_2"
+                                app:layout_constraintHorizontal_bias="0.5"
+                                app:layout_constraintStart_toEndOf="@+id/indicator_4"
+                                app:layout_constraintTop_toTopOf="@+id/indicator_4" />
+
+                            <TextView
+                                android:id="@+id/indicator_2"
+                                android:layout_width="40dp"
+                                android:layout_height="20dp"
+                                android:layout_marginEnd="8dp"
+                                android:background="@drawable/dr_activity_metric_indicator_completed"
+                                android:gravity="center"
+                                android:text="07:02"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="@+id/indicator_3"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintHorizontal_bias="0.5"
+                                app:layout_constraintStart_toEndOf="@+id/indicator_3"
+                                app:layout_constraintTop_toTopOf="@+id/indicator_3" />
+
+                            <TextView
+                                android:id="@+id/indicator_5"
+                                android:layout_width="40dp"
+                                android:layout_height="20dp"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginTop="16dp"
+                                android:background="@drawable/dr_activity_metric_indicator_completed"
+                                android:gravity="center"
+                                android:text="ANO"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                app:layout_constraintEnd_toStartOf="@+id/indicator_1"
+                                app:layout_constraintHorizontal_bias="0.5"
+                                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/indicator_label_1"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="TÝDEN"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                android:textSize="10sp"
+                                app:layout_constraintBottom_toTopOf="@+id/indicator_1"
+                                app:layout_constraintEnd_toEndOf="@+id/indicator_1"
+                                app:layout_constraintStart_toStartOf="@+id/indicator_1"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/indicator_label_2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="TÝDEN"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                android:textSize="10sp"
+                                app:layout_constraintBottom_toTopOf="@+id/indicator_2"
+                                app:layout_constraintEnd_toEndOf="@+id/indicator_2"
+                                app:layout_constraintStart_toStartOf="@+id/indicator_2"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/indicator_label_3"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="TÝDEN"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                android:textSize="10sp"
+                                app:layout_constraintBottom_toTopOf="@+id/indicator_3"
+                                app:layout_constraintEnd_toEndOf="@+id/indicator_3"
+                                app:layout_constraintStart_toStartOf="@+id/indicator_3"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/indicator_label_4"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="2dp"
+                                android:text="TÝDEN"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                android:textSize="10sp"
+                                app:layout_constraintBottom_toTopOf="@+id/indicator_4"
+                                app:layout_constraintEnd_toEndOf="@+id/indicator_4"
+                                app:layout_constraintStart_toStartOf="@+id/indicator_4"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/indicator_label_5"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Čvc"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                android:textSize="10sp"
+                                app:layout_constraintBottom_toTopOf="@+id/indicator_5"
+                                app:layout_constraintEnd_toEndOf="@+id/indicator_5"
+                                app:layout_constraintStart_toStartOf="@+id/indicator_5"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
                     </LinearLayout>
 
-                    <LinearLayout
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="500dp">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp">
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical"
-                            android:visibility="invisible">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical"
-                            android:visibility="invisible">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical"
-                            android:visibility="invisible">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical"
-                            android:visibility="invisible">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp">
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp">
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp">
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp">
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp">
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical"
-                            android:visibility="invisible">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical"
-                            android:visibility="invisible">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical"
-                            android:visibility="invisible">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-
-                        <LinearLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical"
-                            android:visibility="invisible">
-
-                            <TextView
-                                android:layout_width="20dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="20dp"
-                                android:background="@drawable/dr_activity_metric_indicator_table"
-                                android:gravity="center"
-                                android:text="06:12"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-
-                    </LinearLayout>
-
+                        android:text="Poslední záznamy"
+                        android:textAlignment="viewStart"
+                        android:textColor="@android:color/black"
+                        android:textSize="24sp"
+                        android:textStyle="bold">
+                    </TextView>
 
                 </LinearLayout>
+
+
+
+
 
 
             </androidx.cardview.widget.CardView>
@@ -1702,4 +908,4 @@
         app:srcCompat="@drawable/ic_acitivity_add_circle_40dp" />
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>-->
