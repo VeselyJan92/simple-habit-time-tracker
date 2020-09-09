@@ -41,6 +41,9 @@ fun ActivitiesScreen(){
             Temp()
 
         },
+        bottomBar = {
+            LiveActivitiesList()
+        },
         backgroundColor = Colors.AppBackground
     )
 

@@ -17,7 +17,7 @@ android {
 
     composeOptions {
         kotlinCompilerVersion = "1.4.0"
-        kotlinCompilerExtensionVersion ="1.0.0-alpha01"
+        kotlinCompilerExtensionVersion ="1.0.0-alpha02"
 
     }
 
@@ -58,7 +58,7 @@ dependencies {
 
     implementation("androidx.appcompat:appcompat:1.2.0")
 
-    implementation("com.google.android.material:material:1.2.0")
+    implementation("com.google.android.material:material:1.2.1")
 
     implementation("androidx.constraintlayout:constraintlayout:2.0.1")
 
@@ -72,11 +72,12 @@ dependencies {
 
 
 
-    implementation("androidx.compose.ui:ui:1.0.0-alpha01")
-    implementation("androidx.compose.material:material:1.0.0-alpha01")
-    implementation("androidx.ui:ui-tooling:1.0.0-alpha01")
-    implementation("androidx.compose.runtime:runtime-livedata:1.0.0-alpha01")
-    implementation("androidx.compose.foundation:foundation:1.0.0-alpha01")
+    implementation("androidx.compose.ui:ui:1.0.0-alpha02")
+    implementation("androidx.compose.material:material:1.0.0-alpha02")
+    implementation("androidx.ui:ui-tooling:1.0.0-alpha02")
+    implementation("androidx.compose.runtime:runtime-livedata:1.0.0-alpha02")
+    implementation("androidx.compose.foundation:foundation:1.0.0-alpha02")
+    implementation("androidx.compose.material:material-icons-extended:1.0.0-alpha02")
 
 
 

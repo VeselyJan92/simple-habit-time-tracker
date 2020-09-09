@@ -46,7 +46,7 @@ data class TrackedActivity(
         const val TABLE = "tracked_activity"
     }
 
-    fun isActivityMeasured() = expected != 0
+    fun isGoalSet() = expected != 0
 
     enum class Type {
         SESSION, SCORE, COMPLETED;

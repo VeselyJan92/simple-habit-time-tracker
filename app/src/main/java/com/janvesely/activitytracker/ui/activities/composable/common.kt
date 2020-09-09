@@ -77,7 +77,7 @@ fun BaseRow() {
 
         ProvideEmphasis(emphasis = EmphasisAmbient.current.medium) {
             Icon(
-                asset = Icons.Filled.ChevronRight,
+                asset = Icons.Filled.StopPlay,
                 modifier = Modifier
                     .padding(end = 12.dp)
                     .preferredSize(24.dp)
@@ -104,17 +104,17 @@ fun formatAmount(amount: Float): String {
     return "xxx"
 }
 
-val Icons.Filled.ChevronRight: VectorAsset
+
+val Icons.Filled.StopPlay: VectorAsset
     get() {
         if (icon != null) return icon!!
         icon = materialIcon {
             materialPath {
-                moveTo(10.0f, 6.0f)
-                lineTo(8.59f, 7.41f)
-                lineTo(13.17f, 12.0f)
-                lineToRelative(-4.58f, 4.59f)
-                lineTo(10.0f, 18.0f)
-                lineToRelative(6.0f, -6.0f)
+                moveTo(6.0f, 6.0f)
+                lineTo(6f, 6f)
+                horizontalLineTo(12f)
+                verticalLineTo(12f)
+                horizontalLineTo(6f)
                 close()
             }
         }

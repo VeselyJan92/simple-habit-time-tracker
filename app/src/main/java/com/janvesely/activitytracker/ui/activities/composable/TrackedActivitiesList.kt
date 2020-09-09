@@ -1,29 +1,23 @@
 package com.janvesely.activitytracker.ui.activities.composable
 
-import android.util.Log
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LiveData
@@ -50,27 +44,26 @@ fun Temp(){
         Seeder().getTrackedActivityWithMetric(activity = Seeder().getTrackedActivity(
             name = "Posilovna",
             type = TrackedActivity.Type.COMPLETED,
-            goal = 1
+
         )),
         Seeder().getTrackedActivityWithMetric(activity = Seeder().getTrackedActivity(
             name = "Shyby",
             type = TrackedActivity.Type.SCORE,
-            goal = 2
+
         )),
         Seeder().getTrackedActivityWithMetric(activity = Seeder().getTrackedActivity(
             name = "Programování",
             type = TrackedActivity.Type.SESSION,
-            goal = 60 * 60 * 2
+            goal = 60 * 60 * 5
         )),
         Seeder().getTrackedActivityWithMetric(activity = Seeder().getTrackedActivity(
             name = "Posilovna",
             type = TrackedActivity.Type.COMPLETED,
-            goal = 1
         )),
         Seeder().getTrackedActivityWithMetric(activity = Seeder().getTrackedActivity(
             name = "Shyby",
             type = TrackedActivity.Type.SCORE,
-            goal = 2
+            goal = 3
         )),
 
     )
@@ -96,29 +89,32 @@ fun TrackedActivitiesList(data: LiveData<List<TrackedActivityWithMetric>>){
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        val positionOffset = animatedFloat(0f)
-
         Surface(elevation = 2.dp) {
             Row(
-                modifier = Modifier.background(Color.White).padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
-                    .draggable(Orientation.Vertical, onDrag = {
-                        Log.e("xxx", "xxxxxxx")
+                modifier = Modifier
+                    .background(Color.White).padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
 
-
-                    })
 
             ) {
 
-                IconButton(onClick ={}, Modifier.gravity(Alignment.CenterVertically) ) {
+                IconButton(onClick ={}, Modifier.gravity(Alignment.CenterVertically).padding(end = 8.dp, start = 8.dp) ) {
                     Icon(
-                        Icons.Filled.PlayArrow,
-                        Modifier.size(32.dp).background(Colors.ButtonGreen, RoundedCornerShape(16.dp))
+                        when(item.activity.type){
+                            TrackedActivity.Type.SESSION -> Icons.Filled.PlayArrow
+                            TrackedActivity.Type.SCORE -> Icons.Filled.Add
+                            TrackedActivity.Type.COMPLETED -> Icons.Filled.Check
+                        },
+                        Modifier
+                            .size(34.dp)
+                            .background(Colors.ChipGray, RoundedCornerShape(17.dp))
                     )
+
+
                 }
 
                 Column(Modifier.fillMaxWidth()){
 
-                    Row {
+                    Row() {
                         Text(
                             item.activity.name,
                             Modifier.weight(1f),
@@ -128,13 +124,16 @@ fun TrackedActivitiesList(data: LiveData<List<TrackedActivityWithMetric>>){
                             )
                         )
 
-                        ProgressIndicator(item.past.last())
+
+                        if (item.activity.isGoalSet())
+
+                            ProgressIndicator(item.past.last())
 
                     }
 
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalGravity = Alignment.CenterVertically) {
                         repeat(5){
-                            MetricBlock(item.past[it])
+                            MetricBlock(item.past[4-it], it)
                         }
                     }
 
@@ -147,7 +146,7 @@ fun TrackedActivitiesList(data: LiveData<List<TrackedActivityWithMetric>>){
 }
 
 @Composable
-fun MetricBlock(data: ViewRangeData,){
+fun MetricBlock(data: ViewRangeData, position: Int){
     Column(horizontalGravity = Alignment.CenterHorizontally) {
         Text(text = data.getLabel(), style = TextStyle(
             fontSize = 10.sp
@@ -155,21 +154,30 @@ fun MetricBlock(data: ViewRangeData,){
 
         val color = if (data.isCompleted()) Colors.Completed else Colors.NotCompleted
 
-        Stack(
-            modifier = Modifier
-            .size(40.dp, 20.dp)
-            .background(color, RoundedCornerShape(10.dp)),
 
-        ){
-            Text(
-                modifier = Modifier.gravity(Alignment.Center),
-                text = data.formatMetric(),
-                style = TextStyle(
-                    fontWeight = FontWeight.W600,
-                    fontSize = 10.sp
+
+        val modifier = if (position == 0)
+            Modifier.size(80.dp, 20.dp).background(color, RoundedCornerShape(10.dp))
+        else
+            Modifier.size(40.dp, 20.dp).background(color, RoundedCornerShape(10.dp))
+
+        Surface(
+            elevation = if (position == 0) 2.dp else 0.dp,
+            shape =  RoundedCornerShape(10.dp)
+        ) {
+            Stack(modifier = modifier){
+
+                Text(
+                    modifier = Modifier.gravity(Alignment.Center),
+                    text = data.formatMetric(),
+                    style = TextStyle(
+                        fontWeight = FontWeight.W600,
+                        fontSize = if (position == 0) 15.sp else 10.sp
+                    )
                 )
-            )
+            }
         }
+
 
     }
 
@@ -177,15 +185,15 @@ fun MetricBlock(data: ViewRangeData,){
 
 @Composable
 fun ProgressIndicator(recent: ViewRangeData){
-    Row(Modifier.size(130.dp, 25.dp).background(Colors.ChipGray, RoundedCornerShape(50))) {
-        Icon(Icons.Filled.CheckCircle, Modifier.gravity(Alignment.CenterVertically).padding(start = 5.dp).size(20.dp))
+    Row(Modifier.size(80.dp, 20.dp).padding(start = 16.dp, end = 0.dp).background(Colors.ChipGray, RoundedCornerShape(50))) {
+        Icon(Icons.Filled.Flag, Modifier.gravity(Alignment.CenterVertically).padding(start = 5.dp).size(20.dp))
 
         Text(
-            recent.progress(),
-            Modifier.weight(1f).gravity(Alignment.CenterVertically),
+            recent.formatGoal(),
+            Modifier.weight(1f).gravity(Alignment.CenterVertically).padding(end = 8.dp),
             textAlign = TextAlign.Center,
             style = TextStyle(
-                fontSize = 14.sp
+                fontSize = 10.sp
             )
 
         )
