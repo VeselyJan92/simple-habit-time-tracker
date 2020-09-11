@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.ui.home
+package com.janvesely.activitytracker.ui.screens.home
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

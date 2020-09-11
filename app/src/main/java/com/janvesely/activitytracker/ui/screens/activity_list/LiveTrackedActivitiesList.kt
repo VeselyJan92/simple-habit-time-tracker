@@ -1,6 +1,5 @@
-package com.janvesely.activitytracker.ui.activities.composable
+package com.janvesely.activitytracker.ui.screens.activity_list
 
-import android.util.Log
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
@@ -13,7 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.runtime.*

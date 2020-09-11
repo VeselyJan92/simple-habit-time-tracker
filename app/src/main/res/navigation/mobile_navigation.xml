@@ -7,15 +7,15 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.janvesely.activitytracker.ui.home.HomeFragment"
+        android:name="com.janvesely.activitytracker.ui.screens.home.HomeFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.janvesely.activitytracker.ui.activities.ActivitiesFragment"
+        android:name="com.janvesely.activitytracker.ui.screens.activity_list.ActivitiesFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_activities" >
+        tools:layout="@layout/fragment_activities">
         <action
             android:id="@+id/action_navigation_dashboard_to_activityFragment"
             app:destination="@id/activityFragment" />
@@ -23,12 +23,12 @@
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.janvesely.activitytracker.ui.notifications.NotificationsFragment"
+        android:name="com.janvesely.activitytracker.ui.screens.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
 
     <fragment
         android:id="@+id/activityFragment"
-        android:name="com.janvesely.activitytracker.ui.activities.ActivityFragment"
+        android:name="com.janvesely.activitytracker.ui.screens.ActivityFragment"
         android:label="ActivityFragment" />
 </navigation>

@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.ui.home
+package com.janvesely.activitytracker.ui.screens.home
 
 import android.os.Bundle
 import android.view.LayoutInflater

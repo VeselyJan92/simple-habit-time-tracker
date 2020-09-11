@@ -8,4 +8,5 @@ object Colors{
    val ChipGray = Color(0xFFE0E0E0)
    val ButtonGreen = Color(0xFF41C300)
    val AppBackground = Color(0xFFe4eaee)
+   val AppAccent = Color(0xFF4DB6AC)
 }

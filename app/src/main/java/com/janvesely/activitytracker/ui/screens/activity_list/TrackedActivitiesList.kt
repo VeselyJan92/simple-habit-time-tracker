@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.ui.activities.composable
+package com.janvesely.activitytracker.ui.screens.activity_list
 
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
@@ -106,7 +106,7 @@ fun TrackedActivitiesList(data: LiveData<List<TrackedActivityWithMetric>>){
                         },
                         Modifier
                             .size(34.dp)
-                            .background(Colors.ChipGray, RoundedCornerShape(17.dp))
+                            .background(Colors.AppAccent, RoundedCornerShape(17.dp))
                     )
 
 
@@ -127,14 +127,17 @@ fun TrackedActivitiesList(data: LiveData<List<TrackedActivityWithMetric>>){
 
                         if (item.activity.isGoalSet())
 
-                            ProgressIndicator(item.past.last())
+                            Goal(item.past.last())
 
                     }
 
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalGravity = Alignment.CenterVertically) {
-                        repeat(5){
-                            MetricBlock(item.past[4-it], it)
+                        Today(data = item.past[4])
+                        repeat(4){
+                            MetricBlock(item.past[it], it)
                         }
+                        
+
                     }
 
                 }
@@ -156,13 +159,13 @@ fun MetricBlock(data: ViewRangeData, position: Int){
 
 
 
-        val modifier = if (position == 0)
-            Modifier.size(80.dp, 20.dp).background(color, RoundedCornerShape(10.dp))
+        val modifier = if (position == 4)
+            Modifier.size(80.dp, 20.dp).background(Colors.ChipGray, RoundedCornerShape(10.dp))
         else
             Modifier.size(40.dp, 20.dp).background(color, RoundedCornerShape(10.dp))
 
         Surface(
-            elevation = if (position == 0) 2.dp else 0.dp,
+            elevation = if (position == 4) 2.dp else 0.dp,
             shape =  RoundedCornerShape(10.dp)
         ) {
             Stack(modifier = modifier){
@@ -172,7 +175,7 @@ fun MetricBlock(data: ViewRangeData, position: Int){
                     text = data.formatMetric(),
                     style = TextStyle(
                         fontWeight = FontWeight.W600,
-                        fontSize = if (position == 0) 15.sp else 10.sp
+                        fontSize = if (position == 4) 15.sp else 10.sp
                     )
                 )
             }
@@ -184,9 +187,9 @@ fun MetricBlock(data: ViewRangeData, position: Int){
 }
 
 @Composable
-fun ProgressIndicator(recent: ViewRangeData){
-    Row(Modifier.size(80.dp, 20.dp).padding(start = 16.dp, end = 0.dp).background(Colors.ChipGray, RoundedCornerShape(50))) {
-        Icon(Icons.Filled.Flag, Modifier.gravity(Alignment.CenterVertically).padding(start = 5.dp).size(20.dp))
+fun Goal(recent: ViewRangeData){
+    Row(Modifier.size(80.dp, 20.dp).padding(start = 8.dp, end = 8.dp).background(Colors.ChipGray, RoundedCornerShape(50))) {
+        Icon(Icons.Filled.Flag, Modifier.gravity(Alignment.CenterVertically).padding(start = 5.dp).size(15.dp))
 
         Text(
             recent.formatGoal(),
@@ -200,3 +203,37 @@ fun ProgressIndicator(recent: ViewRangeData){
     }
 
 }
+
+@Composable
+fun Today(data: ViewRangeData){
+    Column(horizontalGravity = Alignment.CenterHorizontally) {
+        Text(text = data.getLabel(), style = TextStyle(
+            fontSize = 10.sp
+        ))
+        
+        val modifier = Modifier.size(80.dp, 20.dp).background(Colors.ChipGray, RoundedCornerShape(10.dp))
+        
+        Surface(
+            elevation = 2.dp,
+            shape =  RoundedCornerShape(10.dp)
+        ) {
+            Stack(modifier = modifier){
+
+                Text(
+                    modifier = Modifier.gravity(Alignment.Center),
+                    text = data.formatMetric(),
+                    style = TextStyle(
+                        fontWeight = FontWeight.W600,
+                        fontSize = 15.sp
+                    )
+                )
+            }
+        }
+
+
+    }
+
+}
+
+
+

@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.ui.notifications
+package com.janvesely.activitytracker.ui.screens.notifications
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

@@ -1,24 +1,19 @@
-package com.janvesely.activitytracker.ui.activities
+package com.janvesely.activitytracker.ui.screens.activity_list
 
 import android.util.Log
 import androidx.lifecycle.*
 import androidx.room.InvalidationTracker
-import com.janvesely.activitytracker.core.swap
 import com.janvesely.activitytracker.database.composed.TrackedActivityWithMetric
 import com.janvesely.activitytracker.database.entities.TrackedActivity
 import com.janvesely.activitytracker.database.entities.TrackedActivityCompletion
 import com.janvesely.activitytracker.database.entities.TrackedActivityScore
 import com.janvesely.activitytracker.database.entities.TrackedActivitySession
 import com.janvesely.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.janvesely.activitytracker.ui.other.dragandrop.ItemTouchHelperAdapter
 import com.janvesely.getitdone.database.AppDatabase
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
-class ActivitiesViewModel : ViewModel(), ItemTouchHelperAdapter {
+class ActivitiesViewModel : ViewModel() {
 
     val rep = RepositoryTrackedActivity()
 
@@ -60,39 +55,6 @@ class ActivitiesViewModel : ViewModel(), ItemTouchHelperAdapter {
     fun stopSession(activity: TrackedActivity) {
         rep.update(activity.copy().apply { in_session_since = null})
     }
-
-
-    override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
-
-        Log.e("MOVE", "$fromPosition, $toPosition")
-        val items = activities.value
-
-
-
-
-        if (items != null && fromPosition != toPosition){
-            val x = items.toMutableList().apply {
-                swap(fromPosition, toPosition)
-                forEachIndexed {index, item ->  item.activity.position = index  }
-            }
-            activities.value = x
-
-            rep.transaction {
-                x.forEach { rep.update(it.activity) }
-            }
-        }
-
-        return false
-    }
-
-    override fun onItemDismiss(position: Int) {
-        Log.e("DISMISS",  "")
-    }
-
-    override fun onCleared() {
-        Log.e("CLEARED",  "")
-    }
-
 
 
 }

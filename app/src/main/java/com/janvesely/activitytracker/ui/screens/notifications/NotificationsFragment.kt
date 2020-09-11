@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.ui.notifications
+package com.janvesely.activitytracker.ui.screens.notifications
 
 import android.os.Bundle
 import android.view.LayoutInflater
