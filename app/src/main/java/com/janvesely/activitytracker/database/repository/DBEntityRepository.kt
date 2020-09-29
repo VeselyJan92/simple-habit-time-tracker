@@ -6,17 +6,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-abstract class DBEntityRepository<T>(open val dao: BaseEditableDAO<T>){
+abstract class DBEntityRepository<T>(open val activityDAO: BaseEditableDAO<T>){
 
     fun launch(call: suspend ()->Unit) = GlobalScope.launch(Dispatchers.IO){
         call.invoke()
     }
 
-    fun insert(item: T) = launch{ dao.insert(item) }
+    fun insert(item: T) = launch{ activityDAO.insert(item) }
 
-    fun update(item: T) = launch{ dao.update(item) }
+    fun update(item: T) = launch{ activityDAO.update(item) }
 
-    open fun delete(item: T) = launch{ dao.delete(item) }
+    open fun delete(item: T) = launch{ activityDAO.delete(item) }
 
 
     fun transaction(work: ()->Unit){

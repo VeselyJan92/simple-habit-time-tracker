@@ -15,6 +15,7 @@ interface BaseEditableDAO<T>{
     @Delete
     suspend fun delete(item: T)
 
+
     @Insert
     suspend fun insert(vararg users: T)
 

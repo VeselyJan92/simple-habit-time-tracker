@@ -1,7 +1,9 @@
 package com.janvesely.activitytracker.database.entities
 
+import android.graphics.Color
 import androidx.room.*
 import com.janvesely.activitytracker.database.embedable.TimeRange
+import com.janvesely.activitytracker.ui.components.Colors
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.WeekFields
@@ -33,7 +35,7 @@ data class TrackedActivity(
 
     /**Number minutes for [TrackedActivity.Type] TIMED or count */
     @ColumnInfo(name = "expected")
-    var expected: Int,
+    var expected: Long,
 
 
     @ColumnInfo(name = "hex_color")
@@ -44,18 +46,27 @@ data class TrackedActivity(
 ) {
     companion object{
         const val TABLE = "tracked_activity"
+
+        val empty = TrackedActivity(0L, "", 0, Type.SESSION, in_session_since = null, TimeRange.DAILY, 0L, "", "" )
+
     }
 
-    fun isGoalSet() = expected != 0
+    fun isGoalSet() = expected != 0L && type != Type.COMPLETED
 
     enum class Type {
         SESSION, SCORE, COMPLETED;
 
-        fun format(metric: Int) =  when(this){
-            SESSION -> String.format("%02d:%02d", metric / (60*60), (metric/60) % 60)
-            SCORE -> metric.toString()
-            COMPLETED -> if (metric == 1 ) "ANO" else "NE"
+        fun format(metric: Long) = when {
+            metric < 0 -> ""
+            else -> {
+                when(this){
+                    SESSION -> String.format("%02d:%02d", metric / (60*60), (metric/60) % 60)
+                    SCORE -> metric.toString()
+                    COMPLETED -> if (metric == 1L ) "ANO" else "NE"
+                }
+            }
         }
+
     }
 
 

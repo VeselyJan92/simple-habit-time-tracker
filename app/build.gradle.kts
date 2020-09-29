@@ -4,6 +4,11 @@ plugins {
     id("kotlin-android")
     id("kotlin-kapt")
     id("kotlin-android-extensions")
+
+   // id("androidx.navigation.safeargs.kotlin")
+
+
+    id("dagger.hilt.android.plugin")
 }
 
 android {
@@ -13,6 +18,10 @@ android {
     buildFeatures {
         // Enables Jetpack Compose for this module
         compose =  true
+    }
+
+    lintOptions {
+        isAbortOnError = false
     }
 
     composeOptions {
@@ -56,6 +65,9 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.0")
     implementation("androidx.core:core-ktx:1.3.1")
 
+    implementation("com.google.dagger:hilt-android:2.28-alpha")
+    kapt("com.google.dagger:hilt-android-compiler:2.28-alpha")
+
     implementation("androidx.appcompat:appcompat:1.2.0")
 
     implementation("com.google.android.material:material:1.2.1")
@@ -65,28 +77,24 @@ dependencies {
 
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
 
-    implementation("androidx.navigation:navigation-fragment:2.3.0")
     implementation("androidx.navigation:navigation-fragment-ktx:2.3.0")
-    implementation("androidx.navigation:navigation-ui:2.3.0")
     implementation("androidx.navigation:navigation-ui-ktx:2.3.0")
 
 
 
-    implementation("androidx.compose.ui:ui:1.0.0-alpha02")
-    implementation("androidx.compose.material:material:1.0.0-alpha02")
-    implementation("androidx.ui:ui-tooling:1.0.0-alpha02")
-    implementation("androidx.compose.runtime:runtime-livedata:1.0.0-alpha02")
-    implementation("androidx.compose.foundation:foundation:1.0.0-alpha02")
-    implementation("androidx.compose.material:material-icons-extended:1.0.0-alpha02")
+    implementation("androidx.compose.ui:ui:1.0.0-alpha03")
+    implementation("androidx.compose.material:material:1.0.0-alpha03")
+    implementation("androidx.ui:ui-tooling:1.0.0-alpha03")
+    implementation("androidx.compose.runtime:runtime-livedata:1.0.0-alpha03")
+    implementation("androidx.compose.foundation:foundation:1.0.0-alpha03")
+    implementation("androidx.compose.material:material-icons-extended:1.0.0-alpha03")
 
 
 
-
-    val room_version = "2.3.0-alpha02"
-    implementation ("androidx.room:room-runtime:$room_version")
-    kapt("androidx.room:room-compiler:$room_version")
-    implementation ("androidx.room:room-ktx:$room_version")
-    testImplementation ("androidx.room:room-testing:$room_version")
+    implementation ("androidx.room:room-runtime:2.3.0-alpha02")
+    kapt("androidx.room:room-compiler:2.3.0-alpha02")
+    implementation ("androidx.room:room-ktx:2.3.0-alpha02")
+    testImplementation ("androidx.room:room-testing:2.3.0-alpha02")
 
     testImplementation("junit:junit:4.13")
     androidTestImplementation("androidx.test.ext:junit:1.1.1")
@@ -101,5 +109,13 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class.java).conf
         freeCompilerArgs += "-Xallow-jvm-ir-dependencies"
         freeCompilerArgs += "-Xskip-prerelease-check"
         freeCompilerArgs += "-Xopt-in=androidx.compose.ui.node.ExperimentalLayoutNodeApi"
+
+
     }
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
+    kotlinOptions.freeCompilerArgs +=  "-Xopt-in=kotlin.RequiresOptIn"
+
+
 }

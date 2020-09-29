@@ -1,7 +1,6 @@
 package com.janvesely.activitytracker.database
 
 import androidx.compose.ui.graphics.Color
-import com.janvesely.activitytracker.database.composed.TrackedActivityWithMetric
 import com.janvesely.activitytracker.database.embedable.TimeRange
 import com.janvesely.activitytracker.database.entities.TrackedActivity
 import com.janvesely.activitytracker.database.entities.TrackedActivityCompletion
@@ -45,7 +44,7 @@ class Seeder {
         type: TrackedActivity.Type = TrackedActivity.Type.COMPLETED,
         inSession: LocalDateTime? = null,
         range: TimeRange = TimeRange.DAILY,
-        goal: Int = 0,
+        goal: Long = 0,
         color: String = Color.Blue.toString(),
         icon: String = ""
     ) = TrackedActivity(id, name, position, type, inSession, range, goal, color, icon)
@@ -61,7 +60,7 @@ class Seeder {
         id: Long = 0,
         activityId : Long = 0,
         datetime_scored: LocalDateTime = shiftDateTime(nextInt(0, 2), nextInt(-1, 1)),
-        score: Int = nextInt(1, 3)
+        score: Long = nextInt(1, 3).toLong()
     )  = TrackedActivityScore(id, activityId, datetime_scored, score)
 
 
@@ -73,7 +72,7 @@ class Seeder {
     )  = TrackedActivitySession(id, activityId, start, end)
 
 
-    fun getTrackedActivityWithMetric(
+    /*fun getTrackedActivityWithMetric(
         activity: TrackedActivity = getTrackedActivity()
     ): TrackedActivityWithMetric {
 
@@ -100,6 +99,6 @@ class Seeder {
         }
 
         return TrackedActivityWithMetric(activity, data)
-    }
+    }*/
 
 }

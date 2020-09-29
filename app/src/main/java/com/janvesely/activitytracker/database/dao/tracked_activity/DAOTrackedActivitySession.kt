@@ -8,20 +8,36 @@ import java.time.LocalDateTime
 
 
 @Dao
-interface DAOTrackedActivitySession :
-    DAOTrackedActivitySessionSelectable,
-    BaseEditableDAO<TrackedActivitySession>
+interface DAOTrackedActivitySession : BaseEditableDAO<TrackedActivitySession>{
 
-@Dao
-interface DAOTrackedActivitySessionSelectable {
-
-    @Query("select * from tracked_activity_session where time_start >= :datetime")
-    suspend fun getAllSince(datetime: LocalDateTime): List<TrackedActivitySession>
+    @Query("""
+        select * from tracked_activity_session
+        where time_start >= :from AND time_start <:to AND tracked_activity_id=:activityId
+    """)
+    suspend fun getAll(
+        activityId: Long,
+        from: LocalDateTime,
+        to: LocalDateTime = LocalDateTime.now()
+    ): List<TrackedActivitySession>
 
     @Query("""
         select TOTAL(strftime('%s',time_end) - strftime('%s', time_start)) as metric 
         from tracked_activity_session s 
-        where time_start >= :from AND time_end <:to AND tracked_activity_id=:activityId
+        where (time_start >= :from AND time_start <:to) AND tracked_activity_id=:activityId
     """)
-    suspend fun getMetric(activityId: Long, from: LocalDateTime, to: LocalDateTime): Int
+    suspend fun getMetric(activityId: Long, from: LocalDateTime, to: LocalDateTime): Long
+
+
+    @Query("""
+        select * from tracked_activity_session
+        where tracked_activity_id=:activityId
+    """)
+    suspend fun getById(activityId: Long): TrackedActivitySession
+
+    @Query("""
+        delete from tracked_activity_session
+        where tracked_activity_session_id=:recordId
+    """)
+    suspend fun deleteById(recordId: Long)
 }
+

@@ -16,19 +16,35 @@
         android:name="com.janvesely.activitytracker.ui.screens.activity_list.ActivitiesFragment"
         android:label="@string/title_dashboard"
         tools:layout="@layout/fragment_activities">
+
         <action
-            android:id="@+id/action_navigation_dashboard_to_activityFragment"
-            app:destination="@id/activityFragment" />
+            android:id="@+id/action_navigation_dashboard_to_activity_fragment"
+            app:destination="@id/activity_fragment" />
+
     </fragment>
 
     <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.janvesely.activitytracker.ui.screens.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
+        android:label="Awesome"
         tools:layout="@layout/fragment_notifications" />
 
     <fragment
-        android:id="@+id/activityFragment"
-        android:name="com.janvesely.activitytracker.ui.screens.ActivityFragment"
-        android:label="ActivityFragment" />
+        android:id="@+id/activity_fragment"
+        android:name="com.janvesely.activitytracker.ui.screens.activity.FragmentTrackedActivity"
+        android:label="ActivityFragment">
+        <argument
+            android:name="tracked_activity_id"
+            app:argType="long"
+            app:nullable="false" />
+
+        <action
+            android:id="@+id/action_activity_fragment_to_fragmentTrackedActivityRecords"
+            app:destination="@id/fragmentTrackedActivityRecords" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragmentTrackedActivityRecords"
+        android:name="com.janvesely.activitytracker.ui.screens.records.FragmentTrackedActivityRecords"
+        android:label="FragmentTrackedActivityRecords" />
 </navigation>

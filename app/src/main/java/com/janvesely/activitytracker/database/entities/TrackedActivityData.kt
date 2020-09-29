@@ -11,14 +11,18 @@ import java.time.LocalTime
 sealed class TrackedActivityData(
     open var id: Long,
     open var activity_id: Long
-)
+){
+    companion object{
+
+    }
+}
 
 @Entity(
     tableName = TrackedActivityCompletion.TABLE,
     indices = [
         Index(value = ["tracked_activity_completion_id"]),
         Index(value = ["tracked_activity_id"]),
-        Index(value = ["date_completed"], unique = true)
+        Index(value = ["date_completed", "tracked_activity_id"], unique = true)
     ],
     foreignKeys = [
         ForeignKey(
@@ -75,7 +79,7 @@ data class TrackedActivityScore(
     var time_completed: LocalDateTime,
 
     @ColumnInfo(name = "score")
-    var score: Int
+    var score: Long
 ): TrackedActivityData(id, activity_id){
 
     companion object{

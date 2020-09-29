@@ -19,6 +19,7 @@ import com.janvesely.activitytracker.database.converters.TimeRangeConverter
 import com.janvesely.activitytracker.database.converters.LocalDateConverter
 import com.janvesely.activitytracker.database.embedable.TimeRange
 import com.janvesely.activitytracker.database.converters.LocalDateTimeConverter
+import com.janvesely.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.janvesely.getitdone.database.entities.converters.LocalTimeConverter
 import com.janvesely.getitdone.database.entities.converters.TrackedActivityTypeConverter
 import kotlinx.coroutines.GlobalScope
@@ -48,14 +49,17 @@ import java.time.LocalTime
 
 abstract class AppDatabase : RoomDatabase() {
 
-    abstract val trackedActivity: DAOTrackedActivity
-    abstract val trackedActivityScore: DAOTrackedActivityScore
-    abstract val trackedActivitySession: DAOTrackedActivitySession
-    abstract val trackedActivityCompletion: DAOTrackedActivityCompletion
+    abstract val activityDAO: DAOTrackedActivity
+    abstract val scoreDAO: DAOTrackedActivityScore
+    abstract val sessionDAO: DAOTrackedActivitySession
+    abstract val completionDAO: DAOTrackedActivityCompletion
 
 
     companion object {
         lateinit var db: AppDatabase private set
+
+        val activityRep by lazy { RepositoryTrackedActivity() }
+
 
         @Synchronized
         fun init(context: Context){
@@ -82,29 +86,29 @@ abstract class AppDatabase : RoomDatabase() {
         private suspend fun seed(db: AppDatabase, context: Context){
             val s = Seeder()
 
-            var id = db.trackedActivity.insert(s.getTrackedActivity(
+            var id = db.activityDAO.insert(s.getTrackedActivity(
                 type = TrackedActivity.Type.SCORE,
                 name = "Shyby",
                 position = 1,
                 goal = 2,
                 range = TimeRange.WEEKLY
             ))
-            db.trackedActivityScore.insert(s.getTrackedTaskScore(activityId = id, score = 2, datetime_scored = LocalDateTime.now()))
-            db.trackedActivityScore.insert(s.getTrackedTaskScore(activityId = id, score = 2))
+            db.scoreDAO.insert(s.getTrackedTaskScore(activityId = id, score = 2, datetime_scored = LocalDateTime.now()))
+            db.scoreDAO.insert(s.getTrackedTaskScore(activityId = id, score = 2))
 
 
 
-            id = db.trackedActivity.insert(s.getTrackedActivity(
+            id = db.activityDAO.insert(s.getTrackedActivity(
                 type = TrackedActivity.Type.COMPLETED,
                 name = "Posilovna",
                 position = 10,
                 goal = 1,
                 range = TimeRange.DAILY
             ))
-            db.trackedActivityCompletion.insert(s.getTrackedTaskCompletion(activityId = id, date = LocalDate.now()))
-            db.trackedActivityCompletion.insert(s.getTrackedTaskCompletion(activityId = id, date = LocalDate.now().minusDays(1)))
+            db.completionDAO.insert(s.getTrackedTaskCompletion(activityId = id, date = LocalDate.now()))
+            db.completionDAO.insert(s.getTrackedTaskCompletion(activityId = id, date = LocalDate.now().minusDays(1)))
 
-            id = db.trackedActivity.insert(s.getTrackedActivity(
+            id = db.activityDAO.insert(s.getTrackedActivity(
                 type = TrackedActivity.Type.COMPLETED,
                 name = "Posilovna 2",
                 position = 11,
@@ -115,7 +119,7 @@ abstract class AppDatabase : RoomDatabase() {
 
 
 
-            id = db.trackedActivity.insert(s.getTrackedActivity(
+            id = db.activityDAO.insert(s.getTrackedActivity(
                 type = TrackedActivity.Type.SESSION,
                 name = "Prace na pozemku",
                 position = 3,
@@ -124,23 +128,23 @@ abstract class AppDatabase : RoomDatabase() {
                 range = TimeRange.MONTHLY
             ))
 
-            val start = LocalTime.of(9, 21)
-            val end = LocalTime.of(11, 32)
+            val start = LocalTime.of(9, 0)
+            val end = LocalTime.of(10, 0)
 
-            db.trackedActivitySession.insert(s.getTrackedTaskSession(
+            db.sessionDAO.insert(s.getTrackedTaskSession(
                 activityId = id,
                 start = LocalDate.now().atTime(start),
                 end = LocalDate.now().atTime(end)
             ))
 
-            db.trackedActivitySession.insert(s.getTrackedTaskSession(
+            db.sessionDAO.insert(s.getTrackedTaskSession(
                 activityId = id,
                 start = LocalDate.now().minusDays(1).atTime(start),
                 end = LocalDate.now().minusDays(1).atTime(end)
             ))
 
 
-            id = db.trackedActivity.insert(s.getTrackedActivity(
+            id = db.activityDAO.insert(s.getTrackedActivity(
                 type = TrackedActivity.Type.SESSION,
                 name = "Zajímavosti",
                 position = 4,
@@ -150,20 +154,20 @@ abstract class AppDatabase : RoomDatabase() {
             ))
 
 
-            db.trackedActivitySession.insert(s.getTrackedTaskSession(
+            db.sessionDAO.insert(s.getTrackedTaskSession(
                 activityId = id,
                 start = LocalDate.now().atTime(start),
                 end = LocalDate.now().atTime(end)
             ))
 
-            db.trackedActivitySession.insert(s.getTrackedTaskSession(
+            db.sessionDAO.insert(s.getTrackedTaskSession(
                 activityId = id,
                 start = LocalDate.now().minusDays(1).atTime(start),
                 end = LocalDate.now().minusDays(1).atTime(end)
             ))
 
 
-            val xx = db.trackedActivity.getAllx()
+            val xx = db.activityDAO.getAll()
 
         }
 

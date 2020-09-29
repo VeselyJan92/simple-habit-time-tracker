@@ -1,120 +1,153 @@
 package com.janvesely.activitytracker.ui.screens.activity_list
 
-import androidx.compose.foundation.Icon
-import androidx.compose.foundation.Text
-import androidx.compose.foundation.background
+import android.content.Context
+import android.os.VibrationEffect
+import android.os.Vibrator
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.ui.tooling.preview.Preview
-import com.janvesely.activitytracker.database.Seeder
-import com.janvesely.activitytracker.database.composed.TrackedActivityWithMetric
-import com.janvesely.activitytracker.database.composed.ViewRangeData
+import androidx.core.os.bundleOf
+import androidx.navigation.NavController
+import com.janvesely.activitytracker.R
+import com.janvesely.activitytracker.core.App
 import com.janvesely.activitytracker.database.entities.TrackedActivity
+import com.janvesely.activitytracker.database.entities.TrackedActivity.Type
+import com.janvesely.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
+import com.janvesely.activitytracker.ui.components.BaseMetricData
 import com.janvesely.activitytracker.ui.components.Colors
+import com.janvesely.activitytracker.ui.components.MetricBlock
+import com.janvesely.activitytracker.ui.components.dialogs.DialogSession
+import com.janvesely.activitytracker.ui.components.dialogs.DialogScore
+import com.janvesely.getitdone.database.AppDatabase
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 
-@OptIn(ExperimentalLayoutNodeApi::class)
-@ExperimentalLayout
-@Preview
-@Composable
-fun Temp(){
-    val data = listOf(
-        Seeder().getTrackedActivityWithMetric(activity = Seeder().getTrackedActivity(
-            name = "Programování",
-            type = TrackedActivity.Type.SESSION,
-            goal = 60 * 60 * 2
-        )),
-        Seeder().getTrackedActivityWithMetric(activity = Seeder().getTrackedActivity(
-            name = "Posilovna",
-            type = TrackedActivity.Type.COMPLETED,
-
-        )),
-        Seeder().getTrackedActivityWithMetric(activity = Seeder().getTrackedActivity(
-            name = "Shyby",
-            type = TrackedActivity.Type.SCORE,
-
-        )),
-        Seeder().getTrackedActivityWithMetric(activity = Seeder().getTrackedActivity(
-            name = "Programování",
-            type = TrackedActivity.Type.SESSION,
-            goal = 60 * 60 * 5
-        )),
-        Seeder().getTrackedActivityWithMetric(activity = Seeder().getTrackedActivity(
-            name = "Posilovna",
-            type = TrackedActivity.Type.COMPLETED,
-        )),
-        Seeder().getTrackedActivityWithMetric(activity = Seeder().getTrackedActivity(
-            name = "Shyby",
-            type = TrackedActivity.Type.SCORE,
-            goal = 3
-        )),
-
-    )
-
-    TrackedActivitiesList(MutableLiveData(data))
+data class TrackedActivityWithMetric constructor(
+    var activity: TrackedActivity,
+    val past: List<BaseMetricData>,
+) {
+    val completed = activity.expected <= past[0].metric
 }
 
 
-@ExperimentalLayoutNodeApi
+@OptIn(ExperimentalFocus::class, ExperimentalFoundationApi::class)
 @Composable
-fun TrackedActivitiesList(data: LiveData<List<TrackedActivityWithMetric>>){
-    val items = data.observeAsState(listOf())
-
-    var first = true
-
+fun TrackedActivitiesList(
+    nav: NavController,
+    vm: ActivitiesViewModel
+){
+    val items by vm.activities.observeAsState(arrayListOf())
 
     LazyColumnForIndexed(
-        items = data.value!!,
+        items = items,
         Modifier.padding(8.dp)
     ) { index, item ->
+
+        val requestEdit = remember { mutableStateOf(false) }
+
+
+        if (requestEdit.value) when(item.activity.type){
+            Type.SESSION -> DialogSession(
+                display = requestEdit,
+                activityId = item.activity.id,
+                from = LocalDateTime.now(),
+                to = LocalDateTime.now(),
+            )
+            Type.SCORE -> DialogScore(
+                display = requestEdit,
+                activityId = item.activity.id,
+                datetime = LocalDateTime.now(),
+                score = 1
+            )
+        }
+
 
         if (index != 0){
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        Surface(elevation = 2.dp) {
+        Surface(
+            modifier = Modifier
+                .clickable(
+                    onClick = {
+                        nav.navigate(R.id.action_navigation_dashboard_to_activity_fragment, bundleOf(
+                            "tracked_activity_id" to item.activity.id
+                        ))
+                    }
+                ),
+            elevation = 2.dp,
+        ) {
             Row(
                 modifier = Modifier
                     .background(Color.White).padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
 
-
             ) {
+                Stack(
+                    alignment = Alignment.Center,
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                        .padding(end = 8.dp, start = 8.dp)
+                        .clickable(
+                            onClick = {
+                                GlobalScope.launch {
+                                    when(item.activity.type){
+                                        Type.SESSION ->  vm.rep.startSession(item.activity.id)
+                                        Type.SCORE ->  vm.rep.commitScore(item.activity.id, LocalDateTime.now(), 1)
+                                        Type.COMPLETED -> {
+                                            val record = vm.rep.completionDAO.getRecord(item.activity.id, LocalDate.now())
 
-                IconButton(onClick ={}, Modifier.gravity(Alignment.CenterVertically).padding(end = 8.dp, start = 8.dp) ) {
+                                            if (record != null)
+                                                vm.rep.completionDAO.delete(record)
+                                            else
+                                                vm.rep.commitCompletion(item.activity.id, LocalDate.now())
+                                        }
+                                    }
+                                }
+                            },
+                            onLongClick = {
+                                val viber =  App.context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                                viber.vibrate(VibrationEffect.createOneShot(50L, 1))
+                                RepositoryTrackedActivity()
+
+                                if (item.activity.type!= Type.COMPLETED)
+                                    requestEdit.value = true
+                            }
+                        )
+                ) {
                     Icon(
                         when(item.activity.type){
-                            TrackedActivity.Type.SESSION -> Icons.Filled.PlayArrow
-                            TrackedActivity.Type.SCORE -> Icons.Filled.Add
-                            TrackedActivity.Type.COMPLETED -> Icons.Filled.Check
+                            Type.SESSION -> Icons.Filled.PlayArrow
+                            Type.SCORE -> Icons.Filled.Add
+                            Type.COMPLETED -> if (item.completed) Icons.Filled.DoneAll else Icons.Filled.Check
                         },
                         Modifier
                             .size(34.dp)
                             .background(Colors.AppAccent, RoundedCornerShape(17.dp))
                     )
-
-
                 }
 
                 Column(Modifier.fillMaxWidth()){
-
-                    Row() {
+                    Row {
                         Text(
                             item.activity.name,
                             Modifier.weight(1f),
@@ -124,22 +157,20 @@ fun TrackedActivitiesList(data: LiveData<List<TrackedActivityWithMetric>>){
                             )
                         )
 
-
                         if (item.activity.isGoalSet())
-
-                            Goal(item.past.last())
-
+                            Goal(item.activity.type.format(item.activity.expected))
                     }
 
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalGravity = Alignment.CenterVertically) {
-                        Today(data = item.past[4])
-                        repeat(4){
-                            MetricBlock(item.past[it], it)
-                        }
-                        
-
+                    Row(modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        MetricBlock(item.past[0], editable = false, width = 80.dp, metricStyle = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold) )
+                        MetricBlock(item.past[1], editable = true)
+                        MetricBlock(item.past[2], editable = true)
+                        MetricBlock(item.past[3], editable = true)
+                        MetricBlock(item.past[4], editable = true)
                     }
-
                 }
             }
         }
@@ -149,51 +180,13 @@ fun TrackedActivitiesList(data: LiveData<List<TrackedActivityWithMetric>>){
 }
 
 @Composable
-fun MetricBlock(data: ViewRangeData, position: Int){
-    Column(horizontalGravity = Alignment.CenterHorizontally) {
-        Text(text = data.getLabel(), style = TextStyle(
-            fontSize = 10.sp
-        ))
-
-        val color = if (data.isCompleted()) Colors.Completed else Colors.NotCompleted
-
-
-
-        val modifier = if (position == 4)
-            Modifier.size(80.dp, 20.dp).background(Colors.ChipGray, RoundedCornerShape(10.dp))
-        else
-            Modifier.size(40.dp, 20.dp).background(color, RoundedCornerShape(10.dp))
-
-        Surface(
-            elevation = if (position == 4) 2.dp else 0.dp,
-            shape =  RoundedCornerShape(10.dp)
-        ) {
-            Stack(modifier = modifier){
-
-                Text(
-                    modifier = Modifier.gravity(Alignment.Center),
-                    text = data.formatMetric(),
-                    style = TextStyle(
-                        fontWeight = FontWeight.W600,
-                        fontSize = if (position == 4) 15.sp else 10.sp
-                    )
-                )
-            }
-        }
-
-
-    }
-
-}
-
-@Composable
-fun Goal(recent: ViewRangeData){
-    Row(Modifier.size(80.dp, 20.dp).padding(start = 8.dp, end = 8.dp).background(Colors.ChipGray, RoundedCornerShape(50))) {
-        Icon(Icons.Filled.Flag, Modifier.gravity(Alignment.CenterVertically).padding(start = 5.dp).size(15.dp))
+private fun Goal(label: String){
+    Row(Modifier.size(70.dp, 20.dp).padding(end = 8.dp).background(Colors.ChipGray, RoundedCornerShape(50))) {
+        Icon(Icons.Filled.Flag, Modifier.align(Alignment.CenterVertically).padding(start = 5.dp).size(15.dp))
 
         Text(
-            recent.formatGoal(),
-            Modifier.weight(1f).gravity(Alignment.CenterVertically).padding(end = 8.dp),
+            label,
+            Modifier.weight(1f).align(Alignment.CenterVertically).padding(end = 8.dp),
             textAlign = TextAlign.Center,
             style = TextStyle(
                 fontSize = 10.sp
@@ -204,23 +197,25 @@ fun Goal(recent: ViewRangeData){
 
 }
 
+/*
 @Composable
-fun Today(data: ViewRangeData){
-    Column(horizontalGravity = Alignment.CenterHorizontally) {
+private fun CurrentMetric(data: MetricBlockData){
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = data.getLabel(), style = TextStyle(
             fontSize = 10.sp
         ))
-        
-        val modifier = Modifier.size(80.dp, 20.dp).background(Colors.ChipGray, RoundedCornerShape(10.dp))
+
+        val color = if (data.isCompleted()) Colors.ButtonGreen else Colors.NotCompleted
+
+        val modifier = Modifier.size(80.dp, 20.dp).background(color, RoundedCornerShape(10.dp))
         
         Surface(
             elevation = 2.dp,
             shape =  RoundedCornerShape(10.dp)
         ) {
             Stack(modifier = modifier){
-
                 Text(
-                    modifier = Modifier.gravity(Alignment.Center),
+                    modifier = Modifier.align(Alignment.Center),
                     text = data.formatMetric(),
                     style = TextStyle(
                         fontWeight = FontWeight.W600,
@@ -230,10 +225,9 @@ fun Today(data: ViewRangeData){
             }
         }
 
-
     }
 
-}
+}*/
 
 
 

@@ -11,7 +11,7 @@ open class BaseFragment: Fragment(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        fArgs = if (arguments == null) Bundle() else arguments!!
+        fArgs = if (arguments == null) Bundle() else requireArguments()
     }
 
     override fun onAttach(context: Context) {

@@ -1,21 +1,24 @@
 package com.janvesely.activitytracker.database.embedable
 
-import android.content.Context
-import com.janvesely.activitytracker.database.composed.ViewRangeData
-import java.time.LocalDate
+import androidx.compose.runtime.Composable
+import com.janvesely.activitytracker.R
+import com.janvesely.activitytracker.database.composed.MetricBlockData
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoField
-import java.time.temporal.WeekFields
-import java.util.*
-
 
 
 typealias RangeInterval = List<Pair<LocalDateTime, LocalDateTime>>
 
-enum class TimeRange {
-    DAILY, WEEKLY, MONTHLY;
 
+data class Range(val from: LocalDateTime, val to: LocalDateTime)
+
+enum class TimeRange(val label: Int) {
+    DAILY(R.string.frequency_daily),
+    WEEKLY(R.string.frequency_weekly),
+    MONTHLY(R.string.frequency_monthly);
+
+    @Composable
     fun getLabel( datetime: LocalDateTime): String = when(this){
         DAILY -> datetime.dayOfMonth.toString()
         WEEKLY -> "WEEK"
@@ -31,32 +34,32 @@ enum class TimeRange {
         MONTHLY -> getMonths(periods)
     }
 
-    fun getDays(periods: Int):List<ViewRangeData>{
+    fun getDays(periods: Int):List<Range>{
         val firstDay = LocalDateTime.now()
             .toLocalDate().atStartOfDay()
 
         return (0 until periods).map {
-            ViewRangeData(DAILY, firstDay.minusDays(it - 0L), firstDay.minusDays(it - 1L))
+            Range(firstDay.minusDays(it - 0L), firstDay.minusDays(it - 1L))
         }
     }
 
-    fun getWeeks(periods: Int):List<ViewRangeData>{
+    fun getWeeks(periods: Int):List<Range>{
         val firstDay = LocalDateTime.now()
             .with(ChronoField.DAY_OF_WEEK, 1)
             .toLocalDate().atStartOfDay()
 
         return (0 until periods).map {
-            ViewRangeData(WEEKLY, firstDay.minusDays(it*7L), firstDay.minusDays((it-1)*7L))
+            Range(firstDay.minusDays(it*7L), firstDay.minusDays((it-1)*7L))
         }
     }
 
-    fun getMonths(periods: Int):List<ViewRangeData>{
+    fun getMonths(periods: Int):List<Range>{
         val firstDay = LocalDateTime.now()
             .withDayOfMonth(1)
             .toLocalDate().atStartOfDay()
 
         return (0 until periods).map {
-            ViewRangeData(MONTHLY, firstDay.minusMonths(it+0L), firstDay.minusMonths(it-1L))
+            Range(firstDay.minusMonths(it+0L), firstDay.minusMonths(it-1L))
         }
     }
 

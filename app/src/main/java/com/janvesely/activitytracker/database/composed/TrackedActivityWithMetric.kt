@@ -1,62 +1,30 @@
 package com.janvesely.activitytracker.database.composed
 
+import androidx.compose.ui.graphics.Color
 import androidx.recyclerview.widget.DiffUtil
 import com.janvesely.activitytracker.database.embedable.TimeRange
 import com.janvesely.activitytracker.database.entities.TrackedActivity
+import com.janvesely.activitytracker.ui.components.BaseMetricData
+import java.sql.Time
 import java.time.LocalDateTime
 
 
-data class ViewRangeData(
-    val type: TimeRange,
+data class MetricBlockData(
+    val type: TrackedActivity.Type,
     val from: LocalDateTime,
-    val to: LocalDateTime
+    val to: LocalDateTime,
+    val metric: Long,
+    val label: Int,
+    val color: Color,
+
+    val activityId: Long = -1,
+    val id: Long = -1,
+    val range: TimeRange? = null,
 ) {
-    var goal = 0
-    var metric: Int = 0
-
-    lateinit var format: TrackedActivity.Type
 
 
-    fun getLabel() = type.getLabel(from)
+    fun formatMetric() = type.format(metric)
 
-    fun formatMetric() = format.format(metric)
-
-    fun formatGoal() = format.format(goal)
-
-    fun progress() = if (goal == 0 || format == TrackedActivity.Type.COMPLETED) formatMetric() else "${formatMetric()} / ${formatGoal()}"
-
-    fun isCompleted() = metric >= goal
-
+    fun isRecord() = id != -1L
 }
 
-data class TrackedActivityWithMetric(
-    var activity: TrackedActivity,
-    val past: List<ViewRangeData>
-) {
-    var completed = past[0].metric >= activity.expected
-
-    init {
-        past.forEach {
-            it.format = activity.type
-            it.goal = activity.expected
-        }
-    }
-
-}
-
-
-object TrackedActivityWithMetricDiff : DiffUtil.ItemCallback<TrackedActivityWithMetric>() {
-    override fun areItemsTheSame(
-        old: TrackedActivityWithMetric,
-        new: TrackedActivityWithMetric
-    ): Boolean {
-        return old.activity.id == new.activity.id
-    }
-
-    override fun areContentsTheSame(
-        old: TrackedActivityWithMetric,
-        new: TrackedActivityWithMetric
-    ): Boolean {
-        return old == new && new.activity.in_session_since != null
-    }
-}

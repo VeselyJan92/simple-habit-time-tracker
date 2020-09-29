@@ -2,7 +2,32 @@
     <string name="app_name">My Application</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+
+
+
+
+    <string name="frequency_daily">daily</string>
+    <string name="frequency_weekly">weekly</string>
+    <string name="frequency_monthly">monthly</string>
+
+
+
+    <string-array name="weekdays">
+        <item>Time</item>
+        <item>Count</item>
+    </string-array>
+
+
+
+
+
+
+
+
+
+
+
+
 
     <!-- TRACKED TASK-->
     <string-array name="tracked_task_goal_types">
