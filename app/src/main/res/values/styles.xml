@@ -4,6 +4,8 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorControlNormal">#BDBDBD</item>
+
 
         <item name="android:windowBackground">#e4eaee</item>
         <item name="android:colorBackground">#FAFAFA</item>

@@ -4,6 +4,7 @@ import androidx.compose.foundation.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.focus.ExperimentalFocus
+import com.janvesely.activitytracker.database.embedable.TimeRange
 import com.janvesely.activitytracker.database.entities.TrackedActivity
 import com.janvesely.activitytracker.ui.components.selectors.MinuteAndHourSelector
 import com.janvesely.activitytracker.ui.components.selectors.NumberSelector
@@ -20,7 +21,7 @@ inline fun DialogGoal(
 
         DialogBaseHeader(title = "Pick a goal")
 
-        val goal = remember { mutableStateOf(activity.expected) }
+        val goal = remember { mutableStateOf(activity.goalValue) }
 
         when(activity.type){
             TrackedActivity.Type.SESSION ->{
@@ -40,7 +41,20 @@ inline fun DialogGoal(
                     goal.value = it.toLong()
                 }
             }
-            TrackedActivity.Type.COMPLETED -> throw IllegalStateException()
+            TrackedActivity.Type.COMPLETED ->{
+                NumberSelector(
+                    label = "Score",
+                    number = mutableStateOf(goal.value.toInt())
+                ){
+                    when(activity.goalRange){
+                        TimeRange.DAILY -> throw IllegalStateException()
+                        TimeRange.WEEKLY -> if (it in 0..7) goal.value = it.toLong()
+                        TimeRange.MONTHLY -> if (it in 0..31) goal.value = it.toLong()
+                    }
+                    goal.value = it.toLong()
+                }
+            }
+
         }
 
 

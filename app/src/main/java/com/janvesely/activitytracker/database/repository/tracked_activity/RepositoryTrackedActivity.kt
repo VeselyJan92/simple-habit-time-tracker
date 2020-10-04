@@ -3,16 +3,17 @@ package com.janvesely.activitytracker.database.repository.tracked_activity
 import androidx.compose.ui.res.stringResource
 import androidx.room.withTransaction
 import com.janvesely.activitytracker.R
+import com.janvesely.activitytracker.core.ComposeString
+import com.janvesely.activitytracker.core.sumByLong
+import com.janvesely.activitytracker.core.iter
 import com.janvesely.activitytracker.database.dao.tracked_activity.*
 import com.janvesely.activitytracker.database.embedable.TimeRange
 import com.janvesely.activitytracker.database.entities.*
 import com.janvesely.getitdone.database.AppDatabase
 import com.janvesely.activitytracker.database.repository.DBEntityRepository
-import com.janvesely.activitytracker.ui.components.BaseMetricData
-import com.janvesely.activitytracker.ui.components.Colors
-import com.janvesely.activitytracker.ui.components.Editable
-import com.janvesely.activitytracker.ui.components.Week
+import com.janvesely.activitytracker.ui.components.*
 import com.janvesely.activitytracker.ui.screens.activity_list.TrackedActivityWithMetric
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoField
@@ -24,25 +25,35 @@ class RepositoryTrackedActivity constructor(
     val sessionDAO: DAOTrackedActivitySession = AppDatabase.db.sessionDAO
 ) : DBEntityRepository<TrackedActivity>(activityDAO) {
 
-
-    suspend fun getAllActivities(pastRanges: Int) =  AppDatabase.db.withTransaction {
+    suspend fun getActivitiesOverview(pastRanges: Int) =  AppDatabase.db.withTransaction {
         return@withTransaction AppDatabase.db.activityDAO.getAllNotInSession().map { activity ->
-            val groupedMetric = activity.metric_range.getPastRanges(pastRanges).map {
+            val groupedMetric = activity.goalRange.getPastRanges(pastRanges).map {
+
+                val label:ComposeString = { activity.goalRange.getLabel(it.from) }
 
                 if (activity.type != TrackedActivity.Type.COMPLETED){
                     val metric = getMetric(activity.id, activity.type, it.from, it.to)
-                    val color =  Colors.getMetricColor(activity.type, activity.expected, activity.metric_range, metric, activity.metric_range)
+                    val color =  Colors.getMetricColor(activity.type, activity.goalValue, activity.goalRange, metric, activity.goalRange)
 
-                    BaseMetricData(activity.type, metric, color, Editable(activity.id, it.from, it.to)){ activity.metric_range.getLabel(it.from)}
+                    MetricWidgetData.Labeled(
+                        label,
+                        { activity.type.format(metric) },
+                        color,
+                        Editable(activity.type, metric, it.from, it.to, activity.id)
+                    )
                 }else{
-                    require(activity.metric_range == TimeRange.DAILY)
 
                     val record = completionDAO.getRecord(activity.id, it.from.toLocalDate())
                     val metric = if (record != null) 1L else 0L
                     val color = if (record != null) Colors.Completed else Colors.NotCompleted
                     val recordId = record?.id ?: 0L
 
-                    BaseMetricData(activity.type, metric, color, Editable(activity.id, it.from, it.to, recordId)){ activity.metric_range.getLabel(it.from)}
+                    MetricWidgetData.Labeled(
+                        label,
+                        { activity.type.format(metric) },
+                        color,
+                        Editable(activity.type, metric, it.from, it.to, activity.id,recordId)
+                    )
                 }
             }
             TrackedActivityWithMetric(activity, groupedMetric)
@@ -50,56 +61,68 @@ class RepositoryTrackedActivity constructor(
     }
 
 
-    suspend fun getRecentActivity(activityId: Long, from: LocalDate, to: LocalDate) = AppDatabase.db.withTransaction {
+    suspend fun getRecentActivity(activityId: Long, start: LocalDate, end: LocalDate) = AppDatabase.db.withTransaction {
+        val start =  start.with(ChronoField.DAY_OF_WEEK, 7)
+        val end = end.with(ChronoField.DAY_OF_WEEK, 1)
+
         val activity = activityDAO.getById(activityId)
 
-        var weekIter = to
-            .with(ChronoField.DAY_OF_WEEK, 1)
-            .atStartOfDay()
+        val data  = hashMapOf<LocalDate, Long>()
+
+        getMetricPerDay(activityId, activity.type,  end, start).forEach {
+            data[it.date] = it.metric
+        }
 
         val weeks = arrayListOf<Week>()
+        var days: MutableList<MetricWidgetData> = mutableListOf()
 
-        while (from.atStartOfDay() < weekIter ){
+        (start iter end).forEach {
+            val metric = data[it] ?: 0L
 
-            var weekSum = 0L
-            val days = ArrayList<BaseMetricData>(7)
+            val dayMetricData = MetricWidgetData.Labeled(
+                label = {it.dayOfMonth.toString()},
+                metric = {activity.type.format(metric)},
+                color = Colors.getMetricColor(activity.type, activity.goalValue, activity.goalRange, metric, TimeRange.DAILY),
+                editable = Editable(
+                    type = activity.type,
+                    metric = metric,
+                    from = it.atStartOfDay(),
+                    to = it.atStartOfDay().plusDays(1L),
+                    activityId = activityId
+                )
 
-            for (day in 0L..6L){
-                val from = weekIter.minusDays(day + 1L)
-                val to = weekIter.minusDays(day)
-
-                val metric  = getMetric(activityId, activity.type, from, to)
-
-                weekSum += metric
-
-                val data = BaseMetricData(
-                    activity.type,
-                    metric,
-                    Colors.getMetricColor(activity.type, activity.expected, activity.metric_range, metric, TimeRange.DAILY),
-                    Editable(activityId, from, to)
-                ){ from.dayOfMonth.toString()}
-
-                days.add(data)
-            }
-
-            val summary = if (activity.type != TrackedActivity.Type.COMPLETED) {
-                val color = when (activity.metric_range) {
-                    TimeRange.WEEKLY -> when {
-                        weekSum >= activity.expected -> Colors.Completed
-                        else -> Colors.NotCompleted
-                    }
-                    else -> Colors.AppAccent
-                }
-                BaseMetricData(activity.type, weekSum, color ) { stringResource(id = R.string.frequency_weekly)}
-            } else {
-                null
-            }
-
-            weeks.add(
-                Week(weekIter.minusDays(7), weekIter, days, summary)
             )
+            days.add(dayMetricData)
 
-            weekIter = weekIter.minusDays(7)
+            if (it.dayOfWeek == DayOfWeek.MONDAY){
+
+                val sum = days.sumByLong { it.editable!!.metric}
+
+                val metric:ComposeString = if (activity.type == TrackedActivity.Type.COMPLETED)
+                    {{ "$sum/7" }}
+                else
+                    {{ activity.type.format(sum) }}
+
+                val color = if (activity.goalRange == TimeRange.WEEKLY)
+                    if(sum >= activity.goalValue ) Colors.Completed else Colors.NotCompleted
+                else
+                    Colors.AppAccent
+
+                val stat = MetricWidgetData.Labeled(
+                    label = { stringResource(R.string.frequency_weekly)},
+                    metric = metric,
+                    color = color
+                )
+
+                weeks.add(Week(
+                    from = it.atStartOfDay(),
+                    to = it.atStartOfDay().plusWeeks(1L),
+                    days = days,
+                    stat = stat
+                ))
+
+                days = mutableListOf()
+            }
         }
 
         return@withTransaction weeks
@@ -117,6 +140,17 @@ class RepositoryTrackedActivity constructor(
         TrackedActivity.Type.COMPLETED -> completionDAO.getMetric(activityId, from, to)
     }
 
+    suspend fun getMetricPerDay(
+        activityId: Long,
+        type: TrackedActivity.Type,
+        from: LocalDate,
+        to: LocalDate
+    ) = when(type){
+        TrackedActivity.Type.SESSION -> sessionDAO.getMetricPerDay(activityId, from, to)
+        TrackedActivity.Type.SCORE -> scoreDAO.getMetricPerDay(activityId, from, to)
+        TrackedActivity.Type.COMPLETED -> completionDAO.getMetricPerDay(activityId, from, to)
+    }
+
     suspend fun getRecords(
         activityId: Long,
         type: TrackedActivity.Type,
@@ -128,7 +162,7 @@ class RepositoryTrackedActivity constructor(
         TrackedActivity.Type.COMPLETED -> completionDAO.getAll(activityId, from, to)
     }
 
-    suspend fun deleteRecordById(recordId: Long, ){
+    suspend fun deleteRecordById(recordId: Long){
         sessionDAO.deleteById(recordId)
         scoreDAO.deleteById(recordId)
         completionDAO.deleteById(recordId)
@@ -136,38 +170,14 @@ class RepositoryTrackedActivity constructor(
 
 
     suspend fun startSession(activityId: Long) = AppDatabase.db.withTransaction {
-        activityDAO.update(activityDAO.getById(activityId).copy(in_session_since = LocalDateTime.now()))
+        activityDAO.update(activityDAO.getById(activityId).copy(inSessionSince = LocalDateTime.now()))
     }
 
     suspend fun commitLiveSession(activityId: Long) = AppDatabase.db.withTransaction {
         val activity = activityDAO.getById(activityId)
-        val session = TrackedActivitySession(0, activityId, activity.in_session_since!!, LocalDateTime.now())
+        val session = TrackedActivitySession(0, activityId, activity.inSessionSince!!, LocalDateTime.now())
         sessionDAO.insert(session)
-        activityDAO.update(activity.copy(in_session_since = null))
-    }
-
-    suspend fun commitSession(
-        activityId: Long,
-        from: LocalDateTime,
-        to: LocalDateTime
-    ){
-        sessionDAO.insert(TrackedActivitySession(0, activityId, from, to))
-    }
-
-    suspend fun commitCompletion(activityId: Long, date: LocalDate) = AppDatabase.db.withTransaction{
-        val isCompleted = completionDAO.getMetric(activityId, date.atStartOfDay(), date.atStartOfDay().plusDays(1))
-
-        if (isCompleted == 0L){
-            completionDAO.insert(TrackedActivityCompletion(0, activityId, date))
-        }
-    }
-
-    suspend fun commitScore(activityId: Long, datetime: LocalDateTime,  score: Long){
-        scoreDAO.insert(TrackedActivityScore(0, activityId, datetime, score))
-    }
-
-    suspend fun getRecords(){
-
+        activityDAO.update(activity.copy(inSessionSince = null))
     }
 
 }

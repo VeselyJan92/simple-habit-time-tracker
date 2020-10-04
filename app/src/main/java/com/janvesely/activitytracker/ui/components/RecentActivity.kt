@@ -1,10 +1,8 @@
 package com.janvesely.activitytracker.ui.components
 
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.Icon
-import androidx.compose.foundation.Text
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Functions
@@ -12,35 +10,37 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.janvesely.activitytracker.database.composed.MetricBlockData
-import com.janvesely.activitytracker.database.entities.TrackedActivity
+import androidx.core.os.bundleOf
+import androidx.navigation.NavController
 import java.time.DayOfWeek
 import java.time.LocalDateTime
 import java.util.*
+import com.janvesely.activitytracker.R
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 
 data class Week(
     val from: LocalDateTime,
     val to: LocalDateTime,
-    val days: List<BaseMetricData>,
-    val stat: BaseMetricData?
+    val days: List<MetricWidgetData>,
+    val stat: MetricWidgetData?
 )
 
 @Composable
-fun RecentActivityGrid(weeks: List<Week>){
+fun RecentActivityGrid(weeks: List<Week>, nav: NavController){
 
     Column(Modifier.fillMaxWidth()) {
 
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
 
 
-            DayOfWeek.values().forEach {
+            DayOfWeek.values().reversed().forEach {
                 Stack(Modifier.size(40.dp, 30.dp), alignment = Alignment.Center){
                     Text(
                         text = it.getDisplayName(java.time.format.TextStyle.SHORT, Locale.getDefault()).toUpperCase(),
@@ -61,7 +61,7 @@ fun RecentActivityGrid(weeks: List<Week>){
 
         for (week in weeks){
 
-            Week(week)
+            Week(week, nav)
 
             if (week.from.monthValue != week.to.monthValue || week.from.dayOfMonth == 1 || week.to.dayOfMonth == 1){
                 MonthSplitter(month = week.from.month.name)
@@ -73,14 +73,34 @@ fun RecentActivityGrid(weeks: List<Week>){
 }
 
 @Composable
-private fun Week(week: Week){
+private fun Week(week: Week, nav: NavController){
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         week.days.forEach {
-            MetricBlock(it, editable = true)
+            val modifier = if (it.editable!!.from.toLocalDate() == LocalDate.now())
+                Modifier.border(width = 1.dp, Color.Black, shape = RoundedCornerShape(50))
+            else
+                Modifier
+
+            MetricBlock(
+                it,
+                isEditable = true,
+                onClick = {
+                    nav.navigate(
+                        R.id.action_activity_fragment_to_fragment_day_records,
+                        bundleOf(
+                            "id" to it.editable!!.activityId,
+                            "date" to it.editable!!.from.format(DateTimeFormatter.ISO_DATE)
+                        )
+                    )
+                },
+                modifier = modifier
+            )
         }
 
         if (week.stat != null){
-            MetricBlock(week.stat, editable = false)
+            Box(modifier = Modifier.size(1.dp, 30.dp).background(Colors.ChipGray))
+
+            MetricBlock(week.stat, isEditable = false)
         }
 
 

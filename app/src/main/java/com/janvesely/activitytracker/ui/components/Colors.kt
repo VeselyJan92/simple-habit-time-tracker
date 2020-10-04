@@ -16,11 +16,11 @@ object Colors{
    val AppBackground = Color(0xFFe4eaee)
 
    val AppAccent = Color(0xFF4DB6AC)
-   val AppPrimary = Color(0xFF6200EE)
+   val AppPrimary = Color(0xFF4c37ef)
 
 
    fun getMetricColor(type: TrackedActivity.Type, activityGoal: Long, activityGoalRange: TimeRange, metric: Long, metricRange: TimeRange): Color {
-      return if ((activityGoalRange == metricRange || type == TrackedActivity.Type.COMPLETED) && activityGoal != 0L)
+      return if ((activityGoalRange == metricRange) && activityGoal != 0L)
          if (activityGoal <= metric)
             Completed
          else

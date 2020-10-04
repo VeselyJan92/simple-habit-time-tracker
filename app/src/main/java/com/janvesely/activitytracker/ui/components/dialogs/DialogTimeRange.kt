@@ -3,12 +3,10 @@ package com.janvesely.activitytracker.ui.components.dialogs
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -35,24 +33,29 @@ inline fun DialogTimeRange(
 
         val selected = remember { mutableStateOf(range) }
 
-        TimeRange.values().forEach {
-            Stack(
+        val values = TimeRange.values()
+
+        values.forEachIndexed{ index, timeRange ->
+            Box(
                 modifier = Modifier
                     .weight(1f)
+                    .padding(end = if (values.size - 1 == index) 0.dp else 8.dp)
                     .height(30.dp)
                     .background(
-                        if (selected.value == it) Colors.ChipGraySelected else Colors.ChipGray,
+                        if (selected.value == timeRange) Colors.ChipGraySelected else Colors.ChipGray,
                         RoundedCornerShape(50)
                     )
                     .clickable(onClick = {
                         display.value = false
-                        onRangeSelected.invoke(it)
+                        onRangeSelected.invoke(timeRange)
                     }),
 
                 alignment = Alignment.Center
             ) {
-                Text(text = stringResource(id = it.label))
+                Text(text = stringResource(id = timeRange.label))
             }
+
+
         }
 
 

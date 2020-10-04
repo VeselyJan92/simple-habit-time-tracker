@@ -25,8 +25,8 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerVersion = "1.4.0"
-        kotlinCompilerExtensionVersion ="1.0.0-alpha02"
+        kotlinCompilerVersion = "1.4.10"
+        kotlinCompilerExtensionVersion ="1.0.0-alpha04"
 
     }
 
@@ -62,8 +62,12 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.0")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.10")
     implementation("androidx.core:core-ktx:1.3.1")
+
+
+    implementation( "com.android.support:support-compat:28.0.0")
+
 
     implementation("com.google.dagger:hilt-android:2.28-alpha")
     kapt("com.google.dagger:hilt-android-compiler:2.28-alpha")
@@ -82,12 +86,12 @@ dependencies {
 
 
 
-    implementation("androidx.compose.ui:ui:1.0.0-alpha03")
-    implementation("androidx.compose.material:material:1.0.0-alpha03")
-    implementation("androidx.ui:ui-tooling:1.0.0-alpha03")
-    implementation("androidx.compose.runtime:runtime-livedata:1.0.0-alpha03")
-    implementation("androidx.compose.foundation:foundation:1.0.0-alpha03")
-    implementation("androidx.compose.material:material-icons-extended:1.0.0-alpha03")
+    implementation("androidx.compose.ui:ui:1.0.0-alpha04")
+    implementation("androidx.compose.material:material:1.0.0-alpha04")
+    implementation("androidx.ui:ui-tooling:1.0.0-alpha04")
+    implementation("androidx.compose.runtime:runtime-livedata:1.0.0-alpha04")
+    implementation("androidx.compose.foundation:foundation:1.0.0-alpha04")
+    implementation("androidx.compose.material:material-icons-extended:1.0.0-alpha04")
 
 
 

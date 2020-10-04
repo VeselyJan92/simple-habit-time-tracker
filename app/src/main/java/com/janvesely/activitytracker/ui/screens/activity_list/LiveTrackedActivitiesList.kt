@@ -1,6 +1,5 @@
 package com.janvesely.activitytracker.ui.screens.activity_list
 
-import android.util.Log
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
@@ -14,7 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -27,10 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.MutableLiveData
 import com.janvesely.activitytracker.core.TimeUtils
 import com.janvesely.activitytracker.database.entities.TrackedActivity
-import com.janvesely.activitytracker.ui.components.BaseMetricData
 import com.janvesely.activitytracker.ui.components.Colors
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -88,7 +84,7 @@ fun LiveActivitiesList(vm: ActivitiesViewModel){
                 )
 
 
-                Text(TimeUtils.secondsToMetric(item.in_session_since!!, time),
+                Text(TimeUtils.secondsToMetric(item.inSessionSince!!, time),
                     Modifier.weight(1f).align(Alignment.CenterVertically),
                     textAlign = TextAlign.Center,
                     style = TextStyle(

@@ -2,8 +2,13 @@ package com.janvesely.activitytracker.database.dao.tracked_activity
 
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.withTransaction
+import com.janvesely.activitytracker.database.composed.MetricPerDay
 import com.janvesely.getitdone.database.dao.BaseEditableDAO
 import com.janvesely.activitytracker.database.entities.TrackedActivitySession
+import com.janvesely.getitdone.database.AppDatabase
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 
@@ -29,6 +34,15 @@ interface DAOTrackedActivitySession : BaseEditableDAO<TrackedActivitySession>{
 
 
     @Query("""
+        select DATE(time_end) as date, TOTAL(strftime('%s',time_end) - strftime('%s', time_start)) as metric 
+        from tracked_activity_session s 
+        where (time_start >= :from AND time_start <:to) AND tracked_activity_id=:activityId
+        GROUP BY date
+    """)
+    suspend fun getMetricPerDay(activityId: Long, from: LocalDate, to: LocalDate): List<MetricPerDay>
+
+
+    @Query("""
         select * from tracked_activity_session
         where tracked_activity_id=:activityId
     """)
@@ -39,5 +53,6 @@ interface DAOTrackedActivitySession : BaseEditableDAO<TrackedActivitySession>{
         where tracked_activity_session_id=:recordId
     """)
     suspend fun deleteById(recordId: Long)
+
 }
 

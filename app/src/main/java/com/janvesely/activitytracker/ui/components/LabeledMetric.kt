@@ -3,9 +3,11 @@ package com.janvesely.activitytracker.ui.components
 import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.RowScope.weight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -18,13 +20,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.RowScope.Companion.weight
 import androidx.compose.ui.unit.sp
-import androidx.ui.tooling.preview.Preview
 import com.janvesely.activitytracker.core.App
+import com.janvesely.activitytracker.core.ComposeString
 import com.janvesely.activitytracker.database.entities.TrackedActivity
-import com.janvesely.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.janvesely.activitytracker.ui.components.dialogs.DialogSession
 import com.janvesely.activitytracker.ui.components.dialogs.DialogScore
+import com.janvesely.getitdone.database.AppDatabase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -34,49 +37,44 @@ val labelHeight = 13.dp
 val metricHeight = 20.dp
 val metricTextStyle = TextStyle(fontSize = 10.sp, fontWeight = FontWeight.W600)
 
-
-@Composable
-@Preview
-fun test(){
-
-   // LabeledMetricBlock("00:00", "WEEK", Colors.AppAccent, width = 80.dp)
-
-   Row(Modifier.width(300.dp)) {
-        LabeledMetricBlock("00:00", "WEEK", Colors.AppAccent, width = 0.dp, modifier = Modifier.border(1.dp, Color.Black, RoundedCornerShape(50)))
-        BaseMetricBlock("00:00", Colors.ChipGray, labelOffset = true, width = 0.dp, modifier = Modifier.border(1.dp, Color.Black, RoundedCornerShape(50)))
-    }
-
-}
-
-
 data class Editable(
-    val activityId: Long = 0,
-    val from: LocalDateTime,
-    val to: LocalDateTime,
-    val recordId: Long = 0,
-){
-
-    fun isRecord() = recordId != 0L
-
-}
-
-data class BaseMetricData(
     val type: TrackedActivity.Type,
     val metric: Long,
-    val color: Color,
-    val editable: Editable? = null,
-    val label: @Composable ()->String
+    val from: LocalDateTime,
+    val to: LocalDateTime,
+    val activityId: Long = 0,
+    val recordId: Long = 0,
 ){
-    companion object{
-        fun getEmpty(type: TrackedActivity.Type = TrackedActivity.Type.SESSION) = BaseMetricData(type, -1L, Colors.ChipGray){ "-" }
+    fun isRecord() = recordId != 0L
+}
+
+
+sealed class MetricWidgetData(
+    open val metric: ComposeString,
+    open val color: Color,
+    open val editable: Editable?,
+){
+    data class Base(
+        override val metric: ComposeString,
+        override val color: Color,
+        override val editable: Editable? = null,
+    ): MetricWidgetData(metric, color, editable)
+
+    data class Labeled(
+        val label: ComposeString,
+        override val metric: ComposeString,
+        override val color: Color,
+        override val editable: Editable? = null,
+    ): MetricWidgetData(metric, color, editable){
+
+        @Composable
+        fun formatLabel() = label.invoke()
     }
 
     @Composable
-    fun formatMetric() = type.format(metric)
-
-    @Composable
-    fun formatLabel() = label.invoke()
+    fun formatMetric() = metric.invoke()
 }
+
 
 @Composable
 fun BaseMetricBlock(
@@ -86,10 +84,11 @@ fun BaseMetricBlock(
     labelOffset: Boolean = false,
     width: Dp = 40.dp,
     metricStyle: TextStyle = metricTextStyle,
-    clickable: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
 ){
-    val clickable = if(clickable != null)
-        Modifier.clickable(onClick = {}, onLongClick = clickable)
+    val clickable = if(onClick != null)
+        Modifier.clickable(onClick = onClick, onLongClick = onLongClick)
     else
         Modifier
 
@@ -98,13 +97,15 @@ fun BaseMetricBlock(
     else
         Modifier.size(width, metricHeight)
 
-    Stack(
+
+    Box(
         modifier =  Modifier
             .padding(top = if (labelOffset) labelHeight else 0.dp)
             .then(width)
             .background(color, RoundedCornerShape(10.dp))
             .then(modifier)
-            .then(clickable)
+            .then(clickable),
+        alignment = Alignment.Center
     ){
         Text(
             modifier = Modifier.align(Alignment.Center),
@@ -120,13 +121,14 @@ fun LabeledMetricBlock(
     metric: String,
     label: String,
     color: Color, width: Dp = 40.dp,
-    clickable: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
-    metricStyle: TextStyle =  metricTextStyle
+    metricStyle: TextStyle =  metricTextStyle,
+    onClick: (() -> Unit)? = null
 ){
 
-    val clickable = if(clickable != null)
-        Modifier.clickable(onClick = {}, onLongClick = clickable)
+    val clickable = if(onLongClick != null)
+        Modifier.clickable(onClick = {}, onLongClick = onLongClick)
     else
         Modifier
 
@@ -141,74 +143,94 @@ fun LabeledMetricBlock(
 
         horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = label, style = TextStyle(fontSize = 10.sp), modifier = Modifier.height(labelHeight))
-        BaseMetricBlock(metric, color, modifier.fillMaxWidth(), width = 0.dp, metricStyle = metricStyle)
+        BaseMetricBlock(
+            metric = metric,
+            color = color,
+            modifier = modifier.fillMaxWidth(),
+            width = 0.dp,
+            metricStyle = metricStyle,
+            onLongClick = onLongClick,
+            onClick = onClick
+        )
     }
 
 }
 
 
-
 @OptIn(ExperimentalFoundationApi::class, ExperimentalFocus::class)
 @Composable
 fun MetricBlock(
-    data: BaseMetricData,
+    data: MetricWidgetData,
     modifier: Modifier = Modifier,
-    editable: Boolean = false,
+    isEditable: Boolean = false,
     width: Dp = 40.dp,
-    metricStyle: TextStyle = metricTextStyle
+    metricStyle: TextStyle = metricTextStyle,
+    onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null
 ){
     val requestEdit = remember { mutableStateOf(false) }
 
-    val rep = RepositoryTrackedActivity()
 
-    var clickable: (() -> Unit)? = null
+    var onEdit: (() -> Unit)? = null
 
-    if (editable){
-        require(data.editable != null)
+    if (isEditable){
+        val editable = data.editable
+        require(editable != null)
 
-        clickable = if (editable) fun() {
+        onEdit = onLongClick ?: fun() {
             val viber = App.context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
             viber.vibrate(VibrationEffect.createOneShot(50L, 1))
 
             requestEdit.value = true
-        }else null
+        }
 
-        if (requestEdit.value ) when (data.type){
-
+        if (requestEdit.value ) when (editable.type){
             TrackedActivity.Type.SESSION -> DialogSession(
-                from =  data.editable.from,
-                to =  data.editable.to,
+                from =  editable.from,
+                to =  editable.to,
                 display = requestEdit,
-                recordId = data.editable.recordId,
-                activityId = data.editable.activityId
+                recordId = editable.recordId,
+                activityId = editable.activityId
             )
-
             TrackedActivity.Type.SCORE  -> DialogScore(
                 display = requestEdit,
-                datetime = data.editable.from,
-                score = data.metric
+                datetime = editable.from,
+                score = editable.metric,
+                recordId = editable.recordId,
+                activityId = editable.activityId
             )
-
             TrackedActivity.Type.COMPLETED -> {
                 GlobalScope.launch {
-                    if (data.editable.isRecord())
-                        rep.completionDAO.deleteById(data.editable.recordId)
-                    else
-                        rep.commitCompletion(data.editable.activityId, data.editable.from.toLocalDate())
+                    AppDatabase.activityRep.completionDAO.toggle(editable.activityId, editable.from.toLocalDate())
                 }
-
                 requestEdit.value = false
             }
         }
     }
 
-    LabeledMetricBlock(
-        metric = data.formatMetric(),
-        label = data.formatLabel(),
-        color = data.color,
-        clickable = clickable,
-        modifier = modifier,
-        width = width,
-        metricStyle = metricStyle
-    )
+    when(data){
+        is MetricWidgetData.Base -> BaseMetricBlock(
+            metric = data.formatMetric(),
+            color = data.color,
+            onLongClick = onEdit,
+            modifier = modifier,
+            width = width,
+            metricStyle = metricStyle,
+            onClick = onClick,
+        )
+
+        is MetricWidgetData.Labeled ->  LabeledMetricBlock(
+            metric = data.formatMetric(),
+            label = data.formatLabel(),
+            color = data.color,
+            onLongClick = onEdit,
+            modifier = modifier,
+            width = width,
+            metricStyle = metricStyle,
+            onClick = onClick
+        )
+    }
+
+
+
 }

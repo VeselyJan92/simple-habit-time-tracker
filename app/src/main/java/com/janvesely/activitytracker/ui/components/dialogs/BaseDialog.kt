@@ -3,7 +3,6 @@ package com.janvesely.activitytracker.ui.components.dialogs
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.ColumnScope.align
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -18,10 +17,11 @@ import androidx.compose.ui.window.Dialog
 import com.janvesely.activitytracker.ui.components.Colors
 
 
+
+
 @Composable
 inline fun BaseDialog(display: MutableState<Boolean>, noinline content: @Composable ColumnScope.() -> Unit){
     if (display.value) Dialog(onDismissRequest = {display.value = false}) {
-
 
         Surface(
             elevation = 2.dp
@@ -49,7 +49,11 @@ fun DialogBaseHeader(title: String){
 
 @Composable
 inline fun DialogButtons(content: @Composable RowScope.() -> Unit){
-    Row(Modifier.align(Alignment.End), children = content)
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        children = content,
+        horizontalArrangement = Arrangement.End
+    )
 }
 
 

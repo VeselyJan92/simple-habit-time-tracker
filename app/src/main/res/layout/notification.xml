@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical">
+
+
+    <ImageButton
+        android:id="@+id/rv_live_tracked_task_btn_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginStart="8dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_baseline_stop_24" />
+
+    <TextView
+        android:id="@+id/tracked_task_notification_tv_name"
+        android:layout_width="0dp"
+        android:layout_weight="50"
+        android:layout_height="match_parent"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:lines="1"
+        android:text="sdfs"
+        android:textColor="@android:color/black"
+        android:textSize="17sp"
+        android:textStyle="bold" />
+
+
+    <LinearLayout
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/notification_round_corners"
+        android:layout_width="130dp"
+        android:layout_height="25dp">
+
+        <ImageView
+            android:layout_marginLeft="2dp"
+            android:src="@drawable/ic_baseline_timer_24"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        </ImageView>
+
+        <Chronometer
+            android:format="H:MM:SS"
+            android:textStyle="bold"
+            android:id="@+id/rv_live_tracked_task_chronometer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="5dp"
+            android:gravity="center"
+            android:textColor="@android:color/black" />
+
+    </LinearLayout>
+
+
+
+
+
+</LinearLayout>

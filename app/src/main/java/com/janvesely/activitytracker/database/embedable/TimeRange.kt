@@ -2,7 +2,6 @@ package com.janvesely.activitytracker.database.embedable
 
 import androidx.compose.runtime.Composable
 import com.janvesely.activitytracker.R
-import com.janvesely.activitytracker.database.composed.MetricBlockData
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoField

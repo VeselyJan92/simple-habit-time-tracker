@@ -1,9 +1,7 @@
 package com.janvesely.getitdone.database.dao
 
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Update
+import androidx.room.*
+
 
 interface BaseEditableDAO<T>{
     @Insert(onConflict = OnConflictStrategy.ABORT)
@@ -21,4 +19,6 @@ interface BaseEditableDAO<T>{
 
     @Insert
     suspend fun insert(user: T): Long
+
+
 }

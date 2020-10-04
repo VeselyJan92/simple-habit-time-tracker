@@ -1,11 +1,7 @@
 package com.janvesely.activitytracker.ui.screens.activity
 
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.*
-import com.janvesely.activitytracker.R
-import com.janvesely.activitytracker.core.TimeUtils
 import com.janvesely.activitytracker.core.activityInvalidationTracker
-import com.janvesely.activitytracker.database.composed.MetricBlockData
 import com.janvesely.activitytracker.database.embedable.TimeRange
 import com.janvesely.activitytracker.database.entities.*
 import com.janvesely.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
@@ -35,7 +31,7 @@ class TrackedActivityViewModel(val id: Long) : ViewModel() {
     val metricMonth = MutableLiveData<String>()
     val metric30Days = MutableLiveData<String>()
 
-    val months = MutableLiveData<List<BaseMetricData>>()
+    val months = MutableLiveData<List<MetricWidgetData>>()
 
     val activity = MutableLiveData<TrackedActivity>()
 
@@ -62,8 +58,8 @@ class TrackedActivityViewModel(val id: Long) : ViewModel() {
         val month = today.withDayOfMonth(1)
         val days30 = today.minusDays(30L)
 
-        val recentFrom  = LocalDate.now().with(ChronoField.DAY_OF_WEEK, 7).minusWeeks(3*4)
-        val recentTo  = LocalDate.now().with(ChronoField.DAY_OF_WEEK, 7).plusWeeks(1L)
+        val recentStart  = LocalDate.now()
+        val recentEnd  = LocalDate.now().minusWeeks(3*4)
 
         val recentRecordsFrom  = now.minusDays(2L)
 
@@ -71,7 +67,7 @@ class TrackedActivityViewModel(val id: Long) : ViewModel() {
 
         this@TrackedActivityViewModel.activity.postValue(activity)
 
-        recent.postValue(rep.getRecentActivity(id, recentFrom, recentTo))
+        recent.postValue(rep.getRecentActivity(id, recentStart, recentEnd))
 
         activity.type.apply {
             metricToday.postValue(format(rep.getMetric(id, this, today, now)))
@@ -84,14 +80,16 @@ class TrackedActivityViewModel(val id: Long) : ViewModel() {
 
                     val metric = rep.getMetric(id, this, it.from, it.to)
 
-                    val color = if(activity.metric_range == TimeRange.MONTHLY)
-                        if (activity.expected <= metric) Colors.Completed else Colors.NotCompleted
+                    val color = if(activity.goalRange == TimeRange.MONTHLY)
+                        if (activity.goalValue <= metric) Colors.Completed else Colors.NotCompleted
                     else
                         Colors.AppAccent
 
-                    BaseMetricData(activity.type, metric, color,) {
-                        it.from.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-                    }
+                    MetricWidgetData.Labeled(
+                        label = { it.from.month.getDisplayName(TextStyle.SHORT, Locale.getDefault()) },
+                        metric = { activity.type.format(metric) },
+                        color = color
+                    )
                 }
             )
 

@@ -25,7 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.janvesely.activitytracker.database.entities.*
 import com.janvesely.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
+import com.janvesely.activitytracker.ui.components.dialogs.DialogScore
 import com.janvesely.activitytracker.ui.components.dialogs.DialogSession
+import com.janvesely.getitdone.database.AppDatabase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -33,6 +35,10 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.*
 
+private val metricStyle = TextStyle(
+    fontSize = 12.sp,
+    fontWeight = FontWeight.W600
+)
 
 @Composable
 fun TrackedActivityRecord(item: TrackedActivityData) = when (item){
@@ -48,7 +54,7 @@ fun Completion(item: TrackedActivityCompletion) = BaseRecord(item, {}) {
         append(item.date_completed.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)))
 
         pop()
-        append(item.date_completed.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)))
+        append(item.date_completed.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)))
 
         toAnnotatedString()
     }
@@ -76,8 +82,38 @@ fun Completion(item: TrackedActivityCompletion) = BaseRecord(item, {}) {
 
 
 @Composable
-fun Score(item: TrackedActivityScore) = BaseRecord(item, {}) {
-    var display  = remember { mutableStateOf(false) }
+fun Score(item: TrackedActivityScore){
+    val display  = remember { mutableStateOf(false) }
+
+    DialogScore(display, item.score, item.time_completed, item.id){datetime, score ->
+        GlobalScope.launch {
+            AppDatabase.activityRep.scoreDAO.update(item.copy(time_completed = datetime, score = score))
+        }
+    }
+
+    BaseRecord(item = item, click = { display.value = true }) {
+        val text = with(AnnotatedString.Builder()) {
+            pushStyle(SpanStyle(fontWeight = FontWeight.W700))
+            append(item.time_completed.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)))
+            append("   ")
+            pop()
+            append(item.time_completed.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)))
+
+            toAnnotatedString()
+        }
+
+        Text(
+            text = text,
+            modifier = Modifier
+        )
+
+        BaseMetricBlock(
+            metric = TrackedActivity.Type.SCORE.format(item.score),
+            color = Colors.ChipGray,
+            metricStyle = metricStyle
+        )
+    }
+
 }
 
 @Composable
@@ -114,10 +150,7 @@ fun Session(item: TrackedActivitySession){
         BaseMetricBlock(
             TrackedActivity.Type.SESSION.format(item.getTimeInSeconds()),
             Colors.ChipGray,
-            metricStyle = TextStyle(
-                fontSize = 12.sp,
-                fontWeight = FontWeight.W600
-            )
+            metricStyle = metricStyle
         )
     }
 }

@@ -12,9 +12,7 @@ sealed class TrackedActivityData(
     open var id: Long,
     open var activity_id: Long
 ){
-    companion object{
 
-    }
 }
 
 @Entity(

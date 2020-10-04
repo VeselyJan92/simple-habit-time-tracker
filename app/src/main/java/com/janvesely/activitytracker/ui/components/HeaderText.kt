@@ -15,6 +15,7 @@ fun SectionHeader(label: String){
         modifier = Modifier.fillMaxWidth(),
         text = label,
         style = TextStyle(
+            textAlign = TextAlign.Start,
             fontWeight = FontWeight.W600,
             fontSize = 20.sp
         ),

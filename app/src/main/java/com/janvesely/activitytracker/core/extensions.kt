@@ -1,6 +1,7 @@
 package com.janvesely.activitytracker.core
 
 import androidx.annotation.DrawableRes
+import androidx.compose.runtime.Composable
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
@@ -42,3 +43,14 @@ fun <T> Array<T>.leftShift(d: Int): Array<T> {
     return newList
 }
 
+
+typealias ComposeString = @Composable ()->String
+
+
+inline fun <T> Iterable<T>.sumByLong(selector: (T) -> Long): Long {
+    var sum = 0L
+    for (element in this) {
+        sum += selector(element)
+    }
+    return sum
+}

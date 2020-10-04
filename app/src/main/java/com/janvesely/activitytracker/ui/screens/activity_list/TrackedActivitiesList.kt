@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -31,9 +32,9 @@ import com.janvesely.activitytracker.core.App
 import com.janvesely.activitytracker.database.entities.TrackedActivity
 import com.janvesely.activitytracker.database.entities.TrackedActivity.Type
 import com.janvesely.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.janvesely.activitytracker.ui.components.BaseMetricData
 import com.janvesely.activitytracker.ui.components.Colors
 import com.janvesely.activitytracker.ui.components.MetricBlock
+import com.janvesely.activitytracker.ui.components.MetricWidgetData
 import com.janvesely.activitytracker.ui.components.dialogs.DialogSession
 import com.janvesely.activitytracker.ui.components.dialogs.DialogScore
 import com.janvesely.getitdone.database.AppDatabase
@@ -45,9 +46,9 @@ import java.time.LocalDateTime
 
 data class TrackedActivityWithMetric constructor(
     var activity: TrackedActivity,
-    val past: List<BaseMetricData>,
-) {
-    val completed = activity.expected <= past[0].metric
+    val past: List<MetricWidgetData>,
+){
+    fun currentCompleted() = past[0].editable!!.metric >= activity.goalValue
 }
 
 
@@ -63,6 +64,8 @@ fun TrackedActivitiesList(
         items = items,
         Modifier.padding(8.dp)
     ) { index, item ->
+
+        val context = ContextAmbient.current
 
         val requestEdit = remember { mutableStateOf(false) }
 
@@ -111,15 +114,10 @@ fun TrackedActivitiesList(
                             onClick = {
                                 GlobalScope.launch {
                                     when(item.activity.type){
-                                        Type.SESSION ->  vm.rep.startSession(item.activity.id)
-                                        Type.SCORE ->  vm.rep.commitScore(item.activity.id, LocalDateTime.now(), 1)
+                                        Type.SESSION ->  vm.startSession(context, item.activity)
+                                        Type.SCORE ->  vm.rep.scoreDAO.commitScore(item.activity.id, LocalDateTime.now(), 1)
                                         Type.COMPLETED -> {
-                                            val record = vm.rep.completionDAO.getRecord(item.activity.id, LocalDate.now())
-
-                                            if (record != null)
-                                                vm.rep.completionDAO.delete(record)
-                                            else
-                                                vm.rep.commitCompletion(item.activity.id, LocalDate.now())
+                                            AppDatabase.activityRep.completionDAO.toggle(item.activity.id, LocalDate.now())
                                         }
                                     }
                                 }
@@ -138,7 +136,7 @@ fun TrackedActivitiesList(
                         when(item.activity.type){
                             Type.SESSION -> Icons.Filled.PlayArrow
                             Type.SCORE -> Icons.Filled.Add
-                            Type.COMPLETED -> if (item.completed) Icons.Filled.DoneAll else Icons.Filled.Check
+                            Type.COMPLETED -> if (item.currentCompleted()) Icons.Filled.DoneAll else Icons.Filled.Check
                         },
                         Modifier
                             .size(34.dp)
@@ -158,18 +156,18 @@ fun TrackedActivitiesList(
                         )
 
                         if (item.activity.isGoalSet())
-                            Goal(item.activity.type.format(item.activity.expected))
+                            Goal(item.activity.type.format(item.activity.goalValue))
                     }
 
                     Row(modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        MetricBlock(item.past[0], editable = false, width = 80.dp, metricStyle = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold) )
-                        MetricBlock(item.past[1], editable = true)
-                        MetricBlock(item.past[2], editable = true)
-                        MetricBlock(item.past[3], editable = true)
-                        MetricBlock(item.past[4], editable = true)
+                        MetricBlock(item.past[0], isEditable = false, width = 80.dp, metricStyle = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold) )
+                        MetricBlock(item.past[1], isEditable = true)
+                        MetricBlock(item.past[2], isEditable = true)
+                        MetricBlock(item.past[3], isEditable = true)
+                        MetricBlock(item.past[4], isEditable = true)
                     }
                 }
             }
@@ -196,38 +194,6 @@ private fun Goal(label: String){
     }
 
 }
-
-/*
-@Composable
-private fun CurrentMetric(data: MetricBlockData){
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = data.getLabel(), style = TextStyle(
-            fontSize = 10.sp
-        ))
-
-        val color = if (data.isCompleted()) Colors.ButtonGreen else Colors.NotCompleted
-
-        val modifier = Modifier.size(80.dp, 20.dp).background(color, RoundedCornerShape(10.dp))
-        
-        Surface(
-            elevation = 2.dp,
-            shape =  RoundedCornerShape(10.dp)
-        ) {
-            Stack(modifier = modifier){
-                Text(
-                    modifier = Modifier.align(Alignment.Center),
-                    text = data.formatMetric(),
-                    style = TextStyle(
-                        fontWeight = FontWeight.W600,
-                        fontSize = 15.sp
-                    )
-                )
-            }
-        }
-
-    }
-
-}*/
 
 
 

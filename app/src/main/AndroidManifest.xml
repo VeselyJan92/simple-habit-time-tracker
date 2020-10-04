@@ -21,6 +21,10 @@
             </intent-filter>
         </activity>
 
+        <receiver android:name="com.janvesely.activitytracker.core.StopTrackedActivityReceiver"  android:exported="false">
+        </receiver>
+
     </application>
+
 
 </manifest>

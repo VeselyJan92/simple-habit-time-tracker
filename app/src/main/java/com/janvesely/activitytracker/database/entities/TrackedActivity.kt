@@ -1,13 +1,9 @@
 package com.janvesely.activitytracker.database.entities
 
-import android.graphics.Color
 import androidx.room.*
 import com.janvesely.activitytracker.database.embedable.TimeRange
-import com.janvesely.activitytracker.ui.components.Colors
-import java.time.LocalDate
+import com.janvesely.activitytracker.database.embedable.TrackedActivityGoal
 import java.time.LocalDateTime
-import java.time.temporal.WeekFields
-import java.util.*
 
 @Entity(
     tableName = TrackedActivity.TABLE,
@@ -27,31 +23,27 @@ data class TrackedActivity(
     @ColumnInfo(name = "type")
     var type: Type,
 
-    @ColumnInfo(name = "in_session")
-    var in_session_since: LocalDateTime? = null,
+    @ColumnInfo(name = "in_session_since")
+    var inSessionSince: LocalDateTime? = null,
 
-    @ColumnInfo(name = "metric_range")
-    var metric_range: TimeRange,
+    @Embedded
+    var goal: TrackedActivityGoal,
+
+    @ColumnInfo(name = "goal_time_range")
+    var goalRange: TimeRange,
 
     /**Number minutes for [TrackedActivity.Type] TIMED or count */
-    @ColumnInfo(name = "expected")
-    var expected: Long,
-
-
-    @ColumnInfo(name = "hex_color")
-    var hex_color: String,
-
-    @ColumnInfo(name = "icon")
-    var icon: String
+    @ColumnInfo(name = "goal_value")
+    var goalValue: Long,
 ) {
+
     companion object{
         const val TABLE = "tracked_activity"
 
-        val empty = TrackedActivity(0L, "", 0, Type.SESSION, in_session_since = null, TimeRange.DAILY, 0L, "", "" )
-
+        val empty = TrackedActivity(0L, "", 0, Type.SESSION, inSessionSince = null, TimeRange.DAILY, 0L, "", "" )
     }
 
-    fun isGoalSet() = expected != 0L && type != Type.COMPLETED
+    fun isGoalSet() = goalValue != 0L && type != Type.COMPLETED
 
     enum class Type {
         SESSION, SCORE, COMPLETED;
@@ -72,9 +64,9 @@ data class TrackedActivity(
 
     fun formatGoal() : String{
         return when(type){
-            Type.SCORE -> expected.toString()
-            Type.SESSION ->String.format("%02d:%02d", expected / (60*60), (expected/60) % 60)
-            Type.COMPLETED -> ""
+            Type.SCORE -> goalValue.toString()
+            Type.SESSION ->String.format("%02d:%02d", goalValue / (60*60), (goalValue/60) % 60)
+            Type.COMPLETED -> goalValue.toString() + "x"
         }
     }
 

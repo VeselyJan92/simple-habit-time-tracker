@@ -16,9 +16,6 @@ import androidx.navigation.fragment.navArgs
 
 class FragmentTrackedActivity : Fragment() {
 
-
-
-
     private val vm by viewModels<TrackedActivityViewModel>{
         TrackedActivityVMFactory(requireArguments().getLong("tracked_activity_id"))
     }

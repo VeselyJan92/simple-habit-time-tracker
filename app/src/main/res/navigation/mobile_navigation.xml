@@ -7,15 +7,13 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.janvesely.activitytracker.ui.screens.home.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        android:name="com.janvesely.activitytracker.ui.screens.upcomming.UpcommingFragment"
+        android:label="@string/title_home" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/navigation_activities_list"
         android:name="com.janvesely.activitytracker.ui.screens.activity_list.ActivitiesFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_activities">
+        android:label="@string/title_dashboard">
 
         <action
             android:id="@+id/action_navigation_dashboard_to_activity_fragment"
@@ -25,9 +23,8 @@
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.janvesely.activitytracker.ui.screens.notifications.NotificationsFragment"
-        android:label="Awesome"
-        tools:layout="@layout/fragment_notifications" />
+        android:name="com.janvesely.activitytracker.ui.screens.upcomming.UpcommingFragment"
+        android:label="Awesome" />
 
     <fragment
         android:id="@+id/activity_fragment"
@@ -39,12 +36,11 @@
             app:nullable="false" />
 
         <action
-            android:id="@+id/action_activity_fragment_to_fragmentTrackedActivityRecords"
-            app:destination="@id/fragmentTrackedActivityRecords" />
+            android:id="@+id/action_activity_fragment_to_fragment_day_records"
+            app:destination="@id/fragment_day_records" />
     </fragment>
 
     <fragment
-        android:id="@+id/fragmentTrackedActivityRecords"
-        android:name="com.janvesely.activitytracker.ui.screens.records.FragmentTrackedActivityRecords"
-        android:label="FragmentTrackedActivityRecords" />
+        android:id="@+id/fragment_day_records"
+        android:name="com.janvesely.activitytracker.ui.screens.day_history.DayRecordsFragment" />
 </navigation>

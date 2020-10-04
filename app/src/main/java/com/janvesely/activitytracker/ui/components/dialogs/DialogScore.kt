@@ -23,20 +23,18 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 
-@OptIn(ExperimentalMaterialApi::class)
-@ExperimentalFoundationApi
-@ExperimentalFocus
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class, ExperimentalFocus::class)
 @Composable
 fun DialogScore(
     display: MutableState<Boolean> = mutableStateOf(true),
     score: Long,
     datetime: LocalDateTime,
-    onSetSession: ((LocalDateTime, Long)->Unit)? = null,
     recordId: Long = 0,
-    activityId: Long = 0
+    activityId: Long = 0,
+    onSetSession: ((LocalDateTime, Long)->Unit)? = null
 ) {
     val modify = remember {recordId != 0L}
-    val score = remember { mutableStateOf(score.toInt()) }
+    val score = remember { mutableStateOf(if (modify) score.toInt() else 1) }
     val datetime = remember { mutableStateOf(datetime) }
 
     BaseDialog(display = display) {
@@ -83,9 +81,21 @@ private fun Buttons(
     input: MutableState<Int>
 ) = DialogButtons {
 
+    if (modify){
+        TextButton(
+            onClick = {
+                display.value = false
+                GlobalScope.launch {
+                    RepositoryTrackedActivity().scoreDAO.deleteById(recordId)
+                }
+            }
+        ) {
+            Text(text = "DELETE")
+        }
+    }
+
     TextButton(onClick = {  display.value = false }) {
         Text(text = "CANCEL")
-
     }
 
     TextButton(onClick = {
