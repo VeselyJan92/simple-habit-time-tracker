@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.janvesely.activitytracker.database.Seeder
 import com.janvesely.activitytracker.database.dao.tracked_activity.DAOTrackedActivity
-import com.janvesely.activitytracker.database.dao.tracked_activity.DAOTrackedActivityCompletion
+import com.janvesely.activitytracker.database.dao.tracked_activity.DAOTrackedActivityChecked
 import com.janvesely.activitytracker.database.dao.tracked_activity.DAOTrackedActivitySession
 import com.janvesely.activitytracker.database.dao.tracked_activity.DAOTrackedActivityScore
 import com.janvesely.activitytracker.database.entities.TrackedActivity
@@ -52,7 +52,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract val activityDAO: DAOTrackedActivity
     abstract val scoreDAO: DAOTrackedActivityScore
     abstract val sessionDAO: DAOTrackedActivitySession
-    abstract val completionDAO: DAOTrackedActivityCompletion
+    abstract val completionDAO: DAOTrackedActivityChecked
 
 
     companion object {
@@ -99,7 +99,7 @@ abstract class AppDatabase : RoomDatabase() {
 
 
             id = db.activityDAO.insert(s.getTrackedActivity(
-                type = TrackedActivity.Type.COMPLETED,
+                type = TrackedActivity.Type.CHECKED,
                 name = "Posilovna",
                 position = 10,
                 goal = 1,
@@ -109,7 +109,7 @@ abstract class AppDatabase : RoomDatabase() {
             db.completionDAO.insert(s.getTrackedTaskCompletion(activityId = id, date = LocalDate.now().minusDays(1)))
 
             id = db.activityDAO.insert(s.getTrackedActivity(
-                type = TrackedActivity.Type.COMPLETED,
+                type = TrackedActivity.Type.CHECKED,
                 name = "Posilovna 2",
                 position = 11,
                 goal = 1,

@@ -21,7 +21,12 @@ private fun DialogInputTextPreview(){
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class, ExperimentalFocus::class)
 @Composable
-inline fun DialogInputText(display: MutableState<Boolean>, text: String, title: String, noinline onTextSet: (String)->Unit){
+inline fun DialogInputText(
+    display: MutableState<Boolean>,
+    text: String,
+    title: String,
+    noinline onTextSet: (String) -> Unit
+){
 
     BaseDialog(display = display ) {
 

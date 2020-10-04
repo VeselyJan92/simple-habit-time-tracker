@@ -1,9 +1,8 @@
 package com.janvesely.activitytracker.ui.components
 
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.NativeTileMode
 import com.janvesely.activitytracker.database.embedable.TimeRange
-import com.janvesely.activitytracker.database.entities.TrackedActivity
+import com.janvesely.activitytracker.database.embedable.TrackedActivityGoal
 
 object Colors{
    val Completed = Color(0xFF59BF2D)
@@ -19,9 +18,9 @@ object Colors{
    val AppPrimary = Color(0xFF4c37ef)
 
 
-   fun getMetricColor(type: TrackedActivity.Type, activityGoal: Long, activityGoalRange: TimeRange, metric: Long, metricRange: TimeRange): Color {
-      return if ((activityGoalRange == metricRange) && activityGoal != 0L)
-         if (activityGoal <= metric)
+   fun getMetricColor(goal: TrackedActivityGoal, metric: Long, metricRange: TimeRange, default: Color): Color {
+      return if ((goal.range == metricRange) && goal.isSet())
+         if (goal.value <= metric)
             Completed
          else
             NotCompleted
@@ -29,6 +28,6 @@ object Colors{
          if (metric != 0L)
             Completed
          else
-            ChipGray
+            default
    }
 }

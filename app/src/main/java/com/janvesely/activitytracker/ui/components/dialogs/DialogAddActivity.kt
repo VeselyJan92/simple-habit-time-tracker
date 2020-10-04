@@ -16,21 +16,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawShadow
 import androidx.compose.ui.focus.ExperimentalFocus
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.core.os.bundleOf
+import androidx.navigation.NavController
+import com.janvesely.activitytracker.R
+import com.janvesely.activitytracker.database.embedable.TimeRange
+import com.janvesely.activitytracker.database.embedable.TrackedActivityGoal
 import com.janvesely.activitytracker.database.entities.TrackedActivity
 import com.janvesely.activitytracker.ui.components.Colors
 import com.janvesely.getitdone.database.AppDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class, ExperimentalFocus::class)
 @Composable
 fun DialogAddActivity(
+    nav: NavController,
     display: MutableState<Boolean>,
 ){
     BaseDialog(display = display ) {
@@ -39,18 +48,39 @@ fun DialogAddActivity(
 
         val rep = AppDatabase.activityRep
 
+        val insert = fun(type: TrackedActivity.Type) = GlobalScope.launch(Dispatchers.IO) {
+            val activity = TrackedActivity(
+                id = 0L,
+                name = "New Activity",
+                position = 0,
+                type = type,
+                inSessionSince = null,
+                goal = TrackedActivityGoal(0L, TimeRange.WEEKLY)
+            )
+
+            val id = rep.activityDAO.insertSync(activity)
+
+            withContext(Dispatchers.Main){
+                display.value = false
+
+                nav.navigate(
+                    R.id.action_navigation_dashboard_to_activity_fragment,
+                    bundleOf("tracked_activity_id" to id)
+                )
+            }
+        }
+
         TrackedActivities(Icons.Default.Timer, "Time", "Zaznávejte svoje časové aktivity: práce,  kníčky, ... "){
-            rep.insert(TrackedActivity())
+            insert.invoke(TrackedActivity.Type.SESSION)
         }
 
         TrackedActivities(Icons.Default.Score, "Score", "Zaznávejte svoje časové aktivity: práce,  kníčky, ... "){
-
+            insert.invoke(TrackedActivity.Type.SCORE)
         }
 
         TrackedActivities(Icons.Default.AssignmentTurnedIn, "Habbit", "Zaznávejte svoje časové aktivity: práce,  kníčky, ... ") {
-
+            insert.invoke(TrackedActivity.Type.CHECKED)
         }
-
 
         DialogButtons {
 
@@ -63,31 +93,7 @@ fun DialogAddActivity(
 
 }
 
-@Composable
-private fun InfoPanel(){
-    Column(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth()
-            .zIndex(1f)
-            .drawShadow(2.dp, shape = RoundedCornerShape(20.dp))
-            .background(Colors.ChipGraySelected, RoundedCornerShape(20.dp))
-            .padding(8.dp)
 
-
-    ){
-        Text(
-            text = "Záznamy",
-            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
-        )
-
-        Text(
-            text = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Curabitur vitae diam non enim vestibulum interdum.",
-            style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Bold)
-
-        )
-    }
-}
 
 @Composable
 private fun TrackedActivities(

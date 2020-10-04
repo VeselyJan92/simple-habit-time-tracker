@@ -18,7 +18,7 @@ abstract class DAOTrackedActivity : BaseEditableDAO<TrackedActivity>{
     companion object{
         const val SQL_all_not_in_session = """
             SELECT * FROM tracked_activity 
-            WHERE (type = 'SESSION' AND in_session is NULL) OR (type != 'SESSION') 
+            WHERE (type = 'SESSION' AND in_session_since is NULL) OR (type != 'SESSION') 
             order by position
         """
         const val SQL_one_by_id = """
@@ -29,6 +29,12 @@ abstract class DAOTrackedActivity : BaseEditableDAO<TrackedActivity>{
 
     @Query(SQL_one_by_id)
     abstract suspend fun getById(id: Long): TrackedActivity
+
+    @Query("""
+            DELETE FROM tracked_activity 
+            WHERE tracked_activity_id =:id
+        """)
+    abstract suspend fun deleteById(id: Long)
 
     @Query(SQL_one_by_id)
     abstract fun getLiveById(id: Long): LiveData<TrackedActivity>
@@ -51,8 +57,8 @@ abstract class DAOTrackedActivity : BaseEditableDAO<TrackedActivity>{
 
     @Query("""
         SELECT * FROM tracked_activity 
-        WHERE in_session IS NOT NULL
-        order by in_session
+        WHERE in_session_since IS NOT NULL
+        order by in_session_since
     """)
     abstract fun liveActive(): LiveData<List<TrackedActivity>>
 }

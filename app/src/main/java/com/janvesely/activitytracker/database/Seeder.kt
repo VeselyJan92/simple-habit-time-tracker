@@ -1,7 +1,7 @@
 package com.janvesely.activitytracker.database
 
-import androidx.compose.ui.graphics.Color
 import com.janvesely.activitytracker.database.embedable.TimeRange
+import com.janvesely.activitytracker.database.embedable.TrackedActivityGoal
 import com.janvesely.activitytracker.database.entities.TrackedActivity
 import com.janvesely.activitytracker.database.entities.TrackedActivityCompletion
 import com.janvesely.activitytracker.database.entities.TrackedActivityScore
@@ -41,13 +41,11 @@ class Seeder {
         id: Long = 0,
         name: String = randomWord(),
         position: Int = nextInt(100, 200),
-        type: TrackedActivity.Type = TrackedActivity.Type.COMPLETED,
+        type: TrackedActivity.Type = TrackedActivity.Type.CHECKED,
         inSession: LocalDateTime? = null,
         range: TimeRange = TimeRange.DAILY,
-        goal: Long = 0,
-        color: String = Color.Blue.toString(),
-        icon: String = ""
-    ) = TrackedActivity(id, name, position, type, inSession, range, goal, color, icon)
+        goal: Long = 0
+    ) = TrackedActivity(id, name, position, type, inSession, TrackedActivityGoal(goal, range))
 
 
     fun getTrackedTaskCompletion(

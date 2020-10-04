@@ -1,14 +1,11 @@
 package com.janvesely.activitytracker.ui.screens.activity
 
-import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Flag
-import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.ripple.RippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.janvesely.activitytracker.database.embedable.TimeRange
+import com.janvesely.activitytracker.database.embedable.TrackedActivityGoal
 import com.janvesely.activitytracker.database.entities.TrackedActivity
-import com.janvesely.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.janvesely.activitytracker.ui.components.*
 import com.janvesely.activitytracker.ui.components.Colors
 import com.janvesely.activitytracker.ui.components.dialogs.DialogGoal
@@ -43,11 +40,30 @@ import kotlinx.coroutines.launch
 @ExperimentalLayout
 @Composable
 fun TrackedActivityScreen(nav: NavController, vm: TrackedActivityViewModel) {
+
+    val activity by vm.activity.observeAsState(null)
+
     Scaffold(
-        topBar = { TrackerTopAppBar("Activity") },
+        topBar = {
+            TrackerTopAppBar("Activity") {
+                Icon(
+                    asset = Icons.Default.Delete,
+                    tint = Color.White,
+                    modifier = Modifier.clickable(onClick = {
+                        nav.popBackStack()
+                        GlobalScope.launch {
+                            activity?.id?.let {
+                                AppDatabase.activityRep.activityDAO.deleteById(it)
+                            }
+                        }
+                    })
+                )
+            }
+
+        },
         bodyContent = {
             ScrollableColumn {
-                ScreenBody(nav, vm)
+                ScreenBody(nav, vm, activity)
             }
 
         },
@@ -62,9 +78,9 @@ fun TrackedActivityScreen(nav: NavController, vm: TrackedActivityViewModel) {
 @ExperimentalFocus
 @ExperimentalFoundationApi
 @Composable
-fun ScreenBody(nav: NavController, vm: TrackedActivityViewModel) {
+fun ScreenBody(nav: NavController, vm: TrackedActivityViewModel, activity: TrackedActivity?) {
     Column {
-        ActivitySettings(vm)
+        ActivitySettings(activity)
 
         RecentActivity(nav, vm)
 
@@ -73,10 +89,9 @@ fun ScreenBody(nav: NavController, vm: TrackedActivityViewModel) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ActivitySettings(vm: TrackedActivityViewModel){
+fun ActivitySettings(activity: TrackedActivity?){
     Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp)) {
 
-        val activity by vm.activity.observeAsState(TrackedActivity.empty)
 
         Column(Modifier.padding(8.dp).fillMaxWidth()) {
                 ActivityName(activity)
@@ -93,37 +108,36 @@ fun ActivitySettings(vm: TrackedActivityViewModel){
 }
 
 @Composable
-private fun ActivityName(activity: TrackedActivity) {
+private fun ActivityName(activity: TrackedActivity?) {
     val display = remember { mutableStateOf(false) }
 
-    DialogInputText(
+    if (activity!= null) DialogInputText(
         display = display,
         text = activity.name,
         title = "Zadejte název aktivity",
         onTextSet = {
+            GlobalScope.launch {
+                val item = activity.copy(name = it)
+                AppDatabase.activityRep.update(item)
+            }
+
             display.value = false
-            GlobalScope.launch {RepositoryTrackedActivity().update(activity.copy(name = it)) }
         }
     )
 
-    Stack(
-        modifier = Modifier.background(Colors.ChipGray, shape = RoundedCornerShape(50))
-            .height(30.dp).clickable(
+    Box(
+        modifier = Modifier
+            .background(Colors.ChipGray, shape = RoundedCornerShape(50))
+            .height(30.dp)
+            .clickable(
                 onClick = { display.value = true},
                 indication = RippleIndication()
             ),
         alignment = Alignment.Center
     ) {
-
-        if (activity.name.isEmpty()) {
-            Text(
-                text = "label",
-            )
-        }
-
         Text(
             modifier = Modifier.padding(start = 8.dp, end = 8.dp).fillMaxWidth(),
-            text = activity.name,
+            text = activity?.name ?: "",
             style = TextStyle(
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
@@ -134,11 +148,11 @@ private fun ActivityName(activity: TrackedActivity) {
 }
 
 @Composable
-inline fun Goal(activity: TrackedActivity){
+inline fun Goal(activity: TrackedActivity?){
     val display = remember { mutableStateOf(false) }
 
-    DialogGoal(display = display, activity = activity){
-        AppDatabase.activityRep.update(activity.copy(goalValue = it))
+    if (activity!= null) DialogGoal(display = display, activity = activity){
+        AppDatabase.activityRep.update(activity.copy(goal = TrackedActivityGoal(it, activity.goal.range)))
     }
 
     Row(
@@ -146,15 +160,22 @@ inline fun Goal(activity: TrackedActivity){
             .size(80.dp, 30.dp)
             .padding(end = 8.dp)
             .background(Colors.ChipGray, RoundedCornerShape(50))
-            .clickable(onClick = {if (activity.goalRange != TimeRange.DAILY) display.value = true})
+            .clickable(
+                onClick = {
+                    if (activity == null)
+                        return@clickable
+
+                    if (activity.goal.range != TimeRange.DAILY) display.value = true
+                }
+            )
 
 
     ) {
+
         Icon(Icons.Filled.Flag, Modifier.align(Alignment.CenterVertically).padding(start = 5.dp).size(15.dp))
-        Log.e("GOAL", "COMPOSE")
 
         Text(
-            activity.formatGoal(),
+            activity?.formatGoal() ?: "-",
             Modifier.weight(1f).align(Alignment.CenterVertically).padding(end = 8.dp),
             textAlign = TextAlign.Center,
             style = TextStyle(
@@ -166,15 +187,17 @@ inline fun Goal(activity: TrackedActivity){
 }
 
 @Composable
-private fun ViewRange(activity: TrackedActivity){
+private fun ViewRange(activity: TrackedActivity?){
     val display = remember { mutableStateOf(false) }
 
-    DialogTimeRange(display = display, activity.goalRange){
-        if (activity.goalRange != it) GlobalScope.launch {
-            val item = activity.copy(goalRange = it)
+    if (activity!= null) DialogTimeRange(display = display, activity.goal.range){
+        GlobalScope.launch {
+            val value = if (activity.type == TrackedActivity.Type.CHECKED && it == TimeRange.DAILY)
+                1L
+            else
+                activity.goal.value
 
-            if (activity.type == TrackedActivity.Type.COMPLETED && it == TimeRange.DAILY)
-                item.goalValue = 1
+            val item = activity.copy(goal = TrackedActivityGoal(value, it))
 
             AppDatabase.activityRep.update(item)
         }
@@ -190,7 +213,7 @@ private fun ViewRange(activity: TrackedActivity){
         Icon(Icons.Filled.DateRange, Modifier.align(Alignment.CenterVertically).padding(start = 5.dp).size(15.dp))
 
         Text(
-            stringResource(id = activity.goalRange.label),
+            activity?.goal?.range?.label?.let { stringResource(id = it) } ?: "-",
             Modifier.weight(1f).align(Alignment.CenterVertically).padding(end = 8.dp),
             textAlign = TextAlign.Center,
             style = TextStyle(

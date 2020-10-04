@@ -7,6 +7,7 @@ import com.janvesely.activitytracker.database.entities.*
 import com.janvesely.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.janvesely.activitytracker.ui.components.*
 import com.janvesely.getitdone.database.AppDatabase
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -52,6 +53,7 @@ class TrackedActivityViewModel(val id: Long) : ViewModel() {
     }
 
     fun refresh() = viewModelScope.launch {
+
         val now = LocalDateTime.now()
         val today = LocalDate.now().atStartOfDay()
         val week = today.with(ChronoField.DAY_OF_WEEK, 1)
@@ -80,8 +82,8 @@ class TrackedActivityViewModel(val id: Long) : ViewModel() {
 
                     val metric = rep.getMetric(id, this, it.from, it.to)
 
-                    val color = if(activity.goalRange == TimeRange.MONTHLY)
-                        if (activity.goalValue <= metric) Colors.Completed else Colors.NotCompleted
+                    val color = if(activity.goal.range == TimeRange.MONTHLY)
+                        if (activity.goal.value <= metric) Colors.Completed else Colors.NotCompleted
                     else
                         Colors.AppAccent
 

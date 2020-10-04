@@ -21,7 +21,7 @@ inline fun DialogGoal(
 
         DialogBaseHeader(title = "Pick a goal")
 
-        val goal = remember { mutableStateOf(activity.goalValue) }
+        val goal = remember { mutableStateOf(activity.goal.value) }
 
         when(activity.type){
             TrackedActivity.Type.SESSION ->{
@@ -41,12 +41,12 @@ inline fun DialogGoal(
                     goal.value = it.toLong()
                 }
             }
-            TrackedActivity.Type.COMPLETED ->{
+            TrackedActivity.Type.CHECKED ->{
                 NumberSelector(
                     label = "Score",
                     number = mutableStateOf(goal.value.toInt())
                 ){
-                    when(activity.goalRange){
+                    when(activity.goal.range){
                         TimeRange.DAILY -> throw IllegalStateException()
                         TimeRange.WEEKLY -> if (it in 0..7) goal.value = it.toLong()
                         TimeRange.MONTHLY -> if (it in 0..31) goal.value = it.toLong()

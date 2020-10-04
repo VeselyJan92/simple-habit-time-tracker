@@ -20,20 +20,20 @@ import java.time.temporal.ChronoField
 
 class RepositoryTrackedActivity constructor(
     override val activityDAO: DAOTrackedActivity = AppDatabase.db.activityDAO,
-    val completionDAO: DAOTrackedActivityCompletion = AppDatabase.db.completionDAO,
+    val completionDAO: DAOTrackedActivityChecked = AppDatabase.db.completionDAO,
     val scoreDAO: DAOTrackedActivityScore = AppDatabase.db.scoreDAO,
     val sessionDAO: DAOTrackedActivitySession = AppDatabase.db.sessionDAO
 ) : DBEntityRepository<TrackedActivity>(activityDAO) {
 
     suspend fun getActivitiesOverview(pastRanges: Int) =  AppDatabase.db.withTransaction {
         return@withTransaction AppDatabase.db.activityDAO.getAllNotInSession().map { activity ->
-            val groupedMetric = activity.goalRange.getPastRanges(pastRanges).map {
+            val groupedMetric = activity.goal.range.getPastRanges(pastRanges).map {
 
-                val label:ComposeString = { activity.goalRange.getLabel(it.from) }
+                val label:ComposeString = { activity.goal.range.getLabel(it.from) }
 
-                if (activity.type != TrackedActivity.Type.COMPLETED){
+                if (activity.type != TrackedActivity.Type.CHECKED){
                     val metric = getMetric(activity.id, activity.type, it.from, it.to)
-                    val color =  Colors.getMetricColor(activity.type, activity.goalValue, activity.goalRange, metric, activity.goalRange)
+                    val color =  Colors.getMetricColor(activity.goal, metric, activity.goal.range)
 
                     MetricWidgetData.Labeled(
                         label,
@@ -82,7 +82,7 @@ class RepositoryTrackedActivity constructor(
             val dayMetricData = MetricWidgetData.Labeled(
                 label = {it.dayOfMonth.toString()},
                 metric = {activity.type.format(metric)},
-                color = Colors.getMetricColor(activity.type, activity.goalValue, activity.goalRange, metric, TimeRange.DAILY),
+                color = Colors.getMetricColor(activity.goal, metric, TimeRange.DAILY, Colors.ChipGray),
                 editable = Editable(
                     type = activity.type,
                     metric = metric,
@@ -98,20 +98,15 @@ class RepositoryTrackedActivity constructor(
 
                 val sum = days.sumByLong { it.editable!!.metric}
 
-                val metric:ComposeString = if (activity.type == TrackedActivity.Type.COMPLETED)
+                val metric:ComposeString = if (activity.type == TrackedActivity.Type.CHECKED)
                     {{ "$sum/7" }}
                 else
                     {{ activity.type.format(sum) }}
 
-                val color = if (activity.goalRange == TimeRange.WEEKLY)
-                    if(sum >= activity.goalValue ) Colors.Completed else Colors.NotCompleted
-                else
-                    Colors.AppAccent
-
                 val stat = MetricWidgetData.Labeled(
                     label = { stringResource(R.string.frequency_weekly)},
                     metric = metric,
-                    color = color
+                    color = Colors.getMetricColor(activity.goal, sum, TimeRange.WEEKLY, Colors.AppAccent)
                 )
 
                 weeks.add(Week(
@@ -137,7 +132,7 @@ class RepositoryTrackedActivity constructor(
     ) = when(type){
         TrackedActivity.Type.SESSION -> sessionDAO.getMetric(activityId, from, to)
         TrackedActivity.Type.SCORE -> scoreDAO.getMetric(activityId, from, to)
-        TrackedActivity.Type.COMPLETED -> completionDAO.getMetric(activityId, from, to)
+        TrackedActivity.Type.CHECKED -> completionDAO.getMetric(activityId, from, to)
     }
 
     suspend fun getMetricPerDay(
@@ -148,7 +143,7 @@ class RepositoryTrackedActivity constructor(
     ) = when(type){
         TrackedActivity.Type.SESSION -> sessionDAO.getMetricPerDay(activityId, from, to)
         TrackedActivity.Type.SCORE -> scoreDAO.getMetricPerDay(activityId, from, to)
-        TrackedActivity.Type.COMPLETED -> completionDAO.getMetricPerDay(activityId, from, to)
+        TrackedActivity.Type.CHECKED -> completionDAO.getMetricPerDay(activityId, from, to)
     }
 
     suspend fun getRecords(
@@ -159,7 +154,7 @@ class RepositoryTrackedActivity constructor(
     ) = when(type){
         TrackedActivity.Type.SESSION -> sessionDAO.getAll(activityId, from, to)
         TrackedActivity.Type.SCORE -> scoreDAO.getAll(activityId, from, to)
-        TrackedActivity.Type.COMPLETED -> completionDAO.getAll(activityId, from, to)
+        TrackedActivity.Type.CHECKED -> completionDAO.getAll(activityId, from, to)
     }
 
     suspend fun deleteRecordById(recordId: Long){

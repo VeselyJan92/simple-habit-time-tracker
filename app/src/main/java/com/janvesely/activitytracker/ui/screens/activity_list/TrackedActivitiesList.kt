@@ -48,7 +48,7 @@ data class TrackedActivityWithMetric constructor(
     var activity: TrackedActivity,
     val past: List<MetricWidgetData>,
 ){
-    fun currentCompleted() = past[0].editable!!.metric >= activity.goalValue
+    fun currentCompleted() = past[0].editable!!.metric >= activity.goal.value
 }
 
 
@@ -59,6 +59,8 @@ fun TrackedActivitiesList(
     vm: ActivitiesViewModel
 ){
     val items by vm.activities.observeAsState(arrayListOf())
+
+
 
     LazyColumnForIndexed(
         items = items,
@@ -99,6 +101,7 @@ fun TrackedActivitiesList(
                         ))
                     }
                 ),
+
             elevation = 2.dp,
         ) {
             Row(
@@ -106,7 +109,7 @@ fun TrackedActivitiesList(
                     .background(Color.White).padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
 
             ) {
-                Stack(
+                Box(
                     alignment = Alignment.Center,
                     modifier = Modifier.align(Alignment.CenterVertically)
                         .padding(end = 8.dp, start = 8.dp)
@@ -116,7 +119,7 @@ fun TrackedActivitiesList(
                                     when(item.activity.type){
                                         Type.SESSION ->  vm.startSession(context, item.activity)
                                         Type.SCORE ->  vm.rep.scoreDAO.commitScore(item.activity.id, LocalDateTime.now(), 1)
-                                        Type.COMPLETED -> {
+                                        Type.CHECKED -> {
                                             AppDatabase.activityRep.completionDAO.toggle(item.activity.id, LocalDate.now())
                                         }
                                     }
@@ -127,7 +130,7 @@ fun TrackedActivitiesList(
                                 viber.vibrate(VibrationEffect.createOneShot(50L, 1))
                                 RepositoryTrackedActivity()
 
-                                if (item.activity.type!= Type.COMPLETED)
+                                if (item.activity.type!= Type.CHECKED)
                                     requestEdit.value = true
                             }
                         )
@@ -136,7 +139,7 @@ fun TrackedActivitiesList(
                         when(item.activity.type){
                             Type.SESSION -> Icons.Filled.PlayArrow
                             Type.SCORE -> Icons.Filled.Add
-                            Type.COMPLETED -> if (item.currentCompleted()) Icons.Filled.DoneAll else Icons.Filled.Check
+                            Type.CHECKED -> if (item.currentCompleted()) Icons.Filled.DoneAll else Icons.Filled.Check
                         },
                         Modifier
                             .size(34.dp)
@@ -156,7 +159,7 @@ fun TrackedActivitiesList(
                         )
 
                         if (item.activity.isGoalSet())
-                            Goal(item.activity.type.format(item.activity.goalValue))
+                            Goal(item.activity.type.format(item.activity.goal.value))
                     }
 
                     Row(modifier = Modifier.fillMaxWidth(),

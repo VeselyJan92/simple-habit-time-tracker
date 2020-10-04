@@ -1,18 +1,17 @@
 package com.janvesely.activitytracker.database.dao.tracked_activity
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
-import com.janvesely.activitytracker.database.composed.MetricPerDay
+import com.janvesely.activitytracker.database.composed.MetricAgreagate
 import com.janvesely.getitdone.database.dao.BaseEditableDAO
 import com.janvesely.activitytracker.database.entities.TrackedActivityCompletion
-import com.janvesely.activitytracker.database.entities.TrackedActivitySession
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Dao
-interface DAOTrackedActivityCompletion: BaseEditableDAO<TrackedActivityCompletion>{
+interface DAOTrackedActivityChecked: BaseEditableDAO<TrackedActivityCompletion>{
+
 
     @Query("select count(*) from tracked_activity_completion where date_completed >= :from AND date_completed <:to AND tracked_activity_id=:activityId")
     suspend fun getMetric(activityId:Long, from: LocalDateTime, to: LocalDateTime): Long
@@ -22,7 +21,7 @@ interface DAOTrackedActivityCompletion: BaseEditableDAO<TrackedActivityCompletio
         select date_completed as date, 1 as metric from tracked_activity_completion
         where date_completed >= :from AND date_completed <:to AND tracked_activity_id=:activityId
     """)
-    suspend fun getMetricPerDay(activityId:Long, from: LocalDate, to: LocalDate): List<MetricPerDay>
+    suspend fun getMetricPerDay(activityId:Long, from: LocalDate, to: LocalDate): List<MetricAgreagate>
 
 
     @Query("""
