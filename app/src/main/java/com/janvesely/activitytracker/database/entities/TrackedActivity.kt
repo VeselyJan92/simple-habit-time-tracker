@@ -1,7 +1,10 @@
 package com.janvesely.activitytracker.database.entities
 
+import androidx.compose.runtime.Composable
 import androidx.room.*
+import com.janvesely.activitytracker.database.embedable.TimeRange
 import com.janvesely.activitytracker.database.embedable.TrackedActivityGoal
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Entity(
@@ -35,7 +38,9 @@ data class TrackedActivity(
     fun isGoalSet() = goal.value != 0L && type != Type.CHECKED
 
     enum class Type {
-        SESSION, SCORE, CHECKED;
+        SESSION,
+        SCORE,
+        CHECKED;
 
         fun format(metric: Long) = when {
             metric < 0 -> ""
@@ -48,7 +53,17 @@ data class TrackedActivity(
             }
         }
 
+        @Composable
+        fun formatChecked(metric: Long, range: TimeRange, date: LocalDate) = when(range){
+            TimeRange.DAILY -> if (metric > 0) "ANO" else "NE"
+            TimeRange.WEEKLY -> "$metric / 7"
+            TimeRange.MONTHLY -> "$metric / ${date.month.length(date.isLeapYear)}"
+        }
     }
+
+
+
+
 
 
     fun formatGoal() : String{

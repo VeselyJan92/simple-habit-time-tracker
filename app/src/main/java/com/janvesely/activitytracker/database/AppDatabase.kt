@@ -6,19 +6,13 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.janvesely.activitytracker.database.Seeder
-import com.janvesely.activitytracker.database.dao.tracked_activity.DAOTrackedActivity
-import com.janvesely.activitytracker.database.dao.tracked_activity.DAOTrackedActivityChecked
-import com.janvesely.activitytracker.database.dao.tracked_activity.DAOTrackedActivitySession
-import com.janvesely.activitytracker.database.dao.tracked_activity.DAOTrackedActivityScore
-import com.janvesely.activitytracker.database.entities.TrackedActivity
-import com.janvesely.activitytracker.database.entities.TrackedActivityCompletion
-import com.janvesely.activitytracker.database.entities.TrackedActivityScore
-import com.janvesely.activitytracker.database.entities.TrackedActivitySession
 
 import com.janvesely.activitytracker.database.converters.TimeRangeConverter
 import com.janvesely.activitytracker.database.converters.LocalDateConverter
 import com.janvesely.activitytracker.database.embedable.TimeRange
 import com.janvesely.activitytracker.database.converters.LocalDateTimeConverter
+import com.janvesely.activitytracker.database.dao.tracked_activity.*
+import com.janvesely.activitytracker.database.entities.*
 import com.janvesely.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.janvesely.getitdone.database.entities.converters.LocalTimeConverter
 import com.janvesely.getitdone.database.entities.converters.TrackedActivityTypeConverter
@@ -35,6 +29,9 @@ import java.time.LocalTime
         TrackedActivitySession::class,
         TrackedActivityScore::class,
         TrackedActivityCompletion::class
+    ],
+    views = [
+        TrackedActivityMetric::class
     ],
     version = 1,
     exportSchema = false
@@ -53,6 +50,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract val scoreDAO: DAOTrackedActivityScore
     abstract val sessionDAO: DAOTrackedActivitySession
     abstract val completionDAO: DAOTrackedActivityChecked
+    abstract val metricDAO: DAOTrackedActivityMetric
 
 
     companion object {
@@ -167,7 +165,6 @@ abstract class AppDatabase : RoomDatabase() {
             ))
 
 
-            val xx = db.activityDAO.getAll()
 
         }
 

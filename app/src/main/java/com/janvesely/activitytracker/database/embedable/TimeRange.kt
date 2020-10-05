@@ -2,6 +2,7 @@ package com.janvesely.activitytracker.database.embedable
 
 import androidx.compose.runtime.Composable
 import com.janvesely.activitytracker.R
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoField
@@ -18,9 +19,9 @@ enum class TimeRange(val label: Int) {
     MONTHLY(R.string.frequency_monthly);
 
     @Composable
-    fun getLabel( datetime: LocalDateTime): String = when(this){
+    fun getLabel( datetime: LocalDate): String = when(this){
         DAILY -> datetime.dayOfMonth.toString()
-        WEEKLY -> "WEEK"
+        WEEKLY -> "W" + datetime.dayOfMonth.toString()
         MONTHLY ->  datetime.format(DateTimeFormatter.ofPattern("MMM"))
     }
 
