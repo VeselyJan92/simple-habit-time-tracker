@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.database.composed
+package com.imfibit.activitytracker.database.composed
 
 import androidx.room.ColumnInfo
 import java.time.LocalDate

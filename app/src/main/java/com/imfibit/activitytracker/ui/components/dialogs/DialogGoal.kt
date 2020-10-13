@@ -1,13 +1,13 @@
-package com.janvesely.activitytracker.ui.components.dialogs
+package com.imfibit.activitytracker.ui.components.dialogs
 
 import androidx.compose.foundation.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.focus.ExperimentalFocus
-import com.janvesely.activitytracker.database.embedable.TimeRange
-import com.janvesely.activitytracker.database.entities.TrackedActivity
-import com.janvesely.activitytracker.ui.components.selectors.MinuteAndHourSelector
-import com.janvesely.activitytracker.ui.components.selectors.NumberSelector
+import com.imfibit.activitytracker.database.embedable.TimeRange
+import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.ui.components.selectors.MinuteAndHourSelector
+import com.imfibit.activitytracker.ui.components.selectors.NumberSelector
 
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class, ExperimentalFocus::class)
@@ -29,7 +29,7 @@ inline fun DialogGoal(
                     hours = mutableStateOf(goal.value.toInt()/3600),
                     minutes = mutableStateOf(((goal.value % 3600)/60L).toInt())
                 ){
-                    hours, minutes -> goal.value = (60 * hours + minutes*60).toLong()
+                    hours, minutes -> goal.value = (60 * hours + minutes) * 60L
                 }
             }
 

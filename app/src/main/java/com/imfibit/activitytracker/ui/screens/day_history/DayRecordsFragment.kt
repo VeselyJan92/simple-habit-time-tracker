@@ -1,5 +1,5 @@
 
-package com.janvesely.activitytracker.ui.screens.day_history
+package com.imfibit.activitytracker.ui.screens.day_history
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -23,10 +24,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.janvesely.activitytracker.ui.components.Colors
-import com.janvesely.activitytracker.ui.components.SectionHeader
-import com.janvesely.activitytracker.ui.components.TrackedActivityRecord
-import com.janvesely.activitytracker.ui.components.TrackerTopAppBar
+import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.ui.components.Colors
+import com.imfibit.activitytracker.ui.components.SectionHeader
+import com.imfibit.activitytracker.ui.components.TrackedActivityRecord
+import com.imfibit.activitytracker.ui.components.TrackerTopAppBar
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -50,7 +52,7 @@ class DayRecordsFragment : Fragment() {
     )  = ComposeView(requireContext()).apply {
         setContent {
             Scaffold(
-                topBar = { TrackerTopAppBar("Historie") },
+                topBar = { TrackerTopAppBar(stringResource(id = R.string.screen_title_record_history)) },
                 bodyContent = {
                     ScreenBody(vm)
                 },
@@ -77,11 +79,13 @@ private fun ScreenBody(vm: DayRecordsVM) {
 
         if (items.value.isEmpty()){
             Box(Modifier.fillMaxWidth().fillMaxHeight(), alignment = Alignment.Center) {
-                Text(text = "No records", style = TextStyle(
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                ))
+                Text(
+                    text = stringResource(id = R.string.no_records), style = TextStyle(
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                )
             }
         }else{
             LazyColumnFor(

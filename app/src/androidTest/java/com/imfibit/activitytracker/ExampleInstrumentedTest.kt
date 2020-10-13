@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker
+package com.imfibit.activitytracker
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

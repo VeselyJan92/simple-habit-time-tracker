@@ -1,14 +1,14 @@
-package com.janvesely.activitytracker.ui.screens.activity_list
+package com.imfibit.activitytracker.ui.screens.activity_list
 
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.janvesely.activitytracker.core.AppNotificationManager
-import com.janvesely.activitytracker.core.activityInvalidationTracker
-import com.janvesely.activitytracker.database.entities.TrackedActivity
-import com.janvesely.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.janvesely.getitdone.database.AppDatabase
+import com.imfibit.activitytracker.core.AppNotificationManager
+import com.imfibit.activitytracker.core.activityInvalidationTracker
+import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
+import com.imfibit.getitdone.database.AppDatabase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -39,20 +39,15 @@ class ActivitiesViewModel : ViewModel() {
         AppDatabase.db.invalidationTracker.removeObserver(tracker)
     }
 
-    fun stopSession(activity: TrackedActivity) = GlobalScope.launch {
-        rep.commitLiveSession(activity.id)
+    fun stopSession(context: Context, item: TrackedActivity) = GlobalScope.launch {
+        AppNotificationManager.removeSessionNotification(context, item.id)
+        rep.commitLiveSession(item.id)
     }
 
 
     fun startSession(context: Context, item: TrackedActivity){
-
-
-        GlobalScope.launch {  rep.startSession(item.id) }
-
         AppNotificationManager.showSessionNotification(context, item)
+        GlobalScope.launch {  rep.startSession(item.id) }
     }
-
-
-
 
 }

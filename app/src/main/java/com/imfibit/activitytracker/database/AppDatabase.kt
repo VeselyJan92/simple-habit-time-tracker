@@ -1,22 +1,22 @@
-package com.janvesely.getitdone.database
+package com.imfibit.getitdone.database
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.janvesely.activitytracker.BuildConfig
-import com.janvesely.activitytracker.database.Seeder
+import com.imfibit.activitytracker.BuildConfig
+import com.imfibit.activitytracker.database.Seeder
 
-import com.janvesely.activitytracker.database.converters.TimeRangeConverter
-import com.janvesely.activitytracker.database.converters.LocalDateConverter
-import com.janvesely.activitytracker.database.embedable.TimeRange
-import com.janvesely.activitytracker.database.converters.LocalDateTimeConverter
-import com.janvesely.activitytracker.database.dao.tracked_activity.*
-import com.janvesely.activitytracker.database.entities.*
-import com.janvesely.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.janvesely.getitdone.database.entities.converters.LocalTimeConverter
-import com.janvesely.getitdone.database.entities.converters.TrackedActivityTypeConverter
+import com.imfibit.activitytracker.database.converters.TimeRangeConverter
+import com.imfibit.activitytracker.database.converters.LocalDateConverter
+import com.imfibit.activitytracker.database.embedable.TimeRange
+import com.imfibit.activitytracker.database.converters.LocalDateTimeConverter
+import com.imfibit.activitytracker.database.dao.tracked_activity.*
+import com.imfibit.activitytracker.database.entities.*
+import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
+import com.imfibit.getitdone.database.entities.converters.LocalTimeConverter
+import com.imfibit.getitdone.database.entities.converters.TrackedActivityTypeConverter
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.time.LocalDate

@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.database.views
+package com.imfibit.activitytracker.database.views
 
 import androidx.room.DatabaseView
 

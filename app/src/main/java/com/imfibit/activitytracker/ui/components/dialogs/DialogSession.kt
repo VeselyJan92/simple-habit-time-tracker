@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.ui.components.dialogs
+package com.imfibit.activitytracker.ui.components.dialogs
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -18,10 +18,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.janvesely.activitytracker.core.TimeUtils
-import com.janvesely.activitytracker.database.entities.TrackedActivitySession
-import com.janvesely.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.janvesely.activitytracker.ui.components.Colors
+import com.imfibit.activitytracker.core.TimeUtils
+import com.imfibit.activitytracker.database.entities.TrackedActivitySession
+import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
+import com.imfibit.activitytracker.ui.components.Colors
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime

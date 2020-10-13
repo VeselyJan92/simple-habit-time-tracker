@@ -1,7 +1,8 @@
-package com.janvesely.activitytracker.database.embedable
+package com.imfibit.activitytracker.database.embedable
 
 import androidx.compose.runtime.Composable
-import com.janvesely.activitytracker.R
+import androidx.compose.ui.res.stringResource
+import com.imfibit.activitytracker.R
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -21,8 +22,8 @@ enum class TimeRange(val label: Int) {
     @Composable
     fun getLabel( datetime: LocalDate): String = when(this){
         DAILY -> datetime.dayOfMonth.toString()
-        WEEKLY -> "W" + datetime.dayOfMonth.toString()
-        MONTHLY ->  datetime.format(DateTimeFormatter.ofPattern("MMM"))
+        WEEKLY -> stringResource(id = R.string.week)
+        MONTHLY -> datetime.format(DateTimeFormatter.ofPattern("MMM"))
     }
 
 

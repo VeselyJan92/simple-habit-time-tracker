@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.core
+package com.imfibit.activitytracker.core
 
 import java.time.LocalDate
 

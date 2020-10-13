@@ -1,7 +1,7 @@
-package com.janvesely.getitdone.database.entities.converters
+package com.imfibit.getitdone.database.entities.converters
 
 import androidx.room.TypeConverter
-import com.janvesely.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.database.entities.TrackedActivity
 
 object TrackedActivityTypeConverter {
     @TypeConverter

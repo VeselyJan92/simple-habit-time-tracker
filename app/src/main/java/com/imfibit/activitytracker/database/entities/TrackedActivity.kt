@@ -1,9 +1,11 @@
-package com.janvesely.activitytracker.database.entities
+package com.imfibit.activitytracker.database.entities
 
+import androidx.compose.ui.res.stringResource
+import com.imfibit.activitytracker.R
 import androidx.room.*
-import com.janvesely.activitytracker.core.ComposeString
-import com.janvesely.activitytracker.database.embedable.TimeRange
-import com.janvesely.activitytracker.database.embedable.TrackedActivityGoal
+import com.imfibit.activitytracker.core.ComposeString
+import com.imfibit.activitytracker.database.embedable.TimeRange
+import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -35,7 +37,7 @@ data class TrackedActivity(
         const val TABLE = "tracked_activity"
     }
 
-    fun isGoalSet() = goal.value != 0L && type != Type.CHECKED
+    fun isGoalSet() = goal.value != 0L
 
     enum class Type {
         SESSION,
@@ -72,8 +74,9 @@ data class TrackedActivity(
 
                 CHECKED -> when {
                     fraction != null -> "$metric / $fraction"
-                    metric > 0 -> "ANO"
-                    else -> "NE"
+                    metric == 0L -> stringResource(id = R.string.no).toUpperCase()
+                    metric == 1L  -> stringResource(id = R.string.yes).toUpperCase()
+                    else -> metric.toString()
                 }
             }
         }

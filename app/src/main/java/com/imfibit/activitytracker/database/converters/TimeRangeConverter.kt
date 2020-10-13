@@ -1,7 +1,7 @@
-package com.janvesely.activitytracker.database.converters
+package com.imfibit.activitytracker.database.converters
 
 import androidx.room.TypeConverter
-import com.janvesely.activitytracker.database.embedable.TimeRange
+import com.imfibit.activitytracker.database.embedable.TimeRange
 
 object TimeRangeConverter {
     @TypeConverter

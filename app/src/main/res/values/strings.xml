@@ -1,9 +1,10 @@
 <resources>
-    <string name="app_name">My Application</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
+    <string name="app_name">Simple Activity Tracker</string>
 
 
+    <string name="screen_title_activities">Activities</string>
+    <string name="screen_title_activity">Activity</string>
+    <string name="screen_title_record_history">History</string>
 
 
     <string name="frequency_daily">daily</string>
@@ -12,11 +13,21 @@
 
 
 
-    <string-array name="weekdays">
-        <item>Time</item>
-        <item>Count</item>
-    </string-array>
+    <string name="activity_screen_enter_name">monthly</string>
+    <string name="activity_screen_recent_activity">Recent Activity</string>
 
+
+
+
+    <string name="browse">Browse</string>
+
+    <string name="today">Today</string>
+    <string name="week">Week</string>
+    <string name="month">Month</string>
+    <string name="days30">30 days</string>
+    <string name="no_records">No records</string>
+    <string name="yes">yes</string>
+    <string name="no">no</string>
 
 
 

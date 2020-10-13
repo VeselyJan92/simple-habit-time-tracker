@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.ui.components.dialogs
+package com.imfibit.activitytracker.ui.components.dialogs
 
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
@@ -16,8 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.janvesely.activitytracker.database.embedable.TimeRange
-import com.janvesely.activitytracker.ui.components.Colors
+import com.imfibit.activitytracker.database.embedable.TimeRange
+import com.imfibit.activitytracker.ui.components.Colors
 
 
 @Composable

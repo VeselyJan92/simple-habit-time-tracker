@@ -1,14 +1,10 @@
-package com.janvesely.activitytracker.core
+package com.imfibit.activitytracker.core
 
 import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
-import androidx.room.RoomDatabase
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.runBlocking
-import kotlin.coroutines.coroutineContext
 
 fun <T> MutableList<T>.swap(i: Int, j: Int) {
     with(this[i]) {

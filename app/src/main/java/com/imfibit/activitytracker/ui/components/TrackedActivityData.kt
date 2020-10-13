@@ -1,10 +1,5 @@
-package com.janvesely.activitytracker.ui.components
+package com.imfibit.activitytracker.ui.components
 
-import android.util.Log
-import androidx.compose.animation.asDisposableClock
-import androidx.compose.animation.core.AnimationClockObserver
-import androidx.compose.animation.core.AnimationConstants
-import androidx.compose.animation.core.rootAnimationClockFactory
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,24 +11,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.janvesely.activitytracker.database.entities.*
-import com.janvesely.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.janvesely.activitytracker.ui.components.dialogs.DialogScore
-import com.janvesely.activitytracker.ui.components.dialogs.DialogSession
-import com.janvesely.getitdone.database.AppDatabase
+import com.imfibit.activitytracker.database.entities.*
+import com.imfibit.activitytracker.ui.components.dialogs.DialogScore
+import com.imfibit.activitytracker.ui.components.dialogs.DialogSession
+import com.imfibit.getitdone.database.AppDatabase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-import java.util.*
 
 private val metricStyle = TextStyle(
     fontSize = 12.sp,

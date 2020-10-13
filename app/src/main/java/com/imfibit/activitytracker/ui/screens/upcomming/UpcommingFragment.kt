@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.ui.screens.upcomming
+package com.imfibit.activitytracker.ui.screens.upcomming
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,8 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
-import com.janvesely.activitytracker.ui.components.Colors
-import com.janvesely.activitytracker.ui.components.TrackerTopAppBar
+import com.imfibit.activitytracker.ui.components.Colors
+import com.imfibit.activitytracker.ui.components.TrackerTopAppBar
 
 class UpcommingFragment : Fragment() {
 

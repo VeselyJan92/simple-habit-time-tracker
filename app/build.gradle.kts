@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.konan.properties.Properties
 
 plugins {
     id("com.android.application")
@@ -5,18 +6,28 @@ plugins {
     id("kotlin-kapt")
     id("kotlin-android-extensions")
 
-   // id("androidx.navigation.safeargs.kotlin")
-
-
     id("dagger.hilt.android.plugin")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
+    signingConfigs {
+        create("release"){
+            val properties = Properties().apply {
+                load(File("signing.properties").reader())
+            }
+            storeFile = File(properties.getProperty("key_store"))
+            storePassword = properties.getProperty("key_store_password")
+            keyPassword = properties.getProperty("key_password")
+            keyAlias = properties.getProperty("key_alias")
+        }
+    }
+
     compileSdkVersion(30)
     buildToolsVersion = "30.0.2"
 
     buildFeatures {
-        // Enables Jetpack Compose for this module
         compose =  true
     }
 
@@ -42,7 +53,7 @@ android {
     }
 
     defaultConfig {
-        applicationId ="com.janvesely.activitytracker"
+        applicationId ="com.imfibit.activitytracker"
         minSdkVersion(26)
         targetSdkVersion(30)
         versionCode = 1
@@ -54,8 +65,25 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            manifestPlaceholders["crashlyticsCollectionEnabled"] = true
+
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            debuggable(true)
+            versionNameSuffix = " - PROD"
         }
+
+        getByName("debug") {
+            manifestPlaceholders["crashlyticsCollectionEnabled"] = false
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            debuggable(true)
+
+            applicationIdSuffix =  ".debug"
+            versionNameSuffix = " - DEBUG"
+
+        }
+
     }
 
 }
@@ -64,6 +92,12 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.10")
     implementation("androidx.core:core-ktx:1.3.1")
+
+    implementation(platform("com.google.firebase:firebase-bom:25.11.0"))
+
+    implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation("com.google.firebase:firebase-analytics-ktx")
+
 
 
     implementation( "com.android.support:support-compat:28.0.0")

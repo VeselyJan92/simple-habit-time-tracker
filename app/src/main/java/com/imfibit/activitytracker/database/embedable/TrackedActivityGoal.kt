@@ -1,7 +1,9 @@
-package com.janvesely.activitytracker.database.embedable
+package com.imfibit.activitytracker.database.embedable
 
 import androidx.room.ColumnInfo
-import com.janvesely.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.core.ComposeString
+import com.imfibit.activitytracker.database.entities.TrackedActivity
+import java.time.LocalDate
 
 
 data class TrackedActivityGoal(
@@ -13,4 +15,5 @@ data class TrackedActivityGoal(
     val range: TimeRange
 ){
     fun isSet() = value != 0L
+
 }

@@ -1,11 +1,9 @@
-package com.janvesely.activitytracker.ui.screens.activity_list
+package com.imfibit.activitytracker.ui.screens.activity_list
 
 import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
-import android.util.Log
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,9 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.rawDragGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.text.TextStyle
@@ -32,17 +27,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.os.bundleOf
 import androidx.navigation.NavController
-import com.janvesely.activitytracker.R
-import com.janvesely.activitytracker.core.App
-import com.janvesely.activitytracker.database.entities.TrackedActivity
-import com.janvesely.activitytracker.database.entities.TrackedActivity.Type
-import com.janvesely.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.janvesely.activitytracker.ui.components.Colors
-import com.janvesely.activitytracker.ui.components.MetricBlock
-import com.janvesely.activitytracker.ui.components.MetricWidgetData
-import com.janvesely.activitytracker.ui.components.dialogs.DialogSession
-import com.janvesely.activitytracker.ui.components.dialogs.DialogScore
-import com.janvesely.getitdone.database.AppDatabase
+import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.core.App
+import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.database.entities.TrackedActivity.Type
+import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
+import com.imfibit.activitytracker.ui.components.Colors
+import com.imfibit.activitytracker.ui.components.MetricBlock
+import com.imfibit.activitytracker.ui.components.MetricWidgetData
+import com.imfibit.activitytracker.ui.components.dialogs.DialogSession
+import com.imfibit.activitytracker.ui.components.dialogs.DialogScore
+import com.imfibit.getitdone.database.AppDatabase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -70,6 +65,8 @@ fun TrackedActivitiesList(
         Modifier.padding(8.dp)
     ) { index, item ->
 
+        val activity = item.activity
+
         val context = ContextAmbient.current
 
         val requestEdit = remember { mutableStateOf(false) }
@@ -92,7 +89,7 @@ fun TrackedActivitiesList(
 
 
         if (index != 0){
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
         }
 
         Surface(
@@ -103,7 +100,7 @@ fun TrackedActivitiesList(
                             "tracked_activity_id" to item.activity.id
                         ))
                     }
-                ),
+                ).padding(2.dp),
 
             elevation = 2.dp,
         ) {
@@ -162,8 +159,10 @@ fun TrackedActivitiesList(
                             )
                         )
 
-                        if (item.activity.isGoalSet())
-                            Goal(item.activity.type.format(item.activity.goal.value))
+                        if (activity.goal.isSet() ){
+                            Goal(activity.type.getComposeString(activity.goal.value).invoke())
+                        }
+
                     }
 
                     Row(modifier = Modifier.fillMaxWidth(),
