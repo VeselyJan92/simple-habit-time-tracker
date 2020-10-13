@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "433894261873",
+    "firebase_url": "https://imfibit-simple-time-tracker.firebaseio.com",
+    "project_id": "imfibit-simple-time-tracker",
+    "storage_bucket": "imfibit-simple-time-tracker.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:433894261873:android:fd13db894339bc273487d0",
+        "android_client_info": {
+          "package_name": "com.imfibit.activitytracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "433894261873-tnakertrvkebk0nvchivais1ljoo7pgq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvETe0SzFfSwl-v8Vy63CLBPa44BVbGus"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "433894261873-tnakertrvkebk0nvchivais1ljoo7pgq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
