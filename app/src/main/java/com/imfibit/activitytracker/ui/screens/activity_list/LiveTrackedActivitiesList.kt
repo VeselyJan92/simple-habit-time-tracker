@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.ui.screens.activity_list
+package com.imfibit.activitytracker.ui.screens.activity_list
 
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.Icon
@@ -20,14 +20,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.janvesely.activitytracker.core.TimeUtils
-import com.janvesely.activitytracker.database.entities.TrackedActivity
-import com.janvesely.activitytracker.ui.components.Colors
+import com.imfibit.activitytracker.core.AppNotificationManager
+import com.imfibit.activitytracker.core.TimeUtils
+import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.ui.components.Colors
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import java.time.LocalDateTime
@@ -37,6 +39,8 @@ import java.time.LocalDateTime
 
 @Composable
 fun LiveActivitiesList(vm: ActivitiesViewModel){
+
+    val context = ContextAmbient.current
 
     val items: List<TrackedActivity> by vm.live.observeAsState(listOf())
 
@@ -62,7 +66,11 @@ fun LiveActivitiesList(vm: ActivitiesViewModel){
         Row(Modifier.fillParentMaxWidth().height(56.dp), verticalAlignment = Alignment.CenterVertically) {
 
 
-            IconButton(onClick = { vm.stopSession(item)}) {
+            IconButton(
+                onClick = {
+                    vm.stopSession(context, item)
+                }
+            ) {
                 Box(Modifier.size(20.dp, 20.dp).background(Color.Red))
             }
 
@@ -93,16 +101,7 @@ fun LiveActivitiesList(vm: ActivitiesViewModel){
                     )
 
                 )
-
-
             }
-
-
         }
     }
-
-}
-@Composable
-fun StaticActivity(){
-
 }

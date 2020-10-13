@@ -1,14 +1,14 @@
-package com.janvesely.activitytracker.database.dao.tracked_activity
+package com.imfibit.activitytracker.database.dao.tracked_activity
 
 import android.util.Log
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
-import com.janvesely.activitytracker.core.DateIterator
-import com.janvesely.activitytracker.core.iter
-import com.janvesely.activitytracker.database.composed.MetricAggregation
-import com.janvesely.activitytracker.database.composed.toHashMap
-import com.janvesely.activitytracker.database.entities.TrackedActivityMetric
+import com.imfibit.activitytracker.core.DateIterator
+import com.imfibit.activitytracker.core.iter
+import com.imfibit.activitytracker.database.composed.MetricAggregation
+import com.imfibit.activitytracker.database.composed.toHashMap
+import com.imfibit.activitytracker.database.entities.TrackedActivityMetric
 import java.time.LocalDate
 import java.time.YearMonth
 

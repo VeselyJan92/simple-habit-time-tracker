@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.ui.screens.activity
+package com.imfibit.activitytracker.ui.screens.activity
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -23,16 +23,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.janvesely.activitytracker.database.embedable.TimeRange
-import com.janvesely.activitytracker.database.embedable.TrackedActivityGoal
-import com.janvesely.activitytracker.database.entities.TrackedActivity
-import com.janvesely.activitytracker.ui.components.*
-import com.janvesely.activitytracker.ui.components.Colors
-import com.janvesely.activitytracker.ui.components.dialogs.DialogGoal
-import com.janvesely.activitytracker.ui.components.dialogs.DialogInputText
-import com.janvesely.activitytracker.ui.components.dialogs.DialogTempPriority
-import com.janvesely.activitytracker.ui.components.dialogs.DialogTimeRange
-import com.janvesely.getitdone.database.AppDatabase
+import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.database.embedable.TimeRange
+import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
+import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.ui.components.*
+import com.imfibit.activitytracker.ui.components.Colors
+import com.imfibit.activitytracker.ui.components.dialogs.DialogGoal
+import com.imfibit.activitytracker.ui.components.dialogs.DialogInputText
+import com.imfibit.activitytracker.ui.components.dialogs.DialogTempPriority
+import com.imfibit.activitytracker.ui.components.dialogs.DialogTimeRange
+import com.imfibit.getitdone.database.AppDatabase
 import kotlinx.coroutines.*
 
 @ExperimentalFocus
@@ -45,7 +46,7 @@ fun TrackedActivityScreen(nav: NavController, vm: TrackedActivityViewModel) {
 
     Scaffold(
         topBar = {
-            TrackerTopAppBar("Activity") {
+            TrackerTopAppBar(stringResource(id = R.string.screen_title_activity)) {
                 Icon(
                     asset = Icons.Default.Delete,
                     tint = Color.White,
@@ -55,7 +56,7 @@ fun TrackedActivityScreen(nav: NavController, vm: TrackedActivityViewModel) {
                                 AppDatabase.activityRep.activityDAO.deleteById(it)
                             }
 
-                            withContext(Dispatchers.Main){
+                            withContext(Dispatchers.Main) {
                                 nav.popBackStack()
                             }
                         }
@@ -120,7 +121,7 @@ private fun ActivityName(activity: TrackedActivity?) {
     if (activity!= null) DialogInputText(
         display = display,
         text = activity.name,
-        title = "Zadejte název aktivity",
+        title = stringResource(id = R.string.activity_screen_enter_name),
         onTextSet = {
             GlobalScope.launch {
                 val item = activity.copy(name = it)
@@ -286,14 +287,14 @@ private fun RecentActivity(nav: NavController, vm: TrackedActivityViewModel){
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     modifier = Modifier.weight(1f),
-                    text = "Recent Activity",
+                    text = stringResource(id = R.string.activity_screen_recent_activity),
                     style = TextStyle(
                         fontWeight = FontWeight.W600,
                         fontSize = 20.sp
                     ),
                 )
                 TextButton(onClick = {}) {
-                    Text(text = "Browse")
+                    Text(text = stringResource(id = R.string.browse))
                 }
 
             }
@@ -306,26 +307,26 @@ private fun RecentActivity(nav: NavController, vm: TrackedActivityViewModel){
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 LabeledMetricBlock(
                     metric = today.value.invoke(),
-                    label = "Today",
+                    label = stringResource(id = R.string.today),
                     color = Colors.AppAccent,
                     width = 80.dp,
                     metricStyle = metricTextStyle.copy(fontWeight = FontWeight.Bold)
                 )
                 LabeledMetricBlock(
                     metric = week.value.invoke(),
-                    label = "Week",
+                    label = stringResource(id = R.string.week),
                     color = Colors.AppAccent,
                     width = 80.dp
                 )
                 LabeledMetricBlock(
                     metric = month.value.invoke(),
-                    label = "Month",
+                    label = stringResource(id = R.string.month),
                     color = Colors.AppAccent,
                     width = 80.dp
                 )
                 LabeledMetricBlock(
                     metric = days30.value.invoke(),
-                    label = "30 days",
+                    label = stringResource(id = R.string.days30),
                     color = Colors.AppAccent,
                     width = 80.dp
                 )

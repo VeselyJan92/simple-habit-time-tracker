@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.ui.components.selectors
+package com.imfibit.activitytracker.ui.components.selectors
 
 
 import androidx.compose.foundation.*
@@ -18,9 +18,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.janvesely.activitytracker.ui.components.Colors
-import com.janvesely.activitytracker.ui.components.EditText
-import com.janvesely.activitytracker.ui.components.icons.MinusOne
+import com.imfibit.activitytracker.ui.components.Colors
+import com.imfibit.activitytracker.ui.components.EditText
+import com.imfibit.activitytracker.ui.components.icons.MinusOne
 import java.lang.Exception
 
 

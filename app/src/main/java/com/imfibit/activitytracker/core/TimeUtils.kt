@@ -1,7 +1,6 @@
-package com.janvesely.activitytracker.core
+package com.imfibit.activitytracker.core
 
-import com.janvesely.activitytracker.R
-import kotlinx.coroutines.delay
+import com.imfibit.activitytracker.R
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.Month

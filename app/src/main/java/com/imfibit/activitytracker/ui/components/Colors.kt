@@ -1,8 +1,8 @@
-package com.janvesely.activitytracker.ui.components
+package com.imfibit.activitytracker.ui.components
 
 import androidx.compose.ui.graphics.Color
-import com.janvesely.activitytracker.database.embedable.TimeRange
-import com.janvesely.activitytracker.database.embedable.TrackedActivityGoal
+import com.imfibit.activitytracker.database.embedable.TimeRange
+import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 
 object Colors{
    val Completed = Color(0xFF59BF2D)

@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.ui.components.icons
+package com.imfibit.activitytracker.ui.components.icons
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.materialIcon

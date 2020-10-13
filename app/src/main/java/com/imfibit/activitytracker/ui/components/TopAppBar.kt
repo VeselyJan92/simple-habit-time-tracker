@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.ui.components
+package com.imfibit.activitytracker.ui.components
 
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Arrangement

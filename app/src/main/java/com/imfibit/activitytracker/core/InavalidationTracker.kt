@@ -1,13 +1,10 @@
-package com.janvesely.activitytracker.core
+package com.imfibit.activitytracker.core
 
-import android.util.Log
-import androidx.lifecycle.viewModelScope
 import androidx.room.InvalidationTracker
-import com.janvesely.activitytracker.database.entities.TrackedActivity
-import com.janvesely.activitytracker.database.entities.TrackedActivityCompletion
-import com.janvesely.activitytracker.database.entities.TrackedActivityScore
-import com.janvesely.activitytracker.database.entities.TrackedActivitySession
-import kotlinx.coroutines.launch
+import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
+import com.imfibit.activitytracker.database.entities.TrackedActivityScore
+import com.imfibit.activitytracker.database.entities.TrackedActivitySession
 
 
 inline fun createInvalidationTacker(

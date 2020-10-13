@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.ui.components.dialogs
+package com.imfibit.activitytracker.ui.components.dialogs
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.janvesely.activitytracker.ui.components.EditText
+import com.imfibit.activitytracker.ui.components.EditText
 
 /*
 @ExperimentalFocus

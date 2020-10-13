@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.ui.components.dialogs
+package com.imfibit.activitytracker.ui.components.dialogs
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -24,12 +24,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.core.os.bundleOf
 import androidx.navigation.NavController
-import com.janvesely.activitytracker.R
-import com.janvesely.activitytracker.database.embedable.TimeRange
-import com.janvesely.activitytracker.database.embedable.TrackedActivityGoal
-import com.janvesely.activitytracker.database.entities.TrackedActivity
-import com.janvesely.activitytracker.ui.components.Colors
-import com.janvesely.getitdone.database.AppDatabase
+import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.database.embedable.TimeRange
+import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
+import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.ui.components.Colors
+import com.imfibit.getitdone.database.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

@@ -7,13 +7,11 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.janvesely.activitytracker.ui.screens.upcomming.UpcommingFragment"
-        android:label="@string/title_home" />
+        android:name="com.imfibit.activitytracker.ui.screens.upcomming.UpcommingFragment" />
 
     <fragment
         android:id="@+id/navigation_activities_list"
-        android:name="com.janvesely.activitytracker.ui.screens.activity_list.ActivitiesFragment"
-        android:label="@string/title_dashboard">
+        android:name="com.imfibit.activitytracker.ui.screens.activity_list.ActivitiesFragment">
 
         <action
             android:id="@+id/action_navigation_dashboard_to_activity_fragment"
@@ -23,12 +21,12 @@
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.janvesely.activitytracker.ui.screens.upcomming.UpcommingFragment"
+        android:name="com.imfibit.activitytracker.ui.screens.upcomming.UpcommingFragment"
         android:label="Awesome" />
 
     <fragment
         android:id="@+id/activity_fragment"
-        android:name="com.janvesely.activitytracker.ui.screens.activity.FragmentTrackedActivity"
+        android:name="com.imfibit.activitytracker.ui.screens.activity.FragmentTrackedActivity"
         android:label="ActivityFragment">
         <argument
             android:name="tracked_activity_id"
@@ -42,5 +40,5 @@
 
     <fragment
         android:id="@+id/fragment_day_records"
-        android:name="com.janvesely.activitytracker.ui.screens.day_history.DayRecordsFragment" />
+        android:name="com.imfibit.activitytracker.ui.screens.day_history.DayRecordsFragment" />
 </navigation>

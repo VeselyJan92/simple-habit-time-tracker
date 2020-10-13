@@ -1,13 +1,9 @@
-package com.janvesely.activitytracker.database.dao.tracked_activity
+package com.imfibit.activitytracker.database.dao.tracked_activity
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.janvesely.getitdone.database.dao.BaseEditableDAO
-import com.janvesely.activitytracker.database.entities.TrackedActivity
-import com.janvesely.activitytracker.database.entities.TrackedActivitySession
-import com.janvesely.getitdone.database.AppDatabase
-import kotlinx.coroutines.flow.Flow
-import java.time.LocalDateTime
+import com.imfibit.getitdone.database.dao.BaseEditableDAO
+import com.imfibit.activitytracker.database.entities.TrackedActivity
 
 /////////////////////////////////
 // ----- DAOTrackedTask ----- ///

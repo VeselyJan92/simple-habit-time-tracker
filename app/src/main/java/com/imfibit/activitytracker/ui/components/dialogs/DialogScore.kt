@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.ui.components.dialogs
+package com.imfibit.activitytracker.ui.components.dialogs
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -13,11 +13,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.janvesely.activitytracker.database.entities.TrackedActivityScore
-import com.janvesely.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.janvesely.activitytracker.ui.components.Colors
-import com.janvesely.activitytracker.ui.components.DatetimeEditor
-import com.janvesely.activitytracker.ui.components.selectors.NumberSelector
+import com.imfibit.activitytracker.database.entities.TrackedActivityScore
+import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
+import com.imfibit.activitytracker.ui.components.Colors
+import com.imfibit.activitytracker.ui.components.DatetimeEditor
+import com.imfibit.activitytracker.ui.components.selectors.NumberSelector
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime

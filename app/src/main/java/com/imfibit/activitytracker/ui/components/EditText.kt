@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.ui.components
+package com.imfibit.activitytracker.ui.components
 
 import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi

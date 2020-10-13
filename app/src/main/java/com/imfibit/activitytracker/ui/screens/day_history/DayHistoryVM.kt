@@ -1,10 +1,10 @@
-package com.janvesely.activitytracker.ui.screens.day_history
+package com.imfibit.activitytracker.ui.screens.day_history
 
 import androidx.lifecycle.*
-import com.janvesely.activitytracker.core.activityInvalidationTracker
-import com.janvesely.activitytracker.database.entities.*
-import com.janvesely.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.janvesely.getitdone.database.AppDatabase
+import com.imfibit.activitytracker.core.activityInvalidationTracker
+import com.imfibit.activitytracker.database.entities.*
+import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
+import com.imfibit.getitdone.database.AppDatabase
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 

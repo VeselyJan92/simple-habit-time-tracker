@@ -1,11 +1,11 @@
-package com.janvesely.activitytracker.database
+package com.imfibit.activitytracker.database
 
-import com.janvesely.activitytracker.database.embedable.TimeRange
-import com.janvesely.activitytracker.database.embedable.TrackedActivityGoal
-import com.janvesely.activitytracker.database.entities.TrackedActivity
-import com.janvesely.activitytracker.database.entities.TrackedActivityCompletion
-import com.janvesely.activitytracker.database.entities.TrackedActivityScore
-import com.janvesely.activitytracker.database.entities.TrackedActivitySession
+import com.imfibit.activitytracker.database.embedable.TimeRange
+import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
+import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
+import com.imfibit.activitytracker.database.entities.TrackedActivityScore
+import com.imfibit.activitytracker.database.entities.TrackedActivitySession
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*

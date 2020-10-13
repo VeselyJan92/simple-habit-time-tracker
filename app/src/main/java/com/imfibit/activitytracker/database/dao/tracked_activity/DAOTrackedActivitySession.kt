@@ -1,10 +1,10 @@
-package com.janvesely.activitytracker.database.dao.tracked_activity
+package com.imfibit.activitytracker.database.dao.tracked_activity
 
 import androidx.room.Dao
 import androidx.room.Query
-import com.janvesely.activitytracker.database.composed.MetricAgreagate
-import com.janvesely.getitdone.database.dao.BaseEditableDAO
-import com.janvesely.activitytracker.database.entities.TrackedActivitySession
+import com.imfibit.activitytracker.database.composed.MetricAgreagate
+import com.imfibit.getitdone.database.dao.BaseEditableDAO
+import com.imfibit.activitytracker.database.entities.TrackedActivitySession
 import java.time.LocalDate
 import java.time.LocalDateTime
 

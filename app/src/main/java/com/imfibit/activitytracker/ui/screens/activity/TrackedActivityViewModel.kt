@@ -1,13 +1,13 @@
-package com.janvesely.activitytracker.ui.screens.activity
+package com.imfibit.activitytracker.ui.screens.activity
 
 import androidx.lifecycle.*
-import com.janvesely.activitytracker.core.ComposeString
-import com.janvesely.activitytracker.core.activityInvalidationTracker
-import com.janvesely.activitytracker.database.embedable.TimeRange
-import com.janvesely.activitytracker.database.entities.*
-import com.janvesely.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.janvesely.activitytracker.ui.components.*
-import com.janvesely.getitdone.database.AppDatabase
+import com.imfibit.activitytracker.core.ComposeString
+import com.imfibit.activitytracker.core.activityInvalidationTracker
+import com.imfibit.activitytracker.database.embedable.TimeRange
+import com.imfibit.activitytracker.database.entities.*
+import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
+import com.imfibit.activitytracker.ui.components.*
+import com.imfibit.getitdone.database.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDate

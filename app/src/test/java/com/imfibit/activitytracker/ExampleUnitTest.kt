@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker
+package com.imfibit.activitytracker
 
 import org.junit.Test
 

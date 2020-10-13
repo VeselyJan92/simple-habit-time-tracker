@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.ui.components
+package com.imfibit.activitytracker.ui.components
 
 import android.content.Context
 import android.os.VibrationEffect
@@ -22,12 +22,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.RowScope.Companion.weight
 import androidx.compose.ui.unit.sp
-import com.janvesely.activitytracker.core.App
-import com.janvesely.activitytracker.core.ComposeString
-import com.janvesely.activitytracker.database.entities.TrackedActivity
-import com.janvesely.activitytracker.ui.components.dialogs.DialogSession
-import com.janvesely.activitytracker.ui.components.dialogs.DialogScore
-import com.janvesely.getitdone.database.AppDatabase
+import com.imfibit.activitytracker.core.App
+import com.imfibit.activitytracker.core.ComposeString
+import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.ui.components.dialogs.DialogSession
+import com.imfibit.activitytracker.ui.components.dialogs.DialogScore
+import com.imfibit.getitdone.database.AppDatabase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime

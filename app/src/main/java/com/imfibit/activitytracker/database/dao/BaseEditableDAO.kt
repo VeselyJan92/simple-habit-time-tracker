@@ -1,4 +1,4 @@
-package com.janvesely.getitdone.database.dao
+package com.imfibit.getitdone.database.dao
 
 import androidx.room.*
 

@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.ui.components
+package com.imfibit.activitytracker.ui.components
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -20,8 +20,8 @@ import androidx.navigation.NavController
 import java.time.DayOfWeek
 import java.time.LocalDateTime
 import java.util.*
-import com.janvesely.activitytracker.R
-import com.janvesely.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.database.entities.TrackedActivity
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 

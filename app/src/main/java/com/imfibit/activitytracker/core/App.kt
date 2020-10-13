@@ -1,8 +1,8 @@
-package com.janvesely.activitytracker.core
+package com.imfibit.activitytracker.core
 
 import android.app.Application
 import android.content.Context
-import com.janvesely.getitdone.database.AppDatabase
+import com.imfibit.getitdone.database.AppDatabase
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp

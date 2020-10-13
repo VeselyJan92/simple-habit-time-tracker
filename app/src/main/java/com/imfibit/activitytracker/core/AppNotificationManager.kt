@@ -1,4 +1,4 @@
-package com.janvesely.activitytracker.core
+package com.imfibit.activitytracker.core
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -7,15 +7,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
-import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.navigation.NavDeepLinkBuilder
-import com.janvesely.activitytracker.R
-import com.janvesely.activitytracker.database.entities.TrackedActivity
-import com.janvesely.activitytracker.database.entities.TrackedActivitySession
-import com.janvesely.getitdone.database.AppDatabase
+import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.getitdone.database.AppDatabase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 

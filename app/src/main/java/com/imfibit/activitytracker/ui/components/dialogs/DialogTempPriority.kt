@@ -1,14 +1,12 @@
-package com.janvesely.activitytracker.ui.components.dialogs
+package com.imfibit.activitytracker.ui.components.dialogs
 
 import androidx.compose.foundation.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.focus.ExperimentalFocus
-import com.janvesely.activitytracker.database.embedable.TimeRange
-import com.janvesely.activitytracker.database.entities.TrackedActivity
-import com.janvesely.activitytracker.ui.components.selectors.MinuteAndHourSelector
-import com.janvesely.activitytracker.ui.components.selectors.NumberSelector
-import com.janvesely.getitdone.database.AppDatabase
+import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.ui.components.selectors.NumberSelector
+import com.imfibit.getitdone.database.AppDatabase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
