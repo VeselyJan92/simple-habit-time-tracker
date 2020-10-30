@@ -13,6 +13,7 @@ object Colors{
 
    val ButtonGreen = Color(0xFF41C300)
    val AppBackground = Color(0xFFe4eaee)
+   val BackgroundGray = Color(0xFFFAFAFA)
 
    val AppAccent = Color(0xFF4DB6AC)
    val AppPrimary = Color(0xFF4c37ef)

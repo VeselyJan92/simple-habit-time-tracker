@@ -286,13 +286,14 @@ private fun RecentActivity(nav: NavController, vm: TrackedActivityViewModel){
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    modifier = Modifier.weight(1f),
                     text = stringResource(id = R.string.activity_screen_recent_activity),
                     style = TextStyle(
                         fontWeight = FontWeight.W600,
                         fontSize = 20.sp
                     ),
                 )
+
+                Spacer(Modifier.weight(1f))
                 TextButton(onClick = {}) {
                     Text(text = stringResource(id = R.string.browse))
                 }

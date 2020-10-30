@@ -47,12 +47,29 @@
     </string-array>
 
     <string name="d_tracked_task_goal_frequency">Frequency</string>
+    <string name="statistics_fragment_timed_label">Časoběrné aktivity</string>
+    <string name="work_week">P. týdne</string>
 
     <string-array name="tracked_task_viewed_range">
         <item>daily</item>
         <item>weekly</item>
         <item>monthly</item>
         <item>yearly</item>
+    </string-array>
+
+    <string-array name="months">
+        <item>Leden</item>
+        <item>Únor</item>
+        <item>Březen</item>
+        <item>Duben</item>
+        <item>Květen</item>
+        <item>Červen</item>
+        <item>Červenec</item>
+        <item>Srpen</item>
+        <item>Září</item>
+        <item>Říjen</item>
+        <item>Listopad</item>
+        <item>Prosinec</item>
     </string-array>
 
 

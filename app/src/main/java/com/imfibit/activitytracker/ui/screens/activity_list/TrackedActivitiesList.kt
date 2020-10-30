@@ -16,6 +16,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.HorizontalAlignmentLine
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.Color
@@ -149,15 +150,16 @@ fun TrackedActivitiesList(
                 }
 
                 Column(Modifier.fillMaxWidth()){
-                    Row {
+                    Row() {
                         Text(
                             item.activity.name,
-                            Modifier.weight(1f),
                             style = TextStyle(
                                 fontWeight = FontWeight.W600,
-                                fontSize = 18.sp
+                                fontSize = 18.sp,
+                                textAlign = TextAlign.Start
                             )
                         )
+                        Spacer(modifier = Modifier.weight(1f))
 
                         if (activity.goal.isSet() ){
                             Goal(activity.type.getComposeString(activity.goal.value).invoke())
@@ -184,7 +186,7 @@ fun TrackedActivitiesList(
 }
 
 @Composable
-private fun Goal(label: String){
+fun Goal(label: String){
     Row(Modifier.size(70.dp, 20.dp).padding(end = 8.dp).background(Colors.ChipGray, RoundedCornerShape(50))) {
         Icon(Icons.Filled.Flag, Modifier.align(Alignment.CenterVertically).padding(start = 5.dp).size(15.dp))
 

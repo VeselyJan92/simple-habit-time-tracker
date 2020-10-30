@@ -6,6 +6,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.imfibit.activitytracker.core.DateIterator
 import com.imfibit.activitytracker.core.iter
+import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.composed.MetricAggregation
 import com.imfibit.activitytracker.database.composed.toHashMap
 import com.imfibit.activitytracker.database.entities.TrackedActivityMetric
@@ -30,6 +31,18 @@ interface DAOTrackedActivityMetric {
     """
     )
     suspend fun getMetric(activityId: Long, from: LocalDate, to: LocalDate): Long
+
+    @Query(
+        """
+        SELECT TOTAL(metric) as metric, ta.*
+        FROM tracked_activity_metric
+        LEFT JOIN tracked_activity ta 
+        USING(tracked_activity_id)
+        WHERE  date >= :from AND date <=:to
+        GROUP BY tracked_activity_id
+    """
+    )
+    suspend fun getActivitiesWithMetric(from: LocalDate, to: LocalDate): List<ActivityWithMetric>
 
 
     @Query(

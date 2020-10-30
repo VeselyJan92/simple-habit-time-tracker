@@ -6,7 +6,11 @@ import com.imfibit.activitytracker.R
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import java.time.temporal.ChronoField
+import java.time.temporal.TemporalAdjusters
+import java.time.temporal.WeekFields
+import java.util.*
 
 
 typealias RangeInterval = List<Pair<LocalDateTime, LocalDateTime>>
@@ -26,8 +30,24 @@ enum class TimeRange(val label: Int) {
         MONTHLY -> datetime.format(DateTimeFormatter.ofPattern("MMM"))
     }
 
+    fun getBoundaries(date: LocalDate) = when(this){
+        DAILY -> Pair(date, date)
+        WEEKLY -> {
+            val start = date.with(
+                TemporalAdjusters
+                    .previousOrSame(WeekFields.of(Locale.getDefault())
+                    .getFirstDayOfWeek())
+            )
 
-    fun getCurrent() = getPastRanges(0).first()
+            val end = start.plusDays(6L)
+
+            Pair(start, end)
+        }
+        MONTHLY -> Pair(date.withDayOfMonth(0), date.withDayOfMonth(date.lengthOfMonth()))
+    }
+
+
+
 
     fun getPastRanges(periods: Int = 5) = when(this){
         DAILY -> getDays(periods)

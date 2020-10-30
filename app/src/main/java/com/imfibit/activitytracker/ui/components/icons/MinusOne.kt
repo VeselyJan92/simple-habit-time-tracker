@@ -11,7 +11,7 @@ val Icons.Filled.MinusOne: VectorAsset
         if (_MinusOne != null) {
             return _MinusOne!!
         }
-        _MinusOne = materialIcon {
+        _MinusOne = materialIcon("MinusOne") {
             materialPath {
                 moveTo(19.0f, 13.0f)
                 horizontalLineTo(5.0f)

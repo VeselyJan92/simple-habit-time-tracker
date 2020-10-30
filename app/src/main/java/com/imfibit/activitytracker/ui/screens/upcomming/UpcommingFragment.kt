@@ -5,8 +5,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayout
-import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Scaffold
@@ -37,7 +37,7 @@ class UpcommingFragment : Fragment() {
             Scaffold(
                 topBar = { TrackerTopAppBar("") },
                 bodyContent = {
-                    Stack(Modifier.fillMaxWidth().fillMaxHeight(), alignment = Alignment.Center) {
+                    Box(Modifier.fillMaxWidth().fillMaxHeight(), alignment = Alignment.Center) {
                         Text(text = "UPCOMMING FEATURE", style = TextStyle(
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
