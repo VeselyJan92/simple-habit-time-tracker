@@ -4,7 +4,7 @@ import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -27,7 +27,7 @@ import androidx.ui.tooling.preview.Preview
 @Composable
 fun EditTextPrev(){
 
-    Stack(Modifier.size(300.dp, 300.dp)) {
+    Box(Modifier.size(300.dp, 300.dp)) {
         EditText(text = TextFieldValue(""), onValueChange = {}, modifier = Modifier.size(200.dp, 30.dp))
     }
 
@@ -55,7 +55,7 @@ fun EditText(
 
     val color = if (valid) color else Colors.NotCompleted
 
-    Stack(modifier.background(color, shape = RoundedCornerShape(50)), alignment = Alignment.Center) {
+    Box(modifier.background(color, shape = RoundedCornerShape(50)), alignment = Alignment.Center) {
 
         if (text.text.isEmpty())
             Text(text = label)

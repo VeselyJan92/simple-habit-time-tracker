@@ -33,11 +33,14 @@ android {
 
     lintOptions {
         isAbortOnError = false
+        lintOptions {
+            checkOnly("release")
+        }
     }
 
     composeOptions {
         kotlinCompilerVersion = "1.4.10"
-        kotlinCompilerExtensionVersion ="1.0.0-alpha04"
+        kotlinCompilerExtensionVersion ="1.0.0-alpha05"
 
     }
 
@@ -90,8 +93,9 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.10")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.10")
     implementation("androidx.core:core-ktx:1.3.1")
+    implementation("com.thedeanda:lorem:2.1")
 
     implementation(platform("com.google.firebase:firebase-bom:25.11.0"))
 
@@ -100,7 +104,7 @@ dependencies {
 
 
 
-    implementation( "com.android.support:support-compat:28.0.0")
+   // implementation( "com.android.support:support-compat:28.0.0")
 
 
     implementation("com.google.dagger:hilt-android:2.28-alpha")
@@ -120,12 +124,12 @@ dependencies {
 
 
 
-    implementation("androidx.compose.ui:ui:1.0.0-alpha04")
-    implementation("androidx.compose.material:material:1.0.0-alpha04")
-    implementation("androidx.ui:ui-tooling:1.0.0-alpha04")
-    implementation("androidx.compose.runtime:runtime-livedata:1.0.0-alpha04")
-    implementation("androidx.compose.foundation:foundation:1.0.0-alpha04")
-    implementation("androidx.compose.material:material-icons-extended:1.0.0-alpha04")
+    implementation("androidx.compose.ui:ui:1.0.0-alpha05")
+    implementation("androidx.compose.material:material:1.0.0-alpha05")
+    implementation("androidx.ui:ui-tooling:1.0.0-alpha05")
+    implementation("androidx.compose.runtime:runtime-livedata:1.0.0-alpha05")
+    implementation("androidx.compose.foundation:foundation:1.0.0-alpha05")
+    implementation("androidx.compose.material:material-icons-extended:1.0.0-alpha05")
 
 
 

@@ -14,15 +14,9 @@ class MainActivity : AppCompatActivity() {
 
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
 
-        navView.selectedItemId = R.id.navigation_activities_list
-
-
         val navController = findNavController(R.id.nav_host_fragment)
 
-
         navView.setupWithNavController(navController)
-
-        navView.selectedItemId = R.id.navigation_activities_list
 
     }
 }

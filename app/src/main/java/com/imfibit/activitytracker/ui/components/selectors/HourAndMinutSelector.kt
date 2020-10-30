@@ -49,10 +49,11 @@ inline fun MinuteAndHourSelector(
                 style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp)
             )
 
-            Stack(
+            Box(
                 modifier = Modifier
                     .height(30.dp)
-                    .background(Colors.ChipGray, RoundedCornerShape(50)).fillMaxWidth(),
+                    .background(Colors.ChipGray, RoundedCornerShape(50))
+                    .fillMaxWidth(),
                 alignment = Alignment.Center
             ) {
                 BaseTextField(
@@ -101,10 +102,11 @@ inline fun MinuteAndHourSelector(
                 style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp)
             )
 
-            Stack(
+            Box(
                 modifier = Modifier
-                    .height(30.dp).fillMaxWidth()
-                    .background(Colors.ChipGray, RoundedCornerShape(50)),
+                    .height(30.dp)
+                    .background(Colors.ChipGray, RoundedCornerShape(50))
+                    .fillMaxWidth(),
                 alignment = Alignment.Center
             ) {
 

@@ -10,7 +10,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath ("com.android.tools.build:gradle:4.2.0-alpha13")
+        classpath ("com.android.tools.build:gradle:4.2.0-alpha15")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.10")
 
 
@@ -29,9 +29,9 @@ buildscript {
 
 allprojects {
     repositories {
-        maven {
+       /* maven {
             url = uri("https://dl.bintray.com/kotlin/kotlin-dev")
-        }
+        }*/
         jcenter()
         google()
         mavenCentral()

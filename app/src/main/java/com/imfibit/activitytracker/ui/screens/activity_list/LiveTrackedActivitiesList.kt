@@ -4,10 +4,7 @@ import androidx.compose.foundation.Box
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
@@ -78,6 +75,8 @@ fun LiveActivitiesList(vm: ActivitiesViewModel){
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             ))
+            
+            Spacer(modifier = Modifier.weight(1f))
 
             Row(
                 modifier = Modifier
