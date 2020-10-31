@@ -87,7 +87,6 @@ private fun ScreenBody() = Column {
             mutableStateOf(mapOf<TrackedActivity.Type, List<ActivityWithMetric>>())
         }
 
-      //  Log.e("Date", "Before Launch")
         LaunchedTask(state.value.range){
 
             val x = AppDatabase.activityRep.metricDAO.getActivitiesWithMetric(
@@ -169,7 +168,10 @@ private fun Navigation(state: MutableState<StatisticsState>, pager: PagerState) 
                         .clickable(
                             onClick = {
                                 DatePickerDialog(context, 0,
-                                    { _, i, i2, i3 -> state.value = state.value.setDate(LocalDate.of(i, i2, i3))},
+                                    { _, i, i2, i3 ->
+                                        state.value = state.value.setDate(LocalDate.of(i, i2, i3))
+
+                                    },
                                     state.value.date.year,  state.value.date.month.value,  state.value.date.dayOfMonth
                                 ).show()
                             }

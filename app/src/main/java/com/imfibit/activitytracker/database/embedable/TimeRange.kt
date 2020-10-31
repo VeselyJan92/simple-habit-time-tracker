@@ -43,9 +43,8 @@ enum class TimeRange(val label: Int) {
 
             Pair(start, end)
         }
-        MONTHLY -> Pair(date.withDayOfMonth(0), date.withDayOfMonth(date.lengthOfMonth()))
+        MONTHLY -> Pair(date.withDayOfMonth(1), date.withDayOfMonth(date.lengthOfMonth()))
     }
-
 
 
 
