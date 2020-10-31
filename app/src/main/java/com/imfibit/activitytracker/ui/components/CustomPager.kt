@@ -78,12 +78,6 @@ class PagerState(
 
     var selectionState by mutableStateOf(SelectionState.Selected)
 
- /*   inline fun <R> selectPage(block: PagerState.() -> R): R = try {
-        selectionState = SelectionState.Undecided
-        block()
-    } finally {
-        selectPage()
-    }*/
 
     fun selectPage() {
         currentPage -= currentPageOffset.roundToInt()
@@ -184,7 +178,6 @@ fun Pager(
                     // TODO: current this centers each page. We should investigate reading
                     //  gravity modifiers on the child, or maybe as a param to Pager.
                     val xCenterOffset = (constraints.maxWidth - placeable.width) / 2
-                    val yCenterOffset = (constraints.maxHeight - placeable.height) / 2
 
                     if (currentPage == page) {
                         pageSize = placeable.width
@@ -194,7 +187,7 @@ fun Pager(
 
                     placeable.place(
                         x = xCenterOffset + xItemOffset,
-                        y = yCenterOffset
+                        y = 0
                     )
                 }
         }

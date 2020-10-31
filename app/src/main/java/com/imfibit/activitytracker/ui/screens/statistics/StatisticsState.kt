@@ -14,40 +14,30 @@ import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import java.util.*
 
-class StatisticsState(
-    date: LocalDate,
-    range: TimeRange,
-    data: Map<TrackedActivity.Type, List<ActivityWithMetric>>
+data class StatisticsState(
+    val originDate: LocalDate,
+    val range: TimeRange,
+    val date:LocalDate = originDate
 ) {
-    var date by mutableStateOf(date)
-    var range by mutableStateOf(range)
-    var data by mutableStateOf(data)
-
-    var activities by mutableStateOf(listOf<ActivityWithMetric>())
 
     @Composable
     fun getLabel():String = when(range){
         TimeRange.DAILY -> date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT))
-        TimeRange.WEEKLY -> getWeek().run { "$first - $second" }
+        TimeRange.WEEKLY -> range.getBoundaries(date).run { "$first - $second" }
         TimeRange.MONTHLY -> stringArrayResource(R.array.months)[date.monthValue-1]
     }
 
-
-
-    fun getWeek(): Pair<String, String> {
-        val locale = Locale.getDefault()
-
-        val start = date.with(
-            TemporalAdjusters.previousOrSame(WeekFields.of(locale).getFirstDayOfWeek())
-        )
-
-        val end = start.plusDays(6L)
-
-        return Pair(
-            start.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)),
-            end.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT))
-        )
+    fun offset(offset: Int) = when (range){
+        TimeRange.DAILY -> originDate.minusDays(offset.toLong())
+        TimeRange.WEEKLY -> originDate.minusWeeks(offset.toLong())
+        TimeRange.MONTHLY -> originDate.minusMonths(offset.toLong())
     }
 
+    fun getBoundaries(offset: Int = 0) = range.getBoundaries(offset(offset))
+
+    fun setOffset(offset: Int) = this.copy(date = offset(offset))
+
+    fun setRange(range: TimeRange) = this.copy(date = originDate, range = range)
+    fun setDate(date: LocalDate) = this.copy(date = date)
 
 }

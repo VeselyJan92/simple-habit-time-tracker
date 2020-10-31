@@ -6,7 +6,7 @@ plugins {
     id("kotlin-kapt")
     id("kotlin-android-extensions")
 
-    id("dagger.hilt.android.plugin")
+   // id("dagger.hilt.android.plugin")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
 }
@@ -22,6 +22,7 @@ android {
             keyPassword = properties.getProperty("key_password")
             keyAlias = properties.getProperty("key_alias")
         }
+
     }
 
     compileSdkVersion(30)
@@ -107,8 +108,8 @@ dependencies {
    // implementation( "com.android.support:support-compat:28.0.0")
 
 
-    implementation("com.google.dagger:hilt-android:2.28-alpha")
-    kapt("com.google.dagger:hilt-android-compiler:2.28-alpha")
+   // implementation("com.google.dagger:hilt-android:2.28-alpha")
+   // kapt("com.google.dagger:hilt-android-compiler:2.28-alpha")
 
     implementation("androidx.appcompat:appcompat:1.2.0")
 
@@ -124,12 +125,12 @@ dependencies {
 
 
 
-    implementation("androidx.compose.ui:ui:1.0.0-alpha05")
-    implementation("androidx.compose.material:material:1.0.0-alpha05")
-    implementation("androidx.ui:ui-tooling:1.0.0-alpha05")
-    implementation("androidx.compose.runtime:runtime-livedata:1.0.0-alpha05")
-    implementation("androidx.compose.foundation:foundation:1.0.0-alpha05")
-    implementation("androidx.compose.material:material-icons-extended:1.0.0-alpha05")
+    implementation("androidx.compose.ui:ui:1.0.0-alpha06")
+    implementation("androidx.compose.material:material:1.0.0-alpha06")
+    implementation("androidx.ui:ui-tooling:1.0.0-alpha06")
+    implementation("androidx.compose.runtime:runtime-livedata:1.0.0-alpha06")
+    implementation("androidx.compose.foundation:foundation:1.0.0-alpha06")
+    implementation("androidx.compose.material:material-icons-extended:1.0.0-alpha06")
 
 
 

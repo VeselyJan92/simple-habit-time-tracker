@@ -1,7 +1,9 @@
+/*
 package com.imfibit.activitytracker.ui.screens.statistics
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.*
 import com.imfibit.activitytracker.core.activityInvalidationTracker
@@ -19,9 +21,10 @@ class StatisticsViewModel() : ViewModel() {
 
     val rep = RepositoryTrackedActivity()
 
-    var date by mutableStateOf(LocalDate.now())
-    var range by mutableStateOf(TimeRange.DAILY)
-    var data by mutableStateOf(mapOf<TrackedActivity.Type, List<ActivityWithMetric>>())
+
+    var data  = MutableLiveData()
+    var date  = MutableLiveData(LocalDate.now())
+    var range  = MutableLiveData(TimeRange.DAILY)
 
 
     val tracker = activityInvalidationTracker {
@@ -30,8 +33,6 @@ class StatisticsViewModel() : ViewModel() {
 
     init {
         AppDatabase.db.invalidationTracker.addObserver(tracker)
-
-        onDataChanged()
     }
 
     override fun onCleared() {
@@ -39,8 +40,9 @@ class StatisticsViewModel() : ViewModel() {
     }
 
     fun onDataChanged() = viewModelScope.launch(Dispatchers.IO) {
-        val interval = range.getBoundaries(date)
-        data = AppDatabase.activityRep.metricDAO.getActivitiesWithMetric(
+        val interval = range.value!!.getBoundaries(date.value!!)
+
+        data.value = AppDatabase.activityRep.metricDAO.getActivitiesWithMetric(
             interval.first,
             interval.second
         ).groupBy {
@@ -48,13 +50,12 @@ class StatisticsViewModel() : ViewModel() {
         }
     }
 
-    fun onSwipedCard(offset: Int) {
-        val now = LocalDate.now()
-        val offset = offset.toLong()
-        date = when (range){
-            TimeRange.DAILY -> now.minusDays(offset)
-            TimeRange.WEEKLY -> now.minusWeeks(offset)
-            TimeRange.MONTHLY -> now.minusMonths(offset)
-        }
+
+
+    fun setRange(range: TimeRange) {
+        this.date.value = LocalDate.now()
+        this.range.value = range
+        onDataChanged()
     }
 }
+*/

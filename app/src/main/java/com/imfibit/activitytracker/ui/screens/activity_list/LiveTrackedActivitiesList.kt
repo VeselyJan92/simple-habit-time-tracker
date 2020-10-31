@@ -43,8 +43,8 @@ fun LiveActivitiesList(vm: ActivitiesViewModel){
 
     val (time, setTime) = remember { mutableStateOf(LocalDateTime.now()) }
 
-    launchInComposition{
 
+    LaunchedTask{
         while (this.coroutineContext.isActive){
             setTime(LocalDateTime.now())
             delay(1000)
