@@ -2,6 +2,7 @@ package com.imfibit.activitytracker.ui.screens.statistics
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.foundation.*
@@ -25,18 +26,22 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.viewModel
 import androidx.fragment.app.Fragment
 import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.embedable.TimeRange
+import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.components.*
 import com.imfibit.activitytracker.ui.screens.activity_list.Goal
+import com.imfibit.getitdone.database.AppDatabase
 import com.thedeanda.lorem.LoremIpsum
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import kotlin.random.Random
 
 class StatisticsFragment : Fragment() {
     @ExperimentalFocus
@@ -62,35 +67,74 @@ class StatisticsFragment : Fragment() {
 private fun ScreenBody() = Column {
     val clock = AnimationClockAmbient.current
 
-    val vm = viewModel<StatisticsViewModel>()
+    val state = remember { mutableStateOf(StatisticsState(LocalDate.now(), TimeRange.DAILY)) }
 
     val pager = remember(clock){
         PagerState(clock, 100, minPage = 0, maxPage = 100){
-            vm.onSwipedCard(maxPage - currentPage)
+            state.value = state.value.setOffset(maxPage - currentPage)
+            Log.e("Date", "Shift")
         }
     }
 
-    Navigation(vm, pager = pager)
+    Navigation(state, pager)
 
     Pager(state = pager, modifier = Modifier.padding(bottom = 8.dp)) {
+        Log.e("PAGE", "$page")
 
-        ScrollableColumn(Modifier) {
-            BlockTimeTracked(vm)
-            BlockScores(vm)
-            BlockCompleted(vm)
+        val interval = state.value.getBoundaries(100 - this.page)
+
+        val data = remember(state.value.range) {
+            mutableStateOf(mapOf<TrackedActivity.Type, List<ActivityWithMetric>>())
         }
+
+      //  Log.e("Date", "Before Launch")
+        LaunchedTask(state.value.range){
+
+            val x = AppDatabase.activityRep.metricDAO.getActivitiesWithMetric(
+                interval.first,
+                interval.second
+            ).groupBy {
+                it.activity.type
+            }
+
+            data.value = x
+
+            Log.e("DB: $page", interval.toString() + " " + x.size)
+        }
+
+        if (data.value.isEmpty()){
+            Surface(modifier = Modifier.padding(8.dp).background(Color.White), elevation = 2.dp) {
+                Box(Modifier.fillMaxWidth().padding(vertical = 16.dp), alignment = Alignment.Center) {
+                    Text(text = "No records", style = TextStyle(
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    ))
+                }
+            }
+        }else{
+            ScrollableColumn(Modifier) {
+                BlockTimeTracked(data.value[TrackedActivity.Type.SESSION])
+                BlockScores(data.value[TrackedActivity.Type.SCORE])
+                BlockCompleted(data.value[TrackedActivity.Type.CHECKED])
+            }
+        }
+
     }
 }
 
 @Composable
-private fun Navigation(vm: StatisticsViewModel, pager: PagerState){
+private fun Navigation(state: MutableState<StatisticsState>, pager: PagerState) {
+
+    val x = state.value
+
     Surface(modifier = Modifier.padding(8.dp).background(Color.White), elevation = 2.dp) {
         Column{
 
             Row(Modifier.padding(horizontal = 8.dp).padding(top = 8.dp)) {
 
                 TimeRange.values().forEach {timeRange ->
-                    val color = if (vm.range == timeRange)
+                    val color = if (state.value.range == timeRange)
                         Colors.ChipGraySelected
                     else
                         Colors.ChipGray
@@ -102,8 +146,8 @@ private fun Navigation(vm: StatisticsViewModel, pager: PagerState){
                             .height(30.dp)
                             .background(color, RoundedCornerShape(50))
                             .clickable(onClick = {
-                                vm.date = LocalDate.now()
-                                vm.range = timeRange
+                                pager.currentPage = 100
+                                state.value = state.value.setRange(range = timeRange )
                             }),
 
                         alignment = Alignment.Center
@@ -125,8 +169,8 @@ private fun Navigation(vm: StatisticsViewModel, pager: PagerState){
                         .clickable(
                             onClick = {
                                 DatePickerDialog(context, 0,
-                                    { _, i, i2, i3 -> vm.date =  LocalDate.of(i, i2, i3)},
-                                    vm.date.year, vm.date.month.value, vm.date.dayOfMonth
+                                    { _, i, i2, i3 -> state.value = state.value.setDate(LocalDate.of(i, i2, i3))},
+                                    state.value.date.year,  state.value.date.month.value,  state.value.date.dayOfMonth
                                 ).show()
                             }
                         ),
@@ -147,10 +191,10 @@ private fun Navigation(vm: StatisticsViewModel, pager: PagerState){
 
                 Spacer(Modifier.weight(1f))
 
-                val label = when(vm.range){
-                    TimeRange.DAILY -> vm.date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT))
-                    TimeRange.WEEKLY -> vm.range.getBoundaries(vm.date).run { "$first - $second" }
-                    TimeRange.MONTHLY -> stringArrayResource(R.array.months)[vm.date.monthValue-1]
+                val label = when(state.value.range){
+                    TimeRange.DAILY -> x.date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT))
+                    TimeRange.WEEKLY -> x.range.getBoundaries(x.date).run { "$first - $second" }
+                    TimeRange.MONTHLY -> stringArrayResource(R.array.months)[x.date.monthValue-1]
                 }
 
                 Text(text = label, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
@@ -185,7 +229,9 @@ private fun Header(title: String, icon: VectorAsset, last: @Composable (() -> Un
 }
 
 @Composable
-private fun BlockTimeTracked(scope: StatisticsViewModel) {
+private fun BlockTimeTracked(data: List<ActivityWithMetric>?) {
+    if (data == null) return
+
     Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp)) {
         Column(Modifier.padding(8.dp)) {
             Header(title = "Časoběrné aktivity", icon = Icons.Default.Timer){
@@ -200,28 +246,21 @@ private fun BlockTimeTracked(scope: StatisticsViewModel) {
                 }
             }
 
-
-
-
-            repeat(4){
+            data.forEach {
                 Row(Modifier.padding( start = 8.dp, end= 8.dp)) {
-                    Text(text = LoremIpsum.getInstance().getWords(1, 3), fontSize = 16.sp)
+                    Text(text = it.activity.name, fontSize = 16.sp)
 
                     Spacer(modifier = Modifier.weight(1f))
 
 
-                    if( it ==3)
-                        Goal(label = "11:00")
-
-                    BaseMetricBlock(metric = "12:45", color = Colors.AppAccent, metricStyle = TextStyle(
+                    BaseMetricBlock(metric = it.activity.type.getComposeString(it.metric).invoke(), color = Colors.AppAccent, metricStyle = TextStyle(
                         fontWeight = FontWeight.Bold,
                         fontSize = 12.sp
                     ))
 
                 }
 
-                if (it!= 4)
-                    Divider(Modifier.padding(top = 4.dp, bottom = 4.dp))
+                Divider(Modifier.padding(top = 4.dp, bottom = 4.dp))
             }
 
 
@@ -268,7 +307,7 @@ private fun BlockTimeTracked(scope: StatisticsViewModel) {
 
 
 @Composable
-private fun BlockScores(scope: StatisticsViewModel) {
+private fun BlockScores(scope: List<ActivityWithMetric>?) {
     Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp)) {
         Column(Modifier.padding(8.dp)) {
 
@@ -302,7 +341,7 @@ private fun BlockScores(scope: StatisticsViewModel) {
 
 
 @Composable
-private fun BlockCompleted(scope: StatisticsViewModel) {
+private fun BlockCompleted(scope: List<ActivityWithMetric>?) {
     Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp)) {
         Column(Modifier.padding(8.dp)) {
 
