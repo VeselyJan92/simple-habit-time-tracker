@@ -35,6 +35,15 @@ class RepositoryTrackedActivity constructor(
                 TimeRange.MONTHLY -> metricDAO.getMetricByMonth(activity.id, YearMonth.now(), pastRanges)
             }
 
+            val hasMetricToday = if (activity.type == TrackedActivity.Type.CHECKED){
+                val metric = metricDAO.getMetricByDay(activity.id, LocalDate.now().minusDays(1), LocalDate.now())
+
+                metric.first().metric > 0
+            }
+            else false
+
+
+
             val groupedMetric = data.map {
                 val color = Colors.getMetricColor(
                     activity.goal,
@@ -54,14 +63,14 @@ class RepositoryTrackedActivity constructor(
 
 
                 MetricWidgetData.Labeled(
-                    { activity.goal.range.getLabel(it.from) },
+                    { activity.goal.range.getShortLabel(it.from) },
                     metric,
                     color,
                     Editable(activity.type, it.metric, it.from.atStartOfDay(), it.to.atStartOfDay(), activity.id)
                 )
             }
             Log.e("adasd", "Asdasd")
-            TrackedActivityWithMetric(activity, groupedMetric)
+            TrackedActivityWithMetric(activity, groupedMetric, hasMetricToday)
         }
     }
 

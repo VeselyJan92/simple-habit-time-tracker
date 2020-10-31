@@ -7,9 +7,9 @@
     <string name="screen_title_record_history">History</string>
 
 
-    <string name="frequency_daily">daily</string>
-    <string name="frequency_weekly">weekly</string>
-    <string name="frequency_monthly">monthly</string>
+    <string name="frequency_daily">Daily</string>
+    <string name="frequency_weekly">Weekly</string>
+    <string name="frequency_monthly">Monthly</string>
 
 
 
@@ -34,28 +34,12 @@
 
 
 
-
-
-
-
-
-
-    <!-- TRACKED TASK-->
-    <string-array name="tracked_task_goal_types">
-        <item>Time</item>
-        <item>Count</item>
-    </string-array>
-
     <string name="d_tracked_task_goal_frequency">Frequency</string>
-    <string name="statistics_fragment_timed_label">Časoběrné aktivity</string>
+    <string name="time">Time</string>
     <string name="work_week">P. týdne</string>
+    <string name="score">Score</string>
+    <string name="habbits">Habbits</string>
 
-    <string-array name="tracked_task_viewed_range">
-        <item>daily</item>
-        <item>weekly</item>
-        <item>monthly</item>
-        <item>yearly</item>
-    </string-array>
 
     <string-array name="months">
         <item>Leden</item>

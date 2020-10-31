@@ -4,6 +4,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AssignmentTurnedIn
@@ -114,7 +115,8 @@ private fun TrackedActivities(
 
     ){
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, modifier = Modifier.padding(end = 16.dp))
+            Modifier.padding(end = 16.dp)
+            Icon(icon)
 
             Column {
                 Text(
