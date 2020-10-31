@@ -1,11 +1,15 @@
 package com.imfibit.activitytracker.ui.screens.statistics
 
+import android.util.Log
+import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.res.stringArrayResource
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.ui.components.PagerState
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityWithMetric
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -14,30 +18,44 @@ import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import java.util.*
 
-data class StatisticsState(
-    val originDate: LocalDate,
-    val range: TimeRange,
-    val date:LocalDate = originDate
+class StatisticsState(
+    val default: LocalDate,
+    range: TimeRange,
+    clock: AnimationClockObservable,
+    date:LocalDate = default
 ) {
+    val minPage = 0
+    val maxPage = 101
+    val originPage = 51
 
-    @Composable
-    fun getLabel():String = when(range){
-        TimeRange.DAILY -> date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT))
-        TimeRange.WEEKLY -> range.getBoundaries(date).run { "$first - $second" }
-        TimeRange.MONTHLY -> stringArrayResource(R.array.months)[date.monthValue-1]
+    var origin by mutableStateOf(default)
+    var range by mutableStateOf(range)
+    var date by mutableStateOf(date)
+
+    val pager = PagerState(clock, originPage, minPage = minPage, maxPage = maxPage){
+        this@StatisticsState.date = offset(originPage - this.currentPage)
     }
+
 
     fun offset(offset: Int) = when (range){
-        TimeRange.DAILY -> originDate.minusDays(offset.toLong())
-        TimeRange.WEEKLY -> originDate.minusWeeks(offset.toLong())
-        TimeRange.MONTHLY -> originDate.minusMonths(offset.toLong())
+        TimeRange.DAILY -> origin.minusDays(offset.toLong())
+        TimeRange.WEEKLY -> origin.minusWeeks(offset.toLong())
+        TimeRange.MONTHLY -> origin.minusMonths(offset.toLong())
     }
 
-    fun getBoundaries(offset: Int = 0) = range.getBoundaries(offset(offset))
+    fun setTimeRange(range: TimeRange){
+        this.origin = default
+        this.date = default
+        this.range = range
+        pager.currentPage = originPage
+    }
 
-    fun setOffset(offset: Int) = this.copy(date = offset(offset))
+    fun setCustomDate(date: LocalDate){
+        origin = date
+        this.date = date
+        pager.currentPage = originPage
+    }
 
-    fun setRange(range: TimeRange) = this.copy(date = originDate, range = range)
-    fun setDate(date: LocalDate) = this.copy(date = date)
+    fun getRange(page: Int) = range.getBoundaries(offset(originPage - page))
 
 }

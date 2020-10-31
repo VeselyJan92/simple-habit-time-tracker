@@ -1,8 +1,8 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -30,7 +30,7 @@ fun ActivitiesScreen(
         topBar = { TrackerTopAppBar(stringResource(id = R.string.screen_title_activities)) },
         floatingActionButton = {
             FloatingActionButton(onClick = { display.value = true }) {
-                Icon(asset = Icons.Filled.Add)
+                Icon(Icons.Filled.Add)
             }
         },
         bodyContent = {

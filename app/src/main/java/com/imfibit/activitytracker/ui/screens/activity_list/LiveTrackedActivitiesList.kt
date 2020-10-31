@@ -1,13 +1,13 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
 import androidx.compose.foundation.Box
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Timer
@@ -85,10 +85,8 @@ fun LiveActivitiesList(vm: ActivitiesViewModel){
                     .background(Colors.ChipGray, RoundedCornerShape(50))
 
             ) {
-                Icon(
-                    Icons.Filled.Timer,
-                    Modifier.align(Alignment.CenterVertically).padding(start = 5.dp).size(20.dp)
-                )
+                Modifier.align(Alignment.CenterVertically).padding(start = 5.dp).size(20.dp)
+                Icon(Icons.Filled.Timer)
 
 
                 Text(TimeUtils.secondsToMetric(item.inSessionSince!!, time),

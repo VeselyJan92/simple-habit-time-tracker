@@ -1,10 +1,13 @@
 package com.imfibit.activitytracker.database.embedable
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import com.imfibit.activitytracker.R
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Period
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.temporal.ChronoField
@@ -23,11 +26,23 @@ enum class TimeRange(val label: Int) {
     WEEKLY(R.string.frequency_weekly),
     MONTHLY(R.string.frequency_monthly);
 
+
     @Composable
-    fun getLabel( datetime: LocalDate): String = when(this){
-        DAILY -> datetime.dayOfMonth.toString()
+    fun getShortLabel(date: LocalDate) = when(this){
+        DAILY -> date.dayOfMonth.toString()
         WEEKLY -> stringResource(id = R.string.week)
-        MONTHLY -> datetime.format(DateTimeFormatter.ofPattern("MMM"))
+        MONTHLY -> stringArrayResource(R.array.months)[date.monthValue-1]
+    }
+
+    @Composable
+    fun getDateLabel(date: LocalDate):String = when(this){
+        DAILY -> date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT))
+        WEEKLY -> this.getBoundaries(date).run {
+            first.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)) +
+            " - " +
+            second.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT))
+        }
+        MONTHLY -> stringArrayResource(R.array.months)[date.monthValue-1]
     }
 
     fun getBoundaries(date: LocalDate) = when(this){
@@ -46,9 +61,12 @@ enum class TimeRange(val label: Int) {
         MONTHLY -> Pair(date.withDayOfMonth(1), date.withDayOfMonth(date.lengthOfMonth()))
     }
 
+    fun getNumberOfDays(date:LocalDate) = getBoundaries(date).run {
+        Period.between(first, second).days + 1
+    }
 
 
-    fun getPastRanges(periods: Int = 5) = when(this){
+  /*  fun getPastRanges(periods: Int = 5) = when(this){
         DAILY -> getDays(periods)
         WEEKLY -> getWeeks(periods)
         MONTHLY -> getMonths(periods)
@@ -81,7 +99,7 @@ enum class TimeRange(val label: Int) {
         return (0 until periods).map {
             Range(firstDay.minusMonths(it+0L), firstDay.minusMonths(it-1L))
         }
-    }
+    }*/
 
 }
 

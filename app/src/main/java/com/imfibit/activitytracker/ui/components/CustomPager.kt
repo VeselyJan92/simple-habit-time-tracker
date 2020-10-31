@@ -125,7 +125,7 @@ private val Measurable.page: Int
 @Composable
 fun Pager(
     state: PagerState,
-    offscreenLimit: Int = 2,
+    offscreenLimit: Int = 1,
     modifier: Modifier = Modifier,
     pageContent: @Composable PagerScope.() -> Unit
 ) {

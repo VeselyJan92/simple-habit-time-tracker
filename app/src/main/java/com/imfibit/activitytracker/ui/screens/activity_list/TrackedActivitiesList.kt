@@ -7,6 +7,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -48,6 +49,7 @@ import java.time.LocalDateTime
 data class TrackedActivityWithMetric constructor(
     var activity: TrackedActivity,
     val past: List<MetricWidgetData>,
+    val hasMetricToday: Boolean
 ){
     fun currentCompleted() = past[0].editable!!.metric >= activity.goal.value
 }
@@ -137,13 +139,14 @@ fun TrackedActivitiesList(
                             }
                         )
                 ) {
+
                     Icon(
-                        when(item.activity.type){
+                        asset = when(item.activity.type){
                             Type.SESSION -> Icons.Filled.PlayArrow
                             Type.SCORE -> Icons.Filled.Add
-                            Type.CHECKED -> if (item.currentCompleted()) Icons.Filled.DoneAll else Icons.Filled.Check
+                            Type.CHECKED -> if (item.hasMetricToday) Icons.Filled.DoneAll else Icons.Filled.Check
                         },
-                        Modifier
+                        modifier =  Modifier
                             .size(34.dp)
                             .background(Colors.AppAccent, RoundedCornerShape(17.dp))
                     )
@@ -188,7 +191,8 @@ fun TrackedActivitiesList(
 @Composable
 fun Goal(label: String){
     Row(Modifier.size(70.dp, 20.dp).padding(end = 8.dp).background(Colors.ChipGray, RoundedCornerShape(50))) {
-        Icon(Icons.Filled.Flag, Modifier.align(Alignment.CenterVertically).padding(start = 5.dp).size(15.dp))
+        Modifier.align(Alignment.CenterVertically).padding(start = 5.dp).size(15.dp)
+        Icon(Icons.Filled.Flag)
 
         Text(
             label,
