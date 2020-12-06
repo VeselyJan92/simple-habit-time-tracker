@@ -3,10 +3,10 @@ package com.imfibit.activitytracker.ui.components.icons
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.materialIcon
 import androidx.compose.material.icons.materialPath
-import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.graphics.vector.ImageVector
 
 
-val Icons.Filled.MinusOne: VectorAsset
+val Icons.Filled.MinusOne: ImageVector
     get() {
         if (_MinusOne != null) {
             return _MinusOne!!
@@ -31,4 +31,4 @@ val Icons.Filled.MinusOne: VectorAsset
         return _MinusOne!!
     }
 
-private var _MinusOne: VectorAsset? = null
+private var _MinusOne: ImageVector? = null

@@ -1,6 +1,7 @@
 package com.imfibit.activitytracker.ui.components.dialogs
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -56,9 +57,9 @@ fun DialogScore(
                 style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp)
             )
 
-            Stack(
+            Box(
                 Modifier.height(30.dp).background(Colors.ChipGray, RoundedCornerShape(50)),
-                alignment = Alignment.Center
+                contentAlignment = Alignment.Center
             ) {
                 DatetimeEditor(datetime = datetime)
             }

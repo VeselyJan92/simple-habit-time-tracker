@@ -2,13 +2,15 @@ package com.imfibit.activitytracker.ui.components
 
 import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,18 +22,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.ui.tooling.preview.Preview
 
 
-@Preview
-@Composable
-fun EditTextPrev(){
 
-    Box(Modifier.size(300.dp, 300.dp)) {
-        EditText(text = TextFieldValue(""), onValueChange = {}, modifier = Modifier.size(200.dp, 30.dp))
-    }
-
-}
 
 
 
@@ -55,17 +48,17 @@ fun EditText(
 
     val color = if (valid) color else Colors.NotCompleted
 
-    Box(modifier.background(color, shape = RoundedCornerShape(50)), alignment = Alignment.Center) {
+    Box(modifier.background(color, shape = RoundedCornerShape(50)), contentAlignment = Alignment.Center) {
 
         if (text.text.isEmpty())
-            Text(text = label)
+            Text(label,)
 
-        BaseTextField(
+        BasicTextField(
             value = text,
-            onValueChange = onValueChange,
+            onValueChange = {onValueChange.invoke(it)},
             textStyle = textStyle,
             modifier = Modifier.padding(start = 8.dp, end = 8.dp).fillMaxWidth(),
-            keyboardType = keyboardType,
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         )
     }
 }

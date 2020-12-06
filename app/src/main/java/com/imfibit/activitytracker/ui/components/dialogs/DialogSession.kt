@@ -3,11 +3,13 @@ package com.imfibit.activitytracker.ui.components.dialogs
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.widget.Toast
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.ripple.RippleIndication
+import androidx.compose.material.ripple.rememberRippleIndication
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,11 +63,11 @@ inline fun DialogSession(
                 style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp)
             )
 
-            Stack(
+            Box(
                 modifier = Modifier
                     .height(30.dp)
                     .background(Colors.ChipGray, RoundedCornerShape(50)).fillMaxWidth(),
-                alignment = Alignment.Center
+                contentAlignment = Alignment.Center
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
@@ -115,7 +117,7 @@ inline fun DialogSession(
             )
 
 
-            Stack(
+            Box(
                 Modifier.height(30.dp)
                     .background(Colors.AppAccent, RoundedCornerShape(50))
                     .fillMaxWidth()
@@ -129,7 +131,7 @@ inline fun DialogSession(
                         },
                         indication = RippleIndication(bounded = false)
                     ),
-                alignment = Alignment.Center,
+                contentAlignment = Alignment.Center,
 
             ) {
                 Text(
@@ -153,11 +155,11 @@ inline fun DialogSession(
 
 
 
-            Stack(
+            Box(
                 modifier = Modifier
                     .height(30.dp).fillMaxWidth()
                     .background(if (from <= to) Colors.ChipGray else Colors.NotCompleted, RoundedCornerShape(50)),
-                alignment = Alignment.Center
+                contentAlignment = Alignment.Center
             ) {
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -166,13 +168,16 @@ inline fun DialogSession(
                         text = to.format(DateTimeFormatter.ofPattern("dd. MM.")),
                         modifier = Modifier.clickable(
                             onClick = {
-                                DatePickerDialog(context,
+                                DatePickerDialog(
+                                    context,
                                     0,
-                                    { _, i, i2, i3 -> to =  to.withYear(i).withMonth(i2).withDayOfMonth(i3)},
+                                    { _, i, i2, i3 ->
+                                        to = to.withYear(i).withMonth(i2).withDayOfMonth(i3)
+                                    },
                                     to.year, to.month.value, to.dayOfMonth
                                 ).show()
                             },
-                            indication = RippleIndication(bounded = false)
+                            indication = rememberRippleIndication(bounded = false)
                         )
                     )
 

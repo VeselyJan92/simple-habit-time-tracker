@@ -1,9 +1,10 @@
 package com.imfibit.activitytracker.ui.components
 
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -14,8 +15,8 @@ import androidx.compose.ui.unit.dp
 fun TrackerTopAppBar(title: String, actions: @Composable() (() -> Unit)? = null){
     TopAppBar(backgroundColor = Colors.AppPrimary) {
         Text(
-            title,
-            Modifier.align(Alignment.CenterVertically).padding(start = 8.dp),
+            text = title,
+            modifier = Modifier.align(Alignment.CenterVertically).padding(start = 8.dp),
             style = Typography.AppTitle
         )
 

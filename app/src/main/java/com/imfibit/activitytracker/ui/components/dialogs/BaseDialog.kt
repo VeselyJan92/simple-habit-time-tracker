@@ -1,9 +1,10 @@
 package com.imfibit.activitytracker.ui.components.dialogs
 
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
@@ -25,7 +26,7 @@ inline fun BaseDialog(display: MutableState<Boolean>, noinline content: @Composa
         Surface(
             elevation = 2.dp
         ){
-            Column(children = content)
+            Column(content = content)
         }
     }
 }
@@ -50,7 +51,7 @@ fun DialogBaseHeader(title: String){
 inline fun DialogButtons(content: @Composable RowScope.() -> Unit){
     Row(
         modifier = Modifier.fillMaxWidth(),
-        children = content,
+        content = content,
         horizontalArrangement = Arrangement.End
     )
 }

@@ -2,7 +2,6 @@ package com.imfibit.activitytracker.ui.components.selectors
 
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -50,7 +49,7 @@ fun NumberSelector(
                 .background(Colors.ChipGray, RoundedCornerShape(50)),
 
             ) {
-            Icon(asset = Icons.Filled.MinusOne)
+            Icon(Icons.Filled.MinusOne)
         }
 
 
@@ -60,9 +59,9 @@ fun NumberSelector(
         ) {
 
             Text(
+                text = label,
                 modifier = Modifier.height(15.dp),
                 textAlign = TextAlign.Center,
-                text = label,
                 style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp)
             )
 
@@ -84,12 +83,12 @@ fun NumberSelector(
             )
         }
 
-        Stack(
+        Box(
             modifier = Modifier
                 .padding(start = 8.dp, top = 15.dp).weight(50f)
                 .background(Colors.ChipGray, RoundedCornerShape(50))
                 .padding(start = 8.dp),
-            alignment = Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
             IconButton(
                 onClick = {
@@ -99,7 +98,7 @@ fun NumberSelector(
                 },
                 modifier = Modifier.height(30.dp)
             ) {
-                Icon(asset = Icons.Filled.PlusOne)
+                Icon(Icons.Filled.PlusOne)
             }
         }
 

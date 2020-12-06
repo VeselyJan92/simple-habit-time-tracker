@@ -1,6 +1,6 @@
 package com.imfibit.activitytracker.ui.components.dialogs
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*

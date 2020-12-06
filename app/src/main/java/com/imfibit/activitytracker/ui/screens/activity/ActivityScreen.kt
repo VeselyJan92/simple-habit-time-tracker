@@ -1,6 +1,9 @@
 package com.imfibit.activitytracker.ui.screens.activity
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.ScrollableColumn
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -23,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.viewModel
 import androidx.navigation.NavController
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.embedable.TimeRange
@@ -37,11 +41,12 @@ import com.imfibit.activitytracker.ui.components.dialogs.DialogTimeRange
 import com.imfibit.getitdone.database.AppDatabase
 import kotlinx.coroutines.*
 
-@ExperimentalFocus
-@ExperimentalFoundationApi
-@ExperimentalLayout
+
+@OptIn(ExperimentalFocus::class, ExperimentalFoundationApi::class)
 @Composable
-fun TrackedActivityScreen(nav: NavController, vm: TrackedActivityViewModel) {
+fun ScreenTrackedActivity(nav: NavController) {
+    // TODO id form navigation
+    val vm = viewModel<TrackedActivityViewModel>( factory = TrackedActivityVMFactory(1))
 
     val activity by vm.activity.observeAsState(null)
 
@@ -49,7 +54,7 @@ fun TrackedActivityScreen(nav: NavController, vm: TrackedActivityViewModel) {
         topBar = {
             TrackerTopAppBar(stringResource(id = R.string.screen_title_activity)) {
                 Icon(
-                    asset = Icons.Default.Delete,
+                    imageVector = Icons.Default.Delete,
                     tint = Color.White,
                     modifier = Modifier.clickable(onClick = {
                         GlobalScope.launch {
@@ -141,7 +146,7 @@ private fun ActivityName(activity: TrackedActivity?) {
                 onClick = { display.value = true},
                 indication = RippleIndication()
             ),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         Text(
             modifier = Modifier.padding(start = 8.dp, end = 8.dp).fillMaxWidth(),

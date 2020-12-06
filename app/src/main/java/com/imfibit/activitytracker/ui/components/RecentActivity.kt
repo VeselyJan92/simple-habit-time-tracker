@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Functions
 import androidx.compose.runtime.Composable
@@ -43,20 +44,20 @@ fun RecentActivityGrid(weeks: List<Week>, nav: NavController){
 
 
             DayOfWeek.values().forEach {
-                Stack(Modifier.size(40.dp, 30.dp), alignment = Alignment.Center){
+                Box(Modifier.size(40.dp, 30.dp), contentAlignment = Alignment.Center){
                     Text(
                         text = it.getDisplayName(java.time.format.TextStyle.SHORT, Locale.getDefault()).toUpperCase(),
+                        textAlign = TextAlign.Center,
                         style = TextStyle(
                             fontWeight = FontWeight.W600,
                             fontSize = 10.sp
-                        ),
-                        textAlign = TextAlign.Center
+                        )
                     )
                 }
             }
 
-            Stack(Modifier.size(40.dp, 30.dp), alignment = Alignment.Center){
-                Icon(asset = Icons.Filled.Functions)
+            Box(Modifier.size(40.dp, 30.dp), contentAlignment = Alignment.Center){
+                Icon(imageVector = Icons.Filled.Functions)
             }
 
         }

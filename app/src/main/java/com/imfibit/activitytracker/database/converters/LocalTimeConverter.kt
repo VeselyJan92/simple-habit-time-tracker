@@ -1,4 +1,4 @@
-package com.imfibit.getitdone.database.entities.converters
+package com.imfibit.activitytracker.database.converters
 
 import android.annotation.SuppressLint
 import androidx.room.TypeConverter
