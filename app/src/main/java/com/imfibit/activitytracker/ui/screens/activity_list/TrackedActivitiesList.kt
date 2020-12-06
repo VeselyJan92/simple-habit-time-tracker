@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
@@ -17,7 +18,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.HorizontalAlignmentLine
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.Color
@@ -114,7 +114,7 @@ fun TrackedActivitiesList(
 
             ) {
                 Box(
-                    alignment = Alignment.Center,
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier.align(Alignment.CenterVertically)
                         .padding(end = 8.dp, start = 8.dp)
                         .clickable(
@@ -141,7 +141,7 @@ fun TrackedActivitiesList(
                 ) {
 
                     Icon(
-                        asset = when(item.activity.type){
+                        imageVector = when(item.activity.type){
                             Type.SESSION -> Icons.Filled.PlayArrow
                             Type.SCORE -> Icons.Filled.Add
                             Type.CHECKED -> if (item.hasMetricToday) Icons.Filled.DoneAll else Icons.Filled.Check
@@ -201,7 +201,6 @@ fun Goal(label: String){
             style = TextStyle(
                 fontSize = 10.sp
             )
-
         )
     }
 

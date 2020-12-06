@@ -15,8 +15,8 @@ import com.imfibit.activitytracker.database.converters.LocalDateTimeConverter
 import com.imfibit.activitytracker.database.dao.tracked_activity.*
 import com.imfibit.activitytracker.database.entities.*
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.imfibit.getitdone.database.entities.converters.LocalTimeConverter
-import com.imfibit.getitdone.database.entities.converters.TrackedActivityTypeConverter
+import com.imfibit.activitytracker.database.converters.LocalTimeConverter
+import com.imfibit.activitytracker.database.converters.TrackedActivityTypeConverter
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.time.LocalDate

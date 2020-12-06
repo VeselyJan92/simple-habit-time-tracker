@@ -1,6 +1,5 @@
 package com.imfibit.activitytracker.ui.components
 
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -55,13 +54,13 @@ fun Completion(item: TrackedActivityCompletion) = BaseRecord(item, {}) {
         modifier = Modifier
     )
 
-    Stack(
+    Box(
         modifier = Modifier.size(40.dp, 20.dp)
             .background(Colors.ChipGray, RoundedCornerShape(50))){
 
         Text(
-            modifier = Modifier.align(Alignment.Center),
             text = "2:00",
+            modifier = Modifier.align(Alignment.Center),
             style = TextStyle(
                 fontWeight = FontWeight.W600,
                 fontSize = 12.sp
@@ -158,7 +157,7 @@ private fun BaseRecord(item: TrackedActivityData, click: ()->Unit, body: @Compos
             modifier = Modifier.fillMaxWidth().padding( 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            children = body
+            content = body
         )
     }
 

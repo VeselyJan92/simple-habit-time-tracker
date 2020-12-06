@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.RowScope.Companion.weight
+import androidx.compose.material.Text
 import androidx.compose.ui.unit.sp
 import com.imfibit.activitytracker.core.App
 import com.imfibit.activitytracker.core.ComposeString
@@ -105,11 +106,11 @@ fun BaseMetricBlock(
             .background(color, RoundedCornerShape(10.dp))
             .then(modifier)
             .then(clickable),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ){
         Text(
-            modifier = Modifier.align(Alignment.Center),
             text = metric,
+            modifier = Modifier.align(Alignment.Center),
             style = metricStyle
         )
     }

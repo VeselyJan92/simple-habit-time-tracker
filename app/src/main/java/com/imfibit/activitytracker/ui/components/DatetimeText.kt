@@ -2,20 +2,22 @@ package com.imfibit.activitytracker.ui.components
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Text
 import androidx.compose.material.ripple.RippleIndication
+import androidx.compose.material.ripple.rememberRippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -28,13 +30,11 @@ import java.time.format.DateTimeFormatter
 fun DatetimeEditor(
     datetime: MutableState<LocalDateTime>
 ){
-    val context = ContextAmbient.current
+    val context = AmbientContext.current
 
     Row(Modifier.padding(start = 8.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            textAlign = TextAlign.Center,
-            text = datetime.value.format(DateTimeFormatter.ofPattern("dd. MM.")),
-            modifier = Modifier.clickable(
+        Text(datetime.value.format(DateTimeFormatter.ofPattern("dd. MM.")),
+            Modifier.clickable(
                 onClick = {
                     DatePickerDialog(context,
                         0,
@@ -42,8 +42,8 @@ fun DatetimeEditor(
                         datetime.value.year, datetime.value.month.value, datetime.value.dayOfMonth
                     ).show()
                 },
-                indication = RippleIndication(bounded = false)
-            )
+                indication = rememberRippleIndication(bounded = false)
+            ),
         )
 
         Box(Modifier.padding(start = 8.dp, end = 8.dp).size(5.dp).background(Color.Black, RoundedCornerShape(50)))

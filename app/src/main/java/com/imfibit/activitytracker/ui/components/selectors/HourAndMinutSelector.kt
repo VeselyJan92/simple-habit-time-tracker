@@ -1,9 +1,13 @@
 package com.imfibit.activitytracker.ui.components.selectors
 
 import android.util.Log
-import androidx.compose.foundation.*
+import androidx.compose.foundation.BaseTextField
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -12,6 +16,7 @@ import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -23,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.imfibit.activitytracker.ui.components.Colors
 
 
-@OptIn(ExperimentalMaterialApi::class,ExperimentalFoundationApi::class, ExperimentalFocus::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalTextApi::class, ExperimentalFocus::class)
 @Composable
 inline fun MinuteAndHourSelector(
     hours: MutableState<Int?>,
@@ -54,15 +59,15 @@ inline fun MinuteAndHourSelector(
                     .height(30.dp)
                     .background(Colors.ChipGray, RoundedCornerShape(50))
                     .fillMaxWidth(),
-                alignment = Alignment.Center
+                contentAlignment = Alignment.Center
             ) {
-                BaseTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = TextFieldValue(hours.value?.toString() ?: ""),
-                    onValueChange = {
+                BasicTextField(value = "ASD", onValueChange = {})
 
+                BasicTextField(
+                    value = hours.value?.toString() ?: "",
+                    onValueChange = {
                         try {
-                            it.text.toInt().let {
+                            it.toInt().let {
                                 if (it in 0..9125) {
                                     hours.value = it
                                     onSelectionChanged?.invoke(hours.value ?: 0, minutes.value ?: 0)
@@ -73,12 +78,13 @@ inline fun MinuteAndHourSelector(
                         }
 
                     },
+                    modifier = Modifier.fillMaxWidth(),
                     textStyle = TextStyle(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     ),
-                    keyboardType = KeyboardType.Number
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
             }
 
@@ -107,10 +113,10 @@ inline fun MinuteAndHourSelector(
                     .height(30.dp)
                     .background(Colors.ChipGray, RoundedCornerShape(50))
                     .fillMaxWidth(),
-                alignment = Alignment.Center
+                contentAlignment = Alignment.Center
             ) {
 
-                BaseTextField(
+                BasicTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = TextFieldValue(minutes.value?.toString() ?: ""),
                     onValueChange = {
@@ -124,7 +130,7 @@ inline fun MinuteAndHourSelector(
                         }catch (e: Exception){}
                     },
                     textStyle = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center),
-                    keyboardType = KeyboardType.Number
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
 
             }

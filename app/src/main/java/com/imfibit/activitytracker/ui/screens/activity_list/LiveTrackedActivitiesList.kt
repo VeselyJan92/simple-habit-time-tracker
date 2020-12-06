@@ -1,7 +1,5 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
@@ -9,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.runtime.*
@@ -17,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -37,14 +37,13 @@ import java.time.LocalDateTime
 @Composable
 fun LiveActivitiesList(vm: ActivitiesViewModel){
 
-    val context = ContextAmbient.current
+    val context = AmbientContext.current
 
     val items: List<TrackedActivity> by vm.live.observeAsState(listOf())
 
     val (time, setTime) = remember { mutableStateOf(LocalDateTime.now()) }
 
-
-    LaunchedTask{
+    LaunchedEffect(time){
         while (this.coroutineContext.isActive){
             setTime(LocalDateTime.now())
             delay(1000)
@@ -71,10 +70,14 @@ fun LiveActivitiesList(vm: ActivitiesViewModel){
                 Box(Modifier.size(20.dp, 20.dp).background(Color.Red))
             }
 
-            Text(text = item.name, Modifier.weight(1f), style = TextStyle(
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
-            ))
+            Text(
+                text = item.name,
+                modifier = Modifier.weight(1f),
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
             
             Spacer(modifier = Modifier.weight(1f))
 

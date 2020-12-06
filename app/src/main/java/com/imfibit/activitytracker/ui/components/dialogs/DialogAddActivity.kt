@@ -5,19 +5,20 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
+import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AssignmentTurnedIn
 import androidx.compose.material.icons.filled.Score
 import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material.ripple.RippleIndication
+import androidx.compose.material.ripple.rememberRippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawShadow
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.ExperimentalFocus
-import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -98,7 +99,7 @@ fun DialogAddActivity(
 
 @Composable
 private fun TrackedActivities(
-    icon: VectorAsset,
+    icon: ImageVector,
     name: String,
     desc: String,
     clickable: () -> Unit
@@ -108,9 +109,9 @@ private fun TrackedActivities(
             .padding(8.dp)
             .fillMaxWidth()
             .zIndex(1f)
-            .drawShadow(2.dp, shape = RoundedCornerShape(10.dp))
+            .shadow(2.dp, shape = RoundedCornerShape(10.dp))
             .background(Colors.ChipGray, RoundedCornerShape(10.dp))
-            .clickable(onClick = clickable, indication = RippleIndication())
+            .clickable(onClick = clickable, indication = rememberRippleIndication())
             .padding(8.dp)
 
     ){

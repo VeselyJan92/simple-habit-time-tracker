@@ -1,27 +1,22 @@
 package com.imfibit.activitytracker.ui.screens.statistics
 
 import android.app.DatePickerDialog
-import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ScrollableColumn
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
+import androidx.compose.material.*
 import androidx.compose.material.Icon
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.VectorAsset
-import androidx.compose.ui.platform.AnimationClockAmbient
-import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -29,40 +24,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.components.*
+import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.screens.activity_list.Goal
 import com.imfibit.getitdone.database.AppDatabase
-import com.thedeanda.lorem.LoremIpsum
 import java.time.LocalDate
 
-class StatisticsFragment : Fragment() {
-    @ExperimentalFocus
-    @ExperimentalFoundationApi
-    @OptIn(ExperimentalLayout::class)
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    )  = ComposeView(requireContext()).apply {
-        setContent {
-            Scaffold(
-                topBar = { TrackerTopAppBar("Statistika") },
-                bodyContent = { ScreenBody() },
-                backgroundColor = Colors.AppBackground,
-            )
-        }
-    }
 
+@Composable
+fun ScreenStatistics(navController: NavController){
+    Scaffold(
+        topBar = { TrackerTopAppBar("Statistika") },
+        bodyContent = { ScreenBody() },
+        backgroundColor = Colors.AppBackground,
+    )
 }
+
 
 @Composable
 private fun ScreenBody() = Column {
-    val clock = AnimationClockAmbient.current
+    val clock = AmbientAnimationClock.current
 
     val state = remember { StatisticsState(LocalDate.now(), TimeRange.DAILY, clock) }
 
@@ -89,7 +75,7 @@ private fun ScreenBody() = Column {
 
         if (data.value.isEmpty()){
             Surface(modifier = Modifier.padding(8.dp).background(Color.White), elevation = 2.dp) {
-                Box(Modifier.fillMaxWidth().padding(vertical = 16.dp), alignment = Alignment.Center) {
+                Box(Modifier.fillMaxWidth().padding(vertical = 16.dp), contentAlignment = Alignment.Center) {
                     Text(
                         text = stringResource(id = R.string.no_records), style = TextStyle(
                             fontSize = 16.sp,
@@ -134,7 +120,7 @@ private fun Navigation(state: StatisticsState) {
                                 state.setTimeRange(timeRange)
                             }),
 
-                        alignment = Alignment.Center
+                        contentAlignment = Alignment.Center
                     ) {
                         Text(text = stringResource(id = timeRange.label))
                     }
@@ -160,7 +146,7 @@ private fun Navigation(state: StatisticsState) {
                                 ).show()
                             }
                         ),
-                    alignment = Alignment.Center
+                    contentAlignment = Alignment.Center
                 ) {
                     Icon(Icons.Default.CalendarToday)
                 }
@@ -198,7 +184,7 @@ private fun NavigationTitle(state: StatisticsState){
 }
 
 @Composable
-private fun Header(title: String, icon: VectorAsset, last: @Composable (() -> Unit)? = null){
+private fun Header(title: String, icon: ImageVector, last: @Composable (() -> Unit)? = null){
     Row(modifier = Modifier.padding(bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
 
         Modifier.padding(end = 16.dp)
@@ -209,7 +195,7 @@ private fun Header(title: String, icon: VectorAsset, last: @Composable (() -> Un
             style = TextStyle(
                 fontWeight = FontWeight.W600,
                 fontSize = 20.sp
-            ),
+            )
         )
 
         Spacer(modifier = Modifier.weight(1f))

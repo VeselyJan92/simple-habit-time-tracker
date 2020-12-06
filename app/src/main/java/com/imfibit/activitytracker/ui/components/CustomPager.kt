@@ -31,11 +31,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Layout
-import androidx.compose.ui.Measurable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.ParentDataModifier
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.unit.Density
 import kotlin.math.roundToInt
 
@@ -131,7 +131,7 @@ fun Pager(
 ) {
     var pageSize by remember { mutableStateOf(0) }
     Layout(
-        children = {
+        content = {
             val minPage = (state.currentPage - offscreenLimit).coerceAtLeast(state.minPage)
             val maxPage = (state.currentPage + offscreenLimit).coerceAtMost(state.maxPage)
 
@@ -139,7 +139,7 @@ fun Pager(
                 val pageData = PageData(page)
                 val scope = PagerScope(state, page)
                 key(pageData) {
-                    Box(alignment = Alignment.Center, modifier = pageData) {
+                    Box(contentAlignment = Alignment.Center, modifier = pageData) {
                         scope.pageContent()
                     }
                 }

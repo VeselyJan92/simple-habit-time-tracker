@@ -16,11 +16,6 @@ import java.time.temporal.WeekFields
 import java.util.*
 
 
-typealias RangeInterval = List<Pair<LocalDateTime, LocalDateTime>>
-
-
-data class Range(val from: LocalDateTime, val to: LocalDateTime)
-
 enum class TimeRange(val label: Int) {
     DAILY(R.string.frequency_daily),
     WEEKLY(R.string.frequency_weekly),
