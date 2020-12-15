@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -64,7 +64,7 @@ private fun ScreenBody() = Column {
             mutableStateOf(mapOf<TrackedActivity.Type, List<ActivityWithMetric>>())
         }
 
-        LaunchedTask(state.range, state.origin){
+        LaunchedEffect(state.range, state.origin) {
             data.value = AppDatabase.activityRep.metricDAO.getActivitiesWithMetric(
                 interval.first,
                 interval.second
@@ -128,7 +128,7 @@ private fun Navigation(state: StatisticsState) {
                 
                 Spacer(modifier = Modifier.width(50.dp))
 
-                val context = ContextAmbient.current
+                val context = AmbientContext.current
 
                 Box(
                     modifier = Modifier

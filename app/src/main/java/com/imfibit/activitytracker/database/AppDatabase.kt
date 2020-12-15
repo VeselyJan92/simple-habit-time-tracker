@@ -66,10 +66,10 @@ abstract class AppDatabase : RoomDatabase() {
         fun init(context: Context){
             when(BuildConfig.BUILD_TYPE){
                 "release"->{
-                    db = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DB_NAME).build()
+                    db = Room.databaseBuilder(context, AppDatabase::class.java, DB_NAME).build()
                 }
                 "debug" -> {
-                    db =  Room.inMemoryDatabaseBuilder(context.applicationContext, AppDatabase::class.java)
+                    db =  Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
                         .fallbackToDestructiveMigration()
                         .build()
 

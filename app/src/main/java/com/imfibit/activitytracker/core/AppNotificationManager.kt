@@ -33,7 +33,7 @@ object AppNotificationManager{
 
         val remoteViews = RemoteViews(context.packageName, R.layout.notification)
 
-        remoteViews.setTextViewText(R.id.tracked_task_notification_tv_name, item.name);
+        remoteViews.setTextViewText(R.id.tracked_task_notification_tv_name, item.name)
         remoteViews.setChronometer(
             R.id.rv_live_tracked_task_chronometer,
             SystemClock.elapsedRealtime(),
@@ -74,7 +74,7 @@ object AppNotificationManager{
             .setContent(remoteViews)
             .setOngoing(true)
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
-            .setAutoCancel(true);
+            .setAutoCancel(true)
 
 
         notificationManager.notify(item.id.toInt(), customNotification.build())

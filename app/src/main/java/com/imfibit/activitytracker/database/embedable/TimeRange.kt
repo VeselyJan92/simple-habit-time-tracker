@@ -45,8 +45,7 @@ enum class TimeRange(val label: Int) {
         WEEKLY -> {
             val start = date.with(
                 TemporalAdjusters
-                    .previousOrSame(WeekFields.of(Locale.getDefault())
-                    .getFirstDayOfWeek())
+                    .previousOrSame(WeekFields.of(Locale.getDefault()).firstDayOfWeek)
             )
 
             val end = start.plusDays(6L)

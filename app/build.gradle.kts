@@ -7,6 +7,7 @@ plugins {
 
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+
 }
 
 android {
@@ -42,16 +43,13 @@ android {
 
         isAbortOnError = false
         lintOptions {
-
-
             checkOnly("release")
         }
     }
 
     composeOptions {
-        kotlinCompilerVersion = "1.4.20"
+        kotlinCompilerVersion = "1.4.21"
         kotlinCompilerExtensionVersion ="1.0.0-alpha08"
-
     }
 
     compileOptions {
@@ -59,10 +57,14 @@ android {
         targetCompatibility  = JavaVersion.VERSION_1_8
     }
 
-
     kotlinOptions {
         jvmTarget = "1.8"
-        useIR = true
+        freeCompilerArgs = listOf(
+            "-Xallow-jvm-ir-dependencies",
+            "-Xskip-prerelease-check",
+            "-Xopt-in=kotlin.Experimental",
+            "-Xopt-in=kotlin.RequiresOptIn"
+        )
     }
 
     defaultConfig {
@@ -103,41 +105,26 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.20")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.21")
     implementation("com.thedeanda:lorem:2.1")
-
 
     implementation(platform("com.google.firebase:firebase-bom:25.11.0"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
     implementation("com.google.firebase:firebase-analytics-ktx")
 
-
     implementation("androidx.appcompat:appcompat:1.2.0")
-
-    implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
-
 
     implementation("androidx.navigation:navigation-compose:1.0.0-alpha03")
 
     implementation("androidx.compose.compiler:compiler:1.0.0-alpha08")
     implementation("androidx.compose.ui:ui:1.0.0-alpha08")
     implementation("androidx.compose.material:material:1.0.0-alpha08")
+    implementation("androidx.compose.runtime:runtime:1.0.0-alpha08")
     implementation("androidx.compose.runtime:runtime-livedata:1.0.0-alpha08")
     implementation("androidx.compose.foundation:foundation:1.0.0-alpha08")
     implementation("androidx.compose.material:material-icons-extended:1.0.0-alpha08")
 
-
-    implementation ("androidx.room:room-runtime:2.3.0-alpha03")
     kapt("androidx.room:room-compiler:2.3.0-alpha03")
+    implementation ("androidx.room:room-runtime:2.3.0-alpha03")
     implementation ("androidx.room:room-ktx:2.3.0-alpha03")
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions {
-        jvmTarget = "1.8"
-        freeCompilerArgs +=  "-Xallow-jvm-ir-dependencies"
-        freeCompilerArgs +=  "-Xskip-prerelease-check"
-        freeCompilerArgs +=  "-Xopt-in=kotlin.Experimental"
-        freeCompilerArgs +=  "-Xopt-in=kotlin.RequiresOptIn"
-    }
 }

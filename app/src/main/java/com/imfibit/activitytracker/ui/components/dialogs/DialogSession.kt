@@ -14,7 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -50,7 +50,7 @@ inline fun DialogSession(
 
     val valid = from < to && seconds <= 60*60*24
 
-    val context = ContextAmbient.current
+    val context = AmbientContext.current
 
     DialogBaseHeader(title = if (modify) "EDIT SESSION" else "ADD SESSION")
 
@@ -82,7 +82,7 @@ inline fun DialogSession(
                                     from!!.year, from!!.month.value, from!!.dayOfMonth
                                 ).show()
                             },
-                            indication = RippleIndication(bounded = false)
+                            indication = rememberRippleIndication(bounded = false)
                         )
                     )
 
@@ -100,7 +100,7 @@ inline fun DialogSession(
                                     from.hour, from.minute, true
                                 ).show()
                             },
-                            indication = RippleIndication(bounded = false)
+                            indication = rememberRippleIndication(bounded = false)
                         )
                     )
                 }
@@ -129,7 +129,7 @@ inline fun DialogSession(
                                 0, 0, true
                             ).show()
                         },
-                        indication = RippleIndication(bounded = false)
+                        indication = rememberRippleIndication(bounded = false)
                     ),
                 contentAlignment = Alignment.Center,
 
@@ -195,7 +195,7 @@ inline fun DialogSession(
                                     to.hour, to.minute, true
                                 ).show()
                             },
-                            indication = RippleIndication(bounded = false)
+                            indication = rememberRippleIndication(bounded = false)
                         )
 
                     )

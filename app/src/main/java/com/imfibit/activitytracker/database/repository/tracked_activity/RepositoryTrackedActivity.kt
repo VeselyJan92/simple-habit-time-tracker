@@ -69,7 +69,6 @@ class RepositoryTrackedActivity constructor(
                     Editable(activity.type, it.metric, it.from.atStartOfDay(), it.to.atStartOfDay(), activity.id)
                 )
             }
-            Log.e("adasd", "Asdasd")
             TrackedActivityWithMetric(activity, groupedMetric, hasMetricToday)
         }
     }
@@ -117,7 +116,7 @@ class RepositoryTrackedActivity constructor(
 
             val dayMetricData = MetricWidgetData.Labeled(
                 label = {it.from.dayOfMonth.toString()},
-                metric = {activity.type.format(it.metric)},
+                metric = activity.type.getComposeString(it.metric),
                 color = Colors.getMetricColor(activity.goal, it.metric, TimeRange.DAILY, Colors.ChipGray),
                 editable = Editable(
                     type = activity.type,
