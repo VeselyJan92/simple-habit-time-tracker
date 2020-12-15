@@ -1,4 +1,4 @@
-package com.imfibit.getitdone.database.dao
+package com.imfibit.activitytracker.database.dao
 
 import androidx.room.*
 

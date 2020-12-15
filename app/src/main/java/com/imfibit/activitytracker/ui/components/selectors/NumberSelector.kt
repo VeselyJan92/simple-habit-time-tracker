@@ -92,7 +92,7 @@ fun NumberSelector(
         ) {
             IconButton(
                 onClick = {
-                    if (number.value in Int.MIN_VALUE..Int.MAX_VALUE-1){
+                    if (number.value in Int.MIN_VALUE until Int.MAX_VALUE){
                         onNumberEdit.invoke(number.value + 1)
                     }
                 },

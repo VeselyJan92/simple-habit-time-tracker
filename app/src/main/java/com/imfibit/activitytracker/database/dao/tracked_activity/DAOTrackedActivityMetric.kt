@@ -9,17 +9,16 @@ import com.imfibit.activitytracker.core.iter
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.composed.MetricAggregation
 import com.imfibit.activitytracker.database.composed.toHashMap
-import com.imfibit.activitytracker.database.entities.TrackedActivityMetric
 import java.time.LocalDate
 import java.time.YearMonth
 
 @Dao
 interface DAOTrackedActivityMetric {
 
-    @Query("""
+   /* @Query("""
         SELECT * FROM tracked_activity_metric
     """)
-    suspend fun getAll(): List<TrackedActivityMetric>
+    suspend fun getAll(): List<TrackedActivityMetric>*/
 
 
     @Query(

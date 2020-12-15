@@ -21,7 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -70,7 +70,7 @@ fun TrackedActivitiesList(
 
         val activity = item.activity
 
-        val context = ContextAmbient.current
+        val context = AmbientContext.current
 
         val requestEdit = remember { mutableStateOf(false) }
 

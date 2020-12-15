@@ -2,7 +2,7 @@ package com.imfibit.activitytracker.database.dao.tracked_activity
 
 import androidx.room.Dao
 import androidx.room.Query
-import com.imfibit.getitdone.database.dao.BaseEditableDAO
+import com.imfibit.activitytracker.database.dao.BaseEditableDAO
 import com.imfibit.activitytracker.database.entities.TrackedActivityScore
 import java.time.LocalDateTime
 

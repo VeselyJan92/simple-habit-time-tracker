@@ -18,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.AmbientContext
-import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -60,7 +59,7 @@ fun DatetimeEditor(
                         datetime.value.hour, datetime.value.minute, true
                     ).show()
                 },
-                indication = RippleIndication(bounded = false)
+                indication = rememberRippleIndication(bounded = false)
             )
         )
     }

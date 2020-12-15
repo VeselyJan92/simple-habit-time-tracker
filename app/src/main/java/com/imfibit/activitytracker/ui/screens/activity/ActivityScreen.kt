@@ -11,6 +11,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.ripple.RippleIndication
+import androidx.compose.material.ripple.rememberRippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -144,7 +145,7 @@ private fun ActivityName(activity: TrackedActivity?) {
             .height(30.dp)
             .clickable(
                 onClick = { display.value = true},
-                indication = RippleIndication()
+                indication = rememberRippleIndication()
             ),
         contentAlignment = Alignment.Center
     ) {

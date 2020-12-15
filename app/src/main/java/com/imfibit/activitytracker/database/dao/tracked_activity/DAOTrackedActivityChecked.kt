@@ -3,25 +3,24 @@ package com.imfibit.activitytracker.database.dao.tracked_activity
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
-import com.imfibit.activitytracker.database.composed.MetricAgreagate
-import com.imfibit.getitdone.database.dao.BaseEditableDAO
+import com.imfibit.activitytracker.database.dao.BaseEditableDAO
 import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Dao
-interface DAOTrackedActivityChecked: BaseEditableDAO<TrackedActivityCompletion>{
+interface DAOTrackedActivityChecked: BaseEditableDAO<TrackedActivityCompletion> {
 
 
     @Query("select count(*) from tracked_activity_completion where date_completed >= :from AND date_completed <:to AND tracked_activity_id=:activityId")
     suspend fun getMetric(activityId:Long, from: LocalDateTime, to: LocalDateTime): Long
 
 
-    @Query("""
+    /*@Query("""
         select date_completed as date, 1 as metric from tracked_activity_completion
         where date_completed >= :from AND date_completed <:to AND tracked_activity_id=:activityId
     """)
-    suspend fun getMetricPerDay(activityId:Long, from: LocalDate, to: LocalDate): List<MetricAgreagate>
+    suspend fun getMetricPerDay(activityId:Long, from: LocalDate, to: LocalDate): List<MetricAgreagate>*/
 
 
     @Query("""
@@ -49,7 +48,7 @@ interface DAOTrackedActivityChecked: BaseEditableDAO<TrackedActivityCompletion>{
     suspend fun deleteById(id: Long)
 
 
-    @Query("""
+ /*   @Query("""
         select * from tracked_activity_completion
         where date_completed >= :from AND date_completed <:to AND tracked_activity_id=:activityId
     """)
@@ -57,7 +56,7 @@ interface DAOTrackedActivityChecked: BaseEditableDAO<TrackedActivityCompletion>{
         activityId: Long,
         from: LocalDate,
         to: LocalDate
-    ):List<TrackedActivityCompletion>
+    ):List<TrackedActivityCompletion>*/
 
 
     @Transaction
