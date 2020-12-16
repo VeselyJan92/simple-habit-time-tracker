@@ -5,21 +5,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.imfibit.activitytracker.ui.components.EditText
 
-/*
-@ExperimentalFocus
-@ExperimentalFoundationApi
-@Preview
-@Composable
-private fun DialogInputTextPreview(){
-    DialogInputText("PIVO", "Zadejte text", {})
-}*/
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class, ExperimentalFocus::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 inline fun DialogInputText(
     display: MutableState<Boolean>,

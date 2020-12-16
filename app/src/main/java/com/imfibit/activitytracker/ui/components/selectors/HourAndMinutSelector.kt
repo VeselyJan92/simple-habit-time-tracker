@@ -12,7 +12,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.graphics.Color
@@ -28,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.imfibit.activitytracker.ui.components.Colors
 
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalTextApi::class, ExperimentalFocus::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalTextApi::class)
 @Composable
 inline fun MinuteAndHourSelector(
     hours: MutableState<Int?>,

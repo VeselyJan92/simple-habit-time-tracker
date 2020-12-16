@@ -3,7 +3,6 @@ package com.imfibit.activitytracker.ui.components.dialogs
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.focus.ExperimentalFocus
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.components.selectors.NumberSelector
 import com.imfibit.activitytracker.database.AppDatabase
@@ -11,7 +10,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class, ExperimentalFocus::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 inline fun DialogTempPriority(
     display: MutableState<Boolean>,

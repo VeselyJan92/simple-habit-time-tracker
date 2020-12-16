@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.PlusOne
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -27,7 +26,6 @@ import java.lang.Exception
 
 @OptIn(ExperimentalMaterialApi::class)
 @ExperimentalFoundationApi
-@ExperimentalFocus
 @Composable
 fun NumberSelector(
     label: String,
