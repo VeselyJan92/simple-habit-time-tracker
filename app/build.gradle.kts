@@ -33,7 +33,7 @@ android {
     }
 
     compileSdkVersion(30)
-    buildToolsVersion = "30.0.2"
+    buildToolsVersion = "30.0.3"
 
     buildFeatures {
         compose =  true
@@ -49,7 +49,7 @@ android {
 
     composeOptions {
         kotlinCompilerVersion = "1.4.21"
-        kotlinCompilerExtensionVersion ="1.0.0-alpha08"
+        kotlinCompilerExtensionVersion ="1.0.0-alpha09"
     }
 
     compileOptions {
@@ -116,16 +116,16 @@ dependencies {
 
     implementation("androidx.appcompat:appcompat:1.2.0")
 
-    implementation("androidx.navigation:navigation-compose:1.0.0-alpha03")
+    implementation("androidx.navigation:navigation-compose:1.0.0-alpha04")
 
 
-    implementation("androidx.compose.compiler:compiler:1.0.0-alpha08")
-    implementation("androidx.compose.ui:ui:1.0.0-alpha08")
-    implementation("androidx.compose.material:material:1.0.0-alpha08")
-    implementation("androidx.compose.runtime:runtime:1.0.0-alpha08")
-    implementation("androidx.compose.runtime:runtime-livedata:1.0.0-alpha08")
-    implementation("androidx.compose.foundation:foundation:1.0.0-alpha08")
-    implementation("androidx.compose.material:material-icons-extended:1.0.0-alpha08")
+    implementation("androidx.compose.compiler:compiler:1.0.0-alpha09")
+    implementation("androidx.compose.ui:ui:1.0.0-alpha09")
+    implementation("androidx.compose.material:material:1.0.0-alpha09")
+    implementation("androidx.compose.runtime:runtime:1.0.0-alpha09")
+    implementation("androidx.compose.runtime:runtime-livedata:1.0.0-alpha09")
+    implementation("androidx.compose.foundation:foundation:1.0.0-alpha09")
+    implementation("androidx.compose.material:material-icons-extended:1.0.0-alpha09")
 
     kapt("androidx.room:room-compiler:2.3.0-alpha03")
     implementation ("androidx.room:room-runtime:2.3.0-alpha03")

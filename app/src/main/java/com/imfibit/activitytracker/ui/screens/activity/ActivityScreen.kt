@@ -18,7 +18,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -42,7 +41,7 @@ import com.imfibit.activitytracker.database.AppDatabase
 import kotlinx.coroutines.*
 
 
-@OptIn(ExperimentalFocus::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ScreenTrackedActivity(nav: NavController) {
     // TODO id form navigation
@@ -85,7 +84,6 @@ fun ScreenTrackedActivity(nav: NavController) {
 }
 
 
-@ExperimentalFocus
 @ExperimentalFoundationApi
 @Composable
 fun ScreenBody(nav: NavController, vm: TrackedActivityViewModel, activity: TrackedActivity?) {
