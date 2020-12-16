@@ -21,14 +21,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.RowScope.Companion.weight
-import androidx.compose.material.Text
 import androidx.compose.ui.unit.sp
 import com.imfibit.activitytracker.core.App
 import com.imfibit.activitytracker.core.ComposeString
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.components.dialogs.DialogSession
 import com.imfibit.activitytracker.ui.components.dialogs.DialogScore
-import com.imfibit.getitdone.database.AppDatabase
+import com.imfibit.activitytracker.database.AppDatabase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime

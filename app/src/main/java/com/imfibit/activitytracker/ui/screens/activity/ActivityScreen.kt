@@ -10,7 +10,6 @@ import androidx.compose.material.*
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.ripple.RippleIndication
 import androidx.compose.material.ripple.rememberRippleIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,7 +38,7 @@ import com.imfibit.activitytracker.ui.components.dialogs.DialogGoal
 import com.imfibit.activitytracker.ui.components.dialogs.DialogInputText
 import com.imfibit.activitytracker.ui.components.dialogs.DialogTempPriority
 import com.imfibit.activitytracker.ui.components.dialogs.DialogTimeRange
-import com.imfibit.getitdone.database.AppDatabase
+import com.imfibit.activitytracker.database.AppDatabase
 import kotlinx.coroutines.*
 
 

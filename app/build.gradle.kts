@@ -104,6 +104,8 @@ android {
 }
 
 dependencies {
+
+
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.21")
     implementation("com.thedeanda:lorem:2.1")
@@ -115,6 +117,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.2.0")
 
     implementation("androidx.navigation:navigation-compose:1.0.0-alpha03")
+
 
     implementation("androidx.compose.compiler:compiler:1.0.0-alpha08")
     implementation("androidx.compose.ui:ui:1.0.0-alpha08")

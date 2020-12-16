@@ -39,7 +39,7 @@ import com.imfibit.activitytracker.ui.components.MetricBlock
 import com.imfibit.activitytracker.ui.components.MetricWidgetData
 import com.imfibit.activitytracker.ui.components.dialogs.DialogSession
 import com.imfibit.activitytracker.ui.components.dialogs.DialogScore
-import com.imfibit.getitdone.database.AppDatabase
+import com.imfibit.activitytracker.database.AppDatabase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.time.LocalDate

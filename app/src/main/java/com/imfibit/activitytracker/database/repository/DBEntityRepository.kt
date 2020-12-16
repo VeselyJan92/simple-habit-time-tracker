@@ -1,6 +1,6 @@
 package com.imfibit.activitytracker.database.repository
 
-import com.imfibit.getitdone.database.AppDatabase
+import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.dao.BaseEditableDAO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

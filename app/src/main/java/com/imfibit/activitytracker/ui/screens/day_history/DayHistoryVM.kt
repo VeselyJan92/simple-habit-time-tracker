@@ -4,7 +4,7 @@ import androidx.lifecycle.*
 import com.imfibit.activitytracker.core.activityInvalidationTracker
 import com.imfibit.activitytracker.database.entities.*
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.imfibit.getitdone.database.AppDatabase
+import com.imfibit.activitytracker.database.AppDatabase
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 

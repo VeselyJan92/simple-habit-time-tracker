@@ -31,7 +31,7 @@ import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.components.Colors
-import com.imfibit.getitdone.database.AppDatabase
+import com.imfibit.activitytracker.database.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

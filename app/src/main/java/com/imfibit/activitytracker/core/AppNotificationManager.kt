@@ -13,7 +13,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.navigation.NavDeepLinkBuilder
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.entities.TrackedActivity
-import com.imfibit.getitdone.database.AppDatabase
+import com.imfibit.activitytracker.database.AppDatabase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
