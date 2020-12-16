@@ -32,7 +32,7 @@ import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.components.*
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.screens.activity_list.Goal
-import com.imfibit.getitdone.database.AppDatabase
+import com.imfibit.activitytracker.database.AppDatabase
 import java.time.LocalDate
 
 

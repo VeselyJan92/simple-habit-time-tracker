@@ -2,7 +2,7 @@ package com.imfibit.activitytracker.core
 
 import android.app.Application
 import android.content.Context
-import com.imfibit.getitdone.database.AppDatabase
+import com.imfibit.activitytracker.database.AppDatabase
 
 open class App : Application() {
 

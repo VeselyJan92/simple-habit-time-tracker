@@ -1,4 +1,4 @@
-package com.imfibit.getitdone.database
+package com.imfibit.activitytracker.database
 
 import android.content.Context
 import androidx.room.Database
@@ -6,7 +6,6 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.imfibit.activitytracker.BuildConfig
-import com.imfibit.activitytracker.database.Seeder
 
 import com.imfibit.activitytracker.database.converters.TimeRangeConverter
 import com.imfibit.activitytracker.database.converters.LocalDateConverter
@@ -44,7 +43,6 @@ import java.time.LocalTime
     TimeRangeConverter::class,
     TrackedActivityTypeConverter::class
 )
-
 abstract class AppDatabase : RoomDatabase() {
 
     abstract val activityDAO: DAOTrackedActivity

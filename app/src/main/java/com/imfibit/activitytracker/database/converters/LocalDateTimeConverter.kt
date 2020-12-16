@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter.ISO_DATE_TIME
 
 @SuppressLint("SimpleDateFormat")
-object LocalDateTimeConverter {
+class LocalDateTimeConverter {
 
     @TypeConverter
     fun from(datetime: LocalDateTime?): String? {

@@ -9,7 +9,7 @@ import com.imfibit.activitytracker.core.sumByLong
 import com.imfibit.activitytracker.database.dao.tracked_activity.*
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.entities.*
-import com.imfibit.getitdone.database.AppDatabase
+import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.repository.DBEntityRepository
 import com.imfibit.activitytracker.ui.components.*
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityWithMetric

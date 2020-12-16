@@ -8,7 +8,7 @@ import com.imfibit.activitytracker.core.AppNotificationManager
 import com.imfibit.activitytracker.core.activityInvalidationTracker
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.imfibit.getitdone.database.AppDatabase
+import com.imfibit.activitytracker.database.AppDatabase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 

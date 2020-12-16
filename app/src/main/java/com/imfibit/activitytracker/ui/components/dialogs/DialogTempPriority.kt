@@ -6,7 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.focus.ExperimentalFocus
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.components.selectors.NumberSelector
-import com.imfibit.getitdone.database.AppDatabase
+import com.imfibit.activitytracker.database.AppDatabase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
