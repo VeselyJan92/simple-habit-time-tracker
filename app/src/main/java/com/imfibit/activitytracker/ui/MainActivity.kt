@@ -90,7 +90,7 @@ fun AppBottomNavigation(navController: NavController) {
 @Composable
 fun Router(navControl: NavHostController){
 
-    NavHost(navController = navControl, startDestination = SCREEN_UPCOMING){
+    NavHost(navController = navControl, startDestination = SCREEN_ACTIVITIES){
         composable(SCREEN_STATISTICS){ ScreenStatistics(navControl) }
         composable(SCREEN_ACTIVITIES){ ScreenActivities(navControl) }
         composable(SCREEN_UPCOMING){ ScreenUpcoming(navControl) }
