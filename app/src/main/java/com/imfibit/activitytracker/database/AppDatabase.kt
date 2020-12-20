@@ -63,18 +63,11 @@ abstract class AppDatabase : RoomDatabase() {
 
         @Synchronized
         fun init(context: Context){
-         /*   db = Room.databaseBuilder(context, AppDatabase::class.java, DB_NAME)
-                    .addMigrations(MIGRATION_1_2)
-                    .build()
-
-
-            GlobalScope.launch {
-                seed(db, context)
-            }*/
-
             when(BuildConfig.BUILD_TYPE){
                 "release"->{
-                    db = Room.databaseBuilder(context, AppDatabase::class.java, DB_NAME).build()
+                    db = Room.databaseBuilder(context, AppDatabase::class.java, DB_NAME)
+                        .addMigrations(MIGRATION_1_2)
+                        .build()
                 }
                 "debug" -> {
                     db =  Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
