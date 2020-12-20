@@ -9,6 +9,7 @@ data class MetricAggregation(
 
     @ColumnInfo(name = "to_date")
     val to: LocalDate,
+
     val metric: Long
 )
 

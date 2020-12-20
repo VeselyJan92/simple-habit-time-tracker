@@ -14,27 +14,25 @@ import com.imfibit.activitytracker.ui.components.EditText
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
-inline fun DialogInputText(
+inline fun DialogAgree(
     display: MutableState<Boolean>,
-    text: String,
     title: String,
-    noinline onTextSet: (String) -> Unit
+    text: String? = null,
+    noinline onAction: (Boolean) -> Unit
 ){
     BaseDialog(display = display ) {
 
-        var text by remember { mutableStateOf(TextFieldValue(text)) }
-
         DialogBaseHeader(title = title)
 
-
-        EditText(text, { text = it}, modifier = Modifier.padding(8.dp).height(30.dp))
+        if (text != null)
+            Text(text = text)
 
         DialogButtons {
-            TextButton(onClick = {display.value = false} ) {
+            TextButton(onClick = {onAction.invoke(false)} ) {
                 Text(text = stringResource(id = R.string.dialog_action_cancel))
             }
 
-            TextButton(onClick = {onTextSet.invoke(text.text)}) {
+            TextButton(onClick = {onAction.invoke(true)}) {
                 Text(text = stringResource(id = R.string.dialog_action_continue))
             }
         }

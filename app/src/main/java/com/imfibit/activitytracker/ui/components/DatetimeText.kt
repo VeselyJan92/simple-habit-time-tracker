@@ -10,7 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
-import androidx.compose.material.ripple.rememberRippleIndication
+import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
@@ -40,7 +41,7 @@ fun DatetimeEditor(
                         datetime.value.year, datetime.value.month.value, datetime.value.dayOfMonth
                     ).show()
                 },
-                indication = rememberRippleIndication(bounded = false)
+                indication = rememberRipple(bounded = false)
             ),
         )
 
@@ -58,7 +59,7 @@ fun DatetimeEditor(
                         datetime.value.hour, datetime.value.minute, true
                     ).show()
                 },
-                indication = rememberRippleIndication(bounded = false)
+                indication = rememberRipple(bounded = false)
             )
         )
     }

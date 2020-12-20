@@ -40,22 +40,10 @@ data class TrackedActivity(
     fun isGoalSet() = goal.value != 0L
 
     enum class Type {
-        SESSION,
+        TIME,
         SCORE,
         CHECKED;
-
-        @Deprecated("Oh hell no")
-        fun format(metric: Long) = when {
-            metric < 0 -> ""
-            else -> {
-                when(this){
-                    SESSION -> formatSession(metric)
-                    SCORE -> metric.toString()
-                    CHECKED -> if (metric == 1L ) "ANO" else "NE"
-                }
-            }
-        }
-
+        
         private fun formatSession(metric: Long) = String.format("%02d:%02d", metric / (60*60), (metric/60) % 60)
 
         fun getComposeString(
@@ -63,7 +51,7 @@ data class TrackedActivity(
             fraction:Long? = null
         ): ComposeString = {
             when(this){
-                SESSION ->  when {
+                TIME ->  when {
                     fraction != null -> "${formatSession(metric)} / $fraction"
                     else -> formatSession(metric)
                 }
@@ -101,7 +89,7 @@ data class TrackedActivity(
     fun formatGoal() : String{
         return when(type){
             Type.SCORE -> goal.value.toString()
-            Type.SESSION ->String.format("%02d:%02d", goal.value / (60*60), (goal.value/60) % 60)
+            Type.TIME ->String.format("%02d:%02d", goal.value / (60*60), (goal.value/60) % 60)
             Type.CHECKED -> goal.value.toString() + "x"
         }
     }

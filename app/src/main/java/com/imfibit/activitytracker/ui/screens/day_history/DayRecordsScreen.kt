@@ -2,10 +2,9 @@
 package com.imfibit.activitytracker.ui.screens.day_history
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyColumnFor
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -29,25 +28,30 @@ import java.time.format.FormatStyle
 
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ScreenDayRecords(navControl: NavHostController) {
+fun ScreenDayRecords(navControl: NavHostController, recordId: Long, date: LocalDate) {
 
-    //TODO arguments from navigation
-    val vm  = viewModel<DayRecordsVM>(factory = DayRecordsVMFactory(1L, LocalDate.now()))
+    val vm  = viewModel<DayRecordsVM>(factory = DayRecordsVMFactory(recordId, date))
 
+    val scaffoldState = rememberScaffoldState()
 
     Scaffold(
         topBar = { TrackerTopAppBar(stringResource(id = R.string.screen_title_record_history)) },
         bodyContent = {
-            ScreenBody(vm)
+            ScreenBody(vm, scaffoldState)
         },
-        backgroundColor = Colors.AppBackground
+        snackbarHost = {
+            SnackbarHost(hostState = it)
+        },
+        backgroundColor = Colors . AppBackground,
+        scaffoldState = scaffoldState
     )
 }
 
 
 @Composable
-private fun ScreenBody(vm: DayRecordsVM) {
+private fun ScreenBody(vm: DayRecordsVM, scaffoldState: ScaffoldState) {
     Column {
 
         Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp).fillMaxWidth()) {
@@ -71,11 +75,12 @@ private fun ScreenBody(vm: DayRecordsVM) {
                 )
             }
         }else{
-            LazyColumnFor(
-                items = items.value,
+            LazyColumn(
                 modifier = Modifier.padding(horizontal = 8.dp)
             ) {
-                TrackedActivityRecord(item = it )
+                items( items.value){
+                    TrackedActivityRecord(it.activity,  it.record, scaffoldState)
+                }
             }
         }
 

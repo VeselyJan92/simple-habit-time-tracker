@@ -1,5 +1,6 @@
 package com.imfibit.activitytracker.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.os.bundleOf
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import java.time.DayOfWeek
 import java.time.LocalDateTime
 import java.util.*
@@ -26,6 +28,9 @@ import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+
+import androidx.navigation.compose.*
+
 
 
 data class Week(
@@ -62,11 +67,12 @@ fun RecentActivityGrid(weeks: List<Week>, nav: NavController){
 
         }
 
-        for (week in weeks){
-
+        for ( (index, week) in weeks.withIndex()){
             Week(week, nav)
 
-            if (week.from.monthValue != week.to.monthValue || week.from.dayOfMonth == 1 || week.to.dayOfMonth == 1){
+            val split = week.from.monthValue != week.to.monthValue || week.from.dayOfMonth == 1 || week.to.dayOfMonth == 1
+
+            if (weeks.size -1 != index && split){
                 MonthSplitter(month = week.from.month.name)
             }
 
@@ -91,13 +97,12 @@ private fun Week(week: Week, nav: NavController){
                     if (it.editable!!.type == TrackedActivity.Type.CHECKED)
                         return@MetricBlock
 
-                    nav.navigate(
-                        R.id.action_activity_fragment_to_fragment_day_records,
-                        bundleOf(
-                            "id" to it.editable!!.activityId,
-                            "date" to it.editable!!.from.format(DateTimeFormatter.ISO_DATE)
-                        )
-                    )
+                    val id = it.editable!!.activityId
+                    val date = it.editable!!.from.format(DateTimeFormatter.ISO_DATE)
+
+                    nav.navigate("screen_day_history/$id/$date")
+
+
                 },
                 modifier = modifier
             )

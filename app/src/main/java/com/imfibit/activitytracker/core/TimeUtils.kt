@@ -33,10 +33,5 @@ object TimeUtils {
 
 
 
-    inline fun getMonthLabel(month: Month) = when(month.value){
-       else -> R.string.frequency_monthly
-    }
-
-
 
 }

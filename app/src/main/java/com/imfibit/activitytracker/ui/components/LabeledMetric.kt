@@ -184,7 +184,7 @@ fun MetricBlock(
         }
 
         if (requestEdit.value ) when (editable.type){
-            TrackedActivity.Type.SESSION -> DialogSession(
+            TrackedActivity.Type.TIME -> DialogSession(
                 from =  editable.from,
                 to =  editable.to,
                 display = requestEdit,

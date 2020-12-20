@@ -7,10 +7,12 @@ import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-sealed class TrackedActivityData(
+sealed class TrackedActivityRecord(
     open var id: Long,
     open var activity_id: Long
 ){
+
+    abstract val metric: Long
 
 }
 
@@ -41,11 +43,14 @@ data class TrackedActivityCompletion(
     @NonNull
     @ColumnInfo(name = "date_completed")
     var date_completed: LocalDate
-) : TrackedActivityData(id, activity_id) {
+) : TrackedActivityRecord(id, activity_id) {
 
     companion object {
         const val TABLE = "tracked_activity_completion"
     }
+
+    override val metric: Long
+        get() = 1L
 
 }
 
@@ -73,22 +78,25 @@ data class TrackedActivityScore(
     override var activity_id: Long,
 
     @ColumnInfo(name = "time_completed")
-    var time_completed: LocalDateTime,
+    var datetime_completed: LocalDateTime,
 
     @ColumnInfo(name = "score")
     var score: Long
-): TrackedActivityData(id, activity_id){
+): TrackedActivityRecord(id, activity_id){
 
     companion object{
         const val TABLE = "tracked_activity_score"
     }
+
+    override val metric: Long
+        get() = score
 }
 
 
 
 
 @Entity(
-    tableName = TrackedActivitySession.TABLE,
+    tableName = TrackedActivityTime.TABLE,
     indices = [
         Index(value = ["tracked_activity_session_id"]),
         Index(value = ["tracked_activity_id"])
@@ -102,7 +110,7 @@ data class TrackedActivityScore(
         )
     ]
 )
-data class TrackedActivitySession(
+data class TrackedActivityTime(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "tracked_activity_session_id")
     override var id: Long,
@@ -112,17 +120,17 @@ data class TrackedActivitySession(
 
     @NonNull
     @ColumnInfo(name = "time_start")
-    var time_start: LocalDateTime,
+    var datetime_start: LocalDateTime,
 
     @ColumnInfo(name = "time_end")
-    var time_end: LocalDateTime
-) : TrackedActivityData(id, activity_id) {
+    var datetime_end: LocalDateTime
+) : TrackedActivityRecord(id, activity_id) {
     companion object{
         const val TABLE = "tracked_activity_session"
     }
 
-
-    fun getTimeInSeconds() = Duration.between(time_start, time_end).seconds
+    override val metric: Long
+        get() = Duration.between(datetime_start, datetime_end).seconds
 }
 
 

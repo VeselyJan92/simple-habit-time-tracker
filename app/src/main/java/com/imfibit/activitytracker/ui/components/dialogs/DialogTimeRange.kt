@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.ui.components.Colors
 
@@ -27,7 +28,7 @@ inline fun DialogTimeRange(
     noinline onRangeSelected: (TimeRange)->Unit
 ) = BaseDialog(display = display) {
 
-    DialogBaseHeader("Select displayed range")
+    DialogBaseHeader(stringResource(id = R.string.dialog_time_range_title))
 
     Row(Modifier.padding(8.dp)) {
 

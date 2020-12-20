@@ -20,7 +20,7 @@ import java.time.LocalDate
         UNION ALL
         SELECT 
             tracked_activity_id,
-            date(time_end) as date,
+            date(time_start) as date,
             strftime('%s',time_end) - strftime('%s', time_start) as metric
         FROM tracked_activity_session
 """, viewName = "tracked_activity_metric")

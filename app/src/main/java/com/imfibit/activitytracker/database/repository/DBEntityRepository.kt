@@ -1,5 +1,6 @@
 package com.imfibit.activitytracker.database.repository
 
+import androidx.room.withTransaction
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.dao.BaseEditableDAO
 import kotlinx.coroutines.Dispatchers
@@ -19,8 +20,8 @@ abstract class DBEntityRepository<T>(open val activityDAO: BaseEditableDAO<T>){
     open fun delete(item: T) = launch{ activityDAO.delete(item) }
 
 
-    fun transaction(work: ()->Unit){
-        AppDatabase.db.runInTransaction {
+    suspend fun transaction(work: suspend ()->Unit){
+        AppDatabase.db.withTransaction{
             work.invoke()
         }
     }

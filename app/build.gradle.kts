@@ -84,7 +84,7 @@ android {
 
             signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-            debuggable(true)
+            debuggable(false)
             versionNameSuffix = " - PROD"
         }
 
@@ -92,7 +92,7 @@ android {
             manifestPlaceholders["crashlyticsCollectionEnabled"] = false
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-            debuggable(true)
+           // debuggable(true)
 
             applicationIdSuffix =  ".debug"
             versionNameSuffix = " - DEBUG"
@@ -114,10 +114,7 @@ dependencies {
     implementation("com.google.firebase:firebase-crashlytics-ktx")
     implementation("com.google.firebase:firebase-analytics-ktx")
 
-    implementation("androidx.appcompat:appcompat:1.2.0")
-
     implementation("androidx.navigation:navigation-compose:1.0.0-alpha04")
-
 
     implementation("androidx.compose.compiler:compiler:1.0.0-alpha09")
     implementation("androidx.compose.ui:ui:1.0.0-alpha09")
@@ -127,7 +124,7 @@ dependencies {
     implementation("androidx.compose.foundation:foundation:1.0.0-alpha09")
     implementation("androidx.compose.material:material-icons-extended:1.0.0-alpha09")
 
-    kapt("androidx.room:room-compiler:2.3.0-alpha03")
-    implementation ("androidx.room:room-runtime:2.3.0-alpha03")
-    implementation ("androidx.room:room-ktx:2.3.0-alpha03")
+    kapt("androidx.room:room-compiler:2.3.0-alpha04")
+    implementation ("androidx.room:room-runtime:2.3.0-alpha04")
+    implementation ("androidx.room:room-ktx:2.3.0-alpha04")
 }

@@ -3,17 +3,6 @@ package com.imfibit.activitytracker.core
 import androidx.compose.runtime.Composable
 
 
-fun <T> Array<T>.leftShift(d: Int): Array<T> {
-    val newList = this.copyOf()
-    var shift = d
-    if (shift > size) shift %= size
-    forEachIndexed { index, value ->
-        val newIndex = (index + (size - shift)) % size
-        newList[newIndex] = value
-    }
-    return newList
-}
-
 
 typealias ComposeString = @Composable ()->String
 

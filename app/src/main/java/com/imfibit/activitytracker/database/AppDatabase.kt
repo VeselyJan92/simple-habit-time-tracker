@@ -16,6 +16,7 @@ import com.imfibit.activitytracker.database.entities.*
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.database.converters.LocalTimeConverter
 import com.imfibit.activitytracker.database.converters.TrackedActivityTypeConverter
+import com.imfibit.activitytracker.database.migrations.MIGRATION_1_2
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -26,14 +27,14 @@ import java.time.LocalTime
 @Database(
     entities = [
         TrackedActivity::class,
-        TrackedActivitySession::class,
+        TrackedActivityTime::class,
         TrackedActivityScore::class,
         TrackedActivityCompletion::class
     ],
     views = [
         TrackedActivityMetric::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(
@@ -47,7 +48,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract val activityDAO: DAOTrackedActivity
     abstract val scoreDAO: DAOTrackedActivityScore
-    abstract val sessionDAO: DAOTrackedActivitySession
+    abstract val sessionDAO: DAOTrackedActivityTime
     abstract val completionDAO: DAOTrackedActivityChecked
     abstract val metricDAO: DAOTrackedActivityMetric
 
@@ -62,6 +63,15 @@ abstract class AppDatabase : RoomDatabase() {
 
         @Synchronized
         fun init(context: Context){
+         /*   db = Room.databaseBuilder(context, AppDatabase::class.java, DB_NAME)
+                    .addMigrations(MIGRATION_1_2)
+                    .build()
+
+
+            GlobalScope.launch {
+                seed(db, context)
+            }*/
+
             when(BuildConfig.BUILD_TYPE){
                 "release"->{
                     db = Room.databaseBuilder(context, AppDatabase::class.java, DB_NAME).build()
@@ -78,8 +88,6 @@ abstract class AppDatabase : RoomDatabase() {
                 else -> throw IllegalArgumentException()
             }
 
-
-
         }
 
         private suspend fun seed(db: AppDatabase, context: Context){
@@ -93,7 +101,11 @@ abstract class AppDatabase : RoomDatabase() {
                 range = TimeRange.WEEKLY
             ))
             db.scoreDAO.insert(s.getTrackedTaskScore(activityId = id, score = 2, datetime_scored = LocalDateTime.now()))
-            db.scoreDAO.insert(s.getTrackedTaskScore(activityId = id, score = 2))
+
+            db.scoreDAO.insert(s.getTrackedTaskScore(activityId = id, score = 3))
+            db.scoreDAO.insert(s.getTrackedTaskScore(activityId = id, score = 4))
+            db.scoreDAO.insert(s.getTrackedTaskScore(activityId = id, score = 5))
+            db.scoreDAO.insert(s.getTrackedTaskScore(activityId = id, score = 6))
 
 
 
@@ -119,10 +131,10 @@ abstract class AppDatabase : RoomDatabase() {
 
 
             id = db.activityDAO.insert(s.getTrackedActivity(
-                type = TrackedActivity.Type.SESSION,
+                type = TrackedActivity.Type.TIME,
                 name = "Prace na pozemku",
                 position = 3,
-                inSession = LocalDateTime.now(),
+                inSession = null,
                 goal = 3600,
                 range = TimeRange.MONTHLY
             ))
@@ -142,9 +154,15 @@ abstract class AppDatabase : RoomDatabase() {
                 end = LocalDate.now().minusDays(1).atTime(end)
             ))
 
+            db.sessionDAO.insert(s.getTrackedTaskSession(
+                    activityId = id,
+                    start = LocalDate.now().minusDays(2).atTime(23, 0),
+                    end = LocalDate.now().minusDays(1).atTime(0, 1)
+            ))
+
 
             id = db.activityDAO.insert(s.getTrackedActivity(
-                type = TrackedActivity.Type.SESSION,
+                type = TrackedActivity.Type.TIME,
                 name = "Zajímavosti",
                 position = 4,
                 inSession = null,

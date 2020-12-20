@@ -1,6 +1,5 @@
 <resources>
-    <string name="app_name">Simple Activity Tracker</string>
-
+    <string name="app_name">Activity Time Tracker</string>
 
     <string name="screen_title_activities">Activities</string>
     <string name="screen_title_activity">Activity</string>
@@ -13,11 +12,7 @@
 
 
 
-    <string name="activity_screen_enter_name">monthly</string>
     <string name="activity_screen_recent_activity">Recent Activity</string>
-
-
-
 
     <string name="browse">Browse</string>
 
@@ -36,110 +31,60 @@
 
     <string name="d_tracked_task_goal_frequency">Frequency</string>
     <string name="time">Time</string>
-    <string name="work_week">P. týdne</string>
+    <string name="work_week">W. Week</string>
     <string name="score">Score</string>
     <string name="habbits">Habbits</string>
-
+    <string name="screen_title_timeline">Timeline</string>
+    <string name="screen_title_statistics">Statistics</string>
+    <string name="track_activity_name">Activity</string>
+    <string name="create_new_activity">Create new activity</string>
+    <string name="new_activity_name">New activity</string>
+    <string name="new_activity_time">Time</string>
+    <string name="new_activity_score">Score</string>
+    <string name="new_activity_checked">Habbit</string>
+    <string name="cancel">CANCEL</string>
+    <string name="dialog_goal_title">PICK GOAL</string>
+    <string name="repetitions">Repetititons</string>
+    <string name="dialog_action_delete">DELETE</string>
+    <string name="dialog_action_cancel">CANCEL</string>
+    <string name="dialog_action_continue">CONTINUE</string>
+    <string name="dialo_score_title_add">ADD SCORE</string>
+    <string name="dialo_score_title_edit">EDIT SCORE</string>
+    <string name="dialog_action_edit">EDIT</string>
+    <string name="dialog_action_add">ADD</string>
+    <string name="dialog_session_title_edit">EDIT SESSION</string>
+    <string name="dialog_session_title_add">ADD SESSION</string>
+    <string name="session_start">From</string>
+    <string name="session_end">To</string>
+    <string name="invalid_entry">Invalid data</string>
+    <string name="dialog_priority_title">ACTIVITY PRIORITY</string>
+    <string name="priority">Priority</string>
+    <string name="dialog_time_range_title">SELECT RANGE</string>
+    <string name="hours">Hours</string>
+    <string name="minutes">Minutes</string>
+    <string name="confirm_delete">Really delete</string>
+    <string name="undo">Undo</string>
 
     <string-array name="months">
-        <item>Leden</item>
-        <item>Únor</item>
-        <item>Březen</item>
-        <item>Duben</item>
-        <item>Květen</item>
-        <item>Červen</item>
-        <item>Červenec</item>
-        <item>Srpen</item>
-        <item>Září</item>
-        <item>Říjen</item>
-        <item>Listopad</item>
-        <item>Prosinec</item>
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
     </string-array>
-
 
     <string-array name="tracked_task_goal_frequency">
         <item>not set</item>
         <item>daily</item>
         <item>weekly</item>
         <item>monthly</item>
-    </string-array>
-
-    <string-array name="tracked_task_colors">
-        <item>#e57373</item>
-        <item>#f44336</item>
-        <item>#d32f2f</item>
-        <item>#b71c1c</item>
-        <item>#f06292</item>
-        <item>#e91e63</item>
-        <item>#c2185b</item>
-        <item>#880e4f</item>
-        <item>#ba68c8</item>
-        <item>#9c27b0</item>
-        <item>#7b1fa2</item>
-        <item>#4a148c</item>
-        <item>#673ab7</item>
-        <item>#512da8</item>
-        <item>#311b92</item>
-        <item>#7986cb</item>
-        <item>#3f51b5</item>
-        <item>#303f9f</item>
-        <item>#1a237e</item>
-        <item>#64b5f6</item>
-        <item>#2196f3</item>
-        <item>#1976d2</item>
-        <item>#0d47a1</item>
-        <item>#4fc3f7</item>
-        <item>#03a9f4</item>
-        <item>#0288d1</item>
-        <item>#01579b</item>
-        <item>#4dd0e1</item>
-        <item>#00bcd4</item>
-        <item>#0097a7</item>
-        <item>#006064</item>
-        <item>#4db6ac</item>
-        <item>#009688</item>
-        <item>#00796b</item>
-        <item>#004d40</item>
-        <item>#81c784</item>
-        <item>#4caf50</item>
-        <item>#388e3c</item>
-        <item>#1b5e20</item>
-        <item>#aed581</item>
-        <item>#8bc34a</item>
-        <item>#689f38</item>
-        <item>#33691e</item>
-        <item>#dce775</item>
-        <item>#cddc39</item>
-        <item>#afb42b</item>
-        <item>#827717</item>
-        <item>#fff176</item>
-        <item>#ffeb3b</item>
-        <item>#fbc02d</item>
-        <item>#f57f17</item>
-        <item>#ffd54f</item>
-        <item>#ffc107</item>
-        <item>#ffa000</item>
-        <item>#ff6f00</item>
-        <item>#ffb74d</item>
-        <item>#ff9800</item>
-        <item>#f57c00</item>
-        <item>#e65100</item>
-        <item>#ff8a65</item>
-        <item>#ff5722</item>
-        <item>#e64a19</item>
-        <item>#bf360c</item>
-        <item>#a1887f</item>
-        <item>#795548</item>
-        <item>#5d4037</item>
-        <item>#3e2723</item>
-        <item>#9e9e9e</item>
-        <item>#616161</item>
-        <item>#212121</item>
-        <item>#90a4ae</item>
-        <item>#607d8b</item>
-        <item>#455a64</item>
-        <item>#263238</item>
-        <item>#000000</item>
     </string-array>
 
 </resources>

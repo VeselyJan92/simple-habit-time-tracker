@@ -11,17 +11,21 @@ import java.time.LocalDateTime
 @Dao
 interface DAOTrackedActivityChecked: BaseEditableDAO<TrackedActivityCompletion> {
 
-
-    @Query("select count(*) from tracked_activity_completion where date_completed >= :from AND date_completed <:to AND tracked_activity_id=:activityId")
-    suspend fun getMetric(activityId:Long, from: LocalDateTime, to: LocalDateTime): Long
-
-
-    /*@Query("""
-        select date_completed as date, 1 as metric from tracked_activity_completion
-        where date_completed >= :from AND date_completed <:to AND tracked_activity_id=:activityId
+    @Query("""
+        select * from tracked_activity_completion
+        where date_completed >= :from AND date_completed <:to
     """)
-    suspend fun getMetricPerDay(activityId:Long, from: LocalDate, to: LocalDate): List<MetricAgreagate>*/
+    suspend fun getAll(
+        from: LocalDateTime,
+        to: LocalDateTime = LocalDateTime.now()
+    ): List<TrackedActivityCompletion>
 
+
+    @Query("""
+        select count(*) from tracked_activity_completion
+        where date_completed >= :from AND date_completed <:to AND tracked_activity_id=:activityId
+     """)
+    suspend fun getMetric(activityId:Long, from: LocalDateTime, to: LocalDateTime): Long
 
     @Query("""
         select * from tracked_activity_completion
@@ -48,17 +52,6 @@ interface DAOTrackedActivityChecked: BaseEditableDAO<TrackedActivityCompletion> 
     suspend fun deleteById(id: Long)
 
 
- /*   @Query("""
-        select * from tracked_activity_completion
-        where date_completed >= :from AND date_completed <:to AND tracked_activity_id=:activityId
-    """)
-    suspend fun getRecords(
-        activityId: Long,
-        from: LocalDate,
-        to: LocalDate
-    ):List<TrackedActivityCompletion>*/
-
-
     @Transaction
     suspend fun toggle(activityId: Long, date: LocalDate){
         val record = getRecord(activityId, date)
@@ -68,7 +61,5 @@ interface DAOTrackedActivityChecked: BaseEditableDAO<TrackedActivityCompletion> 
         else
             insert(TrackedActivityCompletion(0L, activityId, date))
     }
-
-
 
 }
