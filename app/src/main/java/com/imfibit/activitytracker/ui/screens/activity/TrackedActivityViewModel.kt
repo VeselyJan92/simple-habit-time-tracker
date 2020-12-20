@@ -1,5 +1,7 @@
 package com.imfibit.activitytracker.ui.screens.activity
 
+
+import androidx.compose.runtime.*
 import androidx.lifecycle.*
 import com.imfibit.activitytracker.core.ComposeString
 import com.imfibit.activitytracker.core.activityInvalidationTracker
@@ -16,28 +18,29 @@ import java.time.format.TextStyle
 import java.time.temporal.ChronoField
 import java.util.*
 
-
 class TrackedActivityVMFactory(private val id: Long) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return TrackedActivityViewModel(id) as T
     }
 }
 
-class TrackedActivityViewModel(val id: Long) : ViewModel() {
+@Immutable
+data class TrackedActivityState(
+        val activity: TrackedActivity,
+        val recent: List<Week>,
+        val months: List<MetricWidgetData>,
+        val metricToday: ComposeString,
+        val metricWeek:  ComposeString,
+        val metricMonth:  ComposeString,
+        val metric30Days:  ComposeString,
+)
 
+class TrackedActivityViewModel(val id: Long) : ViewModel() {
     val rep = RepositoryTrackedActivity()
 
-    val recent = MutableLiveData<List<Week>>(listOf())
-    val metricToday = MutableLiveData<ComposeString>()
-    val metricWeek = MutableLiveData<ComposeString>()
-    val metricMonth = MutableLiveData<ComposeString>()
-    val metric30Days = MutableLiveData<ComposeString>()
+    var screenState = MutableLiveData<TrackedActivityState>()
 
-    val months = MutableLiveData<List<MetricWidgetData>>()
-
-    val activity = MutableLiveData<TrackedActivity>()
-
-    val tracker = activityInvalidationTracker {
+    private val tracker = activityInvalidationTracker {
         refresh()
     }
 
@@ -51,44 +54,38 @@ class TrackedActivityViewModel(val id: Long) : ViewModel() {
         AppDatabase.db.invalidationTracker.removeObserver(tracker)
     }
 
-    fun refresh() = viewModelScope.launch(Dispatchers.IO) {
-        val activity:TrackedActivity? = rep.activityDAO.getById(id)
-
-        if (activity == null)
-            return@launch
+    private fun refresh() = viewModelScope.launch(Dispatchers.IO) {
+        val activity:TrackedActivity = rep.activityDAO.getById(id)
 
         val now = LocalDate.now()
         val today = LocalDate.now()
-        val endOfweek = now.with(ChronoField.DAY_OF_WEEK, 7)
+        val endOfWeek = now.with(ChronoField.DAY_OF_WEEK, 7)
         val month = today.withDayOfMonth(1)
         val days30 = today.minusDays(30L)
 
 
-
-        this@TrackedActivityViewModel.activity.postValue(activity)
-
-        metricToday.postValue(activity.type.getComposeString(
+        val metricToday = activity.type.getComposeString(
             rep.metricDAO.getMetric(activity.id, today, today)
-        ))
+        )
 
-        val isCheked = activity.type == TrackedActivity.Type.CHECKED
+        val isChecked = activity.type == TrackedActivity.Type.CHECKED
 
-        metricWeek.postValue(activity.type.getComposeString(
-            rep.metricDAO.getMetric(activity.id, endOfweek.minusDays(6), endOfweek),
-            fraction = if (isCheked) 7L else null
-        ))
+        val metricWeek = activity.type.getComposeString(
+            rep.metricDAO.getMetric(activity.id, endOfWeek.minusDays(6), endOfWeek),
+            fraction = if (isChecked) 7L else null
+        )
 
-        metricMonth.postValue(activity.type.getComposeString(
+        val metricMonth = activity.type.getComposeString(
             rep.metricDAO.getMetric(activity.id, month, today),
-            fraction = if (isCheked) today.lengthOfMonth().toLong() else null
-        ))
+            fraction = if (isChecked) today.lengthOfMonth().toLong() else null
+        )
 
-        metric30Days.postValue(activity.type.getComposeString(
+        val metric30Days = activity.type.getComposeString(
             rep.metricDAO.getMetric(activity.id, days30, today),
-            fraction = if (isCheked) 30L else null
-        ))
+            fraction = if (isChecked) 30L else null
+        )
 
-        recent.postValue(rep.getRecentActivity(id, endOfweek, 12))
+        val recent = rep.getRecentActivity(id, endOfWeek, 12)
 
         val months = rep.metricDAO.getMetricByMonth(
             activity.id,
@@ -102,7 +99,7 @@ class TrackedActivityViewModel(val id: Long) : ViewModel() {
             val metric:ComposeString = if (activity.type == TrackedActivity.Type.CHECKED)
                 {{ "${it.metric} / ${it.from.month.length(it.from.isLeapYear)}" }}
             else
-                {{ activity.type.format(it.metric) }}
+                { activity.type.getComposeString(it.metric) }
 
             MetricWidgetData.Labeled(
                 label = { it.from.month.getDisplayName(TextStyle.SHORT, Locale.getDefault()) },
@@ -111,9 +108,12 @@ class TrackedActivityViewModel(val id: Long) : ViewModel() {
             )
         }
 
-        this@TrackedActivityViewModel.months.postValue(months)
+        val state = TrackedActivityState(
+                activity, recent, months, metricToday, metricWeek, metricMonth, metric30Days
+        )
 
+        screenState.postValue(state)
     }
-
-
 }
+
+

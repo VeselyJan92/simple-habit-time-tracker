@@ -12,7 +12,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.ui.AppBottomNavigation
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.TrackerTopAppBar
 import com.imfibit.activitytracker.ui.components.dialogs.DialogAddActivity
@@ -20,7 +22,7 @@ import com.imfibit.activitytracker.ui.components.dialogs.DialogAddActivity
 @ExperimentalLayout
 @Composable
 fun ScreenActivities(
-    navController: NavController,
+    navController: NavHostController,
 ){
 
     val vm = viewModel<ActivitiesViewModel>()
@@ -29,18 +31,21 @@ fun ScreenActivities(
     DialogAddActivity(navController, display = display)
 
     Scaffold(
-        topBar = { TrackerTopAppBar(stringResource(id = R.string.screen_title_activities)) },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { display.value = true }) {
-                Icon(Icons.Filled.Add)
-            }
-        },
-        bodyContent = {
-            TrackedActivitiesList(navController, vm)
-        },
-        bottomBar = {
-            LiveActivitiesList(vm)
-        },
-        backgroundColor = Colors.AppBackground
+            topBar = { TrackerTopAppBar(stringResource(id = R.string.screen_title_activities)) },
+            floatingActionButton = {
+                FloatingActionButton(onClick = { display.value = true }) {
+                    Icon(Icons.Filled.Add)
+                }
+            },
+            bodyContent = {
+                TrackedActivitiesList(navController, vm)
+            },
+            bottomBar = {
+                Column {
+                    LiveActivitiesList(vm)
+                    AppBottomNavigation(navController)
+                }
+            },
+            backgroundColor = Colors.AppBackground
     )
 }

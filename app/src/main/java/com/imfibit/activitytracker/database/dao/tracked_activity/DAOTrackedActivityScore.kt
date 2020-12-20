@@ -10,6 +10,15 @@ import java.time.LocalDateTime
 interface DAOTrackedActivityScore : BaseEditableDAO<TrackedActivityScore>, DAOTrackedActivityMetric{
 
 
+    @Query("""
+        select * from tracked_activity_score
+        where time_completed >= :from AND time_completed <:to
+    """)
+    suspend fun getAll(
+        from: LocalDateTime,
+        to: LocalDateTime = LocalDateTime.now()
+    ): List<TrackedActivityScore>
+
 
     @Query("""
         select TOTAL(score) + 0 as metric 

@@ -11,6 +11,8 @@ import com.imfibit.activitytracker.database.repository.tracked_activity.Reposito
 import com.imfibit.activitytracker.database.AppDatabase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 class ActivitiesViewModel : ViewModel() {
 
@@ -48,6 +50,15 @@ class ActivitiesViewModel : ViewModel() {
     fun startSession(context: Context, item: TrackedActivity){
         AppNotificationManager.showSessionNotification(context, item)
         GlobalScope.launch {  rep.startSession(item.id) }
+    }
+
+
+    fun activityTriggered(activity: TrackedActivity, context: Context) = GlobalScope.launch{
+        when (activity.type) {
+            TrackedActivity.Type.TIME -> startSession(context, activity)
+            TrackedActivity.Type.SCORE -> rep.scoreDAO.commitScore(activity.id, LocalDateTime.now(), 1)
+            TrackedActivity.Type.CHECKED -> rep.completionDAO.toggle(activity.id, LocalDate.now())
+        }
     }
 
 }

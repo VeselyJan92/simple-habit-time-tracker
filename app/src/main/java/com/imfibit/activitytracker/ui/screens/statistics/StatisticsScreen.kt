@@ -1,7 +1,6 @@
 package com.imfibit.activitytracker.ui.screens.statistics
 
 import android.app.DatePickerDialog
-import android.util.Log
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,8 +23,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.core.sumByLong
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.entities.TrackedActivity
@@ -33,15 +33,17 @@ import com.imfibit.activitytracker.ui.components.*
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.screens.activity_list.Goal
 import com.imfibit.activitytracker.database.AppDatabase
+import com.imfibit.activitytracker.ui.AppBottomNavigation
 import java.time.LocalDate
 
 
 @Composable
-fun ScreenStatistics(navController: NavController){
+fun ScreenStatistics(navController: NavHostController){
     Scaffold(
         topBar = { TrackerTopAppBar("Statistika") },
         bodyContent = { ScreenBody() },
-        backgroundColor = Colors.AppBackground,
+        bottomBar = { AppBottomNavigation(navController) },
+        backgroundColor = Colors.AppBackground
     )
 }
 
@@ -51,8 +53,6 @@ private fun ScreenBody() = Column {
     val clock = AmbientAnimationClock.current
 
     val state = remember { StatisticsState(LocalDate.now(), TimeRange.DAILY, clock) }
-
-    Log.e("PAGE", "COMPOSE")
 
     Navigation(state)
 
@@ -87,7 +87,7 @@ private fun ScreenBody() = Column {
             }
         }else{
             ScrollableColumn(Modifier) {
-                BlockTimeTracked(data.value[TrackedActivity.Type.SESSION], state)
+                BlockTimeTracked(data.value[TrackedActivity.Type.TIME], state)
                 BlockScores(data.value[TrackedActivity.Type.SCORE], state)
                 BlockCompleted(data.value[TrackedActivity.Type.CHECKED], state)
             }
@@ -212,15 +212,17 @@ private fun BlockTimeTracked(data: List<ActivityWithMetric>?, state: StatisticsS
     Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp)) {
         Column(Modifier.padding(8.dp)) {
             Header(title = stringResource(id = R.string.time), icon = Icons.Default.Timer){
-               /* Box(
+                Box(
                     modifier = Modifier.size(60.dp, 25.dp).background(Colors.ChipGray, RoundedCornerShape(50)),
-                    alignment = Alignment.Center
+                    contentAlignment = Alignment.Center
                 ){
-                    Text("54:23",  style = TextStyle(
+                    val sum = TrackedActivity.Type.TIME.getComposeString(data.sumByLong { it.metric }).invoke()
+
+                    Text(sum,  style = TextStyle(
                         fontWeight = FontWeight.Bold,
                         fontSize = 13.sp
                     ))
-                }*/
+                }
             }
 
             data.forEach {
@@ -242,45 +244,6 @@ private fun BlockTimeTracked(data: List<ActivityWithMetric>?, state: StatisticsS
 
                 Divider(Modifier.padding(top = 4.dp, bottom = 4.dp))
             }
-
-
-/*
-            Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                LabeledMetricBlock(
-                    metric = "20:00",
-                    label = stringResource(id = R.string.today),
-                    color = Colors.AppAccent,
-                    width = 40.dp,
-                    metricStyle = metricTextStyle.copy(fontWeight = FontWeight.Bold)
-                )
-                LabeledMetricBlock(
-                    metric = "20:00",
-                    label = stringResource(id = R.string.week),
-                    color = Colors.AppAccent,
-                    width = 40.dp
-                )
-                LabeledMetricBlock(
-                    metric = "20:00",
-                    label = stringResource(id = R.string.month),
-                    color = Colors.ChipGray,
-                    width = 40.dp,
-                    metricStyle = metricTextStyle.copy(fontWeight = FontWeight.Bold, fontSize = 12.sp),
-                )
-                LabeledMetricBlock(
-                    metric = "20:00",
-                    label = stringResource(id = R.string.days30),
-                    color = Colors.AppAccent,
-                    width = 40.dp
-                )
-
-                LabeledMetricBlock(
-                    metric = "20:00",
-                    label = stringResource(id = R.string.days30),
-                    color = Colors.AppAccent,
-                    width = 40.dp
-                )
-            }
-*/
         }
     }
 

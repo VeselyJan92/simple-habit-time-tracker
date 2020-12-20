@@ -13,6 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.imfibit.activitytracker.ui.AppBottomNavigation
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.TrackerTopAppBar
 
@@ -21,19 +22,22 @@ import com.imfibit.activitytracker.ui.components.TrackerTopAppBar
 @Composable
 fun ScreenUpcoming(navControl: NavHostController) {
     Scaffold(
-        topBar = { TrackerTopAppBar("") },
-        bodyContent = {
-            Box(Modifier.fillMaxWidth().fillMaxHeight(), contentAlignment = Alignment.Center) {
-                Text(
-                    text = "UPCOMMING FEATURE",
-                    style = TextStyle(
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
+            topBar = { TrackerTopAppBar("") },
+            bodyContent = {
+                Box(Modifier.fillMaxWidth().fillMaxHeight(), contentAlignment = Alignment.Center) {
+                    Text(
+                            text = "UPCOMMING FEATURE",
+                            style = TextStyle(
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Center
+                            )
                     )
-                )
-            }
-        },
-        backgroundColor = Colors.AppBackground
+                }
+            },
+            bottomBar = {
+                AppBottomNavigation(navController = navControl)
+            },
+            backgroundColor = Colors . AppBackground
     )
 }

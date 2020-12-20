@@ -36,11 +36,11 @@ abstract class DAOTrackedActivity : BaseEditableDAO<TrackedActivity> {
     abstract fun getLiveById(id: Long): LiveData<TrackedActivity>*/
 
 
-   /* @Query("""
+    @Query("""
         SELECT * FROM tracked_activity 
         order by position
    """)
-    abstract fun getAll(): List<TrackedActivity>*/
+    abstract fun getAll(): List<TrackedActivity>
 
 
     @Query(SQL_all_not_in_session)
@@ -55,4 +55,8 @@ abstract class DAOTrackedActivity : BaseEditableDAO<TrackedActivity> {
         order by in_session_since
     """)
     abstract fun liveActive(): LiveData<List<TrackedActivity>>
+
+
+
+
 }

@@ -15,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
@@ -24,70 +26,38 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.ui.components.Colors
 
 
+private data class State(
+        val hours: MutableState<TextFieldValue>,
+        val minutes: MutableState<TextFieldValue>
+)
+
 @OptIn(ExperimentalMaterialApi::class, ExperimentalTextApi::class)
 @Composable
-inline fun MinuteAndHourSelector(
-    hours: MutableState<Int?>,
-    minutes: MutableState<Int?>,
-    noinline onSelectionChanged: ((hours: Int, minutes:Int)->Unit)? = null
+fun MinuteAndHourSelector(
+    hours: Int,
+    minutes: Int,
+    onSelectionChanged: ((hours: Int, minutes:Int)->Unit)? = null
 ) {
 
-    if (hours.value == 0) hours.value = null
-    if (minutes.value == 0) minutes.value = null
+    fun format(number: Int) = if (number == 0) "" else number.toString()
+
+    val state = remember {
+        State(
+            mutableStateOf(TextFieldValue(format(hours))),
+            mutableStateOf(TextFieldValue(format(minutes)))
+        )
+    }
 
     Row(
-        Modifier.padding(8.dp, top = 16.dp).height(50.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+            Modifier.padding(top = 16.dp).height(50.dp).fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
     ) {
 
-        Column(
-            Modifier.weight(50f),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                textAlign = TextAlign.Center,
-                text = "Hours",
-                style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp)
-            )
-
-            Box(
-                modifier = Modifier
-                    .height(30.dp)
-                    .background(Colors.ChipGray, RoundedCornerShape(50))
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                BasicTextField(value = "ASD", onValueChange = {})
-
-                BasicTextField(
-                    value = hours.value?.toString() ?: "",
-                    onValueChange = {
-                        try {
-                            it.toInt().let {
-                                if (it in 0..9125) {
-                                    hours.value = it
-                                    onSelectionChanged?.invoke(hours.value ?: 0, minutes.value ?: 0)
-                                }
-                            }
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    textStyle = TextStyle(
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
-                    ),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-            }
-
-        }
+        TimeEntry(state, stringResource(id = R.string.hours), state.hours, 0..9125, onSelectionChanged)
 
         Column(Modifier.padding(horizontal = 8.dp)){
             Spacer(modifier = Modifier.height(22.dp))
@@ -96,49 +66,72 @@ inline fun MinuteAndHourSelector(
             Box(Modifier.size(5.dp).background(Color.Black, RoundedCornerShape(50)))
         }
 
-        Column(
-            Modifier.weight(50f).padding(end = 8.dp),
+        TimeEntry(state, stringResource(id = R.string.minutes), state.minutes, 0..59, onSelectionChanged)
+    }
+
+}
+
+@Composable
+private fun TimeEntry(
+        state: State,
+        label: String,
+        holder: MutableState<TextFieldValue>,
+        validRange: IntRange,
+        onSelectionChanged: ((hours: Int, minutes:Int)->Unit)? = null
+
+){
+    Column(
+            Modifier.width(110.dp),
             horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+    ) {
 
-            Text(
-                textAlign = TextAlign.Center,
-                text = "Minutes",
-                style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp)
-            )
+        Text(
+            textAlign = TextAlign.Center,
+            text = label,
+            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp)
+        )
 
-            Box(
-                modifier = Modifier
+        Box(
+            modifier = Modifier
                     .height(30.dp)
                     .background(Colors.ChipGray, RoundedCornerShape(50))
                     .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
+            contentAlignment = Alignment.Center
+        ) {
 
-                BasicTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = TextFieldValue(minutes.value?.toString() ?: ""),
-                    onValueChange = {
+            BasicTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = holder.value,
+                onValueChange = { field ->
+                    if (field.text.isEmpty()){
+                        holder.value = TextFieldValue()
+
+                    } else{
                         try {
-                            it.text.toInt().let {
-                                if (it in 0..59){
-                                    minutes.value = it
-                                    onSelectionChanged?.invoke(hours.value ?: 0, minutes.value ?: 0)
-                                }
+                            if (field.text.toInt() in validRange) {
+                                holder.value = field
                             }
-                        }catch (e: Exception){}
-                    },
-                    textStyle = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
 
-            }
+                    onSelectionChanged?.invoke(
+                        state.hours.value.text.toIntOrNull() ?: 0,
+                        state.minutes.value.text.toIntOrNull() ?: 0
+                    )
+
+                },
+                textStyle = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
 
         }
 
     }
 
 }
+
 
 
 

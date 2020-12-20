@@ -49,13 +49,6 @@ object AppNotificationManager{
 
         notificationManager.createNotificationChannel(channel)
 
-        val intent = NavDeepLinkBuilder(context)
-            .setGraph(R.navigation.mobile_navigation)
-            .setDestination(R.id.navigation_activities_list)
-            .createPendingIntent()
-
-        remoteViews.setOnClickPendingIntent(R.id.tracked_task_notification_tv_name, intent)
-
 
         val stopIntent = PendingIntent.getBroadcast(
             context,

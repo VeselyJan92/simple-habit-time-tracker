@@ -5,7 +5,7 @@ import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
 import com.imfibit.activitytracker.database.entities.TrackedActivityScore
-import com.imfibit.activitytracker.database.entities.TrackedActivitySession
+import com.imfibit.activitytracker.database.entities.TrackedActivityTime
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -67,7 +67,7 @@ class Seeder {
         activityId : Long = 0,
         start: LocalDateTime = shiftDateTime(nextInt(0, 2), nextInt(-1, 1)),
         end: LocalDateTime = start.plusHours(1)
-    )  = TrackedActivitySession(id, activityId, start, end)
+    )  = TrackedActivityTime(id, activityId, start, end)
 
 
     /*fun getTrackedActivityWithMetric(

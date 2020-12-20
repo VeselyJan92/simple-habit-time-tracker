@@ -8,11 +8,13 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.entities.TrackedActivityScore
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.ui.components.Colors
@@ -39,9 +41,9 @@ fun DialogScore(
 
     BaseDialog(display = display) {
 
-        DialogBaseHeader(title = if (modify) "EDIT SCORE" else "ADD SCORE")
+        DialogBaseHeader(title = stringResource(id = if (modify) R.string.dialo_score_title_edit else R.string.dialo_score_title_add))
 
-        NumberSelector(label = "score", number = score){
+        NumberSelector(label = stringResource(id = R.string.score), number = score){
             if ( it in 1..999) score.value = it
         }
 
@@ -90,12 +92,12 @@ private fun Buttons(
                 }
             }
         ) {
-            Text(text = "DELETE")
+            Text(text = stringResource(id = R.string.dialog_action_delete))
         }
     }
 
     TextButton(onClick = {  display.value = false }) {
-        Text(text = "CANCEL")
+        Text(text = stringResource(id = R.string.dialog_action_cancel))
     }
 
     TextButton(onClick = {
@@ -119,7 +121,8 @@ private fun Buttons(
 
 
     }) {
-        Text(text = if (modify) "EDIT" else "ADD")
+        Text(text = stringResource(id = if (modify) R.string.dialog_action_edit else R.string.dialog_action_add))
+
     }
 
 
