@@ -12,10 +12,15 @@ import androidx.compose.runtime.invalidate
 
 
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.navigation.NavController
@@ -58,25 +63,36 @@ fun ScreenTimeline(nav: NavController, scaffoldState: ScaffoldState = rememberSc
 private fun Body(scaffoldState: ScaffoldState) {
     val vm = viewModel<TimelineVM>()
 
-
-
-
-
-    Box {
-        Box(Modifier.padding(start = 28.dp).width(20.dp). fillMaxHeight().background(Colors.AppAccent))
-
-        val items by vm.records.observeAsState(listOf())
-
-        LazyColumn(
-            modifier = Modifier.padding(6.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            items(items = items) { item-> TrackedActivityRecord(item.activity, item.record, scaffoldState) }
+    val items by vm.records.observeAsState(listOf())
+    
+    if (items.isEmpty()){
+        Box(Modifier.fillMaxWidth().fillMaxHeight(), contentAlignment = Alignment.Center) {
+            Text(
+                text = stringResource(id = R.string.no_records),
+                style = TextStyle(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+            )
         }
 
+    }else{
+        Box {
+            Box(Modifier.padding(start = 28.dp).width(20.dp). fillMaxHeight().background(Colors.AppAccent))
+
+
+
+            LazyColumn(
+                modifier = Modifier.padding(6.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                items(items = items) { item-> TrackedActivityRecord(item.activity, item.record, scaffoldState) }
+            }
+
+        }
     }
-
-
+    
 }
 
 

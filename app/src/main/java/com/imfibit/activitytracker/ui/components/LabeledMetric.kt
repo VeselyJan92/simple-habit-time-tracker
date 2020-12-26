@@ -200,7 +200,7 @@ fun MetricBlock(
             )
             TrackedActivity.Type.CHECKED -> {
                 GlobalScope.launch {
-                    AppDatabase.activityRep.completionDAO.toggle(editable.activityId, editable.from.toLocalDate())
+                    AppDatabase.activityRep.completionDAO.toggle(editable.activityId, editable.from)
                 }
                 requestEdit.value = false
             }

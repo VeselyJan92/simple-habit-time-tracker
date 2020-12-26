@@ -6,14 +6,14 @@ import androidx.room.ForeignKey.CASCADE
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 
-sealed class TrackedActivityRecord(
-    open var id: Long,
-    open var activity_id: Long
-){
-
+sealed class TrackedActivityRecord{
+    abstract var id: Long
+    abstract var activity_id: Long
     abstract val metric: Long
 
+    abstract val order: LocalDateTime
 }
 
 @Entity(
@@ -40,10 +40,17 @@ data class TrackedActivityCompletion(
     @ColumnInfo(name = "tracked_activity_id")
     override var activity_id: Long,
 
-    @NonNull
     @ColumnInfo(name = "date_completed")
-    var date_completed: LocalDate
-) : TrackedActivityRecord(id, activity_id) {
+    var date_completed: LocalDate,
+
+    @ColumnInfo(name = "time_completed")
+    var time_completed: LocalTime
+) : TrackedActivityRecord() {
+
+    val datetime_completed get() = time_completed.atDate(date_completed)
+
+    @Transient
+    override val order = datetime_completed
 
     companion object {
         const val TABLE = "tracked_activity_completion"
@@ -77,16 +84,19 @@ data class TrackedActivityScore(
     @ColumnInfo(name = "tracked_activity_id")
     override var activity_id: Long,
 
-    @ColumnInfo(name = "time_completed")
+    @ColumnInfo(name = "datetime_completed")
     var datetime_completed: LocalDateTime,
 
     @ColumnInfo(name = "score")
     var score: Long
-): TrackedActivityRecord(id, activity_id){
+): TrackedActivityRecord(){
 
     companion object{
         const val TABLE = "tracked_activity_score"
     }
+
+    @Transient
+    override val order = datetime_completed
 
     override val metric: Long
         get() = score
@@ -119,18 +129,21 @@ data class TrackedActivityTime(
     override var activity_id:  Long,
 
     @NonNull
-    @ColumnInfo(name = "time_start")
+    @ColumnInfo(name = "datetime_start")
     var datetime_start: LocalDateTime,
 
-    @ColumnInfo(name = "time_end")
+    @ColumnInfo(name = "datetime_end")
     var datetime_end: LocalDateTime
-) : TrackedActivityRecord(id, activity_id) {
+) : TrackedActivityRecord() {
     companion object{
         const val TABLE = "tracked_activity_session"
     }
 
     override val metric: Long
         get() = Duration.between(datetime_start, datetime_end).seconds
+
+    @Transient
+    override val order = datetime_start
 }
 
 

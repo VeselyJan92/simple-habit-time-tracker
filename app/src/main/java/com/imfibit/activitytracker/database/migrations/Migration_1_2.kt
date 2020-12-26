@@ -12,12 +12,12 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
         """)
 
         database.execSQL("""
-             DROP VIEW IF EXISTS tracked_activity_metric
+             DROP VIEW IF EXISTS tracked_activity_metricx
         """)
 
         database.execSQL("""CREATE VIEW `tracked_activity_metric` AS SELECT
             tracked_activity_id,
-            date_completed as date,
+            datetime_completed as date,
             1 as metric
         FROM tracked_activity_completion
         UNION ALL

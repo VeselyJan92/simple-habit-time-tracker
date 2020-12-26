@@ -71,7 +71,7 @@ android {
         applicationId ="com.imfibit.activitytracker"
         minSdkVersion(26)
         targetSdkVersion(30)
-        versionCode = 1
+        versionCode = 2
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -84,7 +84,6 @@ android {
 
             signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-            debuggable(true)
             versionNameSuffix = " - PROD"
         }
 
@@ -92,11 +91,22 @@ android {
             manifestPlaceholders["crashlyticsCollectionEnabled"] = false
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-           // debuggable(true)
+            debuggable(true)
 
             applicationIdSuffix =  ".debug"
             versionNameSuffix = " - DEBUG"
+        }
 
+        create("personal") {
+            isMinifyEnabled = false
+            manifestPlaceholders["crashlyticsCollectionEnabled"] = true
+
+            signingConfig = signingConfigs.getByName("release")
+            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            debuggable(true)
+
+            applicationIdSuffix =  ".personal"
+            versionNameSuffix = " - TEST"
         }
 
     }
@@ -112,7 +122,6 @@ dependencies {
 
     implementation(platform("com.google.firebase:firebase-bom:25.11.0"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
-    implementation("com.google.firebase:firebase-analytics-ktx")
 
     implementation("androidx.navigation:navigation-compose:1.0.0-alpha04")
 

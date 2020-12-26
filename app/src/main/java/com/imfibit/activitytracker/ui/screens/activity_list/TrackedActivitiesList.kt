@@ -4,6 +4,7 @@ import android.content.Context
 import android.inputmethodservice.Keyboard
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.util.Log
 import androidx.navigation.compose.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -46,7 +47,7 @@ import java.time.LocalDateTime
 
 
 data class TrackedActivityWithMetric constructor(
-    var activity: TrackedActivity,
+    val activity: TrackedActivity,
     val past: List<MetricWidgetData>,
     val hasMetricToday: Boolean
 ) {
@@ -60,7 +61,9 @@ fun TrackedActivitiesList(
     nav: NavHostController,
     vm: ActivitiesViewModel
 ) {
-    val items by vm.activities.observeAsState(arrayListOf())
+    val items by vm.activities.observeAsState(listOf())
+
+
 
     LazyColumn(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         items(items) {

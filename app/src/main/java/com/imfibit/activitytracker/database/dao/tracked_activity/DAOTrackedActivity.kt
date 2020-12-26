@@ -14,7 +14,7 @@ abstract class DAOTrackedActivity : BaseEditableDAO<TrackedActivity> {
     companion object{
         const val SQL_all_not_in_session = """
             SELECT * FROM tracked_activity 
-            WHERE (type = 'SESSION' AND in_session_since is NULL) OR (type != 'SESSION') 
+            WHERE (type = 'TIME' AND in_session_since is NULL) OR (type != 'TIME') 
             order by position
         """
         const val SQL_one_by_id = """

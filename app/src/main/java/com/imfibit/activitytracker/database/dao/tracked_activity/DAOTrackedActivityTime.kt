@@ -12,7 +12,7 @@ interface DAOTrackedActivityTime : BaseEditableDAO<TrackedActivityTime> {
 
     @Query("""
         select * from tracked_activity_session
-        where time_start >= :from AND time_start <:to
+        where datetime_start >= :from AND datetime_start <:to
     """)
     suspend fun getAll(
         from: LocalDateTime,
@@ -22,7 +22,7 @@ interface DAOTrackedActivityTime : BaseEditableDAO<TrackedActivityTime> {
 
     @Query("""
         select * from tracked_activity_session
-        where time_start >= :from AND time_start <:to AND tracked_activity_id=:activityId
+        where datetime_start >= :from AND datetime_start <:to AND tracked_activity_id=:activityId
     """)
     suspend fun getAll(
         activityId: Long,
@@ -31,9 +31,9 @@ interface DAOTrackedActivityTime : BaseEditableDAO<TrackedActivityTime> {
     ): List<TrackedActivityTime>
 
     @Query("""
-        select TOTAL(strftime('%s',time_end) - strftime('%s', time_start)) as metric 
+        select TOTAL(strftime('%s',datetime_end) - strftime('%s', datetime_start)) as metric 
         from tracked_activity_session s 
-        where (time_start >= :from AND time_start <:to) AND tracked_activity_id=:activityId
+        where (datetime_start >= :from AND datetime_start <:to) AND tracked_activity_id=:activityId
     """)
     suspend fun getMetric(activityId: Long, from: LocalDateTime, to: LocalDateTime): Long
 

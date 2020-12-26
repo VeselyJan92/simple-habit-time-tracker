@@ -12,7 +12,7 @@ interface DAOTrackedActivityScore : BaseEditableDAO<TrackedActivityScore>, DAOTr
 
     @Query("""
         select * from tracked_activity_score
-        where time_completed >= :from AND time_completed <:to
+        where datetime_completed >= :from AND datetime_completed <:to
     """)
     suspend fun getAll(
         from: LocalDateTime,
@@ -23,7 +23,7 @@ interface DAOTrackedActivityScore : BaseEditableDAO<TrackedActivityScore>, DAOTr
     @Query("""
         select TOTAL(score) + 0 as metric 
         from tracked_activity_score s 
-        where time_completed >= :from AND time_completed <:to AND tracked_activity_id=:activityId
+        where datetime_completed >= :from AND datetime_completed <:to AND tracked_activity_id=:activityId
     """)
     suspend fun getMetric(activityId:Long, from: LocalDateTime, to: LocalDateTime): Long
 
@@ -32,7 +32,7 @@ interface DAOTrackedActivityScore : BaseEditableDAO<TrackedActivityScore>, DAOTr
 
     @Query("""
         select * from tracked_activity_score
-        where time_completed >= :from AND time_completed <:to AND tracked_activity_id=:activityId
+        where datetime_completed >= :from AND datetime_completed <:to AND tracked_activity_id=:activityId
     """)
     suspend fun getAll(
         activityId:Long,

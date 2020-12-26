@@ -51,8 +51,8 @@ class Seeder {
     fun getTrackedTaskCompletion(
         id: Long = 0,
         activityId : Long = 0,
-        date: LocalDate = shiftDateTime(nextInt(0, 2)).toLocalDate()
-    )  = TrackedActivityCompletion(id, activityId, date)
+        date: LocalDateTime = shiftDateTime(nextInt(0, 2))
+    )  = TrackedActivityCompletion(id, activityId, date.toLocalDate(), date.toLocalTime())
 
     fun getTrackedTaskScore(
         id: Long = 0,

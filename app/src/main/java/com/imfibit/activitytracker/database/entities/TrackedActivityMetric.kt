@@ -5,25 +5,27 @@ import androidx.room.DatabaseView
 import java.time.LocalDate
 
 
-@DatabaseView("""
-        SELECT
+@DatabaseView(
+    value = """SELECT
             tracked_activity_id,
             date_completed as date,
             1 as metric
         FROM tracked_activity_completion
         UNION ALL
-        SELECT 
+        SELECT
             tracked_activity_id,
-            date(time_completed) as date,
+            date(datetime_completed) as date,
             score as metric
         FROM tracked_activity_score
         UNION ALL
-        SELECT 
+        SELECT
             tracked_activity_id,
-            date(time_start) as date,
-            strftime('%s',time_end) - strftime('%s', time_start) as metric
+            date(datetime_start) as date,
+            strftime('%s',datetime_end) - strftime('%s', datetime_start) as metric
         FROM tracked_activity_session
-""", viewName = "tracked_activity_metric")
+        """,
+    viewName = "tracked_activity_metric"
+)
 data class TrackedActivityMetric(
     @ColumnInfo(name = "tracked_activity_id")
     val activityId: Long,

@@ -22,35 +22,36 @@ inline fun DialogGoal(
 
         DialogBaseHeader(title = stringResource(id = R.string.dialog_goal_title))
 
-        val goal = remember { mutableStateOf(activity.goal.value) }
+        var goal by remember { mutableStateOf(activity.goal.value) }
 
         when(activity.type){
             TrackedActivity.Type.TIME ->{
                 MinuteAndHourSelector(
-                    hours = goal.value.toInt()/3600,
-                    minutes = ((goal.value % 3600)/60L).toInt()
+                    hours = goal.toInt()/3600,
+                    minutes = ((goal % 3600)/60L).toInt()
                 ){
-                    hours, minutes -> goal.value = (60 * hours + minutes) * 60L
+                    hours, minutes -> goal = (60 * hours + minutes) * 60L
                 }
             }
 
             TrackedActivity.Type.SCORE -> {
                 NumberSelector(
                         label = stringResource(id = R.string.score),
-                        number = mutableStateOf(goal.value.toInt())
+                        number = mutableStateOf(goal.toInt())
                 ) {
-                    goal.value = it.toLong()
+                    if (goal in 1..10_000)
+                        goal = it.toLong()
                 }
             }
             TrackedActivity.Type.CHECKED ->{
                 NumberSelector(
                     label = stringResource(id = R.string.repetitions),
-                    number = mutableStateOf(goal.value.toInt())
+                    number = mutableStateOf(goal.toInt())
                 ){
                     when(activity.goal.range){
                         TimeRange.DAILY -> throw IllegalStateException()
-                        TimeRange.WEEKLY -> if (it in 0..7) goal.value = it.toLong()
-                        TimeRange.MONTHLY -> if (it in 0..31) goal.value = it.toLong()
+                        TimeRange.WEEKLY -> if (it in 0..7) goal = it.toLong()
+                        TimeRange.MONTHLY -> if (it in 0..31) goal = it.toLong()
                     }
                 }
             }
@@ -67,7 +68,7 @@ inline fun DialogGoal(
                 Text(text = stringResource(id = R.string.dialog_action_cancel))
             }
 
-            TextButton(onClick = {display.value = false ; onGoalSet.invoke(goal.value)}) {
+            TextButton(onClick = {display.value = false ; onGoalSet.invoke(goal)}) {
                 Text(text = stringResource(id = R.string.dialog_action_continue))
             }
         }
