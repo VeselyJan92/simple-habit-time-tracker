@@ -1,8 +1,5 @@
 package com.imfibit.activitytracker.ui.components
 
-import android.util.Log
-import androidx.compose.animation.asDisposableClock
-import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,25 +9,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.viewModel
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.entities.*
 import com.imfibit.activitytracker.ui.components.dialogs.DialogScore
 import com.imfibit.activitytracker.ui.components.dialogs.DialogSession
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.imfibit.activitytracker.ui.screens.timeline.TimelineVM
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
@@ -86,7 +78,7 @@ private fun Record(
 
             when(record){
                 is TrackedActivityCompletion -> {
-                    append(record.date_completed.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)))
+                    append(record.datetime_completed.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)))
                 }
                 is TrackedActivityScore -> {
                     append(record.datetime_completed.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)))

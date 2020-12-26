@@ -1,6 +1,7 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -34,7 +35,9 @@ class ActivitiesViewModel : ViewModel() {
     }
 
     fun refresh() = viewModelScope.launch {
-        activities.postValue(rep.getActivitiesOverview(5))
+        val activities =rep.getActivitiesOverview(5)
+        Log.e("VM", "activities: $activities")
+        this@ActivitiesViewModel.activities.postValue(activities)
     }
 
     override fun onCleared() {
@@ -57,7 +60,7 @@ class ActivitiesViewModel : ViewModel() {
         when (activity.type) {
             TrackedActivity.Type.TIME -> startSession(context, activity)
             TrackedActivity.Type.SCORE -> rep.scoreDAO.commitScore(activity.id, LocalDateTime.now(), 1)
-            TrackedActivity.Type.CHECKED -> rep.completionDAO.toggle(activity.id, LocalDate.now())
+            TrackedActivity.Type.CHECKED -> rep.completionDAO.toggle(activity.id, LocalDateTime.now())
         }
     }
 

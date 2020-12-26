@@ -25,9 +25,13 @@ import com.imfibit.activitytracker.core.TimeUtils
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.ui.components.Colors
+import com.imfibit.activitytracker.ui.components.EditableDatetime
+import com.imfibit.activitytracker.ui.components.dialogs.system.DialogTimePicker
+import com.imfibit.activitytracker.ui.components.layout.LabeledColumn
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 
@@ -59,86 +63,37 @@ inline fun DialogSession(
 
     DialogBaseHeader(title = stringResource(id = if (modify) R.string.dialog_session_title_edit else R.string.dialog_session_title_add))
 
-    Row(Modifier.padding(8.dp, top = 16.dp).height(50.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+    Row(
+        modifier = Modifier.padding(top = 16.dp).fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceAround
+    ) {
 
-        Column(Modifier.weight(50f).padding(end = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                    textAlign = TextAlign.Center,
-                    text = stringResource(id = R.string.session_start),
-                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp)
-            )
-
-            Box(
-                modifier = Modifier
-                    .height(30.dp)
-                    .background(Colors.ChipGray, RoundedCornerShape(50)).fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        textAlign = TextAlign.Center,
-                        text = from.value?.format(DateTimeFormatter.ofPattern("dd. MM.")) ?: "-",
-                        modifier = Modifier.clickable(
-                            onClick = {
-
-                                DatePickerDialog(context,
-                                    0,
-                                    { _, i, i2, i3 -> from.value=  from.value!!.withYear(i).withMonth(i2).withDayOfMonth(i3)},
-                                    from.value!!.year, from.value!!.month.value, from.value!!.dayOfMonth
-                                ).show()
-                            },
-                            indication = rememberRipple(bounded = false)
-                        )
-                    )
-
-                    Box(Modifier.padding(start = 8.dp, end = 8.dp).size(5.dp).background(Color.Black, RoundedCornerShape(50)))
-
-                    Text(
-                        textAlign = TextAlign.Center,
-                        text = from.value.format(DateTimeFormatter.ofPattern("HH:mm")),
-                        style = TextStyle(fontWeight = FontWeight.Bold),
-                        modifier = Modifier.clickable(
-                            onClick = {
-                                TimePickerDialog(context,
-                                    0,
-                                    { _, h, m -> from.value =  from.value.withHour(h).withMinute(m)},
-                                    from.value.hour, from.value.minute, true
-                                ).show()
-                            },
-                            indication = rememberRipple(bounded = false)
-                        )
-                    )
+        LabeledColumn(text = stringResource(id = R.string.session_start)) {
+            EditableDatetime(
+                datetime = from.value,
+                onDatetimeEdit = {
+                    from.value =  it
                 }
-            }
-
+            )
         }
 
-        Column(Modifier.weight(25f).padding(end = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-
-            Text(
-                textAlign = TextAlign.Center,
-                text = "",
-                style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp)
-            )
-
-
+        LabeledColumn(text = "") {
             Box(
-                Modifier.height(30.dp)
+                modifier = Modifier.height(30.dp).width(60.dp)
                     .background(Colors.AppAccent, RoundedCornerShape(50))
-                    .fillMaxWidth()
                     .clickable(
                         onClick = {
-                            TimePickerDialog(context,
-                                0,
-                                { _, h, m -> to.value = from.value.plusMinutes(h * 60L + m)},
-                                0, 0, true
-                            ).show()
+                            DialogTimePicker(
+                                time = LocalTime.of(0 , 0),
+                                onTimeSet = {to.value = from.value.plusMinutes(it.hour * 60L + it.minute)},
+                                context = context
+                            )
                         },
                         indication = rememberRipple(bounded = false)
-                    ),
+                    ).padding(horizontal = 8.dp),
                 contentAlignment = Alignment.Center,
 
-            ) {
+                ) {
                 Text(
                     textAlign = TextAlign.Center,
                     text = if (valid) TimeUtils.secondsToMetricShort(from.value, to.value) else "-",
@@ -150,70 +105,20 @@ inline fun DialogSession(
             }
         }
 
-        Column(Modifier.weight(50f).padding(end = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
 
-            Text(
-                textAlign = TextAlign.Center,
-                text = stringResource(id = R.string.session_end),
-                style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp)
-            )
-
-
-
-            Box(
-                modifier = Modifier
-                    .height(30.dp).fillMaxWidth()
-                    .background(if (from.value <= to.value) Colors.ChipGray else Colors.NotCompleted, RoundedCornerShape(50)),
-                contentAlignment = Alignment.Center
-            ) {
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        textAlign = TextAlign.Center,
-                        text = to.value.format(DateTimeFormatter.ofPattern("dd. MM.")),
-                        modifier = Modifier.clickable(
-                            onClick = {
-                                DatePickerDialog(
-                                    context,
-                                    0,
-                                    { _, i, i2, i3 ->
-                                        to.value = to.value.withYear(i).withMonth(i2).withDayOfMonth(i3)
-                                    },
-                                    to.value.year, to.value.month.value, to.value.dayOfMonth
-                                ).show()
-                            },
-                            indication = rememberRipple(bounded = false)
-                        )
-                    )
-
-                    Box(Modifier.padding(start = 8.dp, end = 8.dp).size(5.dp).background(Color.Black, RoundedCornerShape(50)))
-
-                    Text(
-                        textAlign = TextAlign.Center,
-                        text = to.value.format(DateTimeFormatter.ofPattern("HH:mm")),
-                        style = TextStyle(fontWeight = FontWeight.Bold),
-                        modifier = Modifier.clickable(
-                            onClick = {
-                                TimePickerDialog(context,
-                                    0,
-                                    { _, h, m -> to.value=  to.value.withHour(h).withMinute(m)},
-                                    to.value.hour, to.value.minute, true
-                                ).show()
-                            },
-                            indication = rememberRipple(bounded = false)
-                        )
-
-                    )
+        LabeledColumn(text = stringResource(id = R.string.session_end)) {
+            EditableDatetime(
+                datetime = to.value,
+                onDatetimeEdit = {
+                    to.value =  it
                 }
-
-            }
-
+            )
         }
 
     }
 
 
-
+    //TODO REDO
     DialogButtons {
 
         if(modify){

@@ -64,6 +64,9 @@
     <string name="minutes">Minutes</string>
     <string name="confirm_delete">Really delete</string>
     <string name="undo">Undo</string>
+    <string name="dialog_timer_start_title">Activity Start</string>
+    <string name="dialog_timer_start_start_time">"Start: "</string>
+    <string name="timer">Timer</string>
 
     <string-array name="months">
         <item>January</item>

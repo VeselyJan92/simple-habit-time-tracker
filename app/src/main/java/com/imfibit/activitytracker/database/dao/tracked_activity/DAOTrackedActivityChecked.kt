@@ -13,23 +13,17 @@ interface DAOTrackedActivityChecked: BaseEditableDAO<TrackedActivityCompletion> 
 
     @Query("""
         select * from tracked_activity_completion
-        where date_completed >= :from AND date_completed <:to
+        where date_completed  >= :from AND date_completed <=:to
     """)
     suspend fun getAll(
-        from: LocalDateTime,
-        to: LocalDateTime = LocalDateTime.now()
+        from: LocalDate,
+        to: LocalDate
     ): List<TrackedActivityCompletion>
 
 
     @Query("""
-        select count(*) from tracked_activity_completion
-        where date_completed >= :from AND date_completed <:to AND tracked_activity_id=:activityId
-     """)
-    suspend fun getMetric(activityId:Long, from: LocalDateTime, to: LocalDateTime): Long
-
-    @Query("""
         select * from tracked_activity_completion
-        where date_completed >= :from AND date_completed <:to AND tracked_activity_id=:activityId
+        where date_completed >= :from AND date_completed <=:to AND tracked_activity_id=:activityId
     """)
     suspend fun getAll(
         activityId:Long,
@@ -40,7 +34,7 @@ interface DAOTrackedActivityChecked: BaseEditableDAO<TrackedActivityCompletion> 
 
     @Query("""
         select * from tracked_activity_completion
-        where date_completed = :date AND activity_id =:activityId
+        where date_completed = :date AND tracked_activity_id =:activityId
     """)
     suspend fun getRecord(activityId: Long, date: LocalDate): TrackedActivityCompletion?
 
@@ -53,13 +47,13 @@ interface DAOTrackedActivityChecked: BaseEditableDAO<TrackedActivityCompletion> 
 
 
     @Transaction
-    suspend fun toggle(activityId: Long, date: LocalDate){
-        val record = getRecord(activityId, date)
+    suspend fun toggle(activityId: Long, date: LocalDateTime){
+        val record = getRecord(activityId, date.toLocalDate())
 
         if (record != null)
             delete(record)
         else
-            insert(TrackedActivityCompletion(0L, activityId, date))
+            insert(TrackedActivityCompletion(0L, activityId, date.toLocalDate(), date.toLocalTime()))
     }
 
 }

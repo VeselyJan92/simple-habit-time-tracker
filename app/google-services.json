@@ -63,6 +63,35 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:433894261873:android:e8ff29d0c736dfc73487d0",
+        "android_client_info": {
+          "package_name": "com.imfibit.activitytracker.personal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "433894261873-tnakertrvkebk0nvchivais1ljoo7pgq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvETe0SzFfSwl-v8Vy63CLBPa44BVbGus"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "433894261873-tnakertrvkebk0nvchivais1ljoo7pgq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"

@@ -2,6 +2,7 @@ package com.imfibit.activitytracker.database.repository.tracked_activity
 
 import androidx.compose.ui.res.stringResource
 import androidx.room.withTransaction
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.ComposeString
 import com.imfibit.activitytracker.core.sumByLong
@@ -160,9 +161,14 @@ class RepositoryTrackedActivity constructor(
 
     suspend fun commitLiveSession(activityId: Long) = AppDatabase.db.withTransaction {
         val activity = activityDAO.getById(activityId)
-        val session = TrackedActivityTime(0, activityId, activity.inSessionSince!!, LocalDateTime.now())
-        sessionDAO.insert(session)
-        activityDAO.update(activity.copy(inSessionSince = null))
+
+        if (activity.inSessionSince != null){
+            val session = TrackedActivityTime(0, activityId, activity.inSessionSince!!, LocalDateTime.now())
+            sessionDAO.insert(session)
+            activityDAO.update(activity.copy(inSessionSince = null))
+        }else
+            FirebaseCrashlytics.getInstance().recordException(IllegalArgumentException("Committing already committed session"))
+
     }
 
 
@@ -172,8 +178,8 @@ class RepositoryTrackedActivity constructor(
     ): List<TrackedActivityRecord> = listOf(
         sessionDAO.getAll(from, to),
         scoreDAO.getAll(from, to),
-        completionDAO.getAll(from, to)
-    ).flatten()
+        completionDAO.getAll(from.toLocalDate(), to.toLocalDate())
+    ).flatten().sortedBy {it.order }
 
 
 

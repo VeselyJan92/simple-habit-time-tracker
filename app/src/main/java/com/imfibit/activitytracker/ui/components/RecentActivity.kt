@@ -68,13 +68,15 @@ fun RecentActivityGrid(weeks: List<Week>, nav: NavController){
         }
 
         for ( (index, week) in weeks.withIndex()){
-            Week(week, nav)
+
 
             val split = week.from.monthValue != week.to.monthValue || week.from.dayOfMonth == 1 || week.to.dayOfMonth == 1
 
             if (weeks.size -1 != index && split){
                 MonthSplitter(month = week.from.month.name)
             }
+
+            Week(week, nav)
 
         }
     }
