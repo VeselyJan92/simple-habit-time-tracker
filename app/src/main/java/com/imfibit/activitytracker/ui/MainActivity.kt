@@ -23,6 +23,7 @@ import com.imfibit.activitytracker.ui.screens.activity.ScreenTrackedActivity
 import com.imfibit.activitytracker.ui.screens.activity_list.ScreenActivities
 import com.imfibit.activitytracker.ui.screens.day_history.ScreenDayRecords
 import com.imfibit.activitytracker.ui.screens.statistics.ScreenStatistics
+import com.imfibit.activitytracker.ui.screens.settings.ScreenSettings
 import com.imfibit.activitytracker.ui.screens.timeline.ScreenTimeline
 import com.imfibit.activitytracker.ui.screens.upcomming.ScreenUpcoming
 import java.time.LocalDate
@@ -96,6 +97,7 @@ fun Router(navControl: NavHostController){
         composable(SCREEN_UPCOMING){ ScreenUpcoming(navControl) }
         composable("timeline"){ ScreenTimeline(navControl) }
 
+        composable("settings"){ ScreenSettings(navControl) }
 
         composable(
                 route ="screen_activity/{activity_id}",

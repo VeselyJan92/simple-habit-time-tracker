@@ -69,7 +69,7 @@ android {
 
     defaultConfig {
         applicationId ="com.imfibit.activitytracker"
-        minSdkVersion(26)
+        minSdkVersion(29)
         targetSdkVersion(30)
         versionCode = 2
         versionName = "1.0"
@@ -123,15 +123,15 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:25.11.0"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
 
-    implementation("androidx.navigation:navigation-compose:1.0.0-alpha04")
+    implementation("androidx.navigation:navigation-compose:1.0.0-alpha05")
 
-    implementation("androidx.compose.compiler:compiler:1.0.0-alpha09")
-    implementation("androidx.compose.ui:ui:1.0.0-alpha09")
-    implementation("androidx.compose.material:material:1.0.0-alpha09")
-    implementation("androidx.compose.runtime:runtime:1.0.0-alpha09")
-    implementation("androidx.compose.runtime:runtime-livedata:1.0.0-alpha09")
-    implementation("androidx.compose.foundation:foundation:1.0.0-alpha09")
-    implementation("androidx.compose.material:material-icons-extended:1.0.0-alpha09")
+    implementation("androidx.compose.compiler:compiler:1.0.0-alpha10")
+    implementation("androidx.compose.ui:ui:1.0.0-alpha10")
+    implementation("androidx.compose.material:material:1.0.0-alpha10")
+    implementation("androidx.compose.runtime:runtime:1.0.0-alpha10")
+    implementation("androidx.compose.runtime:runtime-livedata:1.0.0-alpha10")
+    implementation("androidx.compose.foundation:foundation:1.0.0-alpha10")
+    implementation("androidx.compose.material:material-icons-extended:1.0.0-alpha10")
 
     kapt("androidx.room:room-compiler:2.3.0-alpha04")
     implementation ("androidx.room:room-runtime:2.3.0-alpha04")

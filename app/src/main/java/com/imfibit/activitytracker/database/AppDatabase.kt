@@ -81,10 +81,12 @@ abstract class AppDatabase : RoomDatabase() {
                         runBlocking(Dispatchers.IO) { ReleaseSeeder.seed(db) }
                 }
                 "debug" -> {
-                    db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+                  //  context.getDatabasePath(DB_NAME).delete()
+
+                    db = Room.databaseBuilder(context, AppDatabase::class.java, DB_NAME)
                         .build()
 
-                        runBlocking(Dispatchers.IO) { ReleaseSeeder.seed(db) }
+                      //  runBlocking(Dispatchers.IO) { ReleaseSeeder.seed(db) }
                 }
                 "personal" ->{
                     db = Room.databaseBuilder(context, AppDatabase::class.java, DB_NAME)
