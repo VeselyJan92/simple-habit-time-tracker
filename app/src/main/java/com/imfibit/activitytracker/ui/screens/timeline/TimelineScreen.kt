@@ -1,20 +1,17 @@
 package com.imfibit.activitytracker.ui.screens.timeline
 
 import android.util.Log
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.invalidate
 
 
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -22,7 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-import androidx.compose.ui.viewinterop.viewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.ui.AppBottomNavigation
@@ -47,7 +44,7 @@ fun ScreenTimeline(nav: NavController, scaffoldState: ScaffoldState = rememberSc
         bottomBar = {
             AppBottomNavigation(nav)
         },
-        bodyContent = {
+        content = {
             Body(scaffoldState)
         },
         backgroundColor = Colors.AppBackground,
@@ -81,13 +78,11 @@ private fun Body(scaffoldState: ScaffoldState) {
         Box {
             Box(Modifier.padding(start = 28.dp).width(20.dp). fillMaxHeight().background(Colors.AppAccent))
 
-
-
             LazyColumn(
                 modifier = Modifier.padding(6.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                items(items = items) { item-> TrackedActivityRecord(item.activity, item.record, scaffoldState) }
+                items(items.size) {TrackedActivityRecord(items[it].activity, items[it].record, scaffoldState) }
             }
 
         }

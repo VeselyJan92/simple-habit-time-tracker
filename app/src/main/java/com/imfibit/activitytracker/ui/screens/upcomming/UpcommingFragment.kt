@@ -23,7 +23,7 @@ import com.imfibit.activitytracker.ui.components.TrackerTopAppBar
 fun ScreenUpcoming(navControl: NavHostController) {
     Scaffold(
             topBar = { TrackerTopAppBar("") },
-            bodyContent = {
+            content = {
                 Box(Modifier.fillMaxWidth().fillMaxHeight(), contentAlignment = Alignment.Center) {
                     Text(
                             text = "UPCOMMING FEATURE",

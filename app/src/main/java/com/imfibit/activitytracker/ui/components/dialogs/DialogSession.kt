@@ -1,19 +1,22 @@
 package com.imfibit.activitytracker.ui.components.dialogs
 
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -32,7 +35,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -59,7 +61,7 @@ inline fun DialogSession(
 
     val valid = from.value < to.value && seconds <= 60*60*24
 
-    val context = AmbientContext.current
+    val context = LocalContext.current
 
     DialogBaseHeader(title = stringResource(id = if (modify) R.string.dialog_session_title_edit else R.string.dialog_session_title_add))
 
@@ -78,10 +80,13 @@ inline fun DialogSession(
         }
 
         LabeledColumn(text = "") {
+            val interaction = remember { MutableInteractionSource() }
+
             Box(
                 modifier = Modifier.height(30.dp).width(60.dp)
                     .background(Colors.AppAccent, RoundedCornerShape(50))
                     .clickable(
+                        interactionSource = interaction,
                         onClick = {
                             DialogTimePicker(
                                 time = LocalTime.of(0 , 0),

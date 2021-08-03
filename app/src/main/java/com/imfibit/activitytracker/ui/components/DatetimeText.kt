@@ -4,6 +4,8 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -14,10 +16,11 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -29,11 +32,15 @@ import java.time.format.DateTimeFormatter
 fun DatetimeEditor(
     datetime: MutableState<LocalDateTime>
 ){
-    val context = AmbientContext.current
+    val context = LocalContext.current
 
     Row(Modifier.padding(start = 8.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+
+        val isDate = remember { MutableInteractionSource() }
+
         Text(datetime.value.format(DateTimeFormatter.ofPattern("dd. MM.")),
             Modifier.clickable(
+                interactionSource = isDate,
                 onClick = {
                     DatePickerDialog(context,
                         0,
@@ -47,11 +54,14 @@ fun DatetimeEditor(
 
         Box(Modifier.padding(start = 8.dp, end = 8.dp).size(5.dp).background(Color.Black, RoundedCornerShape(50)))
 
+        val isTime = remember { MutableInteractionSource() }
+
         Text(
             textAlign = TextAlign.Center,
             text = datetime.value.format(DateTimeFormatter.ofPattern("HH:mm")),
             style = TextStyle(fontWeight = FontWeight.Bold),
             modifier = Modifier.clickable(
+                interactionSource = isTime,
                 onClick = {
                     TimePickerDialog(context,
                         0,

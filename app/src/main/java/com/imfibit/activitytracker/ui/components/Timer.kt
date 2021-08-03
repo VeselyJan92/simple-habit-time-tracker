@@ -1,12 +1,12 @@
 package com.imfibit.activitytracker.ui.components
 
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
-import android.widget.Space
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.Timer
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -26,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.TimeUtils
-import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.components.dialogs.BaseDialog
 import com.imfibit.activitytracker.ui.components.dialogs.DialogBaseHeader
 import com.imfibit.activitytracker.ui.components.dialogs.DialogButtons
@@ -34,9 +32,6 @@ import com.imfibit.activitytracker.ui.components.layout.LabeledColumn
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-import java.util.*
 
 @Composable
 fun Timer(
@@ -67,7 +62,7 @@ fun Timer(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Modifier.align(Alignment.CenterVertically).padding(start = 5.dp).size(20.dp)
-        Icon(Icons.Filled.Timer)
+        Icon(Icons.Filled.Timer, contentDescription = null)
 
 
         Text(

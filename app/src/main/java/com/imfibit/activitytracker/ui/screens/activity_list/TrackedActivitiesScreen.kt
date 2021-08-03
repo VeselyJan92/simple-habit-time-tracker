@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.viewinterop.viewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
@@ -19,7 +19,6 @@ import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.TrackerTopAppBar
 import com.imfibit.activitytracker.ui.components.dialogs.DialogAddActivity
 
-@ExperimentalLayout
 @Composable
 fun ScreenActivities(
     navController: NavHostController,
@@ -34,10 +33,11 @@ fun ScreenActivities(
             topBar = { TrackerTopAppBar(stringResource(id = R.string.screen_title_activities)) },
             floatingActionButton = {
                 FloatingActionButton(onClick = { display.value = true }) {
-                    Icon(Icons.Filled.Add)
+                    Icon(Icons.Filled.Add, "todo")
+
                 }
             },
-            bodyContent = {
+            content = {
                 TrackedActivitiesList(navController, vm)
             },
             bottomBar = {

@@ -7,9 +7,11 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -19,7 +21,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.RowScope.Companion.weight
 import androidx.compose.ui.unit.sp
 import com.imfibit.activitytracker.core.App
 import com.imfibit.activitytracker.core.ComposeString
@@ -30,6 +31,7 @@ import com.imfibit.activitytracker.database.AppDatabase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
+import kotlin.random.Random
 
 
 val labelHeight = 13.dp
@@ -75,6 +77,7 @@ sealed class MetricWidgetData(
 }
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BaseMetricBlock(
     metric: String,
@@ -87,18 +90,21 @@ fun BaseMetricBlock(
     onLongClick: (() -> Unit)? = null,
 ){
     val clickable = if(onClick != null)
-        Modifier.clickable(onClick = onClick, onLongClick = onLongClick)
+        Modifier.combinedClickable(onClick = onClick, onLongClick = onLongClick)
     else
         Modifier
 
     val width = if (width == 0.dp)
-        Modifier.weight(1f).height(metricHeight)
+        //Modifier.weight(1f).height(metricHeight)
+        Modifier
+            .fillMaxWidth()
+            .height(metricHeight)
     else
         Modifier.size(width, metricHeight)
 
 
     Box(
-        modifier =  Modifier
+        modifier = Modifier
             .padding(top = if (labelOffset) labelHeight else 0.dp)
             .then(width)
             .background(color, RoundedCornerShape(10.dp))
@@ -115,6 +121,8 @@ fun BaseMetricBlock(
 }
 
 
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LabeledMetricBlock(
     metric: String,
@@ -127,18 +135,22 @@ fun LabeledMetricBlock(
 ){
 
     val clickable = if(onLongClick != null)
-        Modifier.clickable(onClick = {}, onLongClick = onLongClick)
+        Modifier.combinedClickable(onClick = {}, onLongClick = onLongClick, )
     else
         Modifier
 
     val width = if (width == 0.dp){
-        Modifier.weight(1f)
+       // Modifier.weight(1f)
+        Modifier.fillMaxWidth(1f)
     }else{
         Modifier.width(width)
     }
 
     Column(
-        modifier = Modifier.then(width).height(metricHeight + labelHeight).then(clickable),
+        modifier = Modifier
+            .then(width)
+            .height(metricHeight + labelHeight)
+            .then(clickable),
 
         horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = label, style = TextStyle(fontSize = 10.sp), modifier = Modifier.height(labelHeight))
@@ -199,7 +211,8 @@ fun MetricBlock(
                 activityId = editable.activityId
             )
             TrackedActivity.Type.CHECKED -> {
-                GlobalScope.launch {
+                // Bit hacky here
+                LaunchedEffect(Random.nextFloat()) {
                     AppDatabase.activityRep.completionDAO.toggle(editable.activityId, editable.from)
                 }
                 requestEdit.value = false

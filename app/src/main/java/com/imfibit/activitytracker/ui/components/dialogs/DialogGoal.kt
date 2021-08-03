@@ -35,18 +35,22 @@ inline fun DialogGoal(
             }
 
             TrackedActivity.Type.SCORE -> {
+                val state = remember { mutableStateOf(goal.toInt()) }
+
                 NumberSelector(
                         label = stringResource(id = R.string.score),
-                        number = mutableStateOf(goal.toInt())
+                        number = state
                 ) {
                     if (goal in 1..10_000)
                         goal = it.toLong()
                 }
             }
             TrackedActivity.Type.CHECKED ->{
+                val state = remember { mutableStateOf(goal.toInt()) }
+
                 NumberSelector(
                     label = stringResource(id = R.string.repetitions),
-                    number = mutableStateOf(goal.toInt())
+                    number = state
                 ){
                     when(activity.goal.range){
                         TimeRange.DAILY -> throw IllegalStateException()

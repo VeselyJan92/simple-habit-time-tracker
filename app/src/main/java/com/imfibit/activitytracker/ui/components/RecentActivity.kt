@@ -1,6 +1,5 @@
 package com.imfibit.activitytracker.ui.components
 
-import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,19 +17,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.os.bundleOf
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import java.time.DayOfWeek
-import java.time.LocalDateTime
-import java.util.*
-import com.imfibit.activitytracker.R
-import com.imfibit.activitytracker.database.entities.TrackedActivity
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-
 import androidx.navigation.compose.*
-
+import com.imfibit.activitytracker.database.entities.TrackedActivity
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 
 data class Week(
@@ -62,7 +56,7 @@ fun RecentActivityGrid(weeks: List<Week>, nav: NavController){
             }
 
             Box(Modifier.size(40.dp, 30.dp), contentAlignment = Alignment.Center){
-                Icon(imageVector = Icons.Filled.Functions)
+                Icon(imageVector = Icons.Filled.Functions, contentDescription = null)
             }
 
         }

@@ -3,7 +3,6 @@ package com.imfibit.activitytracker.ui.screens.day_history
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
@@ -15,7 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.viewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.ui.components.Colors
@@ -38,7 +37,7 @@ fun ScreenDayRecords(navControl: NavHostController, recordId: Long, date: LocalD
 
     Scaffold(
         topBar = { TrackerTopAppBar(stringResource(id = R.string.screen_title_record_history)) },
-        bodyContent = {
+        content = {
             ScreenBody(vm, scaffoldState)
         },
         snackbarHost = {
@@ -78,8 +77,9 @@ private fun ScreenBody(vm: DayRecordsVM, scaffoldState: ScaffoldState) {
             LazyColumn(
                 modifier = Modifier.padding(horizontal = 8.dp)
             ) {
-                items( items.value){
-                    TrackedActivityRecord(it.activity,  it.record, scaffoldState)
+                items( items.value.size){
+                    val item = items.value[it]
+                    TrackedActivityRecord(item.activity,  item.record, scaffoldState)
                 }
             }
         }

@@ -1,6 +1,7 @@
 package com.imfibit.activitytracker.ui.components.dialogs
 
 import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -103,6 +105,8 @@ private fun TrackedActivities(
     name: String,
     clickable: () -> Unit
 ){
+    val interaction = remember { MutableInteractionSource() }
+
     Column(
         modifier = Modifier
             .padding(8.dp)
@@ -110,7 +114,7 @@ private fun TrackedActivities(
             .zIndex(1f)
             .shadow(2.dp, shape = RoundedCornerShape(10.dp))
             .background(Colors.ChipGray, RoundedCornerShape(10.dp))
-            .clickable(onClick = clickable, indication = rememberRipple())
+            .clickable(interactionSource = interaction, onClick = clickable, indication = rememberRipple())
             .padding(8.dp)
 
     ){
@@ -119,7 +123,8 @@ private fun TrackedActivities(
 
             Icon(
                 modifier = Modifier.padding(end = 16.dp),
-                imageVector = icon
+                imageVector = icon,
+                contentDescription = ""
             )
 
             Column {

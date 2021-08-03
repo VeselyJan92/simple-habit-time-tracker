@@ -36,8 +36,8 @@ fun TrackedActivityRecord(
 
     val dismissState = rememberDismissState()
 
-    if (dismissState.value != DismissValue.Default){
-        LaunchedEffect(subject = record){
+    if (dismissState.currentValue != DismissValue.Default){
+        LaunchedEffect(record){
 
             val deleted = scaffoldState.snackbarHostState.showSnackbar("Record deleted", "Undo")
 

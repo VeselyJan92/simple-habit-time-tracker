@@ -1,22 +1,24 @@
 package com.imfibit.activitytracker.ui.screens.statistics
 
 import android.app.DatePickerDialog
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -24,16 +26,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.sumByLong
+import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.entities.TrackedActivity
-import com.imfibit.activitytracker.ui.components.*
-import com.imfibit.activitytracker.ui.components.Colors
-import com.imfibit.activitytracker.ui.screens.activity_list.Goal
-import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.ui.AppBottomNavigation
+import com.imfibit.activitytracker.ui.components.BaseMetricBlock
+import com.imfibit.activitytracker.ui.components.Colors
+import com.imfibit.activitytracker.ui.components.TrackerTopAppBar
+import com.imfibit.activitytracker.ui.screens.activity_list.Goal
 import java.time.LocalDate
 
 
@@ -41,24 +46,29 @@ import java.time.LocalDate
 fun ScreenStatistics(navController: NavHostController){
     Scaffold(
         topBar = { TrackerTopAppBar("Statistika") },
-        bodyContent = { ScreenBody() },
+        content = { ScreenBody() },
         bottomBar = { AppBottomNavigation(navController) },
         backgroundColor = Colors.AppBackground
     )
 }
 
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 private fun ScreenBody() = Column {
-    val clock = AmbientAnimationClock.current
 
-    val state = remember { StatisticsState(LocalDate.now(), TimeRange.DAILY, clock) }
+
+    val state = remember { StatisticsState(LocalDate.now(), TimeRange.DAILY) }
+
+
 
     Navigation(state)
 
-    Pager(state = state.pager, modifier = Modifier.padding(bottom = 8.dp)) {
 
-        val interval = state.getRange(this.page)
+    HorizontalPager(state = state.pager, modifier = Modifier.padding(bottom = 8.dp)){
+
+
+        val interval = state.getRange(this.currentPage)
 
         val data = remember(state.range, state.origin) {
             mutableStateOf(mapOf<TrackedActivity.Type, List<ActivityWithMetric>>())
@@ -86,7 +96,7 @@ private fun ScreenBody() = Column {
                 }
             }
         }else{
-            ScrollableColumn(Modifier) {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
                 BlockTimeTracked(data.value[TrackedActivity.Type.TIME], state)
                 BlockScores(data.value[TrackedActivity.Type.SCORE], state)
                 BlockCompleted(data.value[TrackedActivity.Type.CHECKED], state)
@@ -128,7 +138,7 @@ private fun Navigation(state: StatisticsState) {
                 
                 Spacer(modifier = Modifier.width(50.dp))
 
-                val context = AmbientContext.current
+                val context = LocalContext.current
 
                 Box(
                     modifier = Modifier
@@ -148,7 +158,7 @@ private fun Navigation(state: StatisticsState) {
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(Icons.Default.CalendarToday)
+                    Icon(Icons.Default.CalendarToday, contentDescription = null)
                 }
             }
 
@@ -164,10 +174,7 @@ private fun NavigationTitle(state: StatisticsState){
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(Icons.Default.ArrowLeft.copy(
-            defaultHeight = 30.dp,
-            defaultWidth = 30.dp
-        ))
+        Icon(Icons.Default.ArrowLeft, contentDescription = null)
 
         Spacer(Modifier.weight(1f))
 
@@ -179,7 +186,7 @@ private fun NavigationTitle(state: StatisticsState){
 
         Spacer(Modifier.weight(1f))
 
-        Icon(Icons.Default.ArrowRight.copy(defaultHeight = 30.dp, defaultWidth = 30.dp))
+        Icon(Icons.Default.ArrowRight, contentDescription = null)
     }
 }
 
@@ -188,7 +195,7 @@ private fun Header(title: String, icon: ImageVector, last: @Composable (() -> Un
     Row(modifier = Modifier.padding(bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
 
         Modifier.padding(end = 16.dp)
-        Icon(icon, Modifier.padding(end = 8.dp))
+        Icon(icon, modifier = Modifier.padding(end = 8.dp), contentDescription=null)
 
         Text(
             text = title,

@@ -22,7 +22,7 @@ inline fun DialogTempPriority(
 
         DialogBaseHeader(title = stringResource(id = R.string.dialog_priority_title))
 
-        val state = mutableStateOf(activity.position)
+        val state = remember { mutableStateOf(activity.position) }
 
         NumberSelector(
                 label = stringResource(id = R.string.priority),

@@ -1,15 +1,14 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
 import android.content.Context
-import android.inputmethodservice.Keyboard
 import android.os.VibrationEffect
 import android.os.Vibrator
-import android.util.Log
-import androidx.navigation.compose.*
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Surface
@@ -21,8 +20,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.VerticalAlignmentLine
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -32,17 +30,12 @@ import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.core.App
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivity.Type
-import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
+import com.imfibit.activitytracker.ui.SCREEN_ACTIVITY
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.MetricBlock
 import com.imfibit.activitytracker.ui.components.MetricWidgetData
-import com.imfibit.activitytracker.ui.components.dialogs.DialogSession
 import com.imfibit.activitytracker.ui.components.dialogs.DialogScore
-import com.imfibit.activitytracker.database.AppDatabase
-import com.imfibit.activitytracker.ui.SCREEN_ACTIVITY
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import java.time.LocalDate
+import com.imfibit.activitytracker.ui.components.dialogs.DialogSession
 import java.time.LocalDateTime
 
 
@@ -66,8 +59,8 @@ fun TrackedActivitiesList(
 
 
     LazyColumn(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        items(items) {
-            TrackedActivity(vm = vm, item = it, nav = nav)
+        items(items.size) {
+            TrackedActivity(vm = vm, item = items[it], nav = nav)
         }
 
         item {
@@ -157,6 +150,7 @@ private fun TrackedActivity(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun RowScope.ActionButton(
     vm: ActivitiesViewModel,
@@ -164,13 +158,13 @@ private fun RowScope.ActionButton(
     activity: TrackedActivity,
     requestEdit: MutableState<Boolean>
 ) {
-    val context = AmbientContext.current
+    val context = LocalContext.current
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier.align(Alignment.CenterVertically)
             .padding(end = 8.dp, start = 8.dp)
-            .clickable(
+            .combinedClickable(
                 onClick = { vm.activityTriggered(activity, context) },
                 onLongClick = {
                     val viber = App.context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -189,6 +183,7 @@ private fun RowScope.ActionButton(
         }
 
         Icon(
+            contentDescription = null,
             imageVector = icon,
             modifier = Modifier
                 .size(34.dp)
@@ -202,7 +197,7 @@ private fun RowScope.ActionButton(
 fun Goal(label: String) {
     Row(Modifier.size(70.dp, 20.dp).padding(end = 8.dp).background(Colors.ChipGray, RoundedCornerShape(50))) {
         Modifier.align(Alignment.CenterVertically).padding(start = 5.dp).size(15.dp)
-        Icon(Icons.Filled.Flag)
+        Icon(Icons.Filled.Flag, contentDescription = null,)
 
         Text(
             label,

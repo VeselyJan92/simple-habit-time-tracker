@@ -1,9 +1,7 @@
 package com.imfibit.activitytracker.ui.screens.activity
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -25,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.viewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
@@ -60,6 +58,7 @@ fun ScreenTrackedActivity(nav: NavHostController, activityId: Long) {
         topBar = {
             TrackerTopAppBar(stringResource(id = R.string.screen_title_activity)) {
                 Icon(
+                    contentDescription = null,
                     imageVector = Icons.Default.Delete,
                     tint = Color.White,
                     modifier = Modifier.clickable(onClick = {
@@ -83,8 +82,8 @@ fun ScreenTrackedActivity(nav: NavHostController, activityId: Long) {
             }
 
         },
-        bodyContent = {
-            ScrollableColumn {
+        content = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
                 ScreenBody(nav, state)
 
                 Spacer(modifier = Modifier.height(100.dp))
@@ -118,7 +117,10 @@ private fun ActivitySettings(state: TrackedActivityState?) {
     Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp)) {
 
 
-        Column(Modifier.padding(8.dp).fillMaxWidth()) {
+        Column(
+            Modifier
+                .padding(8.dp)
+                .fillMaxWidth()) {
             ActivityName(state?.activity)
 
             Row(Modifier.padding(top = 8.dp)) {
@@ -153,18 +155,23 @@ private fun ActivityName(activity: TrackedActivity?) {
             }
     )
 
+    val source = remember { MutableInteractionSource() }
+
     Box(
             modifier = Modifier
-                    .background(Colors.ChipGray, shape = RoundedCornerShape(50))
-                    .height(30.dp)
-                    .clickable(
-                            onClick = { display.value = true },
-                            indication = rememberRipple()
-                    ),
+                .background(Colors.ChipGray, shape = RoundedCornerShape(50))
+                .height(30.dp)
+                .clickable(
+                    onClick = { display.value = true },
+                    indication = rememberRipple(),
+                    interactionSource = source
+                ),
             contentAlignment = Alignment.Center
     ) {
         Text(
-                modifier = Modifier.padding(start = 8.dp, end = 8.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(start = 8.dp, end = 8.dp)
+                    .fillMaxWidth(),
                 text = activity?.name ?: "",
                 style = TextStyle(
                         fontSize = 16.sp,
@@ -189,22 +196,33 @@ private inline fun Goal(activity: TrackedActivity?) {
             .padding(end = 8.dp)
             .background(Colors.ChipGray, RoundedCornerShape(50))
             .clickable(
-                    onClick = {
-                        if (activity == null)
-                            return@clickable
+                onClick = {
+                    if (activity == null)
+                        return@clickable
 
-                        if (activity.goal.range != TimeRange.DAILY || activity.type != TrackedActivity.Type.CHECKED) display.value = true
-                    }
+                    if (activity.goal.range != TimeRange.DAILY || activity.type != TrackedActivity.Type.CHECKED) display.value =
+                        true
+                }
             )
 
 
     ) {
 
-        Icon(Icons.Filled.Flag, Modifier.align(Alignment.CenterVertically).padding(start = 5.dp).size(15.dp))
+        Icon(Icons.Filled.Flag,
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .padding(start = 5.dp)
+                .size(15.dp),
+
+            contentDescription = null
+        )
 
         Text(
             activity?.formatGoal() ?: "-",
-            Modifier.weight(1f).align(Alignment.CenterVertically).padding(end = 8.dp),
+            Modifier
+                .weight(1f)
+                .align(Alignment.CenterVertically)
+                .padding(end = 8.dp),
             textAlign = TextAlign.Center,
             style = TextStyle(
                     fontSize = 10.sp
@@ -238,11 +256,19 @@ private fun ViewRange(activity: TrackedActivity?) {
             .background(Colors.ChipGray, RoundedCornerShape(50))
             .clickable(onClick = { display.value = true })
     ) {
-        Icon(Icons.Filled.DateRange, Modifier.align(Alignment.CenterVertically).padding(start = 5.dp).size(15.dp))
+        Icon(Icons.Filled.DateRange,
+            contentDescription = null,
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .padding(start = 5.dp)
+                .size(15.dp))
 
         Text(
             activity?.goal?.range?.label?.let { stringResource(id = it) } ?: "-",
-            Modifier.weight(1f).align(Alignment.CenterVertically).padding(end = 8.dp),
+            Modifier
+                .weight(1f)
+                .align(Alignment.CenterVertically)
+                .padding(end = 8.dp),
             textAlign = TextAlign.Center,
             style = TextStyle(
                     fontSize = 10.sp
@@ -264,15 +290,23 @@ private fun Priority(activity: TrackedActivity?) {
             .padding(end = 8.dp)
             .background(Colors.ChipGray, RoundedCornerShape(50))
             .clickable(
-                    onClick = { display.value = true }
+                onClick = { display.value = true }
             )
     ) {
 
-        Icon(Icons.Filled.UnfoldMore, Modifier.align(Alignment.CenterVertically).padding(start = 5.dp).size(15.dp))
+        Icon(Icons.Filled.UnfoldMore,
+            contentDescription = null,
+            Modifier
+                .align(Alignment.CenterVertically)
+                .padding(start = 5.dp)
+                .size(15.dp))
 
         Text(
                 activity?.position?.toString() ?: "-",
-                Modifier.weight(1f).align(Alignment.CenterVertically).padding(end = 8.dp),
+            Modifier
+                .weight(1f)
+                .align(Alignment.CenterVertically)
+                .padding(end = 8.dp),
                 textAlign = TextAlign.Center,
                 style = TextStyle(
                         fontSize = 10.sp
@@ -284,12 +318,24 @@ private fun Priority(activity: TrackedActivity?) {
 
 @Composable
 private fun Remainder(label: String) {
-    Row(Modifier.size(80.dp, 30.dp).padding(end = 8.dp).background(Colors.ChipGray, RoundedCornerShape(50))) {
-        Icon(Icons.Filled.Timer, Modifier.align(Alignment.CenterVertically).padding(start = 5.dp).size(15.dp))
+    Row(
+        Modifier
+            .size(80.dp, 30.dp)
+            .padding(end = 8.dp)
+            .background(Colors.ChipGray, RoundedCornerShape(50))) {
+        Icon(Icons.Filled.Timer,
+            contentDescription = null,
+            Modifier
+                .align(Alignment.CenterVertically)
+                .padding(start = 5.dp)
+                .size(15.dp))
 
         Text(
             label,
-            Modifier.weight(1f).align(Alignment.CenterVertically).padding(end = 8.dp),
+            Modifier
+                .weight(1f)
+                .align(Alignment.CenterVertically)
+                .padding(end = 8.dp),
             textAlign = TextAlign.Center,
             style = TextStyle(
                     fontSize = 10.sp
@@ -303,7 +349,10 @@ private fun Remainder(label: String) {
 private fun RecentActivity(nav: NavController, state: TrackedActivityState?) {
     Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp)) {
 
-        Column(Modifier.padding(8.dp).background(Color.White)) {
+        Column(
+            Modifier
+                .padding(8.dp)
+                .background(Color.White)) {
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(

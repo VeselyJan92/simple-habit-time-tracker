@@ -2,8 +2,8 @@ package com.imfibit.activitytracker.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AssignmentTurnedIn
@@ -12,7 +12,6 @@ import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -62,15 +61,15 @@ sealed class Screen(val route: String, @StringRes val resourceId: Int, val icon:
 fun AppBottomNavigation(navController: NavController) {
     BottomNavigation {
 
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE)
+        val currentRoute = navController.currentBackStackEntry?.destination?.route
 
         listOf(Screen.Statistics, Screen.Activities, Screen.Upcoming).forEach { screen ->
             BottomNavigationItem(
-                    icon = { Icon(screen.icon) },
+                    icon = { Icon(screen.icon, "todo") },
+
                     label = { Text(stringResource(id = screen.resourceId)) },
                     selected = currentRoute == screen.route,
-                    alwaysShowLabels = true,
+                    alwaysShowLabel = true,
                     onClick = {
                         // This if check gives us a "singleTop" behavior where we do not create a
                         // second instance of the composable if we are already on that destination
@@ -83,10 +82,6 @@ fun AppBottomNavigation(navController: NavController) {
     }
 }
 
-
-
-
-@OptIn(ExperimentalLayout::class)
 @Composable
 fun Router(navControl: NavHostController){
 

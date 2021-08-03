@@ -47,7 +47,7 @@ fun NumberSelector(
                 .background(Colors.ChipGray, RoundedCornerShape(50)),
 
             ) {
-            Icon(Icons.Filled.MinusOne)
+            Icon(Icons.Filled.MinusOne, contentDescription = null)
         }
 
 
@@ -96,7 +96,7 @@ fun NumberSelector(
                 },
                 modifier = Modifier.height(30.dp)
             ) {
-                Icon(Icons.Filled.PlusOne)
+                Icon(Icons.Filled.PlusOne, contentDescription = null)
             }
         }
 
