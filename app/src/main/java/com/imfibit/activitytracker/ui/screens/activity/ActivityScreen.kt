@@ -9,11 +9,8 @@ import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,10 +31,11 @@ import com.imfibit.activitytracker.ui.components.*
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.dialogs.DialogGoal
 import com.imfibit.activitytracker.ui.components.dialogs.DialogInputText
-import com.imfibit.activitytracker.ui.components.dialogs.DialogTempPriority
 import com.imfibit.activitytracker.ui.components.dialogs.DialogTimeRange
 import com.imfibit.activitytracker.database.AppDatabase
+import com.imfibit.activitytracker.database.entities.PresetTimer
 import com.imfibit.activitytracker.ui.AppBottomNavigation
+import com.imfibit.activitytracker.ui.components.dialogs.DialogTimers
 import kotlinx.coroutines.*
 
 
@@ -108,6 +106,8 @@ fun ScreenBody(nav: NavController, state: TrackedActivityState?) {
 
         RecentActivity(nav, state)
 
+        SetTimer(state = state)
+
     }
 }
 
@@ -128,9 +128,7 @@ private fun ActivitySettings(state: TrackedActivityState?) {
 
                 ViewRange(state?.activity)
 
-                Priority(state?.activity)
-
-                //Remainder("po - pa 18:00")
+                SetTimer(state)
             }
 
         }
@@ -279,50 +277,22 @@ private fun ViewRange(activity: TrackedActivity?) {
 }
 
 @Composable
-private fun Priority(activity: TrackedActivity?) {
-    val display = remember { mutableStateOf(false) }
+private fun SetTimer(state: TrackedActivityState?) {
 
-    if (activity != null) DialogTempPriority(display = display, activity = activity)
+    var display = remember { mutableStateOf(false) }
 
-    Row(
-        modifier = Modifier
-            .size(80.dp, 30.dp)
-            .padding(end = 8.dp)
-            .background(Colors.ChipGray, RoundedCornerShape(50))
-            .clickable(
-                onClick = { display.value = true }
-            )
-    ) {
+    if (state?.activity != null)
+        DialogTimers(activity = state.activity, timers = state.timers, display = display)
 
-        Icon(Icons.Filled.UnfoldMore,
-            contentDescription = null,
-            Modifier
-                .align(Alignment.CenterVertically)
-                .padding(start = 5.dp)
-                .size(15.dp))
 
-        Text(
-                activity?.position?.toString() ?: "-",
-            Modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically)
-                .padding(end = 8.dp),
-                textAlign = TextAlign.Center,
-                style = TextStyle(
-                        fontSize = 10.sp
-                )
-        )
-    }
-
-}
-
-@Composable
-private fun Remainder(label: String) {
     Row(
         Modifier
             .size(80.dp, 30.dp)
             .padding(end = 8.dp)
-            .background(Colors.ChipGray, RoundedCornerShape(50))) {
+            .background(Colors.ChipGray, RoundedCornerShape(50))
+            .clickable(onClick = {display.value = true})
+
+    ) {
         Icon(Icons.Filled.Timer,
             contentDescription = null,
             Modifier
@@ -331,7 +301,7 @@ private fun Remainder(label: String) {
                 .size(15.dp))
 
         Text(
-            label,
+            "Timer",
             Modifier
                 .weight(1f)
                 .align(Alignment.CenterVertically)

@@ -56,7 +56,11 @@ abstract class DAOTrackedActivity : BaseEditableDAO<TrackedActivity> {
     """)
     abstract fun liveActive(): LiveData<List<TrackedActivity>>
 
-
-
+    @Transaction
+    override suspend fun updateAll(vararg entity: TrackedActivity) {
+       entity.forEach {
+           update(it)
+       }
+    }
 
 }

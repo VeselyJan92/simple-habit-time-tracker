@@ -27,6 +27,7 @@ class TrackedActivityVMFactory(private val id: Long) : ViewModelProvider.Factory
 @Immutable
 data class TrackedActivityState(
         val activity: TrackedActivity,
+        val timers: List<PresetTimer>,
         val recent: List<Week>,
         val months: List<MetricWidgetData>,
         val metricToday: ComposeString,
@@ -55,7 +56,10 @@ class TrackedActivityViewModel(val id: Long) : ViewModel() {
     }
 
     private fun refresh() = viewModelScope.launch(Dispatchers.IO) {
-        val activity:TrackedActivity = rep.activityDAO.getById(id)
+        val activity:TrackedActivity? = rep.activityDAO.getById(id)
+
+        if(activity == null)
+            return@launch
 
         val now = LocalDate.now()
         val today = LocalDate.now()
@@ -108,8 +112,11 @@ class TrackedActivityViewModel(val id: Long) : ViewModel() {
             )
         }
 
+
+        val timers = rep.timers.getAll(activity.id)
+
         val state = TrackedActivityState(
-                activity, recent, months, metricToday, metricWeek, metricMonth, metric30Days
+                activity, timers, recent, months, metricToday, metricWeek, metricMonth, metric30Days
         )
 
         screenState.postValue(state)

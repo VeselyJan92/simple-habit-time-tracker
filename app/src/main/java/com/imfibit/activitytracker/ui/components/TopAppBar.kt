@@ -3,6 +3,7 @@ package com.imfibit.activitytracker.ui.components
 import androidx.compose.material.Text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -21,7 +22,7 @@ fun TrackerTopAppBar(title: String, actions: @Composable() (() -> Unit)? = null)
         )
 
         Row(
-            modifier =   Modifier.align(Alignment.CenterVertically).padding(end = 8.dp),
+            modifier =   Modifier.align(Alignment.CenterVertically).padding(end = 8.dp).fillMaxWidth(),
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {

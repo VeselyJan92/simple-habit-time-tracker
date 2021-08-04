@@ -10,16 +10,17 @@ import com.imfibit.activitytracker.core.activityInvalidationTracker
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.database.AppDatabase
+import io.burnoutcrew.reorderable.move
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 class ActivitiesViewModel : ViewModel() {
 
     val rep = RepositoryTrackedActivity()
 
-    val activities = MutableLiveData<List<TrackedActivityWithMetric>>()
+    val activities = MutableLiveData<MutableList<TrackedActivityWithMetric>>()
 
     val live = rep.activityDAO.liveActive()
 
@@ -37,7 +38,7 @@ class ActivitiesViewModel : ViewModel() {
     fun refresh() = viewModelScope.launch {
         val activities =rep.getActivitiesOverview(5)
         Log.e("VM", "activities: $activities")
-        this@ActivitiesViewModel.activities.postValue(activities)
+        this@ActivitiesViewModel.activities.postValue(activities.toMutableList())
     }
 
     override fun onCleared() {
@@ -61,6 +62,15 @@ class ActivitiesViewModel : ViewModel() {
             TrackedActivity.Type.TIME -> startSession(context, activity)
             TrackedActivity.Type.SCORE -> rep.scoreDAO.commitScore(activity.id, LocalDateTime.now(), 1)
             TrackedActivity.Type.CHECKED -> rep.completionDAO.toggle(activity.id, LocalDateTime.now())
+        }
+    }
+
+    fun move(from: Int, to: Int, items: List<TrackedActivityWithMetric>){
+        viewModelScope.launch(Dispatchers.IO) {
+            val reordered = items.mapIndexed { index, item -> item.activity.copy(position = index) }.toMutableList().apply { move(from, to)}
+
+            rep.activityDAO.updateAll(*reordered.toTypedArray())
+
         }
     }
 

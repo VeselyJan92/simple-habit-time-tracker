@@ -2,10 +2,7 @@ package com.imfibit.activitytracker.database
 
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
-import com.imfibit.activitytracker.database.entities.TrackedActivity
-import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
-import com.imfibit.activitytracker.database.entities.TrackedActivityScore
-import com.imfibit.activitytracker.database.entities.TrackedActivityTime
+import com.imfibit.activitytracker.database.entities.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -36,6 +33,12 @@ object ReleaseSeeder {
                 goal = TrackedActivityGoal(0, TimeRange.WEEKLY)
             )
         )
+
+
+        db.presetTimersDAO.insert(PresetTimer(0,activityId, 60, 0))
+        db.presetTimersDAO.insert(PresetTimer(0,activityId, 120, 0))
+        db.presetTimersDAO.insert(PresetTimer(0,activityId, 60*30, 0))
+
 
         db.sessionDAO.insert(
             TrackedActivityTime(

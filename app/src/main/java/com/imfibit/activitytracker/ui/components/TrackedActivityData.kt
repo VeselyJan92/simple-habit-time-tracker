@@ -1,13 +1,19 @@
 package com.imfibit.activitytracker.ui.components
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -36,7 +42,8 @@ fun TrackedActivityRecord(
 
     val dismissState = rememberDismissState()
 
-    if (dismissState.currentValue != DismissValue.Default){
+
+    if (dismissState.isDismissed(DismissDirection.EndToStart)){
         LaunchedEffect(record){
 
             val deleted = scaffoldState.snackbarHostState.showSnackbar("Record deleted", "Undo")
@@ -47,12 +54,11 @@ fun TrackedActivityRecord(
             }else
                 dismissState.reset()
         }
-
     }
 
     SwipeToDismiss(
         state = dismissState,
-        background = {},
+        background = {}
     ) {
         Record(activity = activity, record = record)
     }

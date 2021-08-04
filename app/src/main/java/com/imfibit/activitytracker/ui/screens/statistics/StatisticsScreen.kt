@@ -57,18 +57,14 @@ fun ScreenStatistics(navController: NavHostController){
 @Composable
 private fun ScreenBody() = Column {
 
-
     val state = remember { StatisticsState(LocalDate.now(), TimeRange.DAILY) }
-
-
 
     Navigation(state)
 
+    HorizontalPager(state = state.pager, modifier = Modifier.padding(bottom = 8.dp).fillMaxHeight(), verticalAlignment = Alignment.Top){  page ->
 
-    HorizontalPager(state = state.pager, modifier = Modifier.padding(bottom = 8.dp)){
 
-
-        val interval = state.getRange(this.currentPage)
+        val interval = state.getRange(page)
 
         val data = remember(state.range, state.origin) {
             mutableStateOf(mapOf<TrackedActivity.Type, List<ActivityWithMetric>>())
@@ -169,6 +165,7 @@ private fun Navigation(state: StatisticsState) {
     }
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 private fun NavigationTitle(state: StatisticsState){
     Row(
@@ -179,7 +176,7 @@ private fun NavigationTitle(state: StatisticsState){
         Spacer(Modifier.weight(1f))
 
         Text(
-            text = state.range.getDateLabel(state.date),
+            text = state.range.getDateLabel(state.getRange(state.pager.currentPage).first),
             fontSize = 18.sp,
             fontWeight = FontWeight.ExtraBold
         )

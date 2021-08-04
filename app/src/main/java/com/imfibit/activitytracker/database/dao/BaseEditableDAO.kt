@@ -10,6 +10,9 @@ interface BaseEditableDAO<T>{
     @Update
     suspend fun update(item: T)
 
+    @Update
+    suspend fun updateAll(vararg entity: T)
+
     @Delete
     suspend fun delete(item: T)
 

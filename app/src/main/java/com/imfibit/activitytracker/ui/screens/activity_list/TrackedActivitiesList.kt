@@ -3,12 +3,14 @@ package com.imfibit.activitytracker.ui.screens.activity_list
 import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Surface
@@ -36,6 +38,7 @@ import com.imfibit.activitytracker.ui.components.MetricBlock
 import com.imfibit.activitytracker.ui.components.MetricWidgetData
 import com.imfibit.activitytracker.ui.components.dialogs.DialogScore
 import com.imfibit.activitytracker.ui.components.dialogs.DialogSession
+import io.burnoutcrew.reorderable.*
 import java.time.LocalDateTime
 
 
@@ -54,13 +57,20 @@ fun TrackedActivitiesList(
     nav: NavHostController,
     vm: ActivitiesViewModel
 ) {
-    val items by vm.activities.observeAsState(listOf())
+    val items by vm.activities.observeAsState(mutableListOf())
 
+    val state: ReorderableState = rememberReorderState(
+        onDragEnd = { from, to -> vm.move(from, to, items) },
+        onMove = { from, to -> items.move(from, to) }
+    )
 
-
-    LazyColumn(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        items(items.size) {
-            TrackedActivity(vm = vm, item = items[it], nav = nav)
+    LazyColumn(
+        state = state.listState,
+        modifier = Modifier.reorderable(state).padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        itemsIndexed(items) { idx, item ->
+            TrackedActivity(vm = vm, item = item, nav = nav, modifier = Modifier.draggedItem(state.offset.takeIf { state.index == idx }))
         }
 
         item {
@@ -74,7 +84,8 @@ fun TrackedActivitiesList(
 private fun TrackedActivity(
     vm: ActivitiesViewModel,
     item: TrackedActivityWithMetric,
-    nav: NavHostController
+    nav: NavHostController,
+    modifier: Modifier = Modifier
 ) {
     val activity = item.activity
 
@@ -97,15 +108,18 @@ private fun TrackedActivity(
 
 
     Surface(
-        modifier = Modifier.clickable(
-            onClick = { nav.navigate(SCREEN_ACTIVITY(activity.id.toString())) }
-        ).padding(2.dp),
+        modifier = modifier
+            .clickable(
+                onClick = { nav.navigate(SCREEN_ACTIVITY(activity.id.toString())) }
+            )
+            .padding(2.dp),
 
         elevation = 2.dp,
     ) {
         Row(
             modifier = Modifier
-                .background(Color.White).padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
+                .background(Color.White)
+                .padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
 
         ) {
 
@@ -162,7 +176,8 @@ private fun RowScope.ActionButton(
 
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.align(Alignment.CenterVertically)
+        modifier = Modifier
+            .align(Alignment.CenterVertically)
             .padding(end = 8.dp, start = 8.dp)
             .combinedClickable(
                 onClick = { vm.activityTriggered(activity, context) },
@@ -182,26 +197,39 @@ private fun RowScope.ActionButton(
             Type.CHECKED -> if (hasMetricToday) Icons.Filled.DoneAll else Icons.Filled.Check
         }
 
-        Icon(
-            contentDescription = null,
-            imageVector = icon,
-            modifier = Modifier
-                .size(34.dp)
-                .background(Colors.AppAccent, RoundedCornerShape(17.dp))
-        )
+        Box(Modifier.size(34.dp).background(Colors.AppAccent, RoundedCornerShape(17.dp)), contentAlignment = Alignment.Center  ){
+            Icon(
+                contentDescription = null,
+                imageVector = icon,
+                modifier = Modifier
+                    .size(30.dp)
+            )
+        }
+
+
     }
 }
 
 
 @Composable
 fun Goal(label: String) {
-    Row(Modifier.size(70.dp, 20.dp).padding(end = 8.dp).background(Colors.ChipGray, RoundedCornerShape(50))) {
-        Modifier.align(Alignment.CenterVertically).padding(start = 5.dp).size(15.dp)
+    Row(
+        Modifier
+            .size(70.dp, 20.dp)
+            .padding(end = 8.dp)
+            .background(Colors.ChipGray, RoundedCornerShape(50))) {
+        Modifier
+            .align(Alignment.CenterVertically)
+            .padding(start = 5.dp)
+            .size(15.dp)
         Icon(Icons.Filled.Flag, contentDescription = null,)
 
         Text(
             label,
-            Modifier.weight(1f).align(Alignment.CenterVertically).padding(end = 8.dp),
+            Modifier
+                .weight(1f)
+                .align(Alignment.CenterVertically)
+                .padding(end = 8.dp),
             textAlign = TextAlign.Center,
             style = TextStyle(
                 fontSize = 10.sp

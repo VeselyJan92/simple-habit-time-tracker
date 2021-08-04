@@ -24,7 +24,8 @@ class RepositoryTrackedActivity constructor(
     val completionDAO: DAOTrackedActivityChecked = AppDatabase.db.completionDAO,
     val scoreDAO: DAOTrackedActivityScore = AppDatabase.db.scoreDAO,
     val sessionDAO: DAOTrackedActivityTime = AppDatabase.db.sessionDAO,
-    val metricDAO: DAOTrackedActivityMetric = AppDatabase.db.metricDAO
+    val metricDAO: DAOTrackedActivityMetric = AppDatabase.db.metricDAO,
+    val timers: DAOPresetTimers = AppDatabase.db.presetTimersDAO
 ) : DBEntityRepository<TrackedActivity>(activityDAO) {
 
     suspend fun getActivitiesOverview(pastRanges: Int) =  AppDatabase.db.withTransaction {

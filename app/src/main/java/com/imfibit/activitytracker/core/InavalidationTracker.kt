@@ -1,10 +1,7 @@
 package com.imfibit.activitytracker.core
 
 import androidx.room.InvalidationTracker
-import com.imfibit.activitytracker.database.entities.TrackedActivity
-import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
-import com.imfibit.activitytracker.database.entities.TrackedActivityScore
-import com.imfibit.activitytracker.database.entities.TrackedActivityTime
+import com.imfibit.activitytracker.database.entities.*
 
 
 inline fun createInvalidationTacker(
@@ -21,5 +18,6 @@ fun activityInvalidationTracker( onInvalidated: (MutableSet<String>)->Unit) = cr
     TrackedActivityTime.TABLE,
     TrackedActivityCompletion.TABLE,
     TrackedActivityScore.TABLE,
+    PresetTimer.TABLE,
     onInvalidated = onInvalidated
 )

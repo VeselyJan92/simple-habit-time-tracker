@@ -1,34 +1,20 @@
 package com.imfibit.activitytracker.database
 
 import android.content.Context
-import android.telecom.Call
-import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.imfibit.activitytracker.BuildConfig
-
-import com.imfibit.activitytracker.database.converters.TimeRangeConverter
 import com.imfibit.activitytracker.database.converters.LocalDateConverter
-import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.converters.LocalDateTimeConverter
+import com.imfibit.activitytracker.database.converters.LocalTimeConverter
 import com.imfibit.activitytracker.database.dao.tracked_activity.*
 import com.imfibit.activitytracker.database.entities.*
-import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.imfibit.activitytracker.database.converters.LocalTimeConverter
-import com.imfibit.activitytracker.database.converters.TrackedActivityTypeConverter
-import com.imfibit.activitytracker.database.migrations.MIGRATION_1_2
-import com.imfibit.activitytracker.database.migrations.MIGRATION_2_3
 import com.imfibit.activitytracker.database.migrations.migrations
+import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
 
 
 @Database(
@@ -36,20 +22,19 @@ import java.time.LocalTime
         TrackedActivity::class,
         TrackedActivityTime::class,
         TrackedActivityScore::class,
-        TrackedActivityCompletion::class
+        TrackedActivityCompletion::class,
+        PresetTimer::class
     ],
     views = [
         TrackedActivityMetric::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(
     LocalDateTimeConverter::class,
     LocalTimeConverter::class,
-    LocalDateConverter::class,
-    TimeRangeConverter::class,
-    TrackedActivityTypeConverter::class
+    LocalDateConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -58,6 +43,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract val sessionDAO: DAOTrackedActivityTime
     abstract val completionDAO: DAOTrackedActivityChecked
     abstract val metricDAO: DAOTrackedActivityMetric
+    abstract val presetTimersDAO: DAOPresetTimers
 
 
     companion object {

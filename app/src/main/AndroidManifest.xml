@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:theme="@android:style/Theme.NoTitleBar"
+        android:theme="@android:style/Theme.Material.Light.NoActionBar"
         android:usesCleartextTraffic="true"
         android:name="com.imfibit.activitytracker.core.App"
         android:allowBackup="true"
