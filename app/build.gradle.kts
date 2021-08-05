@@ -1,5 +1,9 @@
 import org.jetbrains.kotlin.konan.properties.Properties
 
+
+val COMPOSE_VERSION = "1.1.0-alpha01"
+
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -62,8 +66,9 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.0.0"
+        kotlinCompilerExtensionVersion = "1.1.0-alpha01"
     }
+
 
     kotlinOptions {
         jvmTarget = "1.8"
@@ -122,31 +127,30 @@ dependencies {
 
     implementation("com.google.android.material:material:1.4.0")
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.10")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.21")
     implementation("com.thedeanda:lorem:2.1")
 
     implementation(platform("com.google.firebase:firebase-bom:25.11.0"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
 
+
+    implementation("androidx.compose.compiler:compiler:$COMPOSE_VERSION")
+    implementation("androidx.compose.animation:animation:$COMPOSE_VERSION")
+    implementation("androidx.compose.ui:ui:$COMPOSE_VERSION")
+    implementation("androidx.compose.material:material:$COMPOSE_VERSION")
+    implementation("androidx.compose.runtime:runtime:$COMPOSE_VERSION")
+    implementation("androidx.compose.runtime:runtime-livedata:$COMPOSE_VERSION")
+    implementation("androidx.compose.foundation:foundation:$COMPOSE_VERSION")
+    implementation("androidx.compose.material:material-icons-extended:$COMPOSE_VERSION")
+    debugImplementation("androidx.compose.ui:ui-tooling:$COMPOSE_VERSION")
+
     implementation("androidx.navigation:navigation-compose:2.4.0-alpha05")
 
-    implementation("androidx.compose.compiler:compiler:1.0.0")
-    implementation("androidx.compose.animation:animation:1.0.0")
-    implementation("androidx.compose.ui:ui:1.0.0")
-    implementation("androidx.compose.material:material:1.0.0")
-    implementation("androidx.compose.runtime:runtime:1.0.0")
-    implementation("androidx.compose.runtime:runtime-livedata:1.0.0")
-    implementation("androidx.compose.foundation:foundation:1.0.0")
-    implementation("androidx.compose.material:material-icons-extended:1.0.0")
-    debugImplementation("androidx.compose.ui:ui-tooling-preview:1.0.0-rc01"){
-        version {
-            strictly("1.0.0-rc01")
-        }
-    }
+    val ROOM_VERSION = "2.4.0-alpha04"
 
-    kapt("androidx.room:room-compiler:2.4.0-alpha04")
-    implementation ("androidx.room:room-runtime:2.4.0-alpha04")
-    implementation ("androidx.room:room-ktx:2.4.0-alpha04")
+    kapt("androidx.room:room-compiler:$ROOM_VERSION")
+    implementation ("androidx.room:room-runtime:$ROOM_VERSION")
+    implementation ("androidx.room:room-ktx:$ROOM_VERSION")
 
 
     implementation("com.google.accompanist:accompanist-pager:0.15.0")

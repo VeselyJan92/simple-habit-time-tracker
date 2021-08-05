@@ -37,7 +37,8 @@ private data class State(
 fun MinuteAndHourSelector(
     hours: Int,
     minutes: Int,
-    onSelectionChanged: ((hours: Int, minutes:Int)->Unit)? = null
+    onSelectionChanged: ((hours: Int, minutes:Int)->Unit)? = null,
+    modifier: Modifier = Modifier.fillMaxWidth()
 ) {
 
     fun format(number: Int) = if (number == 0) "" else number.toString()
@@ -50,7 +51,7 @@ fun MinuteAndHourSelector(
     }
 
     Row(
-            Modifier.padding(top = 16.dp).height(50.dp).fillMaxWidth(),
+            Modifier.padding(top = 16.dp).height(50.dp),
             horizontalArrangement = Arrangement.Center
     ) {
 

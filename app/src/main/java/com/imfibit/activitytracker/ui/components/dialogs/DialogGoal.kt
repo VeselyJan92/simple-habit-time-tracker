@@ -28,10 +28,11 @@ inline fun DialogGoal(
             TrackedActivity.Type.TIME ->{
                 MinuteAndHourSelector(
                     hours = goal.toInt()/3600,
-                    minutes = ((goal % 3600)/60L).toInt()
-                ){
-                    hours, minutes -> goal = (60 * hours + minutes) * 60L
-                }
+                    minutes = ((goal % 3600)/60L).toInt(),
+                    onSelectionChanged = {
+                            hours, minutes -> goal = (60 * hours + minutes) * 60L
+                    }
+                )
             }
 
             TrackedActivity.Type.SCORE -> {
