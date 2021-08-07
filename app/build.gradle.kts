@@ -96,6 +96,7 @@ android {
             signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
             versionNameSuffix = " - PROD"
+
         }
 
         getByName("debug") {
@@ -105,6 +106,9 @@ android {
 
             applicationIdSuffix =  ".debug"
             versionNameSuffix = " - DEBUG"
+
+
+            isDebuggable = true
         }
 
         create("personal") {
@@ -132,6 +136,8 @@ dependencies {
 
     implementation(platform("com.google.firebase:firebase-bom:25.11.0"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
+
+    implementation("androidx.work:work-runtime-ktx:2.6.0-rc01")
 
 
     implementation("androidx.compose.compiler:compiler:$COMPOSE_VERSION")

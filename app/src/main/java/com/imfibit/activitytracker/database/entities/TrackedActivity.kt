@@ -30,6 +30,9 @@ data class TrackedActivity(
     @ColumnInfo(name = "in_session_since")
     var inSessionSince: LocalDateTime? = null,
 
+    @ColumnInfo(name = "in_session_since")
+    var timer: Int? = null,
+
     @Embedded
     var goal: TrackedActivityGoal,
 ) {

@@ -1,5 +1,10 @@
 package com.imfibit.activitytracker.ui
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,19 +18,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
+import androidx.work.*
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.ui.screens.activity.ScreenTrackedActivity
 import com.imfibit.activitytracker.ui.screens.activity_list.ScreenActivities
 import com.imfibit.activitytracker.ui.screens.day_history.ScreenDayRecords
 import com.imfibit.activitytracker.ui.screens.statistics.ScreenStatistics
 import com.imfibit.activitytracker.ui.screens.timeline.ScreenTimeline
+import com.imfibit.activitytracker.ui.screens.timer_over.ScreenTimerOver
 import com.imfibit.activitytracker.ui.screens.upcomming.ScreenUpcoming
+import com.imfibit.activitytracker.work.ScheduledTimer
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.TimeUnit
+import android.media.AudioAttributes
+import android.media.RingtoneManager
+import android.net.Uri
 
 
 fun SCREEN_ACTIVITY(activity: String = "{activity_id}") = "screen_activity/$activity"
@@ -37,10 +51,52 @@ const val SCREEN_STATISTICS = "SCREEN_STATISTICS"
 const val SCREEN_UPCOMING = "SCREEN_UPCOMING"
 const val SCREEN_DAY_HISTORY = "SCREEN_DAY_HISTORY"
 
+const val SCREEN_TIMER_OVER = "SCREEN_TIMER_OVER"
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+
+        val name = "timer"
+        val descriptionText = "DESC"
+        val importance = NotificationManager.IMPORTANCE_HIGH
+        val channel = NotificationChannel("xx", name, importance).apply {
+            description = descriptionText
+        }
+        // Register the channel with the system
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+
+        val soundUri: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+
+
+        val audioAttributes = AudioAttributes.Builder()
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+            .build()
+
+        channel.setSound(soundUri, audioAttributes)
+
+
+        notificationManager.createNotificationChannel(channel)
+
+
+        val x = OneTimeWorkRequestBuilder<ScheduledTimer>()
+                .setInitialDelay(5, TimeUnit.SECONDS)
+                .build()
+
+
+        WorkManager.getInstance(this).enqueue(x)
+
+
+
+
+
+
 
         setContent {
             val navController = rememberNavController()
@@ -85,11 +141,13 @@ fun AppBottomNavigation(navController: NavController) {
 @Composable
 fun Router(navControl: NavHostController){
 
-    NavHost(navController = navControl, startDestination = SCREEN_ACTIVITIES){
+    NavHost(navController = navControl, startDestination = SCREEN_TIMER_OVER){
+        composable(SCREEN_STATISTICS){ ScreenStatistics(navControl) }
         composable(SCREEN_STATISTICS){ ScreenStatistics(navControl) }
         composable(SCREEN_ACTIVITIES){ ScreenActivities(navControl) }
         composable(SCREEN_UPCOMING){ ScreenUpcoming(navControl) }
-        composable("timeline"){ ScreenTimeline(navControl) }
+
+        composable(SCREEN_TIMER_OVER){ ScreenTimerOver(navControl) }
 
 
         composable(

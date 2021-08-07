@@ -3,6 +3,8 @@ package com.imfibit.activitytracker.ui.screens.activity
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.Icon
@@ -13,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -24,6 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.core.TimeUtils
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import com.imfibit.activitytracker.database.entities.TrackedActivity
@@ -33,7 +37,6 @@ import com.imfibit.activitytracker.ui.components.dialogs.DialogGoal
 import com.imfibit.activitytracker.ui.components.dialogs.DialogInputText
 import com.imfibit.activitytracker.ui.components.dialogs.DialogTimeRange
 import com.imfibit.activitytracker.database.AppDatabase
-import com.imfibit.activitytracker.database.entities.PresetTimer
 import com.imfibit.activitytracker.ui.AppBottomNavigation
 import com.imfibit.activitytracker.ui.components.dialogs.DialogTimers
 import kotlinx.coroutines.*
@@ -82,7 +85,7 @@ fun ScreenTrackedActivity(nav: NavHostController, activityId: Long) {
         },
         content = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
-                ScreenBody(nav, state)
+                ScreenBody(nav, state, vm)
 
                 Spacer(modifier = Modifier.height(100.dp))
             }
@@ -100,20 +103,39 @@ fun ScreenTrackedActivity(nav: NavHostController, activityId: Long) {
 
 @ExperimentalFoundationApi
 @Composable
-fun ScreenBody(nav: NavController, state: TrackedActivityState?) {
+fun ScreenBody(nav: NavController, state: TrackedActivityState?, vm: TrackedActivityViewModel) {
     Column {
-        ActivitySettings(state)
+        ActivitySettings(state, vm)
+
+        //Timers(state = state, vm = vm)
 
         RecentActivity(nav, state)
-
-        SetTimer(state = state)
 
     }
 }
 
+
+/*@Composable
+private fun Timers(state: TrackedActivityState?, vm: TrackedActivityViewModel){
+
+    Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp).height(56.dp).fillMaxWidth()) {
+        if (state != null){
+            LazyRow(verticalAlignment = Alignment.CenterVertically, contentPadding = PaddingValues(8.dp) ){
+                itemsIndexed(state.timers){ index, item ->
+                    RoundTextBox(
+                        modifier = Modifier.height(30.dp).width(60.dp),
+                        text = TimeUtils.secondsToMetric(item.seconds.toLong()).removeSuffix(":00"),
+                        style = TextStyle.Default.copy(fontWeight = FontWeight.W500)
+                    )
+                }
+            }
+        }
+    }
+}*/
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun ActivitySettings(state: TrackedActivityState?) {
+private fun ActivitySettings(state: TrackedActivityState?, vm: TrackedActivityViewModel) {
     Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp)) {
 
 
@@ -128,7 +150,7 @@ private fun ActivitySettings(state: TrackedActivityState?) {
 
                 ViewRange(state?.activity)
 
-                SetTimer(state)
+                SetTimer(state, vm)
             }
 
         }
@@ -277,12 +299,20 @@ private fun ViewRange(activity: TrackedActivity?) {
 }
 
 @Composable
-private fun SetTimer(state: TrackedActivityState?) {
+private fun SetTimer(state: TrackedActivityState?, vm: TrackedActivityViewModel) {
 
     var display = remember { mutableStateOf(false) }
 
     if (state?.activity != null)
-        DialogTimers(activity = state.activity, timers = state.timers, display = display)
+        DialogTimers(
+            activity = state.activity,
+            timers = state.timers,
+            display = display,
+            onTimerAdd = { seconds -> vm.addTimer(seconds) },
+            onTimersReorganized = { items -> vm.reorganizeTimers(items) },
+            onTimerDelete = { timer -> vm.deleteTimer(timer) },
+            runTimer = { timer -> vm.scheduleTimer(timer) }
+        )
 
 
     Row(
@@ -290,7 +320,7 @@ private fun SetTimer(state: TrackedActivityState?) {
             .size(80.dp, 30.dp)
             .padding(end = 8.dp)
             .background(Colors.ChipGray, RoundedCornerShape(50))
-            .clickable(onClick = {display.value = true})
+            .clickable(onClick = { display.value = true })
 
     ) {
         Icon(Icons.Filled.Timer,

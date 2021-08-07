@@ -1,6 +1,7 @@
 package com.imfibit.activitytracker.ui.screens.activity
 
 
+import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
 import com.imfibit.activitytracker.core.ComposeString
@@ -13,6 +14,7 @@ import com.imfibit.activitytracker.database.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.time.temporal.ChronoField
@@ -27,7 +29,7 @@ class TrackedActivityVMFactory(private val id: Long) : ViewModelProvider.Factory
 @Immutable
 data class TrackedActivityState(
         val activity: TrackedActivity,
-        val timers: List<PresetTimer>,
+        val timers: MutableList<PresetTimer>,
         val recent: List<Week>,
         val months: List<MetricWidgetData>,
         val metricToday: ComposeString,
@@ -113,7 +115,7 @@ class TrackedActivityViewModel(val id: Long) : ViewModel() {
         }
 
 
-        val timers = rep.timers.getAll(activity.id)
+        val timers = rep.timers.getAll(activity.id).toMutableList()
 
         val state = TrackedActivityState(
                 activity, timers, recent, months, metricToday, metricWeek, metricMonth, metric30Days
@@ -121,6 +123,41 @@ class TrackedActivityViewModel(val id: Long) : ViewModel() {
 
         screenState.postValue(state)
     }
+
+    fun addTimer(seconds: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            rep.timers.insert(PresetTimer(0, id, seconds, 0))
+        }
+    }
+
+    fun reorganizeTimers(items: List<PresetTimer>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val timers = items.mapIndexed{index, item -> item.copy(position = index) }.toTypedArray()
+            rep.timers.updateAll(*timers)
+        }
+    }
+
+    fun deleteTimer(timer: PresetTimer) {
+        viewModelScope.launch(Dispatchers.IO) {
+            rep.timers.delete(timer)
+
+            rep.timers.getAll(id).forEach {
+                Log.e("xxx", it.id.toString())
+            }
+
+        }
+    }
+
+    fun scheduleTimer(timer: PresetTimer){
+        viewModelScope.launch {
+            val activity = rep.activityDAO.getById(id)
+
+            activity.inSessionSince = LocalDateTime.now().plusSeconds(timer.seconds.toLong())
+
+            rep.activityDAO.update(activity)
+        }
+    }
+
 }
 
 

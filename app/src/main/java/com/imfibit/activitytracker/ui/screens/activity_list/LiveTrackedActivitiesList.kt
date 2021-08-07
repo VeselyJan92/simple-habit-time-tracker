@@ -1,10 +1,13 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -28,7 +31,8 @@ fun LiveActivitiesList(vm: ActivitiesViewModel) {
     val items: List<TrackedActivity> by vm.live.observeAsState(listOf())
 
     LazyColumn(
-        modifier = Modifier.clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+        modifier = Modifier
+            .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
             .background(Color.White),
     ) {
         items(items.size) { LiveActivity(vm = vm, item = items[it]) }
@@ -40,7 +44,10 @@ private fun LiveActivity(vm: ActivitiesViewModel, item: TrackedActivity) {
 
 
 
-    Row(Modifier.fillMaxWidth().height(56.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .height(56.dp), verticalAlignment = Alignment.CenterVertically) {
 
         val context = LocalContext.current
 
@@ -49,19 +56,37 @@ private fun LiveActivity(vm: ActivitiesViewModel, item: TrackedActivity) {
                 vm.stopSession(context, item)
             }
         ) {
-            Box(Modifier.size(20.dp, 20.dp).background(Color.Red))
+            Box(
+                Modifier
+                    .size(20.dp, 20.dp)
+                    .background(Color.Red))
         }
 
-        Text(
-            text = item.name,
-            modifier = Modifier.weight(1f),
-            style = TextStyle(
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
+        Column (modifier = Modifier.weight(1f)) {
+            Text(
+                text = item.name,
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold
+                )
             )
-        )
+            
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.NotificationsActive, null, modifier = Modifier.size(16.dp))
+                
 
-        Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    text = "Cíl: 20:00",
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+                
+            }
+
+            
+        }
+
+
+
 
         Timer(
             startTime = item.inSessionSince!!,
