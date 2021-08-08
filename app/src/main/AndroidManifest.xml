@@ -29,8 +29,13 @@
         </activity>
 
         <receiver
-            android:name="com.imfibit.activitytracker.core.StopTrackedActivityReceiver"
+            android:name="com.imfibit.activitytracker.core.notifications.StopTrackedActivityReceiver"
             android:exported="false" />
+
+        <receiver
+            android:name="com.imfibit.activitytracker.core.notifications.StopScheduledTimerReceiver"
+            android:exported="false" />
+
 
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"

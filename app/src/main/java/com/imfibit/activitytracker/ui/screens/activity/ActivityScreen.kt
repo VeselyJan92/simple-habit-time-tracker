@@ -1,5 +1,6 @@
 package com.imfibit.activitytracker.ui.screens.activity
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -17,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -107,7 +109,7 @@ fun ScreenBody(nav: NavController, state: TrackedActivityState?, vm: TrackedActi
     Column {
         ActivitySettings(state, vm)
 
-        //Timers(state = state, vm = vm)
+        Log.e("xxx", "redraw")
 
         RecentActivity(nav, state)
 
@@ -150,6 +152,7 @@ private fun ActivitySettings(state: TrackedActivityState?, vm: TrackedActivityVi
 
                 ViewRange(state?.activity)
 
+                Log.e("xxx", "timer redraw")
                 SetTimer(state, vm)
             }
 
@@ -303,46 +306,49 @@ private fun SetTimer(state: TrackedActivityState?, vm: TrackedActivityViewModel)
 
     var display = remember { mutableStateOf(false) }
 
-    if (state?.activity != null)
+    val context = LocalContext.current
+
+    if (state?.activity != null && state.activity.type == TrackedActivity.Type.TIME){
         DialogTimers(
             activity = state.activity,
             timers = state.timers,
             display = display,
-            onTimerAdd = { seconds -> vm.addTimer(seconds) },
+            onTimerAdd = { timer -> vm.addTimer(timer)},
             onTimersReorganized = { items -> vm.reorganizeTimers(items) },
             onTimerDelete = { timer -> vm.deleteTimer(timer) },
-            runTimer = { timer -> vm.scheduleTimer(timer) }
+            runTimer = { timer -> vm.scheduleTimer(context, timer)  ; display.value = false  }
         )
 
-
-    Row(
-        Modifier
-            .size(80.dp, 30.dp)
-            .padding(end = 8.dp)
-            .background(Colors.ChipGray, RoundedCornerShape(50))
-            .clickable(onClick = { display.value = true })
-
-    ) {
-        Icon(Icons.Filled.Timer,
-            contentDescription = null,
+        Row(
             Modifier
-                .align(Alignment.CenterVertically)
-                .padding(start = 5.dp)
-                .size(15.dp))
+                .size(80.dp, 30.dp)
+                .padding(end = 8.dp)
+                .background(Colors.ChipGray, RoundedCornerShape(50))
+                .clickable(onClick = { display.value = true })
 
-        Text(
-            "Timer",
-            Modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically)
-                .padding(end = 8.dp),
-            textAlign = TextAlign.Center,
-            style = TextStyle(
+        ) {
+            Icon(Icons.Filled.Timer,
+                contentDescription = null,
+                Modifier
+                    .align(Alignment.CenterVertically)
+                    .padding(start = 5.dp)
+                    .size(15.dp))
+
+            Text(
+                stringResource(id = R.string.scree_activity_timers),
+                Modifier
+                    .weight(1f)
+                    .align(Alignment.CenterVertically)
+                    .padding(end = 8.dp),
+                textAlign = TextAlign.Center,
+                style = TextStyle(
                     fontSize = 10.sp
-            )
+                )
 
-        )
+            )
+        }
     }
+
 }
 
 @Composable

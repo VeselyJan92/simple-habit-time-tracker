@@ -5,8 +5,10 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.imfibit.activitytracker.core.AppNotificationManager
+import androidx.work.WorkManager
+import com.imfibit.activitytracker.core.notifications.NotificationLiveSession
 import com.imfibit.activitytracker.core.activityInvalidationTracker
+import com.imfibit.activitytracker.core.notifications.NotificationTimerOver
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.database.AppDatabase
@@ -46,14 +48,20 @@ class ActivitiesViewModel : ViewModel() {
     }
 
     fun stopSession(context: Context, item: TrackedActivity) = GlobalScope.launch {
-        AppNotificationManager.removeSessionNotification(context, item.id)
+        NotificationLiveSession.remove(context, item.id)
+        NotificationTimerOver.remove(context, item.id)
+
+        WorkManager.getInstance(context).cancelAllWorkByTag("activity_timer_${item.id}")
+
         rep.commitLiveSession(item.id)
     }
 
 
     fun startSession(context: Context, item: TrackedActivity){
-        AppNotificationManager.showSessionNotification(context, item)
-        GlobalScope.launch {  rep.startSession(item.id) }
+        val activity = item.copy(inSessionSince = LocalDateTime.now())
+
+        NotificationLiveSession.show(context, activity)
+        GlobalScope.launch {  rep.activityDAO.update(activity) }
     }
 
 

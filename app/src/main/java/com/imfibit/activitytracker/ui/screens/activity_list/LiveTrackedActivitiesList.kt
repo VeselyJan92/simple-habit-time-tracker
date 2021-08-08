@@ -15,10 +15,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.core.TimeUtils
+import com.imfibit.activitytracker.core.notifications.NotificationLiveSession
+import com.imfibit.activitytracker.core.notifications.NotificationTimerOver
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.components.Timer
 import kotlinx.coroutines.GlobalScope
@@ -70,29 +75,32 @@ private fun LiveActivity(vm: ActivitiesViewModel, item: TrackedActivity) {
                     fontWeight = FontWeight.Bold
                 )
             )
-            
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.NotificationsActive, null, modifier = Modifier.size(16.dp))
-                
 
-                Text(
-                    text = "Cíl: 20:00",
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-                
+            if(item.timer != null){
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.NotificationsActive, null, modifier = Modifier.size(16.dp))
+
+
+
+                    Text(
+                        text = stringResource(id = R.string.screen_activities_target) + TimeUtils.secondsToMetric(item.timer.toLong()).removeSuffix(":00"),
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+
+                }
             }
-
-            
         }
-
-
-
 
         Timer(
             startTime = item.inSessionSince!!,
             onClick = {
+                val activity = item.copy(inSessionSince = it)
+
+                NotificationLiveSession.show(context, activity)
+                NotificationTimerOver.remove(context, item.id)
+
                 GlobalScope.launch {
-                    vm.rep.activityDAO.update(item.copy(inSessionSince = it))
+                    vm.rep.activityDAO.update(activity)
                 }
             }
         )

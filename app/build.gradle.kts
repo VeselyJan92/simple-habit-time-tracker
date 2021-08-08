@@ -158,6 +158,9 @@ dependencies {
     implementation ("androidx.room:room-runtime:$ROOM_VERSION")
     implementation ("androidx.room:room-ktx:$ROOM_VERSION")
 
+    implementation ("androidx.datastore:datastore-preferences:1.0.0")
+
+
 
     implementation("com.google.accompanist:accompanist-pager:0.15.0")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.15.0")

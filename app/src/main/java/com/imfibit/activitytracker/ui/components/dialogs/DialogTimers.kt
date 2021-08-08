@@ -1,16 +1,20 @@
 package com.imfibit.activitytracker.ui.components.dialogs
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.AlarmAdd
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -20,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -31,13 +36,14 @@ import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.TimeUtils
 import com.imfibit.activitytracker.database.entities.PresetTimer
 import com.imfibit.activitytracker.database.entities.TrackedActivity
-import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.ui.components.Colors
+import com.imfibit.activitytracker.ui.components.IconButton
+import com.imfibit.activitytracker.ui.components.dialogs.system.DialogTimePicker
 import io.burnoutcrew.reorderable.ReorderableState
 import io.burnoutcrew.reorderable.move
 import io.burnoutcrew.reorderable.rememberReorderState
 import io.burnoutcrew.reorderable.reorderable
-import java.util.*
+import java.time.LocalTime
 
 
 fun Modifier.draggedItemx(
@@ -64,12 +70,12 @@ inline fun DialogTimers(
         activity: TrackedActivity,
         timers: MutableList<PresetTimer>,
         noinline onTimerDelete: ((timer: PresetTimer)->Unit),
-        noinline onTimerAdd: ((seconds: Int)->Unit),
+        noinline onTimerAdd: ((timer: PresetTimer)->Unit),
         noinline onTimersReorganized: ((timers: List<PresetTimer>)->Unit),
         noinline runTimer: ((timer: PresetTimer)->Unit)
 )  = BaseDialog(display = display) {
 
-    DialogBaseHeader(title = stringResource( R.string.dialog_session_title_add))
+    DialogBaseHeader(title = stringResource( R.string.dialog_preset_timers_title))
 
     Row(
         modifier = Modifier
@@ -78,41 +84,48 @@ inline fun DialogTimers(
         verticalAlignment = Alignment.Bottom,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Box(
-            modifier = Modifier
-                .width(100.dp)
-                .height(30.dp)
-                .background(Colors.ChipGray, RoundedCornerShape(50)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text ="Jednorázový",
-                textAlign = TextAlign.Center,
-                style = TextStyle(
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
+
+        val context = LocalContext.current
+
+        IconButton(text = stringResource( R.string.dialog_preset_timers_single), icon = Icons.Default.Alarm ) {
+            DialogTimePicker(
+                time = LocalTime.MIDNIGHT,
+                onTimeSet = {
+                    runTimer.invoke(
+                        PresetTimer(
+                            0,
+                            activity.id,
+                            it.hour * 3600 + it.minute * 60,
+                            0
+                        )
+                    )
+                },
+                context = context
+            )
+        }
+
+        Spacer(modifier = Modifier.padding(8.dp))
+
+        IconButton(text = stringResource( R.string.dialog_preset_timers_add), icon = Icons.Filled.AlarmAdd ) {
+            DialogTimePicker(
+                time = LocalTime.MIDNIGHT,
+                onTimeSet = {
+                    onTimerAdd.invoke(
+                        PresetTimer(
+                            0,
+                            activity.id,
+                            it.hour * 3600 + it.minute * 60,
+                            0
+                        )
+                    )
+                    display.value = false
+                },
+                context = context
             )
         }
     }
 
-    Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-        .padding(8.dp)
-        .fillMaxWidth()) {
-        Text(text = "Přednastavené", fontWeight = FontWeight.W500, fontSize = 20.sp, modifier = Modifier.padding(8.dp))
-
-        Box(
-            modifier = Modifier
-                .width(50.dp)
-                .height(30.dp)
-                .background(Colors.ChipGray, RoundedCornerShape(50)),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(imageVector = Icons.Filled.Add, contentDescription = null, modifier = Modifier
-                .size(30.dp))
-        }
-
-    }
+    Text(text = stringResource( R.string.dialog_preset_timers_preset), fontWeight = FontWeight.W500, fontSize = 20.sp, modifier = Modifier.padding(8.dp))
 
 
     val state: ReorderableState = rememberReorderState(
@@ -133,16 +146,15 @@ inline fun DialogTimers(
                 DismissState(DismissValue.Default)
             }
 
-            Log.e(index.toString(), dismissState.isDismissed(DismissDirection.EndToStart).toString())
-
-
             if (dismissState.isDismissed(DismissDirection.EndToStart)){
                 onTimerDelete.invoke(item)
             }
 
             SwipeToDismiss(
                 state = dismissState,
-                modifier = Modifier.draggedItemx(state.offset.takeIf {state.index == index }).clickable { runTimer.invoke(item) },
+                modifier = Modifier
+                    .draggedItemx(state.offset.takeIf { state.index == index })
+                    .clickable { runTimer.invoke(item) },
                 background = {},
             ) {
                 Row(modifier = Modifier
@@ -170,14 +182,6 @@ inline fun DialogTimers(
                         )
                     }
 
-
-                    /*Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(end = 8.dp)) {
-                        Icon(imageVector = Icons.Filled.Edit, contentDescription = null, modifier = Modifier
-                            .align(Alignment.CenterEnd))
-                    }*/
-
                 }
 
             }
@@ -185,21 +189,4 @@ inline fun DialogTimers(
         }
 
     }
-}
-
-
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-inline fun DialogInputHourAnd(
-    display: MutableState<Boolean> = mutableStateOf(true),
-    activity: TrackedActivity,
-    timers: MutableList<PresetTimer>,
-    noinline onTimerDelete: ((timer: PresetTimer)->Unit),
-    noinline onTimerAdd: ((seconds: Int)->Unit),
-    noinline onTimersReorganized: ((timers: List<PresetTimer>)->Unit)
-)  = BaseDialog(display = display) {
-
-
-
 }
