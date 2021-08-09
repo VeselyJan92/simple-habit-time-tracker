@@ -16,12 +16,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.entities.TrackedActivityScore
-import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.DatetimeEditor
 import com.imfibit.activitytracker.ui.components.selectors.NumberSelector
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 
@@ -29,19 +26,28 @@ import java.time.LocalDateTime
 @Composable
 fun DialogScore(
     display: MutableState<Boolean> = mutableStateOf(true),
+    record: TrackedActivityScore,
+    onUpdate: ((LocalDateTime, Long)->Unit),
+    onDelete: (() -> Unit)? = null
+) = DialogScore(display, true, record.score, record.datetime_completed, onUpdate, onDelete)
+
+
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
+@Composable
+fun DialogScore(
+    display: MutableState<Boolean> = mutableStateOf(true),
+    allowDelete: Boolean,
     score: Long,
     datetime: LocalDateTime,
-    recordId: Long = 0,
-    activityId: Long = 0,
-    onSetSession: ((LocalDateTime, Long)->Unit)? = null
+    onUpdate: ((LocalDateTime, Long)->Unit),
+    onDelete: (() -> Unit)? = null
 ) {
-    val modify = remember {recordId != 0L}
-    val score = remember { mutableStateOf(if (modify) score.toInt() else 1) }
+    val score = remember { mutableStateOf(score.toInt()) }
     val datetime = remember { mutableStateOf(datetime) }
 
     BaseDialog(display = display) {
 
-        DialogBaseHeader(title = stringResource(id = if (modify) R.string.dialo_score_title_edit else R.string.dialo_score_title_add))
+        DialogBaseHeader(title = stringResource(id = if (allowDelete) R.string.dialo_score_title_edit else R.string.dialo_score_title_add))
 
         NumberSelector(label = stringResource(id = R.string.score), number = score){
             if ( it in 1..999) score.value = it
@@ -66,64 +72,33 @@ fun DialogScore(
             }
         }
 
-
-        Buttons(modify, display, recordId, activityId, onSetSession, datetime, score)
-    }
-
-}
-
-@Composable
-private fun Buttons(
-    modify: Boolean,
-    display: MutableState<Boolean>,
-    recordId: Long,
-    activityId: Long,
-    onSetSession: ((LocalDateTime, Long) -> Unit)?,
-    datetime: MutableState<LocalDateTime>,
-    input: MutableState<Int>
-) = DialogButtons {
-
-    if (modify){
-        TextButton(
-            onClick = {
-                display.value = false
-                GlobalScope.launch {
-                    RepositoryTrackedActivity().scoreDAO.deleteById(recordId)
+        DialogButtons {
+            if (onDelete != null){
+                TextButton(
+                    onClick = {
+                        display.value = false
+                        onDelete.invoke()
+                    }
+                ) {
+                    Text(text = stringResource(id = R.string.dialog_action_delete))
                 }
             }
-        ) {
-            Text(text = stringResource(id = R.string.dialog_action_delete))
-        }
-    }
 
-    TextButton(onClick = {  display.value = false }) {
-        Text(text = stringResource(id = R.string.dialog_action_cancel))
-    }
-
-    TextButton(onClick = {
-        display.value = false
-
-        if (onSetSession == null){
-            require(activityId != 0L)
-
-            GlobalScope.launch {
-                val rep = RepositoryTrackedActivity()
-                val item = TrackedActivityScore(recordId, activityId, datetime.value, input.value.toLong())
-
-                if (recordId != 0L)
-                    rep.scoreDAO.update(item)
-                else
-                    rep.scoreDAO.insert(item)
+            TextButton(onClick = {  display.value = false }) {
+                Text(text = stringResource(id = R.string.dialog_action_cancel))
             }
-        }else{
-            onSetSession.invoke(datetime.value, input.value.toLong())
+
+            TextButton(onClick = {
+                display.value = false
+                onUpdate.invoke(datetime.value, score.value.toLong())
+
+            }) {
+                Text(text = stringResource(id = if (onDelete != null) R.string.dialog_action_edit else R.string.dialog_action_add))
+
+            }
+
         }
-
-
-    }) {
-        Text(text = stringResource(id = if (modify) R.string.dialog_action_edit else R.string.dialog_action_add))
-
     }
-
 
 }
+

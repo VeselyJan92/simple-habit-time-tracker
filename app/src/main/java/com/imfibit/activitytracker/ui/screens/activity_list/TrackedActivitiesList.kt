@@ -3,7 +3,6 @@ package com.imfibit.activitytracker.ui.screens.activity_list
 import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,8 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.imfibit.activitytracker.core.App
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivity.Type
 import com.imfibit.activitytracker.ui.SCREEN_ACTIVITY
@@ -38,6 +37,7 @@ import com.imfibit.activitytracker.ui.components.MetricBlock
 import com.imfibit.activitytracker.ui.components.MetricWidgetData
 import com.imfibit.activitytracker.ui.components.dialogs.DialogScore
 import com.imfibit.activitytracker.ui.components.dialogs.DialogSession
+import com.imfibit.activitytracker.ui.viewmodels.RecordViewModel
 import io.burnoutcrew.reorderable.*
 import java.time.LocalDateTime
 
@@ -66,7 +66,9 @@ fun TrackedActivitiesList(
 
     LazyColumn(
         state = state.listState,
-        modifier = Modifier.reorderable(state).padding(8.dp),
+        modifier = Modifier
+            .reorderable(state)
+            .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         itemsIndexed(items) { idx, item ->
@@ -87,24 +89,30 @@ private fun TrackedActivity(
     nav: NavHostController,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val activity = item.activity
 
-    val requestEdit = remember { mutableStateOf(false) }
+    val openSessionDialog = remember { mutableStateOf(false) }
+    val openScoreDialog = remember { mutableStateOf(false) }
 
-    if (requestEdit.value) when (activity.type) {
-        Type.TIME -> DialogSession(
-            display = requestEdit,
-            activityId = activity.id,
-            from = LocalDateTime.now(),
-            to = LocalDateTime.now(),
-        )
-        Type.SCORE -> DialogScore(
-            display = requestEdit,
-            activityId = activity.id,
-            datetime = LocalDateTime.now(),
-            score = 1
-        )
-    }
+
+    val recordVM = hiltViewModel<RecordViewModel>()
+
+    DialogSession(
+        allowDelete = false,
+        display = openSessionDialog,
+        from = LocalDateTime.now(),
+        to = LocalDateTime.now(),
+        onUpdate = {from, to -> recordVM.insertSession(activity.id, from, to)}
+    )
+
+    DialogScore(
+        allowDelete = false,
+        display = openScoreDialog,
+        datetime = LocalDateTime.now(),
+        score = 1,
+        onUpdate = {time, score -> recordVM.addScore(activity.id, time, score )}
+    )
 
 
     Surface(
@@ -124,10 +132,22 @@ private fun TrackedActivity(
         ) {
 
             ActionButton(
-                vm = vm,
                 hasMetricToday = item.hasMetricToday,
                 activity = item.activity,
-                requestEdit = requestEdit
+                onClick = {
+                    vm.activityTriggered(activity)
+                },
+                onLongClick = {
+                    (context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator).vibrate(
+                        VibrationEffect.createOneShot(50L, 1)
+                    )
+
+                    when(activity.type){
+                        Type.TIME -> openSessionDialog.value = true
+                        Type.SCORE -> openScoreDialog.value = true
+                        Type.CHECKED -> {}
+                    }
+                }
             )
 
 
@@ -149,6 +169,10 @@ private fun TrackedActivity(
 
                 }
 
+
+
+
+
                 Row(modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
@@ -167,27 +191,19 @@ private fun TrackedActivity(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun RowScope.ActionButton(
-    vm: ActivitiesViewModel,
     hasMetricToday: Boolean,
     activity: TrackedActivity,
-    requestEdit: MutableState<Boolean>
+    onClick: (()->Unit),
+    onLongClick: (()->Unit),
 ) {
-    val context = LocalContext.current
-
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .align(Alignment.CenterVertically)
             .padding(end = 8.dp, start = 8.dp)
             .combinedClickable(
-                onClick = { vm.activityTriggered(activity, context) },
-                onLongClick = {
-                    val viber = App.context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                    viber.vibrate(VibrationEffect.createOneShot(50L, 1))
-
-                    if (activity.type != Type.CHECKED)
-                        requestEdit.value = true
-                }
+                onClick = onClick,
+                onLongClick = onLongClick
             )
     ) {
 
@@ -197,7 +213,10 @@ private fun RowScope.ActionButton(
             Type.CHECKED -> if (hasMetricToday) Icons.Filled.DoneAll else Icons.Filled.Check
         }
 
-        Box(Modifier.size(34.dp).background(Colors.AppAccent, RoundedCornerShape(17.dp)), contentAlignment = Alignment.Center  ){
+        Box(
+            Modifier
+                .size(34.dp)
+                .background(Colors.AppAccent, RoundedCornerShape(17.dp)), contentAlignment = Alignment.Center  ){
             Icon(
                 contentDescription = null,
                 imageVector = icon,

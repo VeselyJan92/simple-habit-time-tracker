@@ -4,11 +4,8 @@ import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.ripple.rememberRipple
@@ -16,39 +13,37 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
-import com.imfibit.activitytracker.core.TimeUtils
+import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.ui.AppBottomNavigation
 import com.imfibit.activitytracker.ui.components.*
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.dialogs.DialogGoal
 import com.imfibit.activitytracker.ui.components.dialogs.DialogInputText
 import com.imfibit.activitytracker.ui.components.dialogs.DialogTimeRange
-import com.imfibit.activitytracker.database.AppDatabase
-import com.imfibit.activitytracker.ui.AppBottomNavigation
 import com.imfibit.activitytracker.ui.components.dialogs.DialogTimers
 import kotlinx.coroutines.*
 
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun ScreenTrackedActivity(nav: NavHostController, activityId: Long) {
+fun ScreenTrackedActivity(nav: NavHostController) {
 
-    val vm = viewModel<TrackedActivityViewModel>(factory = TrackedActivityVMFactory(activityId))
+    val vm = hiltViewModel<TrackedActivityViewModel>()
+
 
     val state by vm.screenState.observeAsState(null)
 
@@ -60,25 +55,23 @@ fun ScreenTrackedActivity(nav: NavHostController, activityId: Long) {
     Scaffold(
         topBar = {
             TrackerTopAppBar(stringResource(id = R.string.screen_title_activity)) {
+
+                val scope = rememberCoroutineScope()
+
                 Icon(
                     contentDescription = null,
                     imageVector = Icons.Default.Delete,
                     tint = Color.White,
                     modifier = Modifier.clickable(onClick = {
-                        GlobalScope.launch {
-
+                        scope.launch {
                             val deleted = scaffoldState.snackbarHostState.showSnackbar(msg, undo)
 
                             if (deleted == SnackbarResult.Dismissed){
-                                state?.activity?.id?.let {
-                                    AppDatabase.activityRep.activityDAO.deleteById(it)
-                                }
-
-                                withContext(Dispatchers.Main) {
+                                state?.activity?.let {
                                     nav.popBackStack()
+                                    vm.deleteActivity(it)
                                 }
                             }
-
                         }
                     })
                 )
@@ -109,8 +102,6 @@ fun ScreenBody(nav: NavController, state: TrackedActivityState?, vm: TrackedActi
     Column {
         ActivitySettings(state, vm)
 
-        Log.e("xxx", "redraw")
-
         RecentActivity(nav, state)
 
     }
@@ -140,19 +131,15 @@ private fun Timers(state: TrackedActivityState?, vm: TrackedActivityViewModel){
 private fun ActivitySettings(state: TrackedActivityState?, vm: TrackedActivityViewModel) {
     Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp)) {
 
-
         Column(
             Modifier
                 .padding(8.dp)
                 .fillMaxWidth()) {
-            ActivityName(state?.activity)
+            ActivityName(vm, state?.activity)
 
             Row(Modifier.padding(top = 8.dp)) {
-                Goal(state?.activity)
-
-                ViewRange(state?.activity)
-
-                Log.e("xxx", "timer redraw")
+                Goal(vm, state?.activity)
+                ViewRange(vm, state?.activity)
                 SetTimer(state, vm)
             }
 
@@ -161,7 +148,7 @@ private fun ActivitySettings(state: TrackedActivityState?, vm: TrackedActivityVi
 }
 
 @Composable
-private fun ActivityName(activity: TrackedActivity?) {
+private fun ActivityName(vm: TrackedActivityViewModel, activity: TrackedActivity?) {
     val display = remember { mutableStateOf(false) }
 
     if (activity != null) DialogInputText(
@@ -169,11 +156,7 @@ private fun ActivityName(activity: TrackedActivity?) {
             text = activity.name,
             title = stringResource(id = R.string.track_activity_name),
             onTextSet = {
-                GlobalScope.launch {
-                    val item = activity.copy(name = it)
-                    AppDatabase.activityRep.update(item)
-                }
-
+                vm.updateName(it)
                 display.value = false
             }
     )
@@ -206,11 +189,11 @@ private fun ActivityName(activity: TrackedActivity?) {
 }
 
 @Composable
-private inline fun Goal(activity: TrackedActivity?) {
+private inline fun Goal(vm: TrackedActivityViewModel, activity: TrackedActivity?) {
     val display = remember { mutableStateOf(false) }
 
     if (activity != null) DialogGoal(display = display, activity = activity) {
-        AppDatabase.activityRep.update(activity.copy(goal = TrackedActivityGoal(it, activity.goal.range)))
+        vm.updateGoal(TrackedActivityGoal(it, activity.goal.range))
     }
 
     Row(
@@ -256,7 +239,7 @@ private inline fun Goal(activity: TrackedActivity?) {
 }
 
 @Composable
-private fun ViewRange(activity: TrackedActivity?) {
+private fun ViewRange(vm: TrackedActivityViewModel, activity: TrackedActivity?) {
     val display = remember { mutableStateOf(false) }
 
     if (activity != null) DialogTimeRange(display = display, activity.goal.range) {
@@ -266,9 +249,8 @@ private fun ViewRange(activity: TrackedActivity?) {
             else
                 activity.goal.value
 
-            val item = activity.copy(goal = TrackedActivityGoal(value, it))
 
-            AppDatabase.activityRep.update(item)
+            vm.updateGoal(TrackedActivityGoal(value, it))
         }
     }
 
@@ -306,8 +288,6 @@ private fun SetTimer(state: TrackedActivityState?, vm: TrackedActivityViewModel)
 
     var display = remember { mutableStateOf(false) }
 
-    val context = LocalContext.current
-
     if (state?.activity != null && state.activity.type == TrackedActivity.Type.TIME){
         DialogTimers(
             activity = state.activity,
@@ -316,7 +296,7 @@ private fun SetTimer(state: TrackedActivityState?, vm: TrackedActivityViewModel)
             onTimerAdd = { timer -> vm.addTimer(timer)},
             onTimersReorganized = { items -> vm.reorganizeTimers(items) },
             onTimerDelete = { timer -> vm.deleteTimer(timer) },
-            runTimer = { timer -> vm.scheduleTimer(context, timer)  ; display.value = false  }
+            runTimer = { timer -> vm.scheduleTimer(timer)  ; display.value = false  }
         )
 
         Row(

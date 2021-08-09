@@ -13,29 +13,30 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.core.services.TrackTimeService
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.entities.TrackedActivity
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import com.imfibit.activitytracker.ui.MainActivity
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.*
+import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class StopScheduledTimerReceiver : BroadcastReceiver() {
 
-    @DelicateCoroutinesApi
-    override fun onReceive(context: Context, intent: Intent) {
-        Log.e("StopScheduledTimerReceiver", "receive")
+    @Inject
+    lateinit var service: TrackTimeService
+
+    @Inject
+    lateinit var db: AppDatabase
+
+    override fun onReceive(context: Context, intent: Intent) = runBlocking(){
         val activityId = intent.getLongExtra("activity_id", 0L)
+        val activity = db.activityDAO.getById(activityId)
 
-        if (0 < activityId){
-            GlobalScope.launch(Dispatchers.IO) {
-                AppDatabase.activityRep.commitLiveSession(activityId)
-            }
-        }
+        service.commitSession(activity)
 
-        NotificationTimerOver.remove(context, activityId)
-        NotificationLiveSession.remove(context, activityId)
     }
 }
 
@@ -45,9 +46,10 @@ object NotificationTimerOver {
     val CHANNEL_ID = "NotificationTimerOver"
 
     fun show(context: Context, activity: TrackedActivity){
+
         val openAppIntent = PendingIntent.getActivity(
             context, 0,
-            context.packageManager.getLaunchIntentForPackage(context.packageName),
+            Intent(context, MainActivity::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT
         )
 
@@ -64,8 +66,9 @@ object NotificationTimerOver {
             .setContentTitle(context.getString(R.string.notification_timer_title)+ ": " + activity.name)
             .setContentText(context.getText(R.string.notification_timer_text))
             .setSmallIcon(R.drawable.ic_baseline_stop_24)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setFullScreenIntent(openAppIntent, true)
             .addAction(R.drawable.ic_baseline_stop_24, context.getString(R.string.notification_timer_stop), stopTimerIntent)
             .setSound(sound);

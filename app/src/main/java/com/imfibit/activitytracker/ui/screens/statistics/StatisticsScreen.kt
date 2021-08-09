@@ -25,6 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -57,11 +59,16 @@ fun ScreenStatistics(navController: NavHostController){
 @Composable
 private fun ScreenBody() = Column {
 
+
+    val vm = viewModel<StatisticsViewModel>()
+
     val state = remember { StatisticsState(LocalDate.now(), TimeRange.DAILY) }
 
     Navigation(state)
 
-    HorizontalPager(state = state.pager, modifier = Modifier.padding(bottom = 8.dp).fillMaxHeight(), verticalAlignment = Alignment.Top){  page ->
+    HorizontalPager(state = state.pager, modifier = Modifier
+        .padding(bottom = 8.dp)
+        .fillMaxHeight(), verticalAlignment = Alignment.Top){  page ->
 
 
         val interval = state.getRange(page)
@@ -71,17 +78,17 @@ private fun ScreenBody() = Column {
         }
 
         LaunchedEffect(state.range, state.origin) {
-            data.value = AppDatabase.activityRep.metricDAO.getActivitiesWithMetric(
-                interval.first,
-                interval.second
-            ).groupBy {
-                it.activity.type
-            }
+            data.value = vm.getPageData(interval.first, interval.second)
         }
 
         if (data.value.isEmpty()){
-            Surface(modifier = Modifier.padding(8.dp).background(Color.White), elevation = 2.dp) {
-                Box(Modifier.fillMaxWidth().padding(vertical = 16.dp), contentAlignment = Alignment.Center) {
+            Surface(modifier = Modifier
+                .padding(8.dp)
+                .background(Color.White), elevation = 2.dp) {
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp), contentAlignment = Alignment.Center) {
                     Text(
                         text = stringResource(id = R.string.no_records), style = TextStyle(
                             fontSize = 16.sp,
@@ -105,10 +112,15 @@ private fun ScreenBody() = Column {
 @Composable
 private fun Navigation(state: StatisticsState) {
 
-    Surface(modifier = Modifier.padding(8.dp).background(Color.White), elevation = 2.dp) {
+    Surface(modifier = Modifier
+        .padding(8.dp)
+        .background(Color.White), elevation = 2.dp) {
         Column{
 
-            Row(Modifier.padding(horizontal = 8.dp).padding(top = 8.dp)) {
+            Row(
+                Modifier
+                    .padding(horizontal = 8.dp)
+                    .padding(top = 8.dp)) {
 
                 TimeRange.values().forEach {timeRange ->
                     val color = if (state.range == timeRange)
@@ -119,7 +131,7 @@ private fun Navigation(state: StatisticsState) {
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .padding(end =  8.dp)
+                            .padding(end = 8.dp)
                             .height(30.dp)
                             .background(color, RoundedCornerShape(50))
                             .clickable(onClick = {
@@ -144,11 +156,15 @@ private fun Navigation(state: StatisticsState) {
                         .background(Colors.ChipGray, RoundedCornerShape(50))
                         .clickable(
                             onClick = {
-                                DatePickerDialog(context, 0,
+                                DatePickerDialog(
+                                    context,
+                                    0,
                                     { _, i, i2, i3 ->
-                                       state.setCustomDate(LocalDate.of(i, i2+1, i3))
+                                        state.setCustomDate(LocalDate.of(i, i2 + 1, i3))
                                     },
-                                    state.date.year,  state.date.month.value-1,  state.date.dayOfMonth
+                                    state.date.year,
+                                    state.date.month.value - 1,
+                                    state.date.dayOfMonth
                                 ).show()
                             }
                         ),
@@ -217,7 +233,9 @@ private fun BlockTimeTracked(data: List<ActivityWithMetric>?, state: StatisticsS
         Column(Modifier.padding(8.dp)) {
             Header(title = stringResource(id = R.string.time), icon = Icons.Default.Timer){
                 Box(
-                    modifier = Modifier.size(60.dp, 25.dp).background(Colors.ChipGray, RoundedCornerShape(50)),
+                    modifier = Modifier
+                        .size(60.dp, 25.dp)
+                        .background(Colors.ChipGray, RoundedCornerShape(50)),
                     contentAlignment = Alignment.Center
                 ){
                     val sum = TrackedActivity.Type.TIME.getComposeString(data.sumByLong { it.metric }).invoke()

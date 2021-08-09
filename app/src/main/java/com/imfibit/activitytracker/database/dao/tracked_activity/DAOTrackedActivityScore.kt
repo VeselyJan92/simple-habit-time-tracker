@@ -47,6 +47,12 @@ interface DAOTrackedActivityScore : BaseEditableDAO<TrackedActivityScore>, DAOTr
     """)
     suspend fun deleteById(recordId: Long)
 
+    @Query("""
+        select * FROM tracked_activity_score
+        where tracked_activity_score_id=:recordId
+    """)
+    suspend fun getById(recordId: Long):TrackedActivityScore
+
 
     suspend fun commitScore(activityId: Long, datetime: LocalDateTime,  score: Long){
         insert(TrackedActivityScore(0, activityId, datetime, score))

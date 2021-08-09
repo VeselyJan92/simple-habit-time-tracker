@@ -2,20 +2,19 @@ package com.imfibit.activitytracker.core
 
 import android.app.Application
 import android.content.Context
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
 import com.imfibit.activitytracker.database.AppDatabase
+import dagger.hilt.android.HiltAndroidApp
+import javax.inject.Inject
 
-open class App : Application() {
+@HiltAndroidApp
+open class App : Application(), Configuration.Provider {
 
-    companion object{
-        lateinit var context: Context
-    }
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
 
-    override fun onCreate() {
-        super.onCreate()
-        AppDatabase.init(this)
-
-        context = applicationContext
-    }
-
-
+    override fun getWorkManagerConfiguration() = Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 }

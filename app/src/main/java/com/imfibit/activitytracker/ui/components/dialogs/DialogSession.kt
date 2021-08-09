@@ -26,36 +26,37 @@ import androidx.compose.ui.unit.sp
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.TimeUtils
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
-import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.EditableDatetime
 import com.imfibit.activitytracker.ui.components.dialogs.system.DialogTimePicker
 import com.imfibit.activitytracker.ui.components.layout.LabeledColumn
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.LocalTime
 
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-inline fun DialogSession(
-        display: MutableState<Boolean> = mutableStateOf(true),
-        from: LocalDateTime,
-        to: LocalDateTime,
-        recordId: Long = 0,
-        activityId: Long = 0,
-        noinline onSetSession: ((LocalDateTime, LocalDateTime)->Unit)? = null
+fun DialogSession(
+    display: MutableState<Boolean> = mutableStateOf(true),
+    record: TrackedActivityTime,
+    onUpdate: ((LocalDateTime, LocalDateTime)->Unit),
+    onDelete: (()->Unit)? = null
+) = DialogSession(display, true,record.datetime_start, record.datetime_end, onUpdate, onDelete )
+
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun DialogSession(
+    display: MutableState<Boolean> = mutableStateOf(true),
+    allowDelete: Boolean,
+    from: LocalDateTime,
+    to: LocalDateTime,
+    onUpdate: ((LocalDateTime, LocalDateTime)->Unit),
+    onDelete: (()->Unit)? = null
 )  = BaseDialog(display = display) {
 
-    val modify = remember {recordId != 0L}
-
-
-    val x = if (modify) from else from.toLocalDate().atTime(15, 0)
-    val y = if (modify) to else from.plusHours(1L)
-
-    var from = remember { mutableStateOf(x) }
-    var to = remember { mutableStateOf(y) }
+    val from = remember { mutableStateOf(from) }
+    val to = remember { mutableStateOf(to) }
 
     val seconds = java.time.Duration.between(from.value , to.value).seconds
 
@@ -63,7 +64,7 @@ inline fun DialogSession(
 
     val context = LocalContext.current
 
-    DialogBaseHeader(title = stringResource(id = if (modify) R.string.dialog_session_title_edit else R.string.dialog_session_title_add))
+    DialogBaseHeader(title = stringResource(id = if (allowDelete) R.string.dialog_session_title_edit else R.string.dialog_session_title_add))
 
     Row(
         modifier = Modifier.padding(top = 16.dp).fillMaxWidth(),
@@ -123,14 +124,13 @@ inline fun DialogSession(
     }
 
 
-    //TODO REDO
-    DialogButtons {
 
-        if(modify){
+    DialogButtons {
+        if(allowDelete){
             TextButton(
                 onClick = {
                     display.value = false
-                    GlobalScope.launch { RepositoryTrackedActivity().sessionDAO.deleteById(recordId) }
+                    onDelete!!.invoke()
                 }
             ) {
                 Text(text = stringResource(id = R.string.dialog_action_delete))
@@ -142,34 +142,17 @@ inline fun DialogSession(
         }
 
 
-
         val invalidMessage = stringResource(id = R.string.invalid_entry)
 
         TextButton(onClick = {
             if (valid) {
                 display.value = false
-
-                if (onSetSession == null) {
-                    require(activityId != 0L)
-
-                    val item = TrackedActivityTime(recordId, activityId, from.value, to.value)
-
-                    GlobalScope.launch {
-                        val rep = RepositoryTrackedActivity()
-
-                        if (modify)
-                            rep.sessionDAO.update(item)
-                        else
-                            rep.sessionDAO.insert(item)
-                    }
-                } else {
-                    onSetSession.invoke(from.value, to.value)
-                }
+                onUpdate.invoke(from.value, to.value)
             } else {
                 Toast.makeText(context, invalidMessage, Toast.LENGTH_LONG).show()
             }
         }) {
-            Text(text = stringResource(id = if (modify) R.string.dialog_action_edit else R.string.dialog_action_add))
+            Text(text = stringResource(id = if (allowDelete) R.string.dialog_action_edit else R.string.dialog_action_add))
         }
     }
 

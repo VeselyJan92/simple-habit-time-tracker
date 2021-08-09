@@ -5,18 +5,23 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.imfibit.activitytracker.core.notifications.NotificationLiveSession
 import com.imfibit.activitytracker.core.ComposeString
 import com.imfibit.activitytracker.core.activityInvalidationTracker
+import com.imfibit.activitytracker.core.services.TrackTimeService
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.entities.*
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.ui.components.*
 import com.imfibit.activitytracker.database.AppDatabase
+import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import com.imfibit.activitytracker.work.ScheduledTimer
+import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -26,12 +31,15 @@ import java.time.format.TextStyle
 import java.time.temporal.ChronoField
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
+/*
 class TrackedActivityVMFactory(private val id: Long) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return TrackedActivityViewModel(id) as T
     }
 }
+*/
 
 @Immutable
 data class TrackedActivityState(
@@ -45,8 +53,15 @@ data class TrackedActivityState(
         val metric30Days:  ComposeString,
 )
 
-class TrackedActivityViewModel(val id: Long) : ViewModel() {
-    val rep = RepositoryTrackedActivity()
+@HiltViewModel
+class TrackedActivityViewModel @Inject constructor(
+    private val timerService: TrackTimeService,
+    private val db: AppDatabase,
+    private val rep: RepositoryTrackedActivity,
+    private val savedStateHandle: SavedStateHandle
+) : ViewModel() {
+
+    val id: Long = savedStateHandle["activity_id"] ?: throw IllegalArgumentException()
 
     var screenState = MutableLiveData<TrackedActivityState>()
 
@@ -55,18 +70,18 @@ class TrackedActivityViewModel(val id: Long) : ViewModel() {
     }
 
     init {
-        AppDatabase.db.invalidationTracker.addObserver(tracker)
-
+        db.invalidationTracker.addObserver(tracker)
         refresh()
     }
 
     override fun onCleared() {
-        AppDatabase.db.invalidationTracker.removeObserver(tracker)
+        db.invalidationTracker.removeObserver(tracker)
     }
 
     private fun refresh() = viewModelScope.launch(Dispatchers.IO) {
         val activity:TrackedActivity? = rep.activityDAO.getById(id)
 
+        //TODO this has to be here when activity gets deleted
         if(activity == null)
             return@launch
 
@@ -131,6 +146,14 @@ class TrackedActivityViewModel(val id: Long) : ViewModel() {
         screenState.postValue(state)
     }
 
+    fun updateName(name: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            val activity = rep.activityDAO.getById(id)
+            rep.activityDAO.update(activity.copy(name = name))
+        }
+
+    }
+
     fun addTimer(timer: PresetTimer) {
         viewModelScope.launch(Dispatchers.IO) {
             rep.timers.insert(timer)
@@ -150,32 +173,20 @@ class TrackedActivityViewModel(val id: Long) : ViewModel() {
         }
     }
 
-    fun scheduleTimer(context: Context, timer: PresetTimer){
-        Log.e("timer sec", timer.seconds.toString())
-
-        viewModelScope.launch(Dispatchers.IO) {
-            val activity = rep.activityDAO.getById(id).copy(
-                inSessionSince =  LocalDateTime.now(),
-                timer =  timer.seconds
-            )
-
-            rep.activityDAO.update(activity)
-
-            val tag = "activity_timer_${timer.activity_id}"
-
-            val notifier = OneTimeWorkRequestBuilder<ScheduledTimer>()
-                .setInputData(Data.Builder().putLong("id", id).build())
-                .setInitialDelay(timer.seconds.toLong(), TimeUnit.SECONDS)
-                .addTag(tag)
-                .build()
-
-            val manager = WorkManager.getInstance(context)
-            manager.cancelAllWorkByTag(tag)
-            manager.enqueue(notifier)
-
-            NotificationLiveSession.show(context, activity)
-        }
+    fun updateGoal(goal: TrackedActivityGoal)  = viewModelScope.launch(Dispatchers.IO) {
+        val activity = rep.activityDAO.getById(id)
+        rep.activityDAO.update(activity.copy(goal = goal))
     }
+
+
+    fun scheduleTimer(timer: PresetTimer) = viewModelScope.launch(Dispatchers.IO) {
+        timerService.startWithTimer(rep.activityDAO.getById(id), timer)
+    }
+
+    fun deleteActivity(activity: TrackedActivity) = viewModelScope.launch(Dispatchers.IO) {
+        rep.activityDAO.deleteById(activity.id)
+    }
+
 
 }
 

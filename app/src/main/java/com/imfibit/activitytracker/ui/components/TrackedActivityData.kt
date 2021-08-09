@@ -1,19 +1,13 @@
 package com.imfibit.activitytracker.ui.components
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -21,12 +15,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.entities.*
 import com.imfibit.activitytracker.ui.components.dialogs.DialogScore
 import com.imfibit.activitytracker.ui.components.dialogs.DialogSession
 import com.imfibit.activitytracker.database.AppDatabase
-import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
+import com.imfibit.activitytracker.ui.viewmodels.RecordViewModel
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
@@ -39,18 +34,19 @@ fun TrackedActivityRecord(
     record: TrackedActivityRecord,
     scaffoldState: ScaffoldState,
 ){
-
     val dismissState = rememberDismissState()
+
+    val recordVM = hiltViewModel<RecordViewModel>()
 
 
     if (dismissState.isDismissed(DismissDirection.EndToStart)){
         LaunchedEffect(record){
-
             val deleted = scaffoldState.snackbarHostState.showSnackbar("Record deleted", "Undo")
 
             if (deleted == SnackbarResult.Dismissed){
                 dismissState.snapTo(DismissValue.Default)
-                RepositoryTrackedActivity().deleteRecordById(activity.id, record.id)
+
+                recordVM.deleteByActivity(record.id, record.activity_id)
             }else
                 dismissState.reset()
         }
@@ -71,12 +67,34 @@ private fun Record(
     activity: TrackedActivity,
     record: TrackedActivityRecord
 ){
-    val display  = remember { mutableStateOf(false) }
-    EditDialogs(display, record)
+    val openSessionDialog  = remember { mutableStateOf(false) }
+    val openScoreDialog  = remember { mutableStateOf(false) }
+
+    val recordVM = hiltViewModel<RecordViewModel>()
+
+    DialogSession(
+        display = openSessionDialog,
+        record = (record as TrackedActivityTime),
+        onUpdate = {from, to -> recordVM.updateSession(record.id, from, to)},
+        onDelete = {recordVM.deleteRecord(record.id, TrackedActivity.Type.TIME)}
+    )
+
+    DialogScore(
+        display = openScoreDialog,
+        record = (record as TrackedActivityScore),
+        onUpdate = {from, score -> recordVM.updateScore(record.id, from, score)},
+        onDelete = {recordVM.deleteRecord(record.id, TrackedActivity.Type.SCORE)}
+    )
 
     Surface(
         elevation = 2.dp, modifier = Modifier.height(60.dp)
-            .clickable(onClick = {display.value = true})
+            .clickable(onClick = {
+                when(record){
+                    is TrackedActivityCompletion -> {}
+                    is TrackedActivityScore -> openScoreDialog.value = true
+                    is TrackedActivityTime -> openSessionDialog.value = true
+                }
+            })
             .padding(2.dp)
     ) {
         val time = with(AnnotatedString.Builder()) {
@@ -113,7 +131,6 @@ private fun Record(
                     )
                 )
 
-
                 Text(
                     text = time,
                     modifier = Modifier.padding(start = 16.dp),
@@ -122,7 +139,9 @@ private fun Record(
             }
 
 
-            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxHeight().padding(end = 8.dp)) {
+            Box(contentAlignment = Alignment.Center, modifier = Modifier
+                .fillMaxHeight()
+                .padding(end = 8.dp)) {
                 MetricBlock(metric = metric)
             }
 
@@ -136,7 +155,9 @@ private fun Record(
 @Composable
 private fun MetricBlock(metric: String){
     Box(
-        modifier = Modifier.size(60.dp, 25.dp).background(Colors.ChipGray, RoundedCornerShape(50)),
+        modifier = Modifier
+            .size(60.dp, 25.dp)
+            .background(Colors.ChipGray, RoundedCornerShape(50)),
         contentAlignment = Alignment.Center
     ){
 
@@ -146,40 +167,6 @@ private fun MetricBlock(metric: String){
                 fontWeight = FontWeight.Bold,
                 fontSize = 13.sp
             ))
-    }
-}
-
-
-@Composable
-private fun EditDialogs(display: MutableState<Boolean>, record: TrackedActivityRecord){
-    when(record){
-        is TrackedActivityCompletion -> { }
-        is TrackedActivityScore -> {
-            DialogScore(
-                display,
-                record.score,
-                record.datetime_completed,
-                record.id
-            ) { datetime, score ->
-                GlobalScope.launch {
-                    AppDatabase.activityRep.scoreDAO.update(
-                        record.copy(
-                            datetime_completed = datetime,
-                            score = score
-                        )
-                    )
-                }
-            }
-        }
-        is TrackedActivityTime -> {
-            DialogSession(
-                from = record.datetime_start,
-                to = record.datetime_end,
-                display = display,
-                recordId = record.id,
-                activityId= record.activity_id
-            )
-        }
     }
 }
 

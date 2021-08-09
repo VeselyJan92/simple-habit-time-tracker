@@ -2,7 +2,6 @@ package com.imfibit.activitytracker.database.repository.tracked_activity
 
 import androidx.compose.ui.res.stringResource
 import androidx.room.withTransaction
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.ComposeString
 import com.imfibit.activitytracker.core.sumByLong
@@ -11,25 +10,33 @@ import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.entities.*
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.composed.RecordWithActivity
-import com.imfibit.activitytracker.database.repository.DBEntityRepository
 import com.imfibit.activitytracker.ui.components.*
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityWithMetric
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.temporal.ChronoField
+import javax.inject.Inject
 
-class RepositoryTrackedActivity constructor(
-    override val activityDAO: DAOTrackedActivity = AppDatabase.db.activityDAO,
-    val completionDAO: DAOTrackedActivityChecked = AppDatabase.db.completionDAO,
-    val scoreDAO: DAOTrackedActivityScore = AppDatabase.db.scoreDAO,
-    val sessionDAO: DAOTrackedActivityTime = AppDatabase.db.sessionDAO,
-    val metricDAO: DAOTrackedActivityMetric = AppDatabase.db.metricDAO,
-    val timers: DAOPresetTimers = AppDatabase.db.presetTimersDAO
-) : DBEntityRepository<TrackedActivity>(activityDAO) {
+@Module
+@InstallIn(SingletonComponent::class)
+class RepositoryTrackedActivity @Inject constructor(
+    val db: AppDatabase
+) {
 
-    suspend fun getActivitiesOverview(pastRanges: Int) =  AppDatabase.db.withTransaction {
-        return@withTransaction AppDatabase.db.activityDAO.getAllNotInSession().map { activity ->
+    val completionDAO: DAOTrackedActivityChecked = db.completionDAO
+    val activityDAO: DAOTrackedActivity = db.activityDAO
+    val scoreDAO: DAOTrackedActivityScore = db.scoreDAO
+    val sessionDAO: DAOTrackedActivityTime = db.sessionDAO
+    val metricDAO: DAOTrackedActivityMetric = db.metricDAO
+    val timers: DAOPresetTimers = db.presetTimersDAO
+
+
+    suspend fun getActivitiesOverview(pastRanges: Int) =  db.withTransaction {
+        return@withTransaction db.activityDAO.getAllNotInSession().map { activity ->
 
             val data = when(activity.goal.range){
                 TimeRange.DAILY -> metricDAO.getMetricByDay(activity.id,LocalDate.now().minusDays(pastRanges.toLong()), LocalDate.now())
@@ -79,7 +86,7 @@ class RepositoryTrackedActivity constructor(
         activityId: Long,
         firstDayInWeek: LocalDate,
         weeks: Int
-    ) = AppDatabase.db.withTransaction {
+    ) = db.withTransaction {
         val from  = firstDayInWeek.minusWeeks(weeks.toLong()).plusDays(1)
         val activity = activityDAO.getById(activityId)
 
@@ -145,7 +152,7 @@ class RepositoryTrackedActivity constructor(
         TrackedActivity.Type.CHECKED -> completionDAO.getAll(activityId, from, to)
     }
 
-    suspend fun deleteRecordById(activityId: Long, recordId: Long) = transaction {
+    suspend fun deleteRecordById(activityId: Long, recordId: Long) = db.withTransaction {
         val activity = activityDAO.getById(activityId)
 
         when(activity.type) {
@@ -153,23 +160,6 @@ class RepositoryTrackedActivity constructor(
             TrackedActivity.Type.SCORE -> scoreDAO.deleteById(recordId)
             TrackedActivity.Type.CHECKED ->  completionDAO.deleteById(recordId)
         }
-    }
-
-
-    suspend fun startSession(activityId: Long) = AppDatabase.db.withTransaction {
-        activityDAO.update(activityDAO.getById(activityId).copy(inSessionSince = LocalDateTime.now()))
-    }
-
-    suspend fun commitLiveSession(activityId: Long) = AppDatabase.db.withTransaction {
-        val activity = activityDAO.getById(activityId)
-
-        if (activity.inSessionSince != null){
-            val session = TrackedActivityTime(0, activityId, activity.inSessionSince!!, LocalDateTime.now())
-            sessionDAO.insert(session)
-            activityDAO.update(activity.copy(inSessionSince = null))
-        }else
-            FirebaseCrashlytics.getInstance().recordException(IllegalArgumentException("Committing already committed session"))
-
     }
 
 
@@ -187,7 +177,7 @@ class RepositoryTrackedActivity constructor(
     suspend fun getAllRecordsWithActivity(
         from: LocalDateTime,
         to: LocalDateTime
-    ) = AppDatabase.db.withTransaction {
+    ) = db.withTransaction {
         val activities = activityDAO.getAll().map { Pair(it.id, it) }.toMap()
 
         return@withTransaction getAllRecords(from, to).map {

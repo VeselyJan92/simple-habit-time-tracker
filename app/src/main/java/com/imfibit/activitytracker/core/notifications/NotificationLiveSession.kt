@@ -15,30 +15,41 @@ import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.core.services.TrackTimeService
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.AppDatabase
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import javax.inject.Inject
 
 
+
+
+
+@AndroidEntryPoint
 class StopTrackedActivityReceiver : BroadcastReceiver() {
+
+    @Inject
+    lateinit var service: TrackTimeService
+
+    @Inject
+    lateinit var db: AppDatabase
+
     @DelicateCoroutinesApi
-    override fun onReceive(context: Context, intent: Intent) {
-        val id = intent.getLongExtra("id", 0)
+    override fun onReceive(context: Context, intent: Intent) = runBlocking {
+            val id = intent.getLongExtra("id", 0)
+            val activity = db.activityDAO.getById(id)
 
-        if (0 < id){
-            GlobalScope.launch {
-                AppDatabase.activityRep.commitLiveSession(id)
-            }
-        }
-
-        NotificationLiveSession.remove(context, id)
+            service.commitSession(activity)
     }
+
 }
 
 

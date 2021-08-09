@@ -29,9 +29,9 @@ import java.time.format.FormatStyle
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ScreenDayRecords(navControl: NavHostController, recordId: Long, date: LocalDate) {
+fun ScreenDayRecords() {
 
-    val vm  = viewModel<DayRecordsVM>(factory = DayRecordsVMFactory(recordId, date))
+    val vm  = viewModel<DayRecordsVM>()
 
     val scaffoldState = rememberScaffoldState()
 

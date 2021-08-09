@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -58,7 +59,7 @@ fun ScreenTimeline(nav: NavController, scaffoldState: ScaffoldState = rememberSc
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun Body(scaffoldState: ScaffoldState) {
-    val vm = viewModel<TimelineVM>()
+    val vm = hiltViewModel<TimelineVM>()
 
     val items by vm.records.observeAsState(listOf())
     

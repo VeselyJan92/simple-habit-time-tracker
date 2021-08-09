@@ -28,7 +28,6 @@ import com.imfibit.activitytracker.ui.screens.day_history.ScreenDayRecords
 import com.imfibit.activitytracker.ui.screens.onboarding.ScreenOnboarding
 import com.imfibit.activitytracker.ui.screens.statistics.ScreenStatistics
 import com.imfibit.activitytracker.ui.screens.timeline.ScreenTimeline
-import com.imfibit.activitytracker.ui.screens.timer_over.ScreenTimerOver
 import com.imfibit.activitytracker.ui.screens.upcomming.ScreenUpcoming
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
@@ -36,6 +35,7 @@ import java.time.format.DateTimeFormatter
 
 
 import com.imfibit.activitytracker.core.dataStore
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 
 
@@ -49,7 +49,7 @@ const val SCREEN_TIMELINE = "SCREEN_TIMELINE"
 const val SCREEN_TIMER_OVER = "SCREEN_TIMER_OVER"
 const val SCREEN_ONBOARDING= "SCREEN_ONBOARDING"
 
-
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,9 +58,7 @@ class MainActivity : ComponentActivity() {
         NotificationLiveSession.createChannel(this)
 
         setContent {
-            val navController = rememberNavController()
-
-            Router(navController)
+            Router()
         }
     }
 }
@@ -98,7 +96,8 @@ fun AppBottomNavigation(navController: NavController) {
 }
 
 @Composable
-fun Router(navControl: NavHostController){
+fun Router(){
+    val navControl = rememberNavController()
 
     val context: Context = LocalContext.current
 
@@ -114,8 +113,6 @@ fun Router(navControl: NavHostController){
         composable(SCREEN_TIMELINE){ ScreenTimeline(navControl) }
         composable(SCREEN_ACTIVITIES){ ScreenActivities(navControl) }
         composable(SCREEN_UPCOMING){ ScreenUpcoming(navControl) }
-
-        composable(SCREEN_TIMER_OVER){ ScreenTimerOver(navControl) }
         composable(SCREEN_ONBOARDING){ ScreenOnboarding(navControl) }
 
 
@@ -123,9 +120,8 @@ fun Router(navControl: NavHostController){
                 route ="screen_activity/{activity_id}",
                 arguments = listOf(navArgument("activity_id") { type = NavType.LongType })
         ){
-            ScreenTrackedActivity(navControl, it.arguments?.getLong("activity_id")!!)
+            ScreenTrackedActivity(navControl)
         }
-
 
         composable(
                 route = "screen_day_history/{activity_id}/{date}",
@@ -134,11 +130,7 @@ fun Router(navControl: NavHostController){
                         navArgument("date") { type = NavType.StringType }
                 )
         ){
-            ScreenDayRecords(
-                    navControl,
-                    it.arguments?.getLong("activity_id")!!,
-                    LocalDate.parse(it.arguments?.getString("date"), DateTimeFormatter.ISO_DATE)
-            )
+            ScreenDayRecords()
         }
     }
 }

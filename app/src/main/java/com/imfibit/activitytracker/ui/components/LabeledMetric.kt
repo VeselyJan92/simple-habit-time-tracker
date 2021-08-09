@@ -6,32 +6,28 @@ import android.os.Vibrator
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.Text
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.imfibit.activitytracker.core.App
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.imfibit.activitytracker.core.ComposeString
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.components.dialogs.DialogSession
 import com.imfibit.activitytracker.ui.components.dialogs.DialogScore
-import com.imfibit.activitytracker.database.AppDatabase
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import com.imfibit.activitytracker.ui.viewmodels.RecordViewModel
 import java.time.LocalDateTime
-import kotlin.random.Random
 
 
 val labelHeight = 13.dp
@@ -95,7 +91,6 @@ fun BaseMetricBlock(
         Modifier
 
     val width = if (width == 0.dp)
-        //Modifier.weight(1f).height(metricHeight)
         Modifier
             .fillMaxWidth()
             .height(metricHeight)
@@ -140,7 +135,6 @@ fun LabeledMetricBlock(
         Modifier
 
     val width = if (width == 0.dp){
-       // Modifier.weight(1f)
         Modifier.fillMaxWidth(1f)
     }else{
         Modifier.width(width)
@@ -181,6 +175,7 @@ fun MetricBlock(
 ){
     val requestEdit = remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
 
     var onEdit: (() -> Unit)? = null
 
@@ -189,32 +184,44 @@ fun MetricBlock(
         require(editable != null)
 
         onEdit = onLongClick ?: fun() {
-            val viber = App.context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            val viber = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
             viber.vibrate(VibrationEffect.createOneShot(50L, 1))
 
             requestEdit.value = true
         }
 
+        val vm = hiltViewModel<RecordViewModel>()
+
         if (requestEdit.value ) when (editable.type){
             TrackedActivity.Type.TIME -> DialogSession(
+                display = requestEdit,
+                allowDelete = editable.isRecord(),
                 from =  editable.from,
                 to =  editable.to,
-                display = requestEdit,
-                recordId = editable.recordId,
-                activityId = editable.activityId
+                onUpdate = { from, to ->
+                    if (editable.isRecord()){
+                        vm.updateSession(editable.recordId, from, to )
+                    }else{
+                        vm.insertSession(editable.activityId, from, to)
+                    }
+                },
+                onDelete = { vm.deleteRecord(editable.recordId, TrackedActivity.Type.TIME)}
             )
             TrackedActivity.Type.SCORE  -> DialogScore(
                 display = requestEdit,
+                allowDelete = editable.isRecord(),
                 datetime = editable.from,
-                score = editable.metric,
-                recordId = editable.recordId,
-                activityId = editable.activityId
+                score = if (editable.isRecord()) editable.metric else 1,
+                onUpdate = {time, score ->
+                    if (editable.isRecord())
+                        vm.updateScore(editable.recordId, time, score)
+                    else
+                        vm.addScore(editable.activityId, time, score)
+                },
+                onDelete = { vm.deleteRecord(editable.recordId, TrackedActivity.Type.TIME)}
             )
             TrackedActivity.Type.CHECKED -> {
-                // Bit hacky here
-                LaunchedEffect(Random.nextFloat()) {
-                    AppDatabase.activityRep.completionDAO.toggle(editable.activityId, editable.from)
-                }
+                vm.toggleHabit(editable.activityId, editable.from)
                 requestEdit.value = false
             }
         }

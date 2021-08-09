@@ -6,12 +6,16 @@ import com.imfibit.activitytracker.database.entities.*
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.composed.RecordWithActivity
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import javax.inject.Inject
 
-class TimelineVM : ViewModel() {
-
-    val rep = RepositoryTrackedActivity()
+@HiltViewModel
+class TimelineVM @Inject constructor(
+    private val db: AppDatabase,
+    private val rep: RepositoryTrackedActivity
+) : ViewModel() {
 
     val records = MutableLiveData<List<RecordWithActivity>>(listOf())
 
@@ -20,12 +24,12 @@ class TimelineVM : ViewModel() {
     }
 
     init {
-        AppDatabase.db.invalidationTracker.addObserver(tracker)
+        db.invalidationTracker.addObserver(tracker)
         refresh()
     }
 
     override fun onCleared() {
-        AppDatabase.db.invalidationTracker.removeObserver(tracker)
+        db.invalidationTracker.removeObserver(tracker)
     }
 
     private fun refresh() = viewModelScope.launch {

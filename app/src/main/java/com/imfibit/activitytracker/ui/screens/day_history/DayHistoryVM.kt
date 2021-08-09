@@ -6,19 +6,20 @@ import com.imfibit.activitytracker.database.entities.*
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.composed.RecordWithActivity
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import javax.inject.Inject
 
+@HiltViewModel
+class DayRecordsVM @Inject constructor(
+    private val db: AppDatabase,
+    private val rep: RepositoryTrackedActivity,
+    private val savedStateHandle: SavedStateHandle
+) : ViewModel() {
 
-class DayRecordsVMFactory(val activityId: Long, val date: LocalDate) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return DayRecordsVM(activityId, date) as T
-    }
-}
-
-class DayRecordsVM(val activityId: Long, val date: LocalDate) : ViewModel() {
-
-    val rep = RepositoryTrackedActivity()
+    val activityId: Long = savedStateHandle["activity_id"] ?: throw IllegalArgumentException()
+    val date: LocalDate = LocalDate.parse(savedStateHandle["date"])?: throw IllegalArgumentException()
 
     val records = MutableLiveData<List<RecordWithActivity>>()
 
@@ -27,12 +28,12 @@ class DayRecordsVM(val activityId: Long, val date: LocalDate) : ViewModel() {
     }
 
     init {
-        AppDatabase.db.invalidationTracker.addObserver(tracker)
+        db.invalidationTracker.addObserver(tracker)
         refresh()
     }
 
     override fun onCleared() {
-        AppDatabase.db.invalidationTracker.removeObserver(tracker)
+        db.invalidationTracker.removeObserver(tracker)
     }
 
     fun refresh() = viewModelScope.launch {

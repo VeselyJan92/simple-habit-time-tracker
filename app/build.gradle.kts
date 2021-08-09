@@ -8,6 +8,7 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-kapt")
+    id("dagger.hilt.android.plugin")
 
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
@@ -150,7 +151,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:$COMPOSE_VERSION")
     debugImplementation("androidx.compose.ui:ui-tooling:$COMPOSE_VERSION")
 
-    implementation("androidx.navigation:navigation-compose:2.4.0-alpha05")
+    implementation("androidx.navigation:navigation-compose:2.4.0-alpha06")
 
     val ROOM_VERSION = "2.4.0-alpha04"
 
@@ -166,6 +167,20 @@ dependencies {
     implementation("com.google.accompanist:accompanist-pager-indicators:0.15.0")
 
     implementation("com.github.aclassen:ComposeReorderable:0.1")
+
+
+
+
+    implementation("com.google.dagger:hilt-android:2.38.1")
+    kapt("com.google.dagger:hilt-android-compiler:2.38.1")
+    implementation( "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
+    implementation( "androidx.hilt:hilt-navigation-compose:1.0.0-alpha03")
+    kapt( "androidx.hilt:hilt-compiler:1.0.0")
+    implementation("androidx.hilt:hilt-work:1.0.0")
+
+
+
+
 
 
 }

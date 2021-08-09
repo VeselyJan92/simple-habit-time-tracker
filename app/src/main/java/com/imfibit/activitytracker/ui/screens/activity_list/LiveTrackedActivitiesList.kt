@@ -1,7 +1,6 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,12 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.TimeUtils
-import com.imfibit.activitytracker.core.notifications.NotificationLiveSession
-import com.imfibit.activitytracker.core.notifications.NotificationTimerOver
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.components.Timer
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 
 @Composable
@@ -47,8 +42,6 @@ fun LiveActivitiesList(vm: ActivitiesViewModel) {
 @Composable
 private fun LiveActivity(vm: ActivitiesViewModel, item: TrackedActivity) {
 
-
-
     Row(
         Modifier
             .fillMaxWidth()
@@ -58,7 +51,7 @@ private fun LiveActivity(vm: ActivitiesViewModel, item: TrackedActivity) {
 
         IconButton(
             onClick = {
-                vm.stopSession(context, item)
+                vm.commitSession(item)
             }
         ) {
             Box(
@@ -80,10 +73,8 @@ private fun LiveActivity(vm: ActivitiesViewModel, item: TrackedActivity) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.NotificationsActive, null, modifier = Modifier.size(16.dp))
 
-
-
                     Text(
-                        text = stringResource(id = R.string.screen_activities_target) + TimeUtils.secondsToMetric(item.timer.toLong()).removeSuffix(":00"),
+                        text = stringResource(id = R.string.screen_activities_target) + " " +TimeUtils.secondsToMetric(item.timer.toLong()).removeSuffix(":00"),
                         modifier = Modifier.padding(start = 8.dp)
                     )
 
@@ -94,14 +85,7 @@ private fun LiveActivity(vm: ActivitiesViewModel, item: TrackedActivity) {
         Timer(
             startTime = item.inSessionSince!!,
             onClick = {
-                val activity = item.copy(inSessionSince = it)
-
-                NotificationLiveSession.show(context, activity)
-                NotificationTimerOver.remove(context, item.id)
-
-                GlobalScope.launch {
-                    vm.rep.activityDAO.update(activity)
-                }
+                vm.updateSession(item, it)
             }
         )
 

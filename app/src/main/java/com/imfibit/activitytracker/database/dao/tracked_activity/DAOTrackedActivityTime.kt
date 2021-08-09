@@ -44,5 +44,12 @@ interface DAOTrackedActivityTime : BaseEditableDAO<TrackedActivityTime> {
     """)
     suspend fun deleteById(recordId: Long)
 
+
+    @Query("""
+        select * from tracked_activity_session
+        where tracked_activity_session_id=:recordId
+    """)
+    suspend fun getById(recordId: Long): TrackedActivityTime
+
 }
 
