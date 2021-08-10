@@ -3,7 +3,6 @@ package com.imfibit.activitytracker.ui.components.dialogs
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,44 +26,41 @@ inline fun DialogGoal(
 
         DialogBaseHeader(title = stringResource(id = R.string.dialog_goal_title))
 
-        var goal by remember { mutableStateOf(activity.goal.value) }
+        val goal = remember { mutableStateOf(activity.goal.value) }
 
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
 
             when(activity.type){
                 TrackedActivity.Type.TIME ->{
                     MinuteAndHourSelector(
-                        hours = goal.toInt()/3600,
-                        minutes = ((goal % 3600)/60L).toInt(),
+                        hours = goal.value.toInt()/3600,
+                        minutes = ((goal.value % 3600)/60L).toInt(),
                         onSelectionChanged = {
-                                hours, minutes -> goal = (60 * hours + minutes) * 60L
+                                hours, minutes -> goal.value = (60 * hours + minutes) * 60L
                         }
                     )
                 }
 
                 TrackedActivity.Type.SCORE -> {
-                    val state = remember { mutableStateOf(goal.toInt()) }
-
                     NumberSelector(
                         label = stringResource(id = R.string.score),
-                        number = state
+                        number = goal.value.toInt(),
+                        range = 0..1000
                     ) {
-                        if (goal in 1..10_000)
-                            goal = it.toLong()
+                        goal.value = it.toLong()
                     }
                 }
                 TrackedActivity.Type.CHECKED ->{
-                    val state = remember { mutableStateOf(goal.toInt()) }
-
                     NumberSelector(
                         label = stringResource(id = R.string.repetitions),
-                        number = state
-                    ){
-                        when(activity.goal.range){
+                        number = goal.value.toInt(),
+                        range = when(activity.goal.range){
                             TimeRange.DAILY -> throw IllegalStateException()
-                            TimeRange.WEEKLY -> if (it in 0..7) goal = it.toLong()
-                            TimeRange.MONTHLY -> if (it in 0..31) goal = it.toLong()
+                            TimeRange.WEEKLY -> 0..7
+                            TimeRange.MONTHLY -> 0..31
                         }
+                    ){
+                        goal.value = it.toLong()
                     }
                 }
 
@@ -81,7 +77,7 @@ inline fun DialogGoal(
                 Text(text = stringResource(id = R.string.dialog_action_cancel))
             }
 
-            TextButton(onClick = {display.value = false ; onGoalSet.invoke(goal)}) {
+            TextButton(onClick = {display.value = false ; onGoalSet.invoke(goal.value)}) {
                 Text(text = stringResource(id = R.string.dialog_action_continue))
             }
         }

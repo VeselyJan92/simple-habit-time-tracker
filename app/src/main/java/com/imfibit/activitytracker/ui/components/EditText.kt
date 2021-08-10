@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.sp
 fun EditText(
     text: TextFieldValue,
     onValueChange: (TextFieldValue)->Unit,
-    validate: (TextFieldValue)->Boolean = {true},
+    validate: (TextFieldValue)->Boolean = { true },
     modifier: Modifier = Modifier,
     label: String = "",
     textStyle:TextStyle = TextStyle(
@@ -41,6 +41,8 @@ fun EditText(
     keyboardType: KeyboardType = KeyboardType.Text,
     color: Color = Colors.ChipGray
 ){
+
+
     val valid = validate(text)
 
     val color = if (valid) color else Colors.NotCompleted
@@ -51,8 +53,10 @@ fun EditText(
             Text(label,)
 
         BasicTextField(
+            singleLine = true,
             value = text,
-            onValueChange = {onValueChange.invoke(it)},
+
+            onValueChange = onValueChange,
             textStyle = textStyle,
             modifier = Modifier.padding(start = 8.dp, end = 8.dp).fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),

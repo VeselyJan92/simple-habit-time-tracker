@@ -59,8 +59,7 @@ fun ScreenStatistics(navController: NavHostController){
 @Composable
 private fun ScreenBody() = Column {
 
-
-    val vm = viewModel<StatisticsViewModel>()
+    val vm = hiltViewModel<StatisticsViewModel>()
 
     val state = remember { StatisticsState(LocalDate.now(), TimeRange.DAILY) }
 

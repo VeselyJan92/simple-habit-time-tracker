@@ -103,28 +103,10 @@ fun ScreenBody(nav: NavController, state: TrackedActivityState?, vm: TrackedActi
         ActivitySettings(state, vm)
 
         RecentActivity(nav, state)
-
     }
 }
 
 
-/*@Composable
-private fun Timers(state: TrackedActivityState?, vm: TrackedActivityViewModel){
-
-    Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp).height(56.dp).fillMaxWidth()) {
-        if (state != null){
-            LazyRow(verticalAlignment = Alignment.CenterVertically, contentPadding = PaddingValues(8.dp) ){
-                itemsIndexed(state.timers){ index, item ->
-                    RoundTextBox(
-                        modifier = Modifier.height(30.dp).width(60.dp),
-                        text = TimeUtils.secondsToMetric(item.seconds.toLong()).removeSuffix(":00"),
-                        style = TextStyle.Default.copy(fontWeight = FontWeight.W500)
-                    )
-                }
-            }
-        }
-    }
-}*/
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

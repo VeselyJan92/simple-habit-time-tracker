@@ -1,5 +1,6 @@
 package com.imfibit.activitytracker.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.imfibit.activitytracker.database.entities.TrackedActivity

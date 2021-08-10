@@ -74,7 +74,7 @@
 
 
     <string name="screen_onboarding_page_1_title">Get Insights</string>
-    <string name="screen_onboarding_page_1_text">Habit tracking will motivate you to keep on going. Track your time, score, habit.</string>
+    <string name="screen_onboarding_page_1_text">Habit tracking will motivate you to keep on going. Track your time, score and habits.</string>
     <string name="screen_onboarding_page_2_title">Easily Add Record</string>
     <string name="screen_onboarding_page_2_text">Add record easily by long pressing on any date.</string>
     <string name="screen_onboarding_page_3_title">Improve Yourself</string>

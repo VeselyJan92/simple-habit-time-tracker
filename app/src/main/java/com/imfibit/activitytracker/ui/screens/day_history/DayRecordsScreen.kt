@@ -14,24 +14,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.SectionHeader
 import com.imfibit.activitytracker.ui.components.TrackedActivityRecord
 import com.imfibit.activitytracker.ui.components.TrackerTopAppBar
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-
 
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ScreenDayRecords() {
 
-    val vm  = viewModel<DayRecordsVM>()
+    val vm  = hiltViewModel<DayRecordsVM>()
 
     val scaffoldState = rememberScaffoldState()
 
@@ -53,7 +50,9 @@ fun ScreenDayRecords() {
 private fun ScreenBody(vm: DayRecordsVM, scaffoldState: ScaffoldState) {
     Column {
 
-        Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp).fillMaxWidth()) {
+        Surface(elevation = 2.dp, modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()) {
             Column(modifier = Modifier.padding(8.dp)) {
                 SectionHeader(vm.date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)))
 
@@ -63,7 +62,10 @@ private fun ScreenBody(vm: DayRecordsVM, scaffoldState: ScaffoldState) {
         val items = vm.records.observeAsState(listOf())
 
         if (items.value.isEmpty()){
-            Box(Modifier.fillMaxWidth().fillMaxHeight(), contentAlignment = Alignment.Center) {
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(), contentAlignment = Alignment.Center) {
                 Text(
                     text = stringResource(id = R.string.no_records),
                     style = TextStyle(

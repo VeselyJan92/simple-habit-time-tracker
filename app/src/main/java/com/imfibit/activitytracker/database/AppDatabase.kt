@@ -89,15 +89,15 @@ abstract class AppDatabase : RoomDatabase() {
                 db
             }
             "debug" -> {
-              /*  db = Room.databaseBuilder(context, AppDatabase::class.java, DB_NAME)
+                val db = Room.databaseBuilder(context, AppDatabase::class.java, DB_NAME)
                     .createFromAsset("activity_tracker.db")
                     .addMigrations(*migrations)
-                    .build()*/
-
-                val db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
                     .build()
 
-                runBlocking(Dispatchers.IO) { ReleaseSeeder.seed(db) }
+                /*val db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+                    .build()
+
+                runBlocking(Dispatchers.IO) { ReleaseSeeder.seed(db) }*/
 
                 db
             }

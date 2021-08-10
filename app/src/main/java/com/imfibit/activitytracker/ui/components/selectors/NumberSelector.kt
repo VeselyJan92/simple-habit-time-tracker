@@ -5,12 +5,21 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlusOne
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -21,7 +30,6 @@ import androidx.compose.ui.unit.sp
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.EditText
 import com.imfibit.activitytracker.ui.components.icons.MinusOne
-import java.lang.Exception
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -29,15 +37,20 @@ import java.lang.Exception
 @Composable
 fun NumberSelector(
     label: String,
-    number: MutableState<Int>,
+    number: Int,
+    range: IntRange,
     onNumberEdit: (Int)->Unit,
 ) {
-
     Row(Modifier.padding(start = 8.dp, end = 8.dp, top = 16.dp, bottom = 8.dp)) {
+
+        val focusManager = LocalFocusManager.current
+
         IconButton(
             onClick = {
-                if (number.value in Int.MIN_VALUE+1..Int.MAX_VALUE){
-                    onNumberEdit.invoke(number.value-1)
+                focusManager.clearFocus()
+
+                if (number - 1 in range){
+                    onNumberEdit.invoke(number-1)
                 }
             },
             modifier = Modifier
@@ -50,9 +63,10 @@ fun NumberSelector(
             Icon(Icons.Filled.MinusOne, contentDescription = null)
         }
 
-
         Column(
-            modifier = Modifier.weight(25f).height(45.dp),
+            modifier = Modifier
+                .weight(25f)
+                .height(45.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -63,13 +77,28 @@ fun NumberSelector(
                 style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp)
             )
 
+
+            val localValue = remember(number) {
+                mutableStateOf(TextFieldValue(text = number.toString(), selection = TextRange(number.toString().length)))
+            }
+
             EditText(
-                modifier = Modifier.height(30.dp),
-                text = TextFieldValue(number.value.toString()),
+                modifier = Modifier.height(30.dp).focusRequester(FocusRequester.Default),
+                text = localValue.value,
+
                 onValueChange = {
-                    try {
+                    val valid = when {
+                        it.text.isEmpty() -> true
+                        it.text.toIntOrNull() == null -> false
+                        else ->  it.text.toInt() in range
+                    }
+
+                    if (valid)
+                        localValue.value = it
+
+                    if (valid && it.text.isNotBlank())
                         onNumberEdit.invoke(it.text.toInt())
-                    } catch (e: Exception) { }
+
                 },
                 textStyle = TextStyle(
                     fontSize = 16.sp,
@@ -83,15 +112,18 @@ fun NumberSelector(
 
         Box(
             modifier = Modifier
-                .padding(start = 8.dp, top = 15.dp).weight(50f)
+                .padding(start = 8.dp, top = 15.dp)
+                .weight(50f)
                 .background(Colors.ChipGray, RoundedCornerShape(50))
                 .padding(start = 8.dp),
             contentAlignment = Alignment.Center
         ) {
             IconButton(
                 onClick = {
-                    if (number.value in Int.MIN_VALUE until Int.MAX_VALUE){
-                        onNumberEdit.invoke(number.value + 1)
+                    focusManager.clearFocus()
+
+                    if (number + 1 in range){
+                        onNumberEdit.invoke(number + 1)
                     }
                 },
                 modifier = Modifier.height(30.dp)

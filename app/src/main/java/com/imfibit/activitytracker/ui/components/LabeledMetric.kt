@@ -196,8 +196,8 @@ fun MetricBlock(
             TrackedActivity.Type.TIME -> DialogSession(
                 display = requestEdit,
                 allowDelete = editable.isRecord(),
-                from =  editable.from,
-                to =  editable.to,
+                from =  if (editable.isRecord()) editable.from else editable.from.plusHours(12),
+                to =  if (editable.isRecord()) editable.to else editable.from.plusHours(12),
                 onUpdate = { from, to ->
                     if (editable.isRecord()){
                         vm.updateSession(editable.recordId, from, to )

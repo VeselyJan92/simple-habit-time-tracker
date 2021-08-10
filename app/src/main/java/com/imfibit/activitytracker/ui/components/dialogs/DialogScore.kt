@@ -49,8 +49,12 @@ fun DialogScore(
 
         DialogBaseHeader(title = stringResource(id = if (allowDelete) R.string.dialo_score_title_edit else R.string.dialo_score_title_add))
 
-        NumberSelector(label = stringResource(id = R.string.score), number = score){
-            if ( it in 1..999) score.value = it
+        NumberSelector(
+            label = stringResource(id = R.string.score),
+            number = score.value,
+            range = 1..999
+        ){
+            score.value = it
         }
 
         Column(

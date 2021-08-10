@@ -53,6 +53,7 @@ fun TrackedActivityRecord(
     }
 
     SwipeToDismiss(
+        directions = setOf(DismissDirection.EndToStart),
         state = dismissState,
         background = {}
     ) {
@@ -72,14 +73,14 @@ private fun Record(
 
     val recordVM = hiltViewModel<RecordViewModel>()
 
-    DialogSession(
+    if (openSessionDialog.value) DialogSession(
         display = openSessionDialog,
         record = (record as TrackedActivityTime),
         onUpdate = {from, to -> recordVM.updateSession(record.id, from, to)},
         onDelete = {recordVM.deleteRecord(record.id, TrackedActivity.Type.TIME)}
     )
 
-    DialogScore(
+    if (openScoreDialog.value) DialogScore(
         display = openScoreDialog,
         record = (record as TrackedActivityScore),
         onUpdate = {from, score -> recordVM.updateScore(record.id, from, score)},

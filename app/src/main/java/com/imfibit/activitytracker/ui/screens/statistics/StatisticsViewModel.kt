@@ -1,16 +1,10 @@
 package com.imfibit.activitytracker.ui.screens.statistics
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.imfibit.activitytracker.core.activityInvalidationTracker
-import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
-import com.imfibit.activitytracker.database.composed.RecordWithActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
 
