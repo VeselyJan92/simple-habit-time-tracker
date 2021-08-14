@@ -47,7 +47,7 @@ import java.time.LocalDate
 @Composable
 fun ScreenStatistics(navController: NavHostController){
     Scaffold(
-        topBar = { TrackerTopAppBar("Statistika") },
+        topBar = { TrackerTopAppBar(stringResource(id = R.string.screen_title_statistics)) },
         content = { ScreenBody() },
         bottomBar = { AppBottomNavigation(navController) },
         backgroundColor = Colors.AppBackground

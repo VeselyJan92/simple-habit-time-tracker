@@ -89,23 +89,10 @@ abstract class AppDatabase : RoomDatabase() {
                 db
             }
             "debug" -> {
-                val db = Room.databaseBuilder(context, AppDatabase::class.java, DB_NAME)
-                    .createFromAsset("activity_tracker.db")
-                    .addMigrations(*migrations)
+                val db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
                     .build()
 
-                /*val db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-                    .build()
-
-                runBlocking(Dispatchers.IO) { ReleaseSeeder.seed(db) }*/
-
-                db
-            }
-            "personal" ->{
-                val db = Room.databaseBuilder(context, AppDatabase::class.java, DB_NAME)
-                    .addMigrations(*migrations)
-                    .build()
-
+                runBlocking(Dispatchers.IO) { ReleaseSeeder.seed(db) }
                 db
             }
             else -> throw IllegalArgumentException()

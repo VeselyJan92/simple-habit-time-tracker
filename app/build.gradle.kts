@@ -21,29 +21,16 @@ repositories {
 
 android {
     signingConfigs {
-        /*create("release"){
+        create("release") {
             val properties = Properties().apply {
-                load(File("signing.properties").reader())
+                load(File("../imfibit-tracker-keystore/signing.properties").reader())
             }
 
             storeFile = File(properties.getProperty("key_store"))
             storePassword = properties.getProperty("key_store_password")
             keyPassword = properties.getProperty("key_password")
             keyAlias = properties.getProperty("key_alias")
-        }*/
-
-        create("release"){
-         val properties = Properties().apply {
-             load(File("../imfibit-tracker-keystore/signing.properties").reader())
-         }
-
-         storeFile = File(properties.getProperty("key_store"))
-         storePassword = properties.getProperty("key_store_password")
-         keyPassword = properties.getProperty("key_password")
-         keyAlias = properties.getProperty("key_alias")
-     }
-
-
+        }
 
         getByName("debug") {
             storeFile = rootProject.file("debug.keystore")
@@ -58,12 +45,12 @@ android {
     buildToolsVersion = "30.0.3"
 
     buildFeatures {
-        compose =  true
+        compose = true
     }
 
     compileOptions {
-        sourceCompatibility =  JavaVersion.VERSION_1_8
-        targetCompatibility  = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     composeOptions {
@@ -80,7 +67,7 @@ android {
     }
 
     defaultConfig {
-        applicationId ="com.imfibit.activitytracker"
+        applicationId = "com.imfibit.activitytracker"
         minSdk = 26
         targetSdk = 31
         versionCode = 3
@@ -92,6 +79,7 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+
             manifestPlaceholders["crashlyticsCollectionEnabled"] = true
 
             signingConfig = signingConfigs.getByName("release")
@@ -105,22 +93,11 @@ android {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
 
-            applicationIdSuffix =  ".debug"
+            applicationIdSuffix = ".debug"
             versionNameSuffix = " - DEBUG"
 
 
             isDebuggable = true
-        }
-
-        create("personal") {
-            isMinifyEnabled = false
-            manifestPlaceholders["crashlyticsCollectionEnabled"] = true
-
-            signingConfig = signingConfigs.getByName("release")
-            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-
-            applicationIdSuffix =  ".personal"
-            versionNameSuffix = " - TEST"
         }
 
     }
@@ -156,10 +133,10 @@ dependencies {
     val ROOM_VERSION = "2.4.0-alpha04"
 
     kapt("androidx.room:room-compiler:$ROOM_VERSION")
-    implementation ("androidx.room:room-runtime:$ROOM_VERSION")
-    implementation ("androidx.room:room-ktx:$ROOM_VERSION")
+    implementation("androidx.room:room-runtime:$ROOM_VERSION")
+    implementation("androidx.room:room-ktx:$ROOM_VERSION")
 
-    implementation ("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
 
 
@@ -173,14 +150,10 @@ dependencies {
 
     implementation("com.google.dagger:hilt-android:2.38.1")
     kapt("com.google.dagger:hilt-android-compiler:2.38.1")
-    implementation( "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
-    implementation( "androidx.hilt:hilt-navigation-compose:1.0.0-alpha03")
-    kapt( "androidx.hilt:hilt-compiler:1.0.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0-alpha03")
+    kapt("androidx.hilt:hilt-compiler:1.0.0")
     implementation("androidx.hilt:hilt-work:1.0.0")
-
-
-
-
 
 
 }
