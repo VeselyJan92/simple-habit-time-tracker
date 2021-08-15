@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
+import android.util.Log
 import androidx.work.Data
 import androidx.work.ListenableWorker
 import androidx.work.OneTimeWorkRequestBuilder
@@ -37,6 +38,8 @@ class TimerOverBroadcastReceiver() : BroadcastReceiver(){
     @Inject lateinit var repository: RepositoryTrackedActivity
 
     override fun onReceive(context: Context, intent: Intent)  = runBlocking {
+        Log.e("FIRE", "FIRE")
+
         val activity = try {
             repository.activityDAO.getById( intent.extras!!.getLong(ACTIVITY_ID))
         }catch (e: Exception){
@@ -91,7 +94,10 @@ class TrackTimeService @Inject constructor(
     suspend fun cancelSession(activity: TrackedActivity){
         repository.activityDAO.update(activity.copy(inSessionSince = null))
 
-        (context.getSystemService(Context.ALARM_SERVICE) as AlarmManager).cancel(getTimerPendingIntent(activity))
+        val pendingIntent = PendingIntent.getService(context, activity.id.toInt(), getTimerIntent(activity), PendingIntent.FLAG_NO_CREATE)
+
+
+        (context.getSystemService(Context.ALARM_SERVICE) as AlarmManager).cancel(pendingIntent)
 
         NotificationLiveSession.remove(context, activity.id)
         NotificationTimerOver.remove(context, activity.id)
@@ -102,11 +108,11 @@ class TrackTimeService @Inject constructor(
 
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        val pendingIntent = getTimerPendingIntent(activity)
         val time = System.currentTimeMillis() + timer.seconds * 1000
 
-        alarmManager.cancel(pendingIntent)
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent)
+        //alarmManager.cancel(pendingIntent)
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, PendingIntent.getService(context, activity.id.toInt(), getTimerIntent(activity), 0))
+
     }
 
     suspend fun updateSession(activity: TrackedActivity, start: LocalDateTime){
@@ -116,12 +122,10 @@ class TrackTimeService @Inject constructor(
         NotificationTimerOver.remove(context, activity.id)
     }
 
-    private fun getTimerPendingIntent(activity: TrackedActivity): PendingIntent? {
-        val intent = Intent(context, TimerOverBroadcastReceiver::class.java ).apply {
+    private fun getTimerIntent(activity: TrackedActivity): Intent {
+        return Intent(context, TimerOverBroadcastReceiver::class.java ).apply {
             putExtra(TimerOverBroadcastReceiver.ACTIVITY_ID, activity.id)
         }
-
-        return PendingIntent.getService(context, activity.id.toInt(), intent, PendingIntent.FLAG_NO_CREATE)
     }
 
 }
