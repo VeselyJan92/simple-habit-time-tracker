@@ -89,7 +89,9 @@ abstract class AppDatabase : RoomDatabase() {
                 db
             }
             "debug" -> {
-                val db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+                val db = Room
+                    //.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+                    .databaseBuilder(context, AppDatabase::class.java, DB_NAME)
                     .build()
 
                 runBlocking(Dispatchers.IO) { ReleaseSeeder.seed(db) }

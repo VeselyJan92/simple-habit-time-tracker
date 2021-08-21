@@ -15,6 +15,7 @@ import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.core.receivers.StopActivitySessionReceiver
 import com.imfibit.activitytracker.core.services.TrackTimeService
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.AppDatabase
@@ -33,24 +34,7 @@ import javax.inject.Inject
 
 
 
-@AndroidEntryPoint
-class StopTrackedActivityReceiver : BroadcastReceiver() {
 
-    @Inject
-    lateinit var service: TrackTimeService
-
-    @Inject
-    lateinit var db: AppDatabase
-
-    @DelicateCoroutinesApi
-    override fun onReceive(context: Context, intent: Intent) = runBlocking {
-            val id = intent.getLongExtra("id", 0)
-            val activity = db.activityDAO.getById(id)
-
-            service.commitSession(activity)
-    }
-
-}
 
 
 object NotificationLiveSession{
@@ -82,7 +66,7 @@ object NotificationLiveSession{
         val stopIntent = PendingIntent.getBroadcast(
             context,
             item.id.toInt(),
-            Intent(context, StopTrackedActivityReceiver::class.java).apply { putExtra("id", item.id) },
+            Intent(context, StopActivitySessionReceiver::class.java).apply { putExtra("id", item.id) },
             PendingIntent.FLAG_UPDATE_CURRENT
         )
 

@@ -69,7 +69,7 @@ android {
     defaultConfig {
         applicationId = "com.imfibit.activitytracker"
         minSdk = 26
-        targetSdk = 31
+        targetSdk = 30
         versionCode = 3
         versionName = "1.1"
 
@@ -115,7 +115,6 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:25.11.0"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
 
-    implementation("androidx.work:work-runtime-ktx:2.6.0-rc01")
 
 
     implementation("androidx.compose.compiler:compiler:$COMPOSE_VERSION")
@@ -153,7 +152,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0-alpha03")
     kapt("androidx.hilt:hilt-compiler:1.0.0")
-    implementation("androidx.hilt:hilt-work:1.0.0")
 
 
 }

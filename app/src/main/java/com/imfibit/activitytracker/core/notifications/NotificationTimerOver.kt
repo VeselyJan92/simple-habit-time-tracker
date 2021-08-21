@@ -13,6 +13,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.core.receivers.StopActivitySessionReceiver
 import com.imfibit.activitytracker.core.services.TrackTimeService
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.entities.TrackedActivity
@@ -20,26 +21,6 @@ import com.imfibit.activitytracker.ui.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import javax.inject.Inject
-
-
-@AndroidEntryPoint
-class StopScheduledTimerReceiver : BroadcastReceiver() {
-
-    @Inject
-    lateinit var service: TrackTimeService
-
-    @Inject
-    lateinit var db: AppDatabase
-
-    override fun onReceive(context: Context, intent: Intent) = runBlocking(){
-        val activityId = intent.getLongExtra("activity_id", 0L)
-        val activity = db.activityDAO.getById(activityId)
-
-        service.commitSession(activity)
-
-    }
-}
-
 
 object NotificationTimerOver {
     val ID_BASE = 1000
@@ -55,7 +36,7 @@ object NotificationTimerOver {
 
         val stopTimerIntent = PendingIntent.getBroadcast(
             context, 0,
-            Intent(context, StopScheduledTimerReceiver::class.java).apply { putExtra("activity_id", activity.id) },
+            Intent(context, StopActivitySessionReceiver::class.java).apply { putExtra("activity_id", activity.id) },
             PendingIntent.FLAG_UPDATE_CURRENT
         )
 

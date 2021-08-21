@@ -1,15 +1,8 @@
 package com.imfibit.activitytracker.ui.screens.activity
 
 
-import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.work.Data
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import com.imfibit.activitytracker.core.notifications.NotificationLiveSession
 import com.imfibit.activitytracker.core.ComposeString
 import com.imfibit.activitytracker.core.activityInvalidationTracker
 import com.imfibit.activitytracker.core.services.TrackTimeService
@@ -19,18 +12,14 @@ import com.imfibit.activitytracker.database.repository.tracked_activity.Reposito
 import com.imfibit.activitytracker.ui.components.*
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
-import com.imfibit.activitytracker.work.ScheduledTimer
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.time.temporal.ChronoField
 import java.util.*
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /*
