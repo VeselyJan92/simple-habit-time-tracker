@@ -1,5 +1,6 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
@@ -122,11 +123,8 @@ private fun ScreenBody(
             .padding(8.dp)
             .reorderable(
                 state = state,
-                onDragEnd = { from, to -> vm.moveCategory() },
+                onDragEnd = { from, to -> vm.moveActivity() },
                 onMove = { from, to ->
-                    if (to > activities.size + 1) {
-                        return@reorderable
-                    }
                     vm.dragActivity(from - 1, to - 1)
                 }
             ),

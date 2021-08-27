@@ -11,7 +11,10 @@ import java.time.LocalDateTime
 
 @Entity(
     tableName = TrackedActivity.TABLE,
-    indices = [Index(value = ["tracked_activity_id"], name = "tracked_activity_pk")],
+    indices = [
+        Index(value = ["tracked_activity_id"], name = "tracked_activity_pk"),
+        Index(value = ["activity_group_id"], name = "tracked_activity_group_fk")
+  ],
     foreignKeys = [
         ForeignKey(
             entity = TrackerActivityGroup::class,

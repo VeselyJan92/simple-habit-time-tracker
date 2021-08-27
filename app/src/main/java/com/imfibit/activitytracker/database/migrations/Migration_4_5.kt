@@ -48,6 +48,10 @@ val MIGRATION_4_5 = object : Migration(4, 5) {
         database.execSQL("""
             create index tracked_activity_pk on tracked_activity (tracked_activity_id);
         """)
+
+        database.execSQL("""
+            create index tracked_activity_group_fk on tracked_activity (activity_group_id);
+        """)
     }
 }
 

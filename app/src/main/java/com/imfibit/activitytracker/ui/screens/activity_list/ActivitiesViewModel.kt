@@ -86,9 +86,10 @@ class ActivitiesViewModel @Inject constructor(
 
     }
 
-
-
     fun dragActivity(from: Int, to: Int){
+        if (to == data.value.activities.size)
+            return
+
         val items = data.value.activities.toMutableList().apply { move(from, to) }
         data.value = data.value.copy(activities = items)
     }
@@ -101,18 +102,6 @@ class ActivitiesViewModel @Inject constructor(
         }
     }
 
-    fun dragCategory(from: Int, to: Int){
-        val items = data.value.groups.toMutableList().apply { move(from, to) }
-        data.value = data.value.copy(groups = items)
-    }
-
-    fun moveCategory(){
-        val items = data.value.groups.mapIndexed{ index, item -> item.copy(position = index) }
-
-        viewModelScope.launch(Dispatchers.IO) {
-            db.groupDAO.updateAll(*items.toTypedArray())
-        }
-    }
 
     fun addGroup(group: TrackerActivityGroup) = launchIO {
         db.groupDAO.insert(group)

@@ -86,6 +86,8 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
             versionNameSuffix = " - PROD"
 
+            isDebuggable = true
+
         }
 
         getByName("debug") {
@@ -142,10 +144,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-pager:0.15.0")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.15.0")
 
-    implementation("org.burnoutcrew.composereorderable:reorderable-android-debug:0.6.1")
-
-
-
+    implementation("org.burnoutcrew.composereorderable:reorderable-desktop:0.6.1")
 
     implementation("com.google.dagger:hilt-android:2.38.1")
     kapt("com.google.dagger:hilt-android-compiler:2.38.1")
