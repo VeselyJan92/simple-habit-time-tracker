@@ -13,6 +13,7 @@
 
 
     <string name="activity_screen_recent_activity">Recent Activity</string>
+    <string name="activity_screen_recent_group">Group</string>
 
     <string name="browse">Browse</string>
 
@@ -42,6 +43,7 @@
     <string name="new_activity_time">Time</string>
     <string name="new_activity_score">Score</string>
     <string name="new_activity_checked">Habbit</string>
+    <string name="new_activity_folder">Group</string>
     <string name="cancel">CANCEL</string>
     <string name="dialog_goal_title">PICK GOAL</string>
     <string name="repetitions">Repetititons</string>
@@ -71,6 +73,8 @@
 
 
     <string name="screen_activities_target">Target: </string>
+    <string name="screen_activities_today">Today</string>
+    <string name="screen_activities_new_group">New Group</string>
 
 
     <string name="screen_onboarding_page_1_title">Get Insights</string>
@@ -83,6 +87,13 @@
     <string name="screen_onboarding_track">I want to track!</string>
 
 
+    <string name="screen_group_title">Group settings</string>
+    <string name="screen_group_reorder">Reorder</string>
+    <string name="screen_group_color">Color</string>
+    <string name="screen_group_edit_name">Edit group name</string>
+
+
+
 
     <string name="scree_activity_timers">Timer</string>
 
@@ -91,6 +102,9 @@
     <string name="dialog_preset_timers_preset">Preset</string>
     <string name="dialog_preset_timers_add">Add</string>
     <string name="dialog_preset_timers_single">Start a timer</string>
+
+    <string name="dialog_group_picker_title">Select activity group</string>
+    <string name="dialog_group_picker_default">Main Screen</string>
 
 
 

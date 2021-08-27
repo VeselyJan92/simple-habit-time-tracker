@@ -8,6 +8,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.imfibit.activitytracker.core.notifications.NotificationTimerOver
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import java.lang.IllegalArgumentException
 import javax.inject.Inject
@@ -26,7 +27,7 @@ class ActivityTimerCompletedReceiver() : BroadcastReceiver(){
         Log.e("FIRE", "FIRE")
 
         val activity = try {
-            repository.activityDAO.getById( intent.extras!!.getLong(ACTIVITY_ID))
+            repository.activityDAO.flowById( intent.extras!!.getLong(ACTIVITY_ID)).first()
         }catch (e: Exception){
             e.printStackTrace()
             FirebaseCrashlytics.getInstance().recordException(IllegalArgumentException("Activity ID cannot be zero"))

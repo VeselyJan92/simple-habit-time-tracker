@@ -39,14 +39,11 @@ import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.IconButton
 import com.imfibit.activitytracker.ui.components.dialogs.system.DialogTimePicker
-import io.burnoutcrew.reorderable.ReorderableState
-import io.burnoutcrew.reorderable.move
-import io.burnoutcrew.reorderable.rememberReorderState
-import io.burnoutcrew.reorderable.reorderable
+import org.burnoutcrew.reorderable.*
 import java.time.LocalTime
 
 
-fun Modifier.draggedItemx(
+/*fun Modifier.draggedItemx(
     offset: Float?,
     orientation: Orientation = Orientation.Vertical,
 ): Modifier = composed {
@@ -61,7 +58,7 @@ fun Modifier.draggedItemx(
                 }
             }
         }
-}
+}*/
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -129,8 +126,7 @@ inline fun DialogTimers(
 
 
     val state: ReorderableState = rememberReorderState(
-        onDragEnd = { from, to -> onTimersReorganized.invoke(timers)},
-        onMove = { from, to -> timers.move(from, to) }
+
     )
 
 
@@ -138,7 +134,11 @@ inline fun DialogTimers(
         state = state.listState,
         modifier = Modifier
             .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
-            .reorderable(state)){
+            .reorderable(
+                state = state,
+                onDragEnd = { from, to -> onTimersReorganized.invoke(timers)},
+                onMove = { from, to -> timers.move(from, to) })
+    ){
 
         itemsIndexed(timers){ index, item ->
 
@@ -153,7 +153,7 @@ inline fun DialogTimers(
             SwipeToDismiss(
                 state = dismissState,
                 modifier = Modifier
-                    .draggedItemx(state.offset.takeIf { state.index == index })
+                    .draggedItem(state.offsetByIndex(index))
                     .clickable { runTimer.invoke(item) },
                 background = {},
             ) {

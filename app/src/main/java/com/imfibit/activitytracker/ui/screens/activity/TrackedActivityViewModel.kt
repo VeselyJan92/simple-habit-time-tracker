@@ -3,8 +3,9 @@ package com.imfibit.activitytracker.ui.screens.activity
 
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
+import com.imfibit.activitytracker.core.AppViewModel
 import com.imfibit.activitytracker.core.ComposeString
-import com.imfibit.activitytracker.core.activityInvalidationTracker
+import com.imfibit.activitytracker.core.invalidationFlow
 import com.imfibit.activitytracker.core.services.TrackTimeService
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.entities.*
@@ -13,22 +14,15 @@ import com.imfibit.activitytracker.ui.components.*
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.firstOrNull
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.time.temporal.ChronoField
 import java.util.*
 import javax.inject.Inject
 
-/*
-class TrackedActivityVMFactory(private val id: Long) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return TrackedActivityViewModel(id) as T
-    }
-}
-*/
 
 @Immutable
 data class TrackedActivityState(
@@ -36,6 +30,7 @@ data class TrackedActivityState(
         val timers: MutableList<PresetTimer>,
         val recent: List<Week>,
         val months: List<MetricWidgetData>,
+        val groups: List<TrackerActivityGroup>,
         val metricToday: ComposeString,
         val metricWeek:  ComposeString,
         val metricMonth:  ComposeString,
@@ -48,32 +43,13 @@ class TrackedActivityViewModel @Inject constructor(
     private val db: AppDatabase,
     private val rep: RepositoryTrackedActivity,
     private val savedStateHandle: SavedStateHandle
-) : ViewModel() {
+) : AppViewModel() {
 
     val id: Long = savedStateHandle["activity_id"] ?: throw IllegalArgumentException()
 
-    var screenState = MutableLiveData<TrackedActivityState>()
-
-    private val tracker = activityInvalidationTracker {
-        refresh()
-    }
-
-    init {
-        db.invalidationTracker.addObserver(tracker)
-        refresh()
-    }
-
-    override fun onCleared() {
-        db.invalidationTracker.removeObserver(tracker)
-    }
-
-    private fun refresh() = viewModelScope.launch(Dispatchers.IO) {
-        val activity:TrackedActivity? = rep.activityDAO.getById(id)
-
-        //TODO this has to be here when activity gets deleted
-        if(activity == null)
-            return@launch
-
+    val data = invalidationFlow(db, viewModelScope){
+        val activity: TrackedActivity = rep.activityDAO.flowById(id).firstOrNull() ?: return@invalidationFlow null
+        
         val now = LocalDate.now()
         val today = LocalDate.now()
         val endOfWeek = now.with(ChronoField.DAY_OF_WEEK, 7)
@@ -114,9 +90,9 @@ class TrackedActivityViewModel @Inject constructor(
                 Colors.AppAccent
 
             val metric:ComposeString = if (activity.type == TrackedActivity.Type.CHECKED)
-                {{ "${it.metric} / ${it.from.month.length(it.from.isLeapYear)}" }}
+            {{ "${it.metric} / ${it.from.month.length(it.from.isLeapYear)}" }}
             else
-                { activity.type.getComposeString(it.metric) }
+            { activity.type.getComposeString(it.metric) }
 
             MetricWidgetData.Labeled(
                 label = { it.from.month.getDisplayName(TextStyle.SHORT, Locale.getDefault()) },
@@ -126,54 +102,70 @@ class TrackedActivityViewModel @Inject constructor(
         }
 
 
+        val groups = db.groupDAO.getAll()
+
         val timers = rep.timers.getAll(activity.id).toMutableList()
 
-        val state = TrackedActivityState(
-                activity, timers, recent, months, metricToday, metricWeek, metricMonth, metric30Days
+        TrackedActivityState(
+            activity, timers, recent, months, groups, metricToday, metricWeek, metricMonth, metric30Days
         )
-
-        screenState.postValue(state)
     }
 
-    fun updateName(name: String){
-        viewModelScope.launch(Dispatchers.IO) {
-            val activity = rep.activityDAO.getById(id)
-            rep.activityDAO.update(activity.copy(name = name))
-        }
 
+    fun updateName(name: String) = launchIO {
+        val activity = rep.activityDAO.getById(id)
+        rep.activityDAO.update(activity.copy(name = name))
     }
 
-    fun addTimer(timer: PresetTimer) {
-        viewModelScope.launch(Dispatchers.IO) {
-            rep.timers.insert(timer)
-        }
+    fun addTimer(timer: PresetTimer) = launchIO {
+        rep.timers.insert(timer)
     }
 
-    fun reorganizeTimers(items: List<PresetTimer>) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val timers = items.mapIndexed{index, item -> item.copy(position = index) }.toTypedArray()
-            rep.timers.updateAll(*timers)
-        }
+    fun reorganizeTimers(items: List<PresetTimer>) = launchIO {
+        val timers = items.mapIndexed{index, item -> item.copy(position = index) }.toTypedArray()
+        rep.timers.updateAll(*timers)
     }
 
-    fun deleteTimer(timer: PresetTimer) {
-        viewModelScope.launch(Dispatchers.IO) {
-            rep.timers.delete(timer)
-        }
+
+    fun deleteTimer(timer: PresetTimer) = launchIO {
+        rep.timers.delete(timer)
     }
 
-    fun updateGoal(goal: TrackedActivityGoal)  = viewModelScope.launch(Dispatchers.IO) {
+
+    fun updateGoal(goal: TrackedActivityGoal)  = launchIO {
         val activity = rep.activityDAO.getById(id)
         rep.activityDAO.update(activity.copy(goal = goal))
     }
 
 
-    fun scheduleTimer(timer: PresetTimer) = viewModelScope.launch(Dispatchers.IO) {
+    fun scheduleTimer(timer: PresetTimer) = launchIO {
         timerService.startWithTimer(rep.activityDAO.getById(id), timer)
     }
 
-    fun deleteActivity(activity: TrackedActivity) = viewModelScope.launch(Dispatchers.IO) {
+    fun deleteActivity(activity: TrackedActivity) = launchIO {
         rep.activityDAO.deleteById(activity.id)
+    }
+
+    fun setGroup(group: TrackerActivityGroup?) = launchIO {
+        rep.activityDAO.update(
+            rep.activityDAO.getById(id).copy(groupId = group?.id)
+        )
+    }
+
+    fun commitSession(activity: TrackedActivity) = launchIO {
+        timerService.commitSession(activity)
+    }
+
+    fun startSession(activity: TrackedActivity, start: LocalDateTime) = launchIO {
+        timerService.startSession(activity, start)
+    }
+
+    fun updateSession(activity: TrackedActivity, start: LocalDateTime) = launchIO {
+        timerService.updateSession(activity, start)
+    }
+
+    fun clearRunning(activity: TrackedActivity) = launchIO {
+        timerService.cancelSession(activity)
     }
 
 

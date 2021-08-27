@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AssignmentTurnedIn
 import androidx.compose.material.icons.filled.Score
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.Topic
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -45,7 +46,8 @@ import kotlinx.coroutines.withContext
 @Composable
 fun DialogAddActivity(
     display: MutableState<Boolean>,
-    onAdd: (type: TrackedActivity.Type)->Unit
+    onAdd: (type: TrackedActivity.Type)->Unit,
+    onAddFolder: ()->Unit
 ) = BaseDialog(display = display ) {
 
     DialogBaseHeader(title = stringResource(id = R.string.create_new_activity))
@@ -61,6 +63,10 @@ fun DialogAddActivity(
 
     TrackedActivities(Icons.Default.AssignmentTurnedIn, stringResource(id = R.string.new_activity_checked)) {
         onAdd.invoke(TrackedActivity.Type.CHECKED)
+    }
+
+    TrackedActivities(Icons.Default.Topic, stringResource(id = R.string.new_activity_folder)) {
+        onAddFolder()
     }
 
     DialogButtons {

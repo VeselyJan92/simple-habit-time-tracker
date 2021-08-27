@@ -35,6 +35,7 @@ import java.time.format.DateTimeFormatter
 
 
 import com.imfibit.activitytracker.core.dataStore
+import com.imfibit.activitytracker.ui.screens.group.ScreenActivityGroup
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 
@@ -115,6 +116,11 @@ fun Router(){
         composable(SCREEN_UPCOMING){ ScreenUpcoming(navControl) }
         composable(SCREEN_ONBOARDING){ ScreenOnboarding(navControl) }
 
+        composable(
+            route ="screen_activity_group/{group_id}",
+            arguments = listOf(navArgument("group_id") { type = NavType.LongType })){
+            ScreenActivityGroup(navControl)
+        }
 
         composable(
                 route ="screen_activity/{activity_id}",

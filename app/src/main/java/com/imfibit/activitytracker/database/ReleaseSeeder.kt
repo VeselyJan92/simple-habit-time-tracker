@@ -18,6 +18,8 @@ object ReleaseSeeder {
         activity_workout(db)
 
         activity_point(db)
+
+        categories(db)
     }
 
 
@@ -125,6 +127,14 @@ object ReleaseSeeder {
             goal = TrackedActivityGoal(3, TimeRange.WEEKLY)
         ))
 
+        activityId = db.activityDAO.insert(TrackedActivity(
+            id = 0, name = "Workout routinex",
+            position = 1,
+            type = TrackedActivity.Type.CHECKED,
+            inSessionSince = null,
+            goal = TrackedActivityGoal(3, TimeRange.WEEKLY)
+        ))
+
         db.completionDAO.insert(TrackedActivityCompletion(
             id = 0,
             activity_id = activityId,
@@ -173,7 +183,50 @@ object ReleaseSeeder {
                 ))
             }
         }
+    }
 
+    suspend fun categories(db: AppDatabase){
+        val categoryId = db.groupDAO.insert(TrackerActivityGroup(0, "Work", 1))
+
+        db.groupDAO.insert(TrackerActivityGroup(0, "Hobbies", 2))
+
+        db.groupDAO.insert(TrackerActivityGroup(0, "Other", 2))
+
+        db.groupDAO.insert(TrackerActivityGroup(0, "Workout", 2))
+
+        db.groupDAO.insert(TrackerActivityGroup(0, "Gym", 2))
+
+        val activityId = db.activityDAO.insert(TrackedActivity(
+            id = 0,
+            name = "Project management",
+            position = 1,
+            groupId = categoryId,
+            type = TrackedActivity.Type.TIME,
+            goal = TrackedActivityGoal(0, TimeRange.DAILY)
+        ))
+
+        db.activityDAO.insert(TrackedActivity(
+            id = 0,
+            name = "Project management 2",
+            position = 2,
+            groupId = categoryId,
+            type = TrackedActivity.Type.TIME,
+            goal = TrackedActivityGoal(0, TimeRange.DAILY)
+        ))
+
+        db.sessionDAO.insert(TrackedActivityTime(
+            activity_id = activityId,
+            id = 0,
+            datetime_start = LocalDateTime.now().minusHours(2).minusDays(2),
+            datetime_end = LocalDateTime.now().minusHours(1).minusDays(2)
+        ))
+
+        db.sessionDAO.insert(TrackedActivityTime(
+            activity_id = activityId,
+            id = 0,
+            datetime_start = LocalDateTime.now().minusHours(4).minusDays(2),
+            datetime_end = LocalDateTime.now().minusHours(3).minusDays(2)
+        ))
     }
 
 

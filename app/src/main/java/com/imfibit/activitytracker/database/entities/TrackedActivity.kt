@@ -11,18 +11,31 @@ import java.time.LocalDateTime
 
 @Entity(
     tableName = TrackedActivity.TABLE,
-    indices = [Index(value = ["tracked_activity_id"], name = "tracked_activity_pk")]
+    indices = [Index(value = ["tracked_activity_id"], name = "tracked_activity_pk")],
+    foreignKeys = [
+        ForeignKey(
+            entity = TrackerActivityGroup::class,
+            parentColumns = ["activity_group_id"],
+            childColumns = ["activity_group_id"]
+        )
+    ]
 )
 data class TrackedActivity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "tracked_activity_id")
     var id: Long,
 
+    @ColumnInfo(name = "activity_group_id")
+    var groupId: Long? = null,
+
     @ColumnInfo(name = "name")
     var name: String,
 
     @ColumnInfo(name = "position")
-    var position: Int,
+    var position: Int = 0,
+
+    @ColumnInfo(name = "group_position")
+    var groupPosition: Int = 0,
 
     @ColumnInfo(name = "type")
     var type: Type,
@@ -83,6 +96,8 @@ data class TrackedActivity(
         }
 
     }
+
+    fun isInSession() = inSessionSince != null
 
 
 

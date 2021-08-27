@@ -3,12 +3,12 @@ package com.imfibit.activitytracker.ui.screens.activity_list
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,24 +23,33 @@ import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.TimeUtils
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.components.Timer
+import java.time.LocalDateTime
 
 
 @Composable
-fun LiveActivitiesList(vm: ActivitiesViewModel) {
-
-    val items: List<TrackedActivity> by vm.live.observeAsState(listOf())
+fun LiveActivitiesList(vm: ActivitiesViewModel, activities: List<TrackedActivity>) {
 
     LazyColumn(
         modifier = Modifier
             .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
             .background(Color.White),
     ) {
-        items(items.size) { LiveActivity(vm = vm, item = items[it]) }
+        items(activities, {it.id}){
+            LiveActivity(
+                item = it,
+                onCommitSession = { vm.commitSession(it)},
+                onuUpdateSession = {start ->  vm.updateSession(it, start)}
+            )
+        }
     }
 }
 
 @Composable
-private fun LiveActivity(vm: ActivitiesViewModel, item: TrackedActivity) {
+fun LiveActivity(
+    item: TrackedActivity,
+    onCommitSession: (TrackedActivity)->Unit,
+    onuUpdateSession: (LocalDateTime)->Unit,
+) {
 
     Row(
         Modifier
@@ -50,9 +59,7 @@ private fun LiveActivity(vm: ActivitiesViewModel, item: TrackedActivity) {
         val context = LocalContext.current
 
         IconButton(
-            onClick = {
-                vm.commitSession(item)
-            }
+            onClick = { onCommitSession(item) }
         ) {
             Box(
                 Modifier
@@ -79,15 +86,15 @@ private fun LiveActivity(vm: ActivitiesViewModel, item: TrackedActivity) {
                     )
 
                 }
+
             }
         }
 
         Timer(
             startTime = item.inSessionSince!!,
-            onClick = {
-                vm.updateSession(item, it)
-            }
+            onClick = onuUpdateSession
         )
+
 
     }
 }

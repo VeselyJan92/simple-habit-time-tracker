@@ -3,10 +3,10 @@ package com.imfibit.activitytracker.ui.screens.activity_list
 import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
+import android.util.Log
+import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -17,10 +17,10 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -38,7 +38,10 @@ import com.imfibit.activitytracker.ui.components.MetricWidgetData
 import com.imfibit.activitytracker.ui.components.dialogs.DialogScore
 import com.imfibit.activitytracker.ui.components.dialogs.DialogSession
 import com.imfibit.activitytracker.ui.viewmodels.RecordViewModel
-import io.burnoutcrew.reorderable.*
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import org.burnoutcrew.reorderable.*
 import java.time.LocalDateTime
 
 
@@ -51,50 +54,17 @@ data class TrackedActivityWithMetric constructor(
 }
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TrackedActivitiesList(
-    nav: NavHostController,
-    vm: ActivitiesViewModel
-) {
-    val items by vm.activities.observeAsState(mutableListOf())
-
-    val state: ReorderableState = rememberReorderState(
-        onDragEnd = { from, to -> vm.move(from, to, items) },
-        onMove = { from, to -> items.move(from, to) }
-    )
-
-    LazyColumn(
-        state = state.listState,
-        modifier = Modifier
-            .reorderable(state)
-            .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        itemsIndexed(items) { idx, item ->
-            TrackedActivity(vm = vm, item = item, nav = nav, modifier = Modifier.draggedItem(state.offset.takeIf { state.index == idx }))
-        }
-
-        item {
-            Spacer(modifier = Modifier.height(100.dp))
-        }
-
-    }
-}
-
-@Composable
-private fun TrackedActivity(
-    vm: ActivitiesViewModel,
+fun TrackedActivity(
     item: TrackedActivityWithMetric,
-    nav: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onNavigate: (activity: TrackedActivity) -> Unit
 ) {
     val context = LocalContext.current
     val activity = item.activity
 
     val openSessionDialog = remember { mutableStateOf(false) }
     val openScoreDialog = remember { mutableStateOf(false) }
-
 
     val recordVM = hiltViewModel<RecordViewModel>()
 
@@ -117,12 +87,13 @@ private fun TrackedActivity(
 
     Surface(
         modifier = modifier
-            .clickable(
-                onClick = { nav.navigate(SCREEN_ACTIVITY(activity.id.toString())) }
-            )
+            .clickable {
+                onNavigate(activity)
+            }
             .padding(2.dp),
 
         elevation = 2.dp,
+        shape = RoundedCornerShape(20.dp)
     ) {
         Row(
             modifier = Modifier
@@ -135,7 +106,7 @@ private fun TrackedActivity(
                 hasMetricToday = item.hasMetricToday,
                 activity = item.activity,
                 onClick = {
-                    vm.activityTriggered(activity)
+                    recordVM.activityTriggered(activity)
                 },
                 onLongClick = {
                     (context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator).vibrate(
@@ -190,16 +161,17 @@ private fun TrackedActivity(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun RowScope.ActionButton(
+fun RowScope.ActionButton(
     hasMetricToday: Boolean,
     activity: TrackedActivity,
     onClick: (()->Unit),
-    onLongClick: (()->Unit),
+    onLongClick: (()->Unit) = {},
 ) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .align(Alignment.CenterVertically)
+            .size(55.dp)
             .padding(end = 8.dp, start = 8.dp)
             .combinedClickable(
                 onClick = onClick,
@@ -208,15 +180,28 @@ private fun RowScope.ActionButton(
     ) {
 
         val icon = when (activity.type) {
-            Type.TIME -> Icons.Filled.PlayArrow
+            Type.TIME -> if (activity.inSessionSince != null) Icons.Filled.Stop else Icons.Filled.PlayArrow
             Type.SCORE -> Icons.Filled.Add
             Type.CHECKED -> if (hasMetricToday) Icons.Filled.DoneAll else Icons.Filled.Check
         }
 
+        val color = if (activity.inSessionSince != null ) Color.Red else Colors.AppAccent
+
+        val glow = remember {
+            mutableStateOf(34.dp)
+        }
+
+        if (activity.inSessionSince!= null) LaunchedEffect(activity.inSessionSince){
+            while (currentCoroutineContext().isActive){
+                glow.value = if (glow.value == 34.dp) 37.dp else 34.dp
+                delay(1000)
+            }
+        }
+
         Box(
             Modifier
-                .size(34.dp)
-                .background(Colors.AppAccent, RoundedCornerShape(17.dp)), contentAlignment = Alignment.Center  ){
+                .size(glow.value)
+                .background(color, RoundedCornerShape(50)), contentAlignment = Alignment.Center  ){
             Icon(
                 contentDescription = null,
                 imageVector = icon,
@@ -224,8 +209,6 @@ private fun RowScope.ActionButton(
                     .size(30.dp)
             )
         }
-
-
     }
 }
 
@@ -235,12 +218,8 @@ fun Goal(label: String) {
     Row(
         Modifier
             .size(70.dp, 20.dp)
-            .padding(end = 8.dp)
-            .background(Colors.ChipGray, RoundedCornerShape(50))) {
-        Modifier
-            .align(Alignment.CenterVertically)
-            .padding(start = 5.dp)
-            .size(15.dp)
+            .background(Colors.ChipGray, RoundedCornerShape(50))
+    ) {
         Icon(Icons.Filled.Flag, contentDescription = null,)
 
         Text(

@@ -16,9 +16,9 @@ class StatisticsState(
     val maxPage = 101
     val originPage = 51
 
-    var origin by mutableStateOf(default)
-    var range by mutableStateOf(range)
-    var date by mutableStateOf(date)
+    var origin = mutableStateOf(default)
+    var range = mutableStateOf(range)
+    var date = mutableStateOf(date)
 
 
     @OptIn(ExperimentalPagerApi::class)
@@ -28,17 +28,17 @@ class StatisticsState(
     )
 
 
-    fun offset(offset: Int) = when (range){
-        TimeRange.DAILY -> origin.minusDays(offset.toLong())
-        TimeRange.WEEKLY -> origin.minusWeeks(offset.toLong())
-        TimeRange.MONTHLY -> origin.minusMonths(offset.toLong())
+    fun offset(offset: Int) = when (range.value){
+        TimeRange.DAILY -> origin.value.minusDays(offset.toLong())
+        TimeRange.WEEKLY -> origin.value.minusWeeks(offset.toLong())
+        TimeRange.MONTHLY -> origin.value.minusMonths(offset.toLong())
     }
 
     @OptIn(ExperimentalPagerApi::class)
     fun setTimeRange(range: TimeRange){
-        this.origin = default
-        this.date = default
-        this.range = range
+        this.origin.value = default
+        this.date.value = default
+        this.range.value = range
 
         pager  = PagerState(
             pageCount = 100,
@@ -48,14 +48,14 @@ class StatisticsState(
 
     @OptIn(ExperimentalPagerApi::class)
     fun setCustomDate(date: LocalDate){
-        origin = date
-        this.date = date
+        origin.value = date
+        this.date.value = date
         pager  = PagerState(
             pageCount = 100,
             currentPage = 51
         )
     }
 
-    fun getRange(page: Int) = range.getBoundaries(offset(originPage - page))
+    fun getRange(page: Int) = range.value.getBoundaries(offset(originPage - page))
 
 }

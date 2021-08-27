@@ -15,6 +15,7 @@ import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityWithM
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.flow.first
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
@@ -35,8 +36,11 @@ class RepositoryTrackedActivity @Inject constructor(
     val timers: DAOPresetTimers = db.presetTimersDAO
 
 
-    suspend fun getActivitiesOverview(pastRanges: Int) =  db.withTransaction {
-        return@withTransaction db.activityDAO.getAllNotInSession().map { activity ->
+    suspend fun getActivitiesOverview(activities: List<TrackedActivity>) =  db.withTransaction {
+
+        val pastRanges = 5
+
+        return@withTransaction activities.map { activity ->
 
             val data = when(activity.goal.range){
                 TimeRange.DAILY -> metricDAO.getMetricByDay(activity.id,LocalDate.now().minusDays(pastRanges.toLong()), LocalDate.now())
@@ -153,7 +157,7 @@ class RepositoryTrackedActivity @Inject constructor(
     }
 
     suspend fun deleteRecordById(activityId: Long, recordId: Long) = db.withTransaction {
-        val activity = activityDAO.getById(activityId)
+        val activity = activityDAO.flowById(activityId).first()
 
         when(activity.type) {
             TrackedActivity.Type.TIME -> sessionDAO.deleteById(recordId)

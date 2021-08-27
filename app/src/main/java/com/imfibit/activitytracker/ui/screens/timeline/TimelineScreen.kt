@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -64,7 +65,10 @@ private fun Body(scaffoldState: ScaffoldState) {
     val items by vm.records.observeAsState(listOf())
     
     if (items.isEmpty()){
-        Box(Modifier.fillMaxWidth().fillMaxHeight(), contentAlignment = Alignment.Center) {
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(), contentAlignment = Alignment.Center) {
             Text(
                 text = stringResource(id = R.string.no_records),
                 style = TextStyle(
@@ -76,20 +80,37 @@ private fun Body(scaffoldState: ScaffoldState) {
         }
 
     }else{
-        Box {
-            Box(Modifier.padding(start = 28.dp).width(20.dp). fillMaxHeight().background(Colors.AppAccent))
+        Column {
+            Header()
 
             LazyColumn(
                 modifier = Modifier.padding(6.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                items(items.size) {TrackedActivityRecord(items[it].activity, items[it].record, scaffoldState) }
+                items(items.size) { TrackedActivityRecord(items[it].activity, items[it].record, scaffoldState) }
             }
-
         }
     }
     
 }
+
+
+@Composable
+private fun Header(){
+    Surface(
+        elevation = 2.dp,
+        modifier = Modifier.padding(8.dp).fillMaxWidth().height(60.dp),
+        shape = RoundedCornerShape(5.dp)
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Text(text = stringResource(id = R.string.today), style = TextStyle(
+                fontSize = 19.sp,
+                fontWeight = FontWeight.W600
+            ))
+        }
+    }
+}
+
 
 
 

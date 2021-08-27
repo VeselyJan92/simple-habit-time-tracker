@@ -87,16 +87,18 @@ private fun Record(
         onDelete = {recordVM.deleteRecord(record.id, TrackedActivity.Type.SCORE)}
     )
 
+
     Surface(
-        elevation = 2.dp, modifier = Modifier.height(60.dp)
+        elevation = 2.dp,
+        modifier = Modifier
             .clickable(onClick = {
                 when(record){
                     is TrackedActivityCompletion -> {}
                     is TrackedActivityScore -> openScoreDialog.value = true
                     is TrackedActivityTime -> openSessionDialog.value = true
                 }
-            })
-            .padding(2.dp)
+            }),
+        shape = RoundedCornerShape(20.dp)
     ) {
         val time = with(AnnotatedString.Builder()) {
             append(stringResource(id = R.string.time) + ": ")
@@ -121,7 +123,7 @@ private fun Record(
         val metric = activity.type.getComposeString(record.metric).invoke()
 
 
-        Row(Modifier.fillMaxWidth()) {
+        Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(
                     modifier = Modifier.padding(4.dp),
@@ -170,4 +172,3 @@ private fun MetricBlock(metric: String){
             ))
     }
 }
-

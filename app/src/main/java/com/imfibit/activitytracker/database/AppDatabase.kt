@@ -1,7 +1,6 @@
 package com.imfibit.activitytracker.database
 
 import android.content.Context
-import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -17,12 +16,10 @@ import com.imfibit.activitytracker.database.repository.tracked_activity.Reposito
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import javax.inject.Inject
 import javax.inject.Singleton
 
 
@@ -50,12 +47,13 @@ object DatabaseModule {
         TrackedActivityTime::class,
         TrackedActivityScore::class,
         TrackedActivityCompletion::class,
-        PresetTimer::class
+        PresetTimer::class,
+        TrackerActivityGroup::class
     ],
     views = [
         TrackedActivityMetric::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 @TypeConverters(
@@ -71,6 +69,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract val completionDAO: DAOTrackedActivityChecked
     abstract val metricDAO: DAOTrackedActivityMetric
     abstract val presetTimersDAO: DAOPresetTimers
+    abstract val groupDAO: DAOActivityGroup
 
     companion object {
         const val DB_NAME ="activity_tracker.db"
@@ -90,8 +89,10 @@ abstract class AppDatabase : RoomDatabase() {
             }
             "debug" -> {
                 val db = Room
-                    //.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-                    .databaseBuilder(context, AppDatabase::class.java, DB_NAME)
+                    .inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+                    //.databaseBuilder(context, AppDatabase::class.java, DB_NAME)
+                    //.createFromAsset("activity_tracker.db")
+                    //.addMigrations(*migrations)
                     .build()
 
                 runBlocking(Dispatchers.IO) { ReleaseSeeder.seed(db) }

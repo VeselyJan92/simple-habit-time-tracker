@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.konan.properties.Properties
 
 
-val COMPOSE_VERSION = "1.1.0-alpha01"
+val COMPOSE_VERSION = "1.1.0-alpha02"
 
 
 plugins {
@@ -41,7 +41,7 @@ android {
 
     }
 
-    compileSdk = 30
+    compileSdk = 31
     buildToolsVersion = "30.0.3"
 
     buildFeatures {
@@ -54,7 +54,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.1.0-alpha01"
+        kotlinCompilerExtensionVersion = COMPOSE_VERSION
     }
 
 
@@ -69,7 +69,7 @@ android {
     defaultConfig {
         applicationId = "com.imfibit.activitytracker"
         minSdk = 26
-        targetSdk = 30
+        targetSdk = 31
         versionCode = 3
         versionName = "1.1"
 
@@ -127,7 +127,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:$COMPOSE_VERSION")
     debugImplementation("androidx.compose.ui:ui-tooling:$COMPOSE_VERSION")
 
-    implementation("androidx.navigation:navigation-compose:2.4.0-alpha06")
+    implementation("androidx.navigation:navigation-compose:2.4.0-alpha07")
 
     val ROOM_VERSION = "2.4.0-alpha04"
 
@@ -142,7 +142,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-pager:0.15.0")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.15.0")
 
-    implementation("com.github.aclassen:ComposeReorderable:0.1")
+    implementation("org.burnoutcrew.composereorderable:reorderable-android-debug:0.6.1")
 
 
 

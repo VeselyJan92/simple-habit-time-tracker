@@ -45,7 +45,7 @@ import java.time.LocalDate
 
 
 @Composable
-fun ScreenStatistics(navController: NavHostController){
+fun ScreenStatistics(navController: NavHostController) {
     Scaffold(
         topBar = { TrackerTopAppBar(stringResource(id = R.string.screen_title_statistics)) },
         content = { ScreenBody() },
@@ -54,54 +54,74 @@ fun ScreenStatistics(navController: NavHostController){
     )
 }
 
-
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-private fun ScreenBody() = Column {
+private fun ScreenBody() = Column() {
 
     val vm = hiltViewModel<StatisticsViewModel>()
 
+
     val state = remember { StatisticsState(LocalDate.now(), TimeRange.DAILY) }
 
-    Navigation(state)
 
-    HorizontalPager(state = state.pager, modifier = Modifier
-        .padding(bottom = 8.dp)
-        .fillMaxHeight(), verticalAlignment = Alignment.Top){  page ->
+    Navigation(
+        range = state.range.value,
+        date = state.date.value,
+        goTo = { state.setCustomDate(it) },
+        setRange = { state.setTimeRange(it) }
+    )
 
 
-        val interval = state.getRange(page)
+    HorizontalPager(
+        state = state.pager,
+        modifier = Modifier
+            .fillMaxHeight(),
+        verticalAlignment = Alignment.Top
+    ) { page ->
 
-        val data = remember(state.range, state.origin) {
-            mutableStateOf(mapOf<TrackedActivity.Type, List<ActivityWithMetric>>())
-        }
+        Column {
 
-        LaunchedEffect(state.range, state.origin) {
-            data.value = vm.getPageData(interval.first, interval.second)
-        }
+            NavigationTitle(
+                range = state.range.value,
+                rangeDate = state.getRange(page).first,
+            )
 
-        if (data.value.isEmpty()){
-            Surface(modifier = Modifier
-                .padding(8.dp)
-                .background(Color.White), elevation = 2.dp) {
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp), contentAlignment = Alignment.Center) {
-                    Text(
-                        text = stringResource(id = R.string.no_records), style = TextStyle(
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
-                        )
-                    )
-                }
+            val interval = state.getRange(page)
+
+            val data = remember(state.range, state.origin) {
+                mutableStateOf(mapOf<TrackedActivity.Type, List<ActivityWithMetric>>())
             }
-        }else{
-            Column(Modifier.verticalScroll(rememberScrollState())) {
-                BlockTimeTracked(data.value[TrackedActivity.Type.TIME], state)
-                BlockScores(data.value[TrackedActivity.Type.SCORE], state)
-                BlockCompleted(data.value[TrackedActivity.Type.CHECKED], state)
+
+            LaunchedEffect(state.range, state.origin) {
+                data.value = vm.getPageData(interval.first, interval.second)
+            }
+
+            if (data.value.isEmpty()) {
+                Surface(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .background(Color.White), elevation = 2.dp
+                ) {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp), contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.no_records), style = TextStyle(
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center
+                            )
+                        )
+                    }
+                }
+            } else {
+                Column(Modifier.verticalScroll(rememberScrollState())) {
+                    BlockTimeTracked(data.value[TrackedActivity.Type.TIME], state)
+                    BlockScores(data.value[TrackedActivity.Type.SCORE], state)
+                    BlockCompleted(data.value[TrackedActivity.Type.CHECKED], state)
+                }
             }
         }
 
@@ -109,105 +129,119 @@ private fun ScreenBody() = Column {
 }
 
 @Composable
-private fun Navigation(state: StatisticsState) {
+private fun Navigation(
+    range: TimeRange,
+    date: LocalDate,
+    goTo: (LocalDate) -> Unit,
+    setRange: (TimeRange) -> Unit,
+) {
+    Surface(
+        modifier = Modifier
+            .padding(top = 8.dp).padding(horizontal = 8.dp),
+        elevation = 2.dp,
+        shape = RoundedCornerShape(5.dp)
+    ) {
+        Row(
+            Modifier.padding(8.dp)
+        ) {
 
-    Surface(modifier = Modifier
-        .padding(8.dp)
-        .background(Color.White), elevation = 2.dp) {
-        Column{
-
-            Row(
-                Modifier
-                    .padding(horizontal = 8.dp)
-                    .padding(top = 8.dp)) {
-
-                TimeRange.values().forEach {timeRange ->
-                    val color = if (state.range == timeRange)
-                        Colors.ChipGraySelected
-                    else
-                        Colors.ChipGray
-
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(end = 8.dp)
-                            .height(30.dp)
-                            .background(color, RoundedCornerShape(50))
-                            .clickable(onClick = {
-                                state.setTimeRange(timeRange)
-                            }),
-
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = stringResource(id = timeRange.label))
-                    }
-                }
-                
-                Spacer(modifier = Modifier.width(50.dp))
-
-                val context = LocalContext.current
+            TimeRange.values().forEach { timeRange ->
+                val color = if (range == timeRange)
+                    Colors.ChipGraySelected
+                else
+                    Colors.ChipGray
 
                 Box(
                     modifier = Modifier
                         .weight(1f)
                         .padding(end = 8.dp)
                         .height(30.dp)
-                        .background(Colors.ChipGray, RoundedCornerShape(50))
-                        .clickable(
-                            onClick = {
-                                DatePickerDialog(
-                                    context,
-                                    0,
-                                    { _, i, i2, i3 ->
-                                        state.setCustomDate(LocalDate.of(i, i2 + 1, i3))
-                                    },
-                                    state.date.year,
-                                    state.date.month.value - 1,
-                                    state.date.dayOfMonth
-                                ).show()
-                            }
-                        ),
+                        .background(color, RoundedCornerShape(50))
+                        .clickable(onClick = {
+                            setRange(timeRange)
+                        }),
+
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(Icons.Default.CalendarToday, contentDescription = null)
+                    Text(text = stringResource(id = timeRange.label))
                 }
             }
 
-            Divider(Modifier.padding(top = 8.dp))
+            Spacer(modifier = Modifier.width(50.dp))
 
-            NavigationTitle(state)
+            val context = LocalContext.current
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp)
+                    .height(30.dp)
+                    .background(Colors.ChipGray, RoundedCornerShape(50))
+                    .clickable(
+                        onClick = {
+                            DatePickerDialog(
+                                context,
+                                0,
+                                { _, i, i2, i3 -> goTo(LocalDate.of(i, i2 + 1, i3)) },
+                                date.year,
+                                date.month.value - 1,
+                                date.dayOfMonth
+                            ).show()
+                        }
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Default.CalendarToday, contentDescription = null)
+            }
         }
     }
 }
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-private fun NavigationTitle(state: StatisticsState){
-    Row(
-        verticalAlignment = Alignment.CenterVertically
+private fun NavigationTitle(
+    range: TimeRange,
+    rangeDate: LocalDate
+) {
+    Surface(
+        modifier = Modifier
+            .padding(top = 16.dp).padding(horizontal = 8.dp).padding(bottom = 8.dp)
+            .height(40.dp),
+        elevation = 2.dp,
+        shape = RoundedCornerShape(5.dp)
     ) {
-        Icon(Icons.Default.ArrowLeft, contentDescription = null)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+        ) {
+            Icon(Icons.Default.ArrowLeft, contentDescription = null)
 
-        Spacer(Modifier.weight(1f))
+            Spacer(Modifier.weight(1f))
 
-        Text(
-            text = state.range.getDateLabel(state.getRange(state.pager.currentPage).first),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.ExtraBold
-        )
+            Text(
+                text = range.getDateLabel(rangeDate),
+                fontSize = 19.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
 
-        Spacer(Modifier.weight(1f))
+            Spacer(Modifier.weight(1f))
 
-        Icon(Icons.Default.ArrowRight, contentDescription = null)
+            Icon(Icons.Default.ArrowRight, contentDescription = null)
+        }
+
     }
+
 }
 
 @Composable
-private fun Header(title: String, icon: ImageVector, last: @Composable (() -> Unit)? = null){
-    Row(modifier = Modifier.padding(bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+private fun Header(title: String, icon: ImageVector, last: @Composable (() -> Unit)? = null) {
+    Row(
+        modifier = Modifier.padding(bottom = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
 
         Modifier.padding(end = 16.dp)
-        Icon(icon, modifier = Modifier.padding(end = 8.dp), contentDescription=null)
+        Icon(icon, modifier = Modifier.padding(end = 8.dp), contentDescription = null)
 
         Text(
             text = title,
@@ -228,38 +262,46 @@ private fun Header(title: String, icon: ImageVector, last: @Composable (() -> Un
 private fun BlockTimeTracked(data: List<ActivityWithMetric>?, state: StatisticsState) {
     if (data == null) return
 
-    Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp)) {
+    Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp), shape = RoundedCornerShape(20.dp)) {
         Column(Modifier.padding(8.dp)) {
-            Header(title = stringResource(id = R.string.time), icon = Icons.Default.Timer){
+            Header(title = stringResource(id = R.string.time), icon = Icons.Default.Timer) {
                 Box(
                     modifier = Modifier
                         .size(60.dp, 25.dp)
                         .background(Colors.ChipGray, RoundedCornerShape(50)),
                     contentAlignment = Alignment.Center
-                ){
-                    val sum = TrackedActivity.Type.TIME.getComposeString(data.sumByLong { it.metric }).invoke()
+                ) {
+                    val sum =
+                        TrackedActivity.Type.TIME.getComposeString(data.sumByLong { it.metric })
+                            .invoke()
 
-                    Text(sum,  style = TextStyle(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 13.sp
-                    ))
+                    Text(
+                        sum, style = TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 13.sp
+                        )
+                    )
                 }
             }
 
             data.forEach {
-                Row(Modifier.padding( start = 8.dp, end= 8.dp)) {
+                Row(Modifier.padding(start = 8.dp, end = 8.dp)) {
                     Text(text = it.activity.name, fontSize = 16.sp)
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    if (it.activity.isGoalSet() && it.activity.goal.range == state.range)
+                    if (it.activity.isGoalSet() && it.activity.goal.range == state.range.value)
                         Goal(label = it.activity.formatGoal())
 
 
-                    BaseMetricBlock(metric = it.activity.type.getComposeString(it.metric).invoke(), color = Colors.AppAccent, metricStyle = TextStyle(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp
-                    ))
+                    BaseMetricBlock(
+                        metric = it.activity.type.getComposeString(it.metric).invoke(),
+                        color = Colors.AppAccent,
+                        metricStyle = TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 12.sp
+                        )
+                    )
 
                 }
 
@@ -271,29 +313,32 @@ private fun BlockTimeTracked(data: List<ActivityWithMetric>?, state: StatisticsS
 }
 
 
-
 @Composable
 private fun BlockScores(data: List<ActivityWithMetric>?, state: StatisticsState) {
     if (data == null) return
 
-    Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp)) {
+    Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp), shape = RoundedCornerShape(20.dp)) {
         Column(Modifier.padding(8.dp)) {
 
             Header(title = stringResource(id = R.string.score), Icons.Default.Score)
 
-            data.forEach{
-                Row(Modifier.padding( start = 8.dp, end= 8.dp)) {
+            data.forEach {
+                Row(Modifier.padding(start = 8.dp, end = 8.dp)) {
                     Text(text = it.activity.name, fontSize = 16.sp)
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    if (it.activity.isGoalSet() && it.activity.goal.range == state.range)
+                    if (it.activity.isGoalSet() && it.activity.goal.range == state.range.value)
                         Goal(label = it.activity.formatGoal())
 
-                    BaseMetricBlock(metric = it.metric.toString(), color = Colors.AppAccent, metricStyle = TextStyle(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp
-                    ))
+                    BaseMetricBlock(
+                        metric = it.metric.toString(),
+                        color = Colors.AppAccent,
+                        metricStyle = TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 12.sp
+                        )
+                    )
                 }
 
                 Divider(Modifier.padding(top = 4.dp, bottom = 4.dp))
@@ -308,24 +353,25 @@ private fun BlockScores(data: List<ActivityWithMetric>?, state: StatisticsState)
 private fun BlockCompleted(data: List<ActivityWithMetric>?, state: StatisticsState) {
     if (data == null) return
 
-    Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp)) {
+    Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp), shape = RoundedCornerShape(20.dp)) {
         Column(Modifier.padding(8.dp)) {
 
             Header(title = stringResource(id = R.string.habbits), Icons.Default.AssignmentTurnedIn)
 
-            data.forEach{
-                Row(Modifier.padding( start = 8.dp, end= 8.dp)) {
+            data.forEach {
+                Row(Modifier.padding(start = 8.dp, end = 8.dp)) {
                     Text(text = it.activity.name, fontSize = 16.sp)
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    if (it.activity.isGoalSet() && it.activity.goal.range == state.range && it.activity.goal.range != TimeRange.DAILY)
+                    if (it.activity.isGoalSet() && it.activity.goal.range == state.range.value && it.activity.goal.range != TimeRange.DAILY)
                         Goal(label = it.activity.formatGoal())
 
-                    val label = if(it.activity.type == TrackedActivity.Type.CHECKED && state.range == TimeRange.DAILY)
-                        stringResource(id = R.string.yes).toUpperCase()
-                    else
-                        "${it.metric} / ${state.range.getNumberOfDays(state.date)}"
+                    val label =
+                        if (it.activity.type == TrackedActivity.Type.CHECKED && state.range.value == TimeRange.DAILY)
+                            stringResource(id = R.string.yes).toUpperCase()
+                        else
+                            "${it.metric} / ${state.range.value.getNumberOfDays(state.date.value)}"
 
                     BaseMetricBlock(
                         metric = label,

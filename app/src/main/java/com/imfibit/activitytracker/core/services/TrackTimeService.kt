@@ -29,10 +29,9 @@ class TrackTimeService @Inject constructor(
     @ApplicationContext private val context: Context,
 ){
 
-    suspend fun startSession(activity: TrackedActivity){
-        val updated = activity.copy(inSessionSince = LocalDateTime.now())
+    suspend fun startSession(activity: TrackedActivity, start: LocalDateTime = LocalDateTime.now()){
+        val updated = activity.copy(inSessionSince = start)
         repository.activityDAO.update(updated)
-        Log.e("UPDATE", "UPDATED")
 
         NotificationLiveSession.show(context, updated)
     }

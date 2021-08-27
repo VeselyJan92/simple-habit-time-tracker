@@ -37,7 +37,7 @@ class Seeder {
         return datetime
     }
 
-    fun getTrackedActivity(
+/*    fun getTrackedActivity(
         id: Long = 0,
         name: String = randomWord(),
         position: Int = nextInt(100, 200),
@@ -45,7 +45,7 @@ class Seeder {
         inSession: LocalDateTime? = null,
         range: TimeRange = TimeRange.DAILY,
         goal: Long = 0
-    ) = TrackedActivity(id, name, position, type, inSession, TrackedActivityGoal(goal, range))
+    ) = TrackedActivity(id, null, name, position, type, inSession, TrackedActivityGoal(goal, range))*/
 
 
     fun getTrackedTaskCompletion(

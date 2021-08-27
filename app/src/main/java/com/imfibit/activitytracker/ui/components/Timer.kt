@@ -35,22 +35,31 @@ import java.time.LocalDateTime
 
 @Composable
 fun Timer(
-    modifier: Modifier  = Modifier.size(130.dp, 25.dp).padding(end = 8.dp),
-    startTime: LocalDateTime,
-    onClick: ((LocalDateTime) -> Unit)? = null
+    modifier: Modifier  = Modifier
+        .size(130.dp, 25.dp)
+        .padding(end = 8.dp),
+    startTime: LocalDateTime?,
+    enable: Boolean = true,
+    onClick: ((LocalDateTime) -> Unit)? = null,
 ){
 
     val display = remember { mutableStateOf(false)}
 
-    if (onClick != null)
-        DialogSetTimerStart(display, startTime, onClick)
+
+    val startTime = when {
+        startTime == null -> null
+        startTime > LocalDateTime.now() -> null
+        else -> startTime
+    }
 
     var time  by remember { mutableStateOf(LocalDateTime.now()) }
 
-    LaunchedEffect(time) {
-        while (this.coroutineContext.isActive) {
-            time = LocalDateTime.now()
-            delay(1000)
+    if (enable){
+        LaunchedEffect(time) {
+            while (this.coroutineContext.isActive) {
+                time = LocalDateTime.now()
+                delay(1000)
+            }
         }
     }
 
@@ -58,16 +67,28 @@ fun Timer(
         modifier = Modifier
             .then(modifier)
             .background(Colors.ChipGray, RoundedCornerShape(50))
-            .clickable(onClick = {display.value = true}),
+            .clickable(onClick = { display.value = true }),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Modifier.align(Alignment.CenterVertically).padding(start = 5.dp).size(20.dp)
+        Modifier
+            .align(Alignment.CenterVertically)
+            .padding(start = 5.dp)
+            .size(20.dp)
         Icon(Icons.Filled.Timer, contentDescription = null)
 
 
+        val text = if(startTime != null){
+            TimeUtils.secondsToMetric(startTime, time)
+        }else{
+            TimeUtils.secondsToMetric(0L)
+        }
+
+
         Text(
-            text = TimeUtils.secondsToMetric(startTime, time),
-            modifier = Modifier.weight(1f).align(Alignment.CenterVertically),
+            text = text,
+            modifier = Modifier
+                .weight(1f)
+                .align(Alignment.CenterVertically),
             textAlign = TextAlign.Center,
             style = TextStyle(
                 fontSize = 14.sp,
@@ -110,7 +131,9 @@ private fun DialogSetTimerStart(
 
             LabeledColumn(text = stringResource(id = R.string.timer)) {
                 Timer(
-                    modifier = Modifier.size(130.dp, height = 30.dp).padding(end = 8.dp),
+                    modifier = Modifier
+                        .size(130.dp, height = 30.dp)
+                        .padding(end = 8.dp),
                     startTime = datetime
                 )
             }

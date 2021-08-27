@@ -2,11 +2,11 @@ package com.imfibit.activitytracker.ui.screens.day_history
 
 import androidx.lifecycle.*
 import com.imfibit.activitytracker.core.activityInvalidationTracker
-import com.imfibit.activitytracker.database.entities.*
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.composed.RecordWithActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
@@ -38,7 +38,7 @@ class DayRecordsVM @Inject constructor(
 
     fun refresh() = viewModelScope.launch {
 
-        val activity = rep.activityDAO.getById(activityId)
+        val activity = rep.activityDAO.flowById(activityId).first()
 
         val from = date.atStartOfDay()
         val to = from.plusDays(1L)

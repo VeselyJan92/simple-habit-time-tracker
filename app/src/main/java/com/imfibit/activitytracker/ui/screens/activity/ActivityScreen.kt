@@ -1,41 +1,36 @@
 package com.imfibit.activitytracker.ui.screens.activity
 
-import android.util.Log
 import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
-import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.ui.AppBottomNavigation
 import com.imfibit.activitytracker.ui.components.*
 import com.imfibit.activitytracker.ui.components.Colors
-import com.imfibit.activitytracker.ui.components.dialogs.DialogGoal
-import com.imfibit.activitytracker.ui.components.dialogs.DialogInputText
-import com.imfibit.activitytracker.ui.components.dialogs.DialogTimeRange
-import com.imfibit.activitytracker.ui.components.dialogs.DialogTimers
+import com.imfibit.activitytracker.ui.components.dialogs.*
+import com.imfibit.activitytracker.ui.screens.activity_list.ActionButton
 import kotlinx.coroutines.*
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
@@ -44,8 +39,7 @@ fun ScreenTrackedActivity(nav: NavHostController) {
 
     val vm = hiltViewModel<TrackedActivityViewModel>()
 
-
-    val state by vm.screenState.observeAsState(null)
+    val state by vm.data.collectAsState(initial = null)
 
     val scaffoldState = rememberScaffoldState()
 
@@ -99,19 +93,126 @@ fun ScreenTrackedActivity(nav: NavHostController) {
 @ExperimentalFoundationApi
 @Composable
 fun ScreenBody(nav: NavController, state: TrackedActivityState?, vm: TrackedActivityViewModel) {
-    Column {
-        ActivitySettings(state, vm)
+    if (state != null){
+        Column {
+            ActivitySettings(state, vm)
 
-        RecentActivity(nav, state)
+            if (state.activity.type == TrackedActivity.Type.TIME){
+                Live(
+                    activity = state.activity,
+                    onActionClick = {
+                        if (state.activity.isInSession()){
+                            vm.commitSession(state.activity)
+                        }else{
+                            vm.startSession(state.activity, it)
+                        }
+                    },
+                    onUpdate = {
+                        vm.updateSession(state.activity, it)
+                    },
+
+                    onClear = {
+                        vm.clearRunning(state.activity)
+                    }
+                )
+            }
+
+            RecentActivity(nav, state)
+        }
     }
+
+
 }
 
+@Composable
+fun Live(
+    activity: TrackedActivity,
+    onActionClick: (LocalDateTime)->Unit,
+    onUpdate: (LocalDateTime)->Unit,
+    onClear: ()->Unit
+) {
+
+    val start = remember(activity.inSessionSince) {
+        mutableStateOf(activity.inSessionSince)
+    }
+
+
+    Surface(
+        elevation = 2.dp,
+        modifier = Modifier
+            .padding(horizontal = 8.dp)
+            .padding(top = 8.dp),
+        shape = RoundedCornerShape(5.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+
+            ActionButton(hasMetricToday = false, activity = activity, onClick = {
+                val validStart = start.value?.withSecond(LocalTime.now().second) ?: LocalDateTime.now()
+
+                if ( validStart > LocalDateTime.now())
+                    return@ActionButton
+
+                onActionClick(validStart)
+            })
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            EditableDatetime(
+                datetime = start.value ?: LocalDateTime.now(),
+                onDatetimeEdit = {
+                    if(activity.isInSession()){
+                        onUpdate(it)
+                    }else{
+                        start.value = it
+                    }
+                }
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+
+            Timer(
+                modifier = Modifier
+                    .size(100.dp, 30.dp),
+                startTime = start.value,
+                enable = activity.inSessionSince != null
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+
+            if (activity.isInSession()){
+                Box(
+                    modifier = Modifier.size(50.dp, 30.dp).padding(end = 8.dp)
+                        .background(Colors.ChipGray, RoundedCornerShape(50))
+                        .clickable(onClick = onClear),
+                    contentAlignment = Alignment.Center
+                ){
+                    Icon(imageVector = Icons.Default.Clear, contentDescription = null )
+                }
+            }
+
+        }
+
+    }
+
+}
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ActivitySettings(state: TrackedActivityState?, vm: TrackedActivityViewModel) {
-    Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp)) {
+    Surface(
+        elevation = 2.dp,
+        shape = RoundedCornerShape(5.dp),
+        modifier = Modifier
+            .padding(horizontal = 8.dp)
+            .padding(top = 8.dp)
+    ) {
 
         Column(
             Modifier
@@ -121,8 +222,15 @@ private fun ActivitySettings(state: TrackedActivityState?, vm: TrackedActivityVi
 
             Row(Modifier.padding(top = 8.dp)) {
                 Goal(vm, state?.activity)
+                Spacer(modifier = Modifier.width(8.dp))
+
                 ViewRange(vm, state?.activity)
+                Spacer(modifier = Modifier.width(8.dp))
+
                 SetTimer(state, vm)
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Group(vm, state?.groups, state?.activity)
             }
 
         }
@@ -143,31 +251,10 @@ private fun ActivityName(vm: TrackedActivityViewModel, activity: TrackedActivity
             }
     )
 
-    val source = remember { MutableInteractionSource() }
-
-    Box(
-            modifier = Modifier
-                .background(Colors.ChipGray, shape = RoundedCornerShape(50))
-                .height(30.dp)
-                .clickable(
-                    onClick = { display.value = true },
-                    indication = rememberRipple(),
-                    interactionSource = source
-                ),
-            contentAlignment = Alignment.Center
-    ) {
-        Text(
-                modifier = Modifier
-                    .padding(start = 8.dp, end = 8.dp)
-                    .fillMaxWidth(),
-                text = activity?.name ?: "",
-                style = TextStyle(
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                )
-        )
-
+    TextBox(text = activity?.name ?: "-", modifier = Modifier.fillMaxWidth()){
+        display.value = true
     }
+
 }
 
 @Composable
@@ -178,44 +265,12 @@ private inline fun Goal(vm: TrackedActivityViewModel, activity: TrackedActivity?
         vm.updateGoal(TrackedActivityGoal(it, activity.goal.range))
     }
 
-    Row(
-        modifier = Modifier
-            .size(80.dp, 30.dp)
-            .padding(end = 8.dp)
-            .background(Colors.ChipGray, RoundedCornerShape(50))
-            .clickable(
-                onClick = {
-                    if (activity == null)
-                        return@clickable
+    IconTextButton(Icons.Filled.Flag, activity?.formatGoal()) {
+        if (activity == null)
+            return@IconTextButton
 
-                    if (activity.goal.range != TimeRange.DAILY || activity.type != TrackedActivity.Type.CHECKED) display.value =
-                        true
-                }
-            )
-
-
-    ) {
-
-        Icon(Icons.Filled.Flag,
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .padding(start = 5.dp)
-                .size(15.dp),
-
-            contentDescription = null
-        )
-
-        Text(
-            activity?.formatGoal() ?: "-",
-            Modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically)
-                .padding(end = 8.dp),
-            textAlign = TextAlign.Center,
-            style = TextStyle(
-                    fontSize = 10.sp
-            )
-        )
+        if ( activity.goal.range != TimeRange.DAILY || activity.type != TrackedActivity.Type.CHECKED)
+            display.value = true
     }
 
 }
@@ -224,6 +279,7 @@ private inline fun Goal(vm: TrackedActivityViewModel, activity: TrackedActivity?
 private fun ViewRange(vm: TrackedActivityViewModel, activity: TrackedActivity?) {
     val display = remember { mutableStateOf(false) }
 
+    // TODO REDO
     if (activity != null) DialogTimeRange(display = display, activity.goal.range) {
         GlobalScope.launch {
             val value = if (activity.type == TrackedActivity.Type.CHECKED && it == TimeRange.DAILY)
@@ -231,44 +287,20 @@ private fun ViewRange(vm: TrackedActivityViewModel, activity: TrackedActivity?) 
             else
                 activity.goal.value
 
-
             vm.updateGoal(TrackedActivityGoal(value, it))
         }
     }
 
-    Row(
-        modifier = Modifier
-            .size(80.dp, 30.dp)
-            .padding(end = 8.dp)
-            .background(Colors.ChipGray, RoundedCornerShape(50))
-            .clickable(onClick = { display.value = true })
-    ) {
-        Icon(Icons.Filled.DateRange,
-            contentDescription = null,
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .padding(start = 5.dp)
-                .size(15.dp))
-
-        Text(
-            activity?.goal?.range?.label?.let { stringResource(id = it) } ?: "-",
-            Modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically)
-                .padding(end = 8.dp),
-            textAlign = TextAlign.Center,
-            style = TextStyle(
-                    fontSize = 10.sp
-            )
-
-        )
+    IconTextButton(Icons.Filled.DateRange, activity?.goal?.range?.label?.let { stringResource(id = it) }) {
+        display.value = true
     }
+
 }
 
 @Composable
 private fun SetTimer(state: TrackedActivityState?, vm: TrackedActivityViewModel) {
 
-    var display = remember { mutableStateOf(false) }
+    val display = remember { mutableStateOf(false) }
 
     if (state?.activity != null && state.activity.type == TrackedActivity.Type.TIME){
         DialogTimers(
@@ -281,41 +313,34 @@ private fun SetTimer(state: TrackedActivityState?, vm: TrackedActivityViewModel)
             runTimer = { timer -> vm.scheduleTimer(timer)  ; display.value = false  }
         )
 
-        Row(
-            Modifier
-                .size(80.dp, 30.dp)
-                .padding(end = 8.dp)
-                .background(Colors.ChipGray, RoundedCornerShape(50))
-                .clickable(onClick = { display.value = true })
-
-        ) {
-            Icon(Icons.Filled.Timer,
-                contentDescription = null,
-                Modifier
-                    .align(Alignment.CenterVertically)
-                    .padding(start = 5.dp)
-                    .size(15.dp))
-
-            Text(
-                stringResource(id = R.string.scree_activity_timers),
-                Modifier
-                    .weight(1f)
-                    .align(Alignment.CenterVertically)
-                    .padding(end = 8.dp),
-                textAlign = TextAlign.Center,
-                style = TextStyle(
-                    fontSize = 10.sp
-                )
-
-            )
+        IconTextButton(Icons.Filled.Timer, stringResource(id = R.string.scree_activity_timers)) {
+            display.value = true
         }
+    }
+}
+
+
+@Composable
+private fun Group(vm: TrackedActivityViewModel, groups: List<TrackerActivityGroup>?, activity: TrackedActivity?) {
+    val display = remember { mutableStateOf(false) }
+
+    if (activity != null && groups != null) DialogActivityGroupPicker(display = display, activity, groups) {
+        vm.setGroup(it)
+        display.value = false
+    }
+
+    IconTextButton(Icons.Default.Topic, stringResource(id = R.string.activity_screen_recent_group)) {
+        display.value = true
     }
 
 }
 
+
+
+
 @Composable
 private fun RecentActivity(nav: NavController, state: TrackedActivityState?) {
-    Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp)) {
+    Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp), shape = RoundedCornerShape(5.dp)) {
 
         Column(
             Modifier
@@ -332,10 +357,6 @@ private fun RecentActivity(nav: NavController, state: TrackedActivityState?) {
                 )
 
                 Spacer(Modifier.weight(1f))
-               /* TextButton(onClick = {}) {
-                    Text(text = stringResource(id = R.string.browse))
-                }*/
-
             }
 
 

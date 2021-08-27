@@ -9,6 +9,7 @@ import com.imfibit.activitytracker.core.iter
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.composed.MetricAggregation
 import com.imfibit.activitytracker.database.composed.toHashMap
+import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -124,7 +125,6 @@ interface DAOTrackedActivityMetric {
             )
         }
 
-        Log.e("asd", "Asd")
         return list.asReversed()
     }
 

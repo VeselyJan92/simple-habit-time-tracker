@@ -1,10 +1,8 @@
 package com.imfibit.activitytracker.database.dao.tracked_activity
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.imfibit.activitytracker.database.dao.BaseEditableDAO
 import com.imfibit.activitytracker.database.entities.PresetTimer
-import com.imfibit.activitytracker.database.entities.TrackedActivity
 
 /////////////////////////////////
 // ----- DAOPresetTimers ----- ///
