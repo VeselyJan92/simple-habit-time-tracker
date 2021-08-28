@@ -66,7 +66,7 @@ object NotificationLiveSession{
         val stopIntent = PendingIntent.getBroadcast(
             context,
             item.id.toInt(),
-            Intent(context, StopActivitySessionReceiver::class.java).apply { putExtra("id", item.id) },
+            Intent(context, StopActivitySessionReceiver::class.java).apply { putExtra("activity_id", item.id) },
             PendingIntent.FLAG_UPDATE_CURRENT
         )
 
@@ -77,6 +77,7 @@ object NotificationLiveSession{
             .setContentTitle(context.getString(R.string.notification_session_channel_title))
             .setUsesChronometer(true)
             .setContent(remoteViews)
+            .setSilent(true)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)

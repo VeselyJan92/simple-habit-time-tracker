@@ -5,6 +5,8 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.imfibit.activitytracker.core.notifications.NotificationLiveSession
@@ -30,6 +32,11 @@ class TrackTimeService @Inject constructor(
 ){
 
     suspend fun startSession(activity: TrackedActivity, start: LocalDateTime = LocalDateTime.now()){
+
+        (context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator).vibrate(
+            VibrationEffect.createOneShot(100L, 1)
+        )
+
         val updated = activity.copy(inSessionSince = start)
         repository.activityDAO.update(updated)
 

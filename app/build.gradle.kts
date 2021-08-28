@@ -141,8 +141,8 @@ dependencies {
 
 
 
-    implementation("com.google.accompanist:accompanist-pager:0.15.0")
-    implementation("com.google.accompanist:accompanist-pager-indicators:0.15.0")
+    implementation("com.google.accompanist:accompanist-pager:0.17.0")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.17.0")
 
     implementation("org.burnoutcrew.composereorderable:reorderable-desktop:0.6.1")
 

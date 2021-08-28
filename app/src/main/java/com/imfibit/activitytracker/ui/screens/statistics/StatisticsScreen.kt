@@ -10,10 +10,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,13 +23,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.sumByLong
-import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.entities.TrackedActivity
@@ -41,6 +37,7 @@ import com.imfibit.activitytracker.ui.components.BaseMetricBlock
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.TrackerTopAppBar
 import com.imfibit.activitytracker.ui.screens.activity_list.Goal
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 
@@ -56,43 +53,70 @@ fun ScreenStatistics(navController: NavHostController) {
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-private fun ScreenBody() = Column() {
+private fun ScreenBody() = Column {
 
     val vm = hiltViewModel<StatisticsViewModel>()
 
+    val origin = remember { mutableStateOf(LocalDate.now())}
+    val range = remember { mutableStateOf(TimeRange.DAILY)}
+    val date = remember { mutableStateOf(LocalDate.now())}
 
-    val state = remember { StatisticsState(LocalDate.now(), TimeRange.DAILY) }
-
-
-    Navigation(
-        range = state.range.value,
-        date = state.date.value,
-        goTo = { state.setCustomDate(it) },
-        setRange = { state.setTimeRange(it) }
+    val state = rememberPagerState(
+        pageCount = 100,
+        initialPage = 51
     )
 
+    val scope = rememberCoroutineScope()
+
+    Navigation(
+        range = range.value,
+        date = date.value,
+        goTo = {
+            scope.launch {
+            origin.value = it
+            date.value = it
+            state.scrollToPage(51)
+        } },
+        setRange = {
+            scope.launch {
+                origin.value = LocalDate.now()
+                date.value = LocalDate.now()
+                range.value = it
+                state.scrollToPage(51)
+            }
+
+        }
+    )
 
     HorizontalPager(
-        state = state.pager,
+        state = state,
         modifier = Modifier
             .fillMaxHeight(),
         verticalAlignment = Alignment.Top
     ) { page ->
 
+        val relativePage = (51 - page).toLong()
+
+        val interval = range.value.getBoundaries(
+            when (range.value){
+                TimeRange.DAILY -> origin.value.minusDays(relativePage)
+                TimeRange.WEEKLY -> origin.value.minusWeeks(relativePage)
+                TimeRange.MONTHLY -> origin.value.minusMonths(relativePage)
+            }
+        )
+
         Column {
 
             NavigationTitle(
-                range = state.range.value,
-                rangeDate = state.getRange(page).first,
+                range = range.value,
+                rangeDate = interval.first,
             )
 
-            val interval = state.getRange(page)
-
-            val data = remember(state.range, state.origin) {
+            val data = remember(range, origin) {
                 mutableStateOf(mapOf<TrackedActivity.Type, List<ActivityWithMetric>>())
             }
 
-            LaunchedEffect(state.range, state.origin) {
+            LaunchedEffect(range, origin, date, page) {
                 data.value = vm.getPageData(interval.first, interval.second)
             }
 
@@ -118,9 +142,9 @@ private fun ScreenBody() = Column() {
                 }
             } else {
                 Column(Modifier.verticalScroll(rememberScrollState())) {
-                    BlockTimeTracked(data.value[TrackedActivity.Type.TIME], state)
-                    BlockScores(data.value[TrackedActivity.Type.SCORE], state)
-                    BlockCompleted(data.value[TrackedActivity.Type.CHECKED], state)
+                    BlockTimeTracked(data.value[TrackedActivity.Type.TIME], range.value)
+                    BlockScores(data.value[TrackedActivity.Type.SCORE], range.value)
+                    BlockCompleted(data.value[TrackedActivity.Type.CHECKED], range.value, date.value)
                 }
             }
         }
@@ -137,7 +161,8 @@ private fun Navigation(
 ) {
     Surface(
         modifier = Modifier
-            .padding(top = 8.dp).padding(horizontal = 8.dp),
+            .padding(top = 8.dp)
+            .padding(horizontal = 8.dp),
         elevation = 2.dp,
         shape = RoundedCornerShape(5.dp)
     ) {
@@ -205,7 +230,9 @@ private fun NavigationTitle(
 ) {
     Surface(
         modifier = Modifier
-            .padding(top = 16.dp).padding(horizontal = 8.dp).padding(bottom = 8.dp)
+            .padding(top = 16.dp)
+            .padding(horizontal = 8.dp)
+            .padding(bottom = 8.dp)
             .height(40.dp),
         elevation = 2.dp,
         shape = RoundedCornerShape(5.dp)
@@ -259,7 +286,10 @@ private fun Header(title: String, icon: ImageVector, last: @Composable (() -> Un
 }
 
 @Composable
-private fun BlockTimeTracked(data: List<ActivityWithMetric>?, state: StatisticsState) {
+private fun BlockTimeTracked(
+    data: List<ActivityWithMetric>?,
+    range: TimeRange
+) {
     if (data == null) return
 
     Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp), shape = RoundedCornerShape(20.dp)) {
@@ -290,7 +320,7 @@ private fun BlockTimeTracked(data: List<ActivityWithMetric>?, state: StatisticsS
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    if (it.activity.isGoalSet() && it.activity.goal.range == state.range.value)
+                    if (it.activity.isGoalSet() && it.activity.goal.range == range)
                         Goal(label = it.activity.formatGoal())
 
 
@@ -314,7 +344,10 @@ private fun BlockTimeTracked(data: List<ActivityWithMetric>?, state: StatisticsS
 
 
 @Composable
-private fun BlockScores(data: List<ActivityWithMetric>?, state: StatisticsState) {
+private fun BlockScores(
+    data: List<ActivityWithMetric>?,
+    range: TimeRange
+) {
     if (data == null) return
 
     Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp), shape = RoundedCornerShape(20.dp)) {
@@ -328,7 +361,7 @@ private fun BlockScores(data: List<ActivityWithMetric>?, state: StatisticsState)
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    if (it.activity.isGoalSet() && it.activity.goal.range == state.range.value)
+                    if (it.activity.isGoalSet() && it.activity.goal.range == range)
                         Goal(label = it.activity.formatGoal())
 
                     BaseMetricBlock(
@@ -350,7 +383,11 @@ private fun BlockScores(data: List<ActivityWithMetric>?, state: StatisticsState)
 
 
 @Composable
-private fun BlockCompleted(data: List<ActivityWithMetric>?, state: StatisticsState) {
+private fun BlockCompleted(
+    data: List<ActivityWithMetric>?,
+    range: TimeRange,
+    date: LocalDate
+) {
     if (data == null) return
 
     Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp), shape = RoundedCornerShape(20.dp)) {
@@ -364,14 +401,14 @@ private fun BlockCompleted(data: List<ActivityWithMetric>?, state: StatisticsSta
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    if (it.activity.isGoalSet() && it.activity.goal.range == state.range.value && it.activity.goal.range != TimeRange.DAILY)
+                    if (it.activity.isGoalSet() && it.activity.goal.range == range && it.activity.goal.range != TimeRange.DAILY)
                         Goal(label = it.activity.formatGoal())
 
                     val label =
-                        if (it.activity.type == TrackedActivity.Type.CHECKED && state.range.value == TimeRange.DAILY)
+                        if (it.activity.type == TrackedActivity.Type.CHECKED && range == TimeRange.DAILY)
                             stringResource(id = R.string.yes).toUpperCase()
                         else
-                            "${it.metric} / ${state.range.value.getNumberOfDays(state.date.value)}"
+                            "${it.metric} / ${range.getNumberOfDays(date)}"
 
                     BaseMetricBlock(
                         metric = label,
