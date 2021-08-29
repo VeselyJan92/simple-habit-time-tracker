@@ -112,11 +112,14 @@ private fun ScreenBody() = Column {
                 rangeDate = interval.first,
             )
 
-            val data = remember(range, origin) {
+            val keys = arrayOf(range.value, origin.value, date.value, page)
+
+            val data = remember(*keys) {
                 mutableStateOf(mapOf<TrackedActivity.Type, List<ActivityWithMetric>>())
             }
 
-            LaunchedEffect(range, origin, date, page) {
+            // TODO bit hacky here
+            LaunchedEffect(*keys) {
                 data.value = vm.getPageData(interval.first, interval.second)
             }
 
