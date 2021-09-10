@@ -5,6 +5,13 @@
     <string name="screen_title_activity">Activity</string>
     <string name="screen_title_record_history">History</string>
 
+    <string name="screen_settings_title">Settings</string>
+    <string name="screen_settings_backup_section">Backup / Restore</string>
+    <string name="screen_settings_backup_label">Backup</string>
+    <string name="screen_settings_backup_explain">Backup your app data</string>
+    <string name="screen_settings_restore_label">Restore</string>
+    <string name="screen_settings_restore_explain">Restore your app data</string>
+
 
     <string name="frequency_daily">Daily</string>
     <string name="frequency_weekly">Weekly</string>

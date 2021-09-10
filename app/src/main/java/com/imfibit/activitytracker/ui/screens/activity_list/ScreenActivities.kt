@@ -8,10 +8,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Topic
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -28,6 +30,7 @@ import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.ui.AppBottomNavigation
 import com.imfibit.activitytracker.ui.SCREEN_ACTIVITY
+import com.imfibit.activitytracker.ui.SCREEN_SETTINGS
 import com.imfibit.activitytracker.ui.components.BaseMetricBlock
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.TrackerTopAppBar
@@ -85,11 +88,21 @@ fun ScreenActivities(
     )
 
     Scaffold(
-        topBar = { TrackerTopAppBar(stringResource(id = R.string.screen_title_activities)) },
+        topBar = {
+            TrackerTopAppBar(stringResource(id = R.string.screen_title_activities)){
+                Icon(
+                    modifier = Modifier.clickable {
+                        navController.navigate(SCREEN_SETTINGS)
+                    },
+                    imageVector = Icons.Default.Settings,
+                    tint = Color.White,
+                    contentDescription = null
+                )
+            }
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = { display.value = true }) {
                 Icon(Icons.Filled.Add, null)
-
             }
         },
         content = {

@@ -146,6 +146,8 @@ dependencies {
 
     implementation("org.burnoutcrew.composereorderable:reorderable:0.6.2")
 
+    implementation( "com.github.alorma:compose-settings:0.3.0")
+
     implementation("com.google.dagger:hilt-android:2.38.1")
     kapt("com.google.dagger:hilt-android-compiler:2.38.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0-alpha03")

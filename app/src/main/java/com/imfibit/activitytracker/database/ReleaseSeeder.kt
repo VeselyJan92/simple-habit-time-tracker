@@ -1,5 +1,6 @@
 package com.imfibit.activitytracker.database
 
+import android.util.Log
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import com.imfibit.activitytracker.database.entities.*
@@ -11,6 +12,9 @@ import kotlin.random.Random
 object ReleaseSeeder {
 
     suspend fun seed(db: AppDatabase){
+
+        Log.e("SEED", "SEED")
+
         activity_the_awesome_project(db)
 
         activity_exploring(db)

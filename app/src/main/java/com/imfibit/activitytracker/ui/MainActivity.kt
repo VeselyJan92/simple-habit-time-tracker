@@ -15,7 +15,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import com.imfibit.activitytracker.R
@@ -30,12 +29,11 @@ import com.imfibit.activitytracker.ui.screens.statistics.ScreenStatistics
 import com.imfibit.activitytracker.ui.screens.timeline.ScreenTimeline
 import com.imfibit.activitytracker.ui.screens.upcomming.ScreenUpcoming
 import kotlinx.coroutines.runBlocking
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 
 import com.imfibit.activitytracker.core.dataStore
 import com.imfibit.activitytracker.ui.screens.group.ScreenActivityGroup
+import com.imfibit.activitytracker.ui.screens.settings.ScreenSetting
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 
@@ -49,6 +47,7 @@ const val SCREEN_UPCOMING = "SCREEN_UPCOMING"
 const val SCREEN_TIMELINE = "SCREEN_TIMELINE"
 const val SCREEN_TIMER_OVER = "SCREEN_TIMER_OVER"
 const val SCREEN_ONBOARDING= "SCREEN_ONBOARDING"
+const val SCREEN_SETTINGS= "SCREEN_SETTINGS"
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -115,6 +114,7 @@ fun Router(){
         composable(SCREEN_ACTIVITIES){ ScreenActivities(navControl) }
         composable(SCREEN_UPCOMING){ ScreenUpcoming(navControl) }
         composable(SCREEN_ONBOARDING){ ScreenOnboarding(navControl) }
+        composable(SCREEN_SETTINGS){ ScreenSetting(navControl) }
 
         composable(
             route ="screen_activity_group/{group_id}",

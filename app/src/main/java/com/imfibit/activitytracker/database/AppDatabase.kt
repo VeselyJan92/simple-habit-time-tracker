@@ -1,6 +1,7 @@
 package com.imfibit.activitytracker.database
 
 import android.content.Context
+import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -89,13 +90,13 @@ abstract class AppDatabase : RoomDatabase() {
             }
             "debug" -> {
                 val db = Room
-                    .inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-                    //.databaseBuilder(context, AppDatabase::class.java, DB_NAME)
+                    //.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+                    .databaseBuilder(context, AppDatabase::class.java, DB_NAME)
                     //.createFromAsset("activity_tracker.db")
-                    //.addMigrations(*migrations)
+                    .addMigrations(*migrations)
                     .build()
+                //runBlocking(Dispatchers.IO) { ReleaseSeeder.seed(db) }
 
-                runBlocking(Dispatchers.IO) { ReleaseSeeder.seed(db) }
                 db
             }
             else -> throw IllegalArgumentException()

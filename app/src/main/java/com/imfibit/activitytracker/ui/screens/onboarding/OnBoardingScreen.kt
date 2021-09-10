@@ -105,10 +105,13 @@ fun ScreenOnboarding(
             OutlinedButton(shape = RoundedCornerShape(20.dp) ,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 8.dp), onClick = { cancel() },
+                    .padding(bottom = 32.dp)
+                    .padding(horizontal = 8.dp),
+                onClick = { cancel() },
                 colors = ButtonDefaults.outlinedButtonColors(
                     backgroundColor = Colors.ButtonGreen,
-                    contentColor = Color.White)) {
+                    contentColor = Color.White)
+            ) {
                 Text(text = stringResource(id = R.string.screen_onboarding_track))
             }
         }
