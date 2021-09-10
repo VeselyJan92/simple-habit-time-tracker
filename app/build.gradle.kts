@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.konan.properties.Properties
 
 
-val COMPOSE_VERSION = "1.1.0-alpha02"
+val COMPOSE_VERSION = "1.1.0-alpha03"
 
 
 plugins {
@@ -21,7 +21,7 @@ repositories {
 
 android {
     signingConfigs {
-        create("release") {
+        /*create("release") {
             val properties = Properties().apply {
                 load(File("../imfibit-tracker-keystore/signing.properties").reader())
             }
@@ -30,7 +30,7 @@ android {
             storePassword = properties.getProperty("key_store_password")
             keyPassword = properties.getProperty("key_password")
             keyAlias = properties.getProperty("key_alias")
-        }
+        }*/
 
         getByName("debug") {
             storeFile = rootProject.file("debug.keystore")
@@ -77,7 +77,7 @@ android {
     }
 
     buildTypes {
-        getByName("release") {
+     /*   getByName("release") {
             isMinifyEnabled = false
 
             manifestPlaceholders["crashlyticsCollectionEnabled"] = true
@@ -88,7 +88,7 @@ android {
 
             isDebuggable = true
 
-        }
+        }*/
 
         getByName("debug") {
             manifestPlaceholders["crashlyticsCollectionEnabled"] = false
@@ -111,7 +111,7 @@ dependencies {
 
     implementation("com.google.android.material:material:1.4.0")
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.21")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.30")
     implementation("com.thedeanda:lorem:2.1")
 
     implementation(platform("com.google.firebase:firebase-bom:25.11.0"))
@@ -129,7 +129,9 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:$COMPOSE_VERSION")
     debugImplementation("androidx.compose.ui:ui-tooling:$COMPOSE_VERSION")
 
-    implementation("androidx.navigation:navigation-compose:2.4.0-alpha07")
+    implementation("androidx.navigation:navigation-compose:2.4.0-alpha08")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
+
 
     val ROOM_VERSION = "2.4.0-alpha04"
 
@@ -139,18 +141,13 @@ dependencies {
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-
-
     implementation("com.google.accompanist:accompanist-pager:0.17.0")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.17.0")
 
-    implementation("org.burnoutcrew.composereorderable:reorderable-desktop:0.6.1")
+    implementation("org.burnoutcrew.composereorderable:reorderable:0.6.2")
 
     implementation("com.google.dagger:hilt-android:2.38.1")
     kapt("com.google.dagger:hilt-android-compiler:2.38.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0-alpha03")
     kapt("androidx.hilt:hilt-compiler:1.0.0")
-
-
 }
