@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.util.Log
@@ -92,6 +93,8 @@ class TrackTimeService @Inject constructor(
         val intent = Intent(context, ActivityTimerCompletedReceiver::class.java ).apply {
             putExtra(ActivityTimerCompletedReceiver.ACTIVITY_ID, activity.id)
         }
+
+        val flag =  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else flag
 
         return PendingIntent.getBroadcast(context, activity.id.toInt(), intent, flag)
     }

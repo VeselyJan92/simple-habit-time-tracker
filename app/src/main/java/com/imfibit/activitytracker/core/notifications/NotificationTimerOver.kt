@@ -9,6 +9,7 @@ import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -28,16 +29,18 @@ object NotificationTimerOver {
 
     fun show(context: Context, activity: TrackedActivity){
 
+        val flag =  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_UPDATE_CURRENT
+
         val openAppIntent = PendingIntent.getActivity(
             context, 0,
             Intent(context, MainActivity::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT
+            flag
         )
 
         val stopTimerIntent = PendingIntent.getBroadcast(
             context, 0,
             Intent(context, StopActivitySessionReceiver::class.java).apply { putExtra("activity_id", activity.id) },
-            PendingIntent.FLAG_UPDATE_CURRENT
+            flag
         )
 
 

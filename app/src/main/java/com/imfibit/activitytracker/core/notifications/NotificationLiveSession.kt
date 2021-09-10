@@ -9,6 +9,7 @@ import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.Uri
+import android.os.Build
 import android.os.SystemClock
 import android.util.Log
 import android.widget.RemoteViews
@@ -63,11 +64,13 @@ object NotificationLiveSession{
             true
         )
 
+        val flag =  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else PendingIntent.FLAG_UPDATE_CURRENT
+
         val stopIntent = PendingIntent.getBroadcast(
             context,
             item.id.toInt(),
             Intent(context, StopActivitySessionReceiver::class.java).apply { putExtra("activity_id", item.id) },
-            PendingIntent.FLAG_UPDATE_CURRENT
+            flag
         )
 
         remoteViews.setOnClickPendingIntent(R.id.rv_live_tracked_task_btn_stop, stopIntent)
