@@ -13,4 +13,5 @@ val Context.dataStore by preferencesDataStore(
 
 object PreferencesKeys {
     val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
+    val ERASE_OBOARDING_SHOW = booleanPreferencesKey("erase_onboarding_data_card")
 }

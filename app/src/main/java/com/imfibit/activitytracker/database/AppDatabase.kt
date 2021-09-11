@@ -95,7 +95,8 @@ abstract class AppDatabase : RoomDatabase() {
                     //.createFromAsset("activity_tracker.db")
                     .addMigrations(*migrations)
                     .build()
-                //runBlocking(Dispatchers.IO) { ReleaseSeeder.seed(db) }
+
+               // runBlocking(Dispatchers.IO) { ReleaseSeeder.seed(db) }
 
                 db
             }

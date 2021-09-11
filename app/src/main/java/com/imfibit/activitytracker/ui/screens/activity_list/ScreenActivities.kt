@@ -1,6 +1,5 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
-import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
@@ -8,21 +7,25 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Topic
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.core.Preferences
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.core.PreferencesKeys
+import com.imfibit.activitytracker.core.dataStore
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.entities.TrackedActivity
@@ -143,7 +146,18 @@ private fun ScreenBody(
             ),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+
         item {
+
+            val context = LocalContext.current
+
+            val pref by context.dataStore.data.collectAsState(initial = null)
+
+            if (pref?.get(PreferencesKeys.ERASE_OBOARDING_SHOW) != false){
+                ClearAll(vm)
+            }
+
+
             if(today.isNotEmpty())
                 Today(today)
         }
@@ -175,6 +189,59 @@ private fun ScreenBody(
 
 
 
+    }
+}
+
+
+@Composable
+private fun ClearAll(vm: ActivitiesViewModel) {
+
+    val context = LocalContext.current
+
+    Surface(
+        modifier = Modifier.padding(bottom = 8.dp),
+        elevation = 2.dp,
+        shape = RoundedCornerShape(5.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Icon(
+                modifier = Modifier.clickable {
+                    vm.hideClearCard(context)
+                },
+                imageVector = Icons.Default.Clear,
+                contentDescription = null
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Text(
+                modifier = Modifier.weight(1f),
+                text = "Clear all onboarding data",
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(70.dp, 30.dp)
+                    .padding(end = 8.dp)
+                    .background(Colors.ChipGray, RoundedCornerShape(50))
+                    .clickable(onClick = {
+                        vm.clearOnboardingData(context)
+                    }),
+                contentAlignment = Alignment.Center
+            ){
+                Text(text = "Erase")
+            }
+
+        }
     }
 }
 

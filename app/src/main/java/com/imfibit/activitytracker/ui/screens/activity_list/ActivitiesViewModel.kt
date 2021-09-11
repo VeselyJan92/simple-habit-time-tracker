@@ -1,9 +1,12 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
-import androidx.lifecycle.ViewModel
+import android.content.Context
+import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.viewModelScope
 import com.imfibit.activitytracker.core.AppViewModel
+import com.imfibit.activitytracker.core.PreferencesKeys
 import com.imfibit.activitytracker.core.activityInvalidationTracker
+import com.imfibit.activitytracker.core.dataStore
 import com.imfibit.activitytracker.core.services.TrackTimeService
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
@@ -68,8 +71,6 @@ class ActivitiesViewModel @Inject constructor(
     fun move(from: Int, to: Int, items: List<TrackedActivityWithMetric>){
         viewModelScope.launch(Dispatchers.IO) {
             val reordered = items.mapIndexed { index, item -> item.activity.copy(position = index) }.toMutableList().apply { this.move(from, to)}
-
-
         }
     }
 
@@ -105,6 +106,21 @@ class ActivitiesViewModel @Inject constructor(
 
     fun addGroup(group: TrackerActivityGroup) = launchIO {
         db.groupDAO.insert(group)
+    }
+
+    fun clearOnboardingData(context: Context) = launchIO  {
+        db.clearAllTables()
+
+        context.dataStore.edit {
+            it[PreferencesKeys.ERASE_OBOARDING_SHOW] = false
+        }
+
+    }
+
+    fun hideClearCard(context: Context) = launchIO {
+        context.dataStore.edit {
+            it[PreferencesKeys.ERASE_OBOARDING_SHOW] = false
+        }
     }
 
 
