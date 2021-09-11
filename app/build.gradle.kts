@@ -141,8 +141,10 @@ dependencies {
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-    implementation("com.google.accompanist:accompanist-pager:0.17.0")
-    implementation("com.google.accompanist:accompanist-pager-indicators:0.17.0")
+    implementation("com.google.accompanist:accompanist-pager:0.18.0")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.18.0")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.18.0")
+
 
     implementation("org.burnoutcrew.composereorderable:reorderable:0.6.2")
 

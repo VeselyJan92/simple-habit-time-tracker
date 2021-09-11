@@ -80,6 +80,7 @@ object NotificationLiveSession{
             .setContentTitle(context.getString(R.string.notification_session_channel_title))
             .setUsesChronometer(true)
             .setContent(remoteViews)
+            .setCustomBigContentView(remoteViews)
             .setSilent(true)
             .setOngoing(true)
             .setOnlyAlertOnce(true)

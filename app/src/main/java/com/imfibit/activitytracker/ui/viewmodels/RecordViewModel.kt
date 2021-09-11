@@ -2,13 +2,13 @@ package com.imfibit.activitytracker.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.imfibit.activitytracker.core.services.ToggleService
 import com.imfibit.activitytracker.core.services.TrackTimeService
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivityScore
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -17,7 +17,8 @@ import javax.inject.Inject
 @HiltViewModel
 class RecordViewModel @Inject constructor(
     private val rep: RepositoryTrackedActivity,
-    private val timerService: TrackTimeService
+    private val timerService: TrackTimeService,
+    private val toggleService: ToggleService,
 ): ViewModel() {
 
     fun deleteRecord(recordId: Long, type: TrackedActivity.Type) = viewModelScope.launch {
@@ -51,7 +52,7 @@ class RecordViewModel @Inject constructor(
     }
 
     fun toggleHabit(activityId: Long, datetime: LocalDateTime) = viewModelScope.launch {
-        rep.completionDAO.toggle(activityId, datetime)
+        toggleService.toggleActivity(activityId, datetime)
     }
 
     fun activityTriggered(activity: TrackedActivity) = viewModelScope.launch {
@@ -64,7 +65,7 @@ class RecordViewModel @Inject constructor(
                 }
             }
             TrackedActivity.Type.SCORE -> rep.scoreDAO.commitScore(activity.id, LocalDateTime.now(), 1)
-            TrackedActivity.Type.CHECKED -> rep.completionDAO.toggle(activity.id, LocalDateTime.now())
+            TrackedActivity.Type.CHECKED -> toggleService.toggleActivity(activity.id, LocalDateTime.now())
         }
     }
 

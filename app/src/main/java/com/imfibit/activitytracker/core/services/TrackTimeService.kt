@@ -27,15 +27,15 @@ import javax.inject.Inject
 
 class TrackTimeService @Inject constructor(
     private val repository: RepositoryTrackedActivity,
+    private val haptics: UserHapticsService,
     @ApplicationContext private val context: Context,
 ){
 
     suspend fun startSession(activity: TrackedActivity, start: LocalDateTime = LocalDateTime.now()){
-
-
-
         val updated = activity.copy(inSessionSince = start)
         repository.activityDAO.update(updated)
+
+        haptics.activityFeedback()
 
         NotificationLiveSession.show(context, updated)
     }
@@ -104,16 +104,6 @@ class TrackTimeService @Inject constructor(
     }
 
 
-    private fun vibrate(){
-        val vibrator  = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            (context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator
-        }else{
-            context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        }
 
-        vibrator.vibrate(
-            VibrationEffect.createOneShot(200L, VibrationEffect.DEFAULT_AMPLITUDE)
-        )
-    }
 
 }
