@@ -32,14 +32,14 @@ interface DAOTrackedActivityMetric {
     )
     suspend fun getMetric(activityId: Long, from: LocalDate, to: LocalDate): Long
 
-    @Query(
-        """
-        SELECT TOTAL(metric) as metric, ta.*
-        FROM tracked_activity_metric
-        LEFT JOIN tracked_activity ta 
-        USING(tracked_activity_id)
-        WHERE  date >= :from AND date <=:to
-        GROUP BY tracked_activity_id
+    @Query("""
+       select ta.*,  data.metric from tracked_activity ta 
+       left join (
+            SELECT tracked_activity_id, TOTAL(metric) as metric
+            from tracked_activity_metric   
+            WHERE  date >= :from AND date <= :to  
+            GROUP BY tracked_activity_id
+       ) data USING(tracked_activity_id)
     """
     )
     suspend fun getActivitiesWithMetric(from: LocalDate, to: LocalDate): List<ActivityWithMetric>

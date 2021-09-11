@@ -1,6 +1,7 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.viewModelScope
 import com.imfibit.activitytracker.core.AppViewModel
@@ -10,6 +11,7 @@ import com.imfibit.activitytracker.core.dataStore
 import com.imfibit.activitytracker.core.services.TrackTimeService
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
+import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
@@ -51,9 +53,13 @@ class ActivitiesViewModel @Inject constructor(
         val data =  Data(
             rep.getActivitiesOverview(activities).toMutableList(),
             rep.activityDAO.liveActive(),
-            rep.metricDAO.getActivitiesWithMetric(LocalDate.now(), LocalDate.now()),
+            rep.metricDAO.getActivitiesWithMetric(LocalDate.now(), LocalDate.now()).filter {
+                (it.activity.goal.range == TimeRange.DAILY && it.activity.goal.isSet()) || it.metric > 0
+            },
             db.groupDAO.getAll()
         )
+
+        Log.e("Activities", data.today.size.toString())
 
         this@ActivitiesViewModel.data.value = data
     }
@@ -65,13 +71,6 @@ class ActivitiesViewModel @Inject constructor(
 
     override fun onCleared() {
         db.invalidationTracker.removeObserver(tracker)
-    }
-
-
-    fun move(from: Int, to: Int, items: List<TrackedActivityWithMetric>){
-        viewModelScope.launch(Dispatchers.IO) {
-            val reordered = items.mapIndexed { index, item -> item.activity.copy(position = index) }.toMutableList().apply { this.move(from, to)}
-        }
     }
 
     fun commitSession(activity: TrackedActivity) {

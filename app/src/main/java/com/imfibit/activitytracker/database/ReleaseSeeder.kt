@@ -131,13 +131,6 @@ object ReleaseSeeder {
             goal = TrackedActivityGoal(3, TimeRange.WEEKLY)
         ))
 
-        activityId = db.activityDAO.insert(TrackedActivity(
-            id = 0, name = "Workout routinex",
-            position = 1,
-            type = TrackedActivity.Type.CHECKED,
-            inSessionSince = null,
-            goal = TrackedActivityGoal(3, TimeRange.WEEKLY)
-        ))
 
         db.completionDAO.insert(TrackedActivityCompletion(
             id = 0,

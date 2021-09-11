@@ -37,6 +37,7 @@ import com.imfibit.activitytracker.ui.components.BaseMetricBlock
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.TrackerTopAppBar
 import com.imfibit.activitytracker.ui.screens.activity_list.Goal
+import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityWithMetric
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -58,7 +59,7 @@ private fun ScreenBody() = Column {
     val vm = hiltViewModel<StatisticsViewModel>()
 
     val origin = remember { mutableStateOf(LocalDate.now())}
-    val range = remember { mutableStateOf(TimeRange.DAILY)}
+    val range = remember { mutableStateOf(TimeRange.WEEKLY)}
     val date = remember { mutableStateOf(LocalDate.now())}
 
     val state = rememberPagerState(
@@ -120,7 +121,7 @@ private fun ScreenBody() = Column {
 
             // TODO bit hacky here
             LaunchedEffect(*keys) {
-                data.value = vm.getPageData(interval.first, interval.second)
+                data.value = vm.getPageData(interval.first, interval.second, range.value)
             }
 
             if (data.value.isEmpty()) {
@@ -323,13 +324,16 @@ private fun BlockTimeTracked(
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    if (it.activity.isGoalSet() && it.activity.goal.range == range)
+                    if (it.activity.isGoalSet() && it.activity.goal.range == range){
                         Goal(label = it.activity.formatGoal())
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+
 
 
                     BaseMetricBlock(
                         metric = it.activity.type.getComposeString(it.metric).invoke(),
-                        color = Colors.AppAccent,
+                        color = getColor(it, range),
                         metricStyle = TextStyle(
                             fontWeight = FontWeight.Bold,
                             fontSize = 12.sp
@@ -364,12 +368,14 @@ private fun BlockScores(
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    if (it.activity.isGoalSet() && it.activity.goal.range == range)
+                    if (it.activity.isGoalSet() && it.activity.goal.range == range){
                         Goal(label = it.activity.formatGoal())
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
 
                     BaseMetricBlock(
                         metric = it.metric.toString(),
-                        color = Colors.AppAccent,
+                        color = getColor(it, range),
                         metricStyle = TextStyle(
                             fontWeight = FontWeight.Bold,
                             fontSize = 12.sp
@@ -404,8 +410,10 @@ private fun BlockCompleted(
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    if (it.activity.isGoalSet() && it.activity.goal.range == range && it.activity.goal.range != TimeRange.DAILY)
+                    if (it.activity.isGoalSet() && it.activity.goal.range == range && it.activity.goal.range != TimeRange.DAILY){
                         Goal(label = it.activity.formatGoal())
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
 
                     val label =
                         if (it.activity.type == TrackedActivity.Type.CHECKED && range == TimeRange.DAILY)
@@ -415,7 +423,7 @@ private fun BlockCompleted(
 
                     BaseMetricBlock(
                         metric = label,
-                        color = Colors.AppAccent, metricStyle = TextStyle(
+                        color = getColor(it, range), metricStyle = TextStyle(
                             fontWeight = FontWeight.Bold,
                             fontSize = 12.sp
                         )
@@ -425,6 +433,16 @@ private fun BlockCompleted(
                 Divider(Modifier.padding(top = 4.dp, bottom = 4.dp))
             }
         }
+    }
+
+}
+
+
+fun getColor(item: ActivityWithMetric, range: TimeRange): Color {
+    return if (item.activity.goal.range == range && item.metric < item.activity.goal.value){
+        Colors.NotCompleted
+    }else{
+        Colors.AppAccent
     }
 
 }

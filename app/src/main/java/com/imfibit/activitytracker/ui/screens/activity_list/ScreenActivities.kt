@@ -265,16 +265,23 @@ private fun Today(today: List<ActivityWithMetric>){
             )
 
             today.forEachIndexed{ index, item ->
+
+                val xx = item.activity.goal.range == TimeRange.DAILY && item.metric < item.activity.goal.value ;
+
                 Row(Modifier.padding(start = 8.dp, end = 8.dp)) {
+
+
                     Text(text = item.activity.name, fontSize = 16.sp)
 
                     Spacer(modifier = Modifier.weight(1f))
 
                     val label = item.activity.type.getComposeString(item.metric).invoke()
 
+                    val color = if (xx) Colors.NotCompleted else Colors.AppAccent
+
                     BaseMetricBlock(
                         metric = label,
-                        color = Colors.AppAccent, metricStyle = TextStyle(
+                        color = color, metricStyle = TextStyle(
                             fontWeight = FontWeight.Bold,
                             fontSize = 12.sp
                         )
@@ -347,61 +354,4 @@ private fun Categories(
         }
     }
 
-
-
-
-
-
-
-  /*  val rowState: ReorderableState = rememberReorderState()
-
-    LazyRow(
-        state = rowState.listState,
-        modifier = Modifier
-            .reorderable(
-                orientation = Orientation.Horizontal,
-                state = rowState,
-                onDragEnd = { from, to -> vm.moveCategory() },
-                onMove = { from, to -> vm.dragCategory(from, to)}
-            )
-    ){
-        itemsIndexed(groups){ index, item ->
-
-            Row {
-                Surface(
-                    elevation = 2.dp,
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .detectReorderAfterLongPress(rowState)
-                        .draggedItem(
-                            rowState.offsetByIndex(index),
-                            orientation = Orientation.Horizontal,
-                        ),
-                    shape = RoundedCornerShape(20.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .height(30.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-
-                        ) {
-                        Icon(modifier = Modifier.padding(end = 8.dp), imageVector = Icons.Outlined.Topic, contentDescription = null)
-
-                        Text(
-                            text = item.name,
-                            style = TextStyle(
-                                fontWeight = FontWeight.W500,
-                                fontSize = 16.sp
-                            )
-                        )
-                    }
-                }
-
-                if (index != groups.size-1)
-                    Spacer(modifier = Modifier.width(8.dp))
-
-            }
-        }
-    }*/
 }
