@@ -6,6 +6,7 @@ val COMPOSE_VERSION = "1.1.0-alpha03"
 
 plugins {
     id("com.android.application")
+    id("com.github.triplet.play") version "3.6.0"
     id("kotlin-android")
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
@@ -21,7 +22,7 @@ repositories {
 
 android {
     signingConfigs {
-        /*create("release") {
+        create("release") {
             val properties = Properties().apply {
                 load(File("../imfibit-tracker-keystore/signing.properties").reader())
             }
@@ -30,7 +31,7 @@ android {
             storePassword = properties.getProperty("key_store_password")
             keyPassword = properties.getProperty("key_password")
             keyAlias = properties.getProperty("key_alias")
-        }*/
+        }
 
         getByName("debug") {
             storeFile = rootProject.file("debug.keystore")
@@ -70,25 +71,21 @@ android {
         applicationId = "com.imfibit.activitytracker"
         minSdk = 26
         targetSdk = 31
-        versionCode = 3
+        versionCode = 7
         versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
-     /*   getByName("release") {
+        getByName("release") {
             isMinifyEnabled = false
 
             manifestPlaceholders["crashlyticsCollectionEnabled"] = true
 
             signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-            versionNameSuffix = " - PROD"
-
-            isDebuggable = true
-
-        }*/
+        }
 
         getByName("debug") {
             manifestPlaceholders["crashlyticsCollectionEnabled"] = false
@@ -104,6 +101,11 @@ android {
 
     }
 
+}
+
+play {
+    serviceAccountCredentials.set(File("../../imfibit-tracker-keystore/publish-key.json"))
+    track.set("production")
 }
 
 dependencies {

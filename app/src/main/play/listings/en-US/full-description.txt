@@ -1,0 +1,10 @@
+Simple activity and time tracking app. Everything is made to be as simple as possible with a focus on clarity of displayed information. Habit tracker and time tracker in one App. 
+
+Features
+- Time tracking
+- Habit tracking
+- Score tracking
+- Detailed statistics
+- Timeline of activities
+
+Feel free to send me constructive criticism or contribute to the App.
