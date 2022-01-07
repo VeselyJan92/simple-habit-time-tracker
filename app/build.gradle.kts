@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.konan.properties.Properties
 
 
-val COMPOSE_VERSION = "1.1.0-alpha03"
+val COMPOSE_VERSION = "1.1.0-rc01"
 
 
 plugins {
@@ -113,7 +113,7 @@ dependencies {
 
     implementation("com.google.android.material:material:1.4.0")
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.30")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0")
     implementation("com.thedeanda:lorem:2.1")
 
     implementation(platform("com.google.firebase:firebase-bom:25.11.0"))
@@ -131,11 +131,11 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:$COMPOSE_VERSION")
     debugImplementation("androidx.compose.ui:ui-tooling:$COMPOSE_VERSION")
 
-    implementation("androidx.navigation:navigation-compose:2.4.0-alpha08")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
+    implementation("androidx.navigation:navigation-compose:2.4.0-rc01")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0")
 
 
-    val ROOM_VERSION = "2.4.0-alpha04"
+    val ROOM_VERSION = "2.4.0"
 
     kapt("androidx.room:room-compiler:$ROOM_VERSION")
     implementation("androidx.room:room-runtime:$ROOM_VERSION")
@@ -154,6 +154,6 @@ dependencies {
 
     implementation("com.google.dagger:hilt-android:2.38.1")
     kapt("com.google.dagger:hilt-android-compiler:2.38.1")
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0-alpha03")
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0-rc01")
     kapt("androidx.hilt:hilt-compiler:1.0.0")
 }
