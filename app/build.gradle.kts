@@ -113,7 +113,7 @@ dependencies {
 
     implementation("com.google.android.material:material:1.4.0")
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.10")
     implementation("com.thedeanda:lorem:2.1")
 
     implementation(platform("com.google.firebase:firebase-bom:25.11.0"))
@@ -149,6 +149,8 @@ dependencies {
 
 
     implementation("org.burnoutcrew.composereorderable:reorderable:0.6.2")
+
+    implementation("io.github.bytebeats:compose-charts:0.1.0")
 
     implementation( "com.github.alorma:compose-settings:0.3.0")
     implementation( "com.github.madrapps:plot:0.1.1")

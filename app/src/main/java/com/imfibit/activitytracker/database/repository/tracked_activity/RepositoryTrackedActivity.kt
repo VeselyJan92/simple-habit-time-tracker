@@ -141,6 +141,24 @@ class RepositoryTrackedActivity @Inject constructor(
         )
     }
 
+    suspend fun getWeeks(activityId: Long) = db.withTransaction {
+        val to  = LocalDate.now().with(ChronoField.DAY_OF_WEEK, 7)
+        val from = to.minusWeeks(12).with(ChronoField.DAY_OF_WEEK, 7).minusDays(6)
+
+        metricDAO.getMetricByDay(activityId, from, to).chunked(7).map {
+
+
+            val metricSum =  it.map { it.metric }.sum()
+
+            Week(
+                from = it.first().from.atStartOfDay(),
+                to =  it.last().to.atStartOfDay(),
+                days = listOf(),
+                total = metricSum,
+            )
+        }
+    }
+
 
 
     suspend fun getRecords(

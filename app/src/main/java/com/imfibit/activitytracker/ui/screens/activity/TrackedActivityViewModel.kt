@@ -26,15 +26,16 @@ import javax.inject.Inject
 
 @Immutable
 data class TrackedActivityState(
-        val activity: TrackedActivity,
-        val timers: MutableList<PresetTimer>,
-        val recent: List<RepositoryTrackedActivity.Month>,
-        val months: List<MetricWidgetData>,
-        val groups: List<TrackerActivityGroup>,
-        val metricToday: ComposeString,
-        val metricWeek:  ComposeString,
-        val metricMonth:  ComposeString,
-        val metric30Days:  ComposeString,
+    val activity: TrackedActivity,
+    val timers: MutableList<PresetTimer>,
+    val recent: List<RepositoryTrackedActivity.Month>,
+    val months: List<MetricWidgetData>,
+    val groups: List<TrackerActivityGroup>,
+    val metricToday: ComposeString,
+    val metricWeek: ComposeString,
+    val metricMonth: ComposeString,
+    val metric30Days: ComposeString,
+    val graph: List<RepositoryTrackedActivity.Week>,
 )
 
 @HiltViewModel
@@ -84,6 +85,10 @@ class TrackedActivityViewModel @Inject constructor(
             rep.getMonthData(id, YearMonth.now()),
         )
 
+       // val graph = rep.getWeeks(id)
+        val graph = listOf<RepositoryTrackedActivity.Week>()
+
+
         val months = rep.metricDAO.getMetricByMonth(
             activity.id,
             YearMonth.now(),6
@@ -111,7 +116,7 @@ class TrackedActivityViewModel @Inject constructor(
         val timers = rep.timers.getAll(activity.id).toMutableList()
 
         TrackedActivityState(
-            activity, timers, recent, months, groups, metricToday, metricWeek, metricMonth, metric30Days
+            activity, timers, recent, months, groups, metricToday, metricWeek, metricMonth, metric30Days, graph
         )
     }
 

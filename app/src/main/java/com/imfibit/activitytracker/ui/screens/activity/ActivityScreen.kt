@@ -31,10 +31,14 @@ import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.dialogs.*
 import com.imfibit.activitytracker.ui.screens.activity_list.ActionButton
 import kotlinx.coroutines.*
+import me.bytebeats.views.charts.line.LineChart
+import me.bytebeats.views.charts.line.LineChartData
+import me.bytebeats.views.charts.line.render.yaxis.SimpleYAxisDrawer
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -80,6 +84,8 @@ fun ScreenTrackedActivity(nav: NavHostController) {
         content = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 ScreenBody(nav, state, vm)
+
+                //LineChartView(state)
 
                 Spacer(modifier = Modifier.height(100.dp))
             }
@@ -452,6 +458,33 @@ fun RecentActivityGrid(activity: TrackedActivity, months: List<RepositoryTracked
         }
 
     }
+
+}
+
+
+@Composable
+fun LineChartView(state: TrackedActivityState?) {
+
+    if (state == null)
+        return
+
+
+
+
+    Surface(elevation = 2.dp, shape = RoundedCornerShape(2.dp), modifier = Modifier.padding(8.dp).height(250.dp)) {
+        Column(Modifier.padding(8.dp)) {
+            LineChart(
+                lineChartData = LineChartData(
+                    points =  state.graph.mapIndexed { index, item ->  LineChartData.Point(item.total.toFloat()/(60*60), if (index%4 == 0) item.from.month.name else "") }
+                ,
+                ),
+                // Optional properties.
+                modifier = Modifier.fillMaxSize(),
+                yAxisDrawer = SimpleYAxisDrawer(),
+            )
+        }
+    }
+
 
 }
 
