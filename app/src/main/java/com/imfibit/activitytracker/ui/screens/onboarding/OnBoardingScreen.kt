@@ -77,7 +77,7 @@ fun ScreenOnboarding(
     )
 
 
-    val pagerState = rememberPagerState(pageCount = 3, )
+    val pagerState = rememberPagerState()
 
     Column() {
 
@@ -92,7 +92,7 @@ fun ScreenOnboarding(
         HorizontalPager(state = pagerState,
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f) ) { page -> PageUI(page = onboardPages[page]) }
+                .weight(1f), count = 3 ) { page -> PageUI(page = onboardPages[page]) }
 
         HorizontalPagerIndicator(pagerState = pagerState,
             modifier = Modifier

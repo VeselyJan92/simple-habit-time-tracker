@@ -27,10 +27,10 @@ inline fun BaseDialog(display: MutableState<Boolean>, noinline content: @Composa
     if (display.value) Dialog(onDismissRequest = {display.value = false}) {
 
         Surface(
-            modifier = Modifier.clip(RoundedCornerShape(20.dp)),
+            modifier = Modifier.clip(RoundedCornerShape(10.dp)),
             elevation = 2.dp
         ){
-            Column(content = content)
+            Column(content = content, )
         }
     }
 }

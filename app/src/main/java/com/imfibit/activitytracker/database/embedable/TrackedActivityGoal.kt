@@ -1,8 +1,10 @@
 package com.imfibit.activitytracker.database.embedable
 
+import android.graphics.Color
 import androidx.room.ColumnInfo
 import com.imfibit.activitytracker.core.ComposeString
 import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.ui.components.Colors
 import java.time.LocalDate
 
 
@@ -16,4 +18,19 @@ data class TrackedActivityGoal(
 ){
     fun isSet() = value != 0L
 
+    fun color(metric: Long) = when {
+        range == TimeRange.WEEKLY -> {
+            if (value != 0L) {
+                if (value <= metric)
+                    Colors.Completed
+                else
+                    Colors.NotCompleted
+            } else  {
+                Colors.AppAccent
+            }
+        }
+        else -> {
+            Colors.AppAccent
+        }
+    }
 }

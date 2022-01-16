@@ -24,6 +24,32 @@ object ReleaseSeeder {
         activity_point(db)
 
         categories(db)
+
+
+       /* var activityId: Long = 0
+
+        activityId = db.activityDAO.insert(
+            TrackedActivity(
+                id = 0, name = "TEST",
+                position = 1,
+                type = TrackedActivity.Type.TIME,
+                inSessionSince = null,
+                goal = TrackedActivityGoal(0, TimeRange.WEEKLY)
+            )
+        )
+        var x = LocalDate.of(2021, 12, 27)
+
+
+        repeat(7){
+            db.sessionDAO.insert(TrackedActivityTime(0, activityId, x.atTime(12, 0), x.atTime(13, 0)))
+            x = x.plusDays(1)
+        }*/
+
+
+
+
+
+
     }
 
 

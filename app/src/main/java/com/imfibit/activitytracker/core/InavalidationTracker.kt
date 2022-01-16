@@ -1,6 +1,8 @@
 package com.imfibit.activitytracker.core
 
 import android.util.Log
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.room.InvalidationTracker
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.entities.*
@@ -33,14 +35,14 @@ fun activityInvalidationTracker( onInvalidated: (MutableSet<String>)->Unit) = cr
 )
 
 
-fun  <T> invalidationFlow(db: AppDatabase, scope: CoroutineScope, source: suspend ()->T) = callbackFlow {
+fun  <T> ViewModel.invalidationFlow(db: AppDatabase, source: suspend ()->T) = callbackFlow {
 
-    scope.launch(Dispatchers.IO) {
+    viewModelScope.launch(Dispatchers.IO) {
         trySend(source.invoke())
     }
 
     val tracker = activityInvalidationTracker {
-        scope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO) {
             trySend(source.invoke())
         }
     }

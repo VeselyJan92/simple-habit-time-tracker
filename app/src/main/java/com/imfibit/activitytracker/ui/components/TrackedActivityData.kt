@@ -64,7 +64,7 @@ fun TrackedActivityRecord(
 
 
 @Composable
-private fun Record(
+fun Record(
     activity: TrackedActivity,
     record: TrackedActivityRecord
 ){

@@ -37,7 +37,6 @@ import com.imfibit.activitytracker.ui.components.BaseMetricBlock
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.TrackerTopAppBar
 import com.imfibit.activitytracker.ui.screens.activity_list.Goal
-import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityWithMetric
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -63,7 +62,6 @@ private fun ScreenBody() = Column {
     val date = remember { mutableStateOf(LocalDate.now())}
 
     val state = rememberPagerState(
-        pageCount = 100,
         initialPage = 51
     )
 
@@ -93,7 +91,8 @@ private fun ScreenBody() = Column {
         state = state,
         modifier = Modifier
             .fillMaxHeight(),
-        verticalAlignment = Alignment.Top
+        verticalAlignment = Alignment.Top,
+        count = 100
     ) { page ->
 
         val relativePage = (51 - page).toLong()

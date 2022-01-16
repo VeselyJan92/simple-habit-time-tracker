@@ -76,7 +76,7 @@ interface DAOTrackedActivityMetric {
             list.add(map[it] ?: MetricAggregation(it, it.plusDays(1L), 0L))
         }
 
-        return list.asReversed()
+        return list
     }
 
     @Query(

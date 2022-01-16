@@ -34,6 +34,8 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 
 
+
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DialogSession(
@@ -41,7 +43,7 @@ fun DialogSession(
     record: TrackedActivityTime,
     onUpdate: ((LocalDateTime, LocalDateTime)->Unit),
     onDelete: (()->Unit)? = null
-) = DialogSession(display, true,record.datetime_start, record.datetime_end, onUpdate, onDelete )
+) = DialogSession(display, record.id != 0L,record.datetime_start, record.datetime_end, onUpdate, onDelete )
 
 
 @OptIn(ExperimentalMaterialApi::class)

@@ -26,7 +26,6 @@ import com.imfibit.activitytracker.core.notifications.NotificationLiveSession
 import com.imfibit.activitytracker.core.notifications.NotificationTimerOver
 import com.imfibit.activitytracker.ui.screens.activity.ScreenTrackedActivity
 import com.imfibit.activitytracker.ui.screens.activity_list.ScreenActivities
-import com.imfibit.activitytracker.ui.screens.day_history.ScreenDayRecords
 import com.imfibit.activitytracker.ui.screens.onboarding.ScreenOnboarding
 import com.imfibit.activitytracker.ui.screens.statistics.ScreenStatistics
 import com.imfibit.activitytracker.ui.screens.timeline.ScreenTimeline
@@ -35,6 +34,8 @@ import kotlinx.coroutines.runBlocking
 
 
 import com.imfibit.activitytracker.core.dataStore
+import com.imfibit.activitytracker.ui.components.dialogs.DialogRecords
+import com.imfibit.activitytracker.ui.screens.activity_history.ScreenActivityHistory
 import com.imfibit.activitytracker.ui.screens.group.ScreenActivityGroup
 import com.imfibit.activitytracker.ui.screens.settings.ScreenSetting
 import dagger.hilt.android.AndroidEntryPoint
@@ -74,7 +75,9 @@ sealed class Screen(val route: String, @StringRes val resourceId: Int, val icon:
 }
 
 @Composable
-fun AppBottomNavigation(navController: NavController) {
+fun AppBottomNavigation(
+    navController: NavController
+) {
     BottomNavigation {
 
         val currentRoute = navController.currentBackStackEntry?.destination?.route
@@ -150,13 +153,21 @@ fun Router(){
         }
 
         composable(
+            route ="screen_activity_history/{activity_id}",
+            arguments = listOf(navArgument("activity_id") { type = NavType.LongType })
+        ){
+            ScreenActivityHistory(navControl)
+        }
+
+        dialog(
                 route = "screen_day_history/{activity_id}/{date}",
                 arguments = listOf(
                         navArgument("activity_id") { type = NavType.LongType },
                         navArgument("date") { type = NavType.StringType }
                 )
         ){
-            ScreenDayRecords()
+            DialogRecords(navControl)
         }
+
     }
 }

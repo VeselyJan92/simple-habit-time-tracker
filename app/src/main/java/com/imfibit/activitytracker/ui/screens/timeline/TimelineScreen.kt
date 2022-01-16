@@ -1,7 +1,5 @@
 package com.imfibit.activitytracker.ui.screens.timeline
 
-import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,17 +19,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.ui.AppBottomNavigation
 import com.imfibit.activitytracker.ui.components.Colors
+import com.imfibit.activitytracker.ui.components.Record
 import com.imfibit.activitytracker.ui.components.TrackedActivityRecord
 import com.imfibit.activitytracker.ui.components.TrackerTopAppBar
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.lang.Exception
 import java.util.*
 
@@ -87,7 +81,9 @@ private fun Body(scaffoldState: ScaffoldState) {
                 modifier = Modifier.padding(6.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                items(items.size) { TrackedActivityRecord(items[it].activity, items[it].record, scaffoldState) }
+                items(items.size) {
+                    Record(items[it].activity, items[it].record)
+                }
             }
         }
     }

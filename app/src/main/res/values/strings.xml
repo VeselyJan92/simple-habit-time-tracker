@@ -113,6 +113,9 @@
     <string name="dialog_group_picker_title">Select activity group</string>
     <string name="dialog_group_picker_default">Main Screen</string>
 
+    <string name="dialog_records_title">Records</string>
+    <string name="dialog_records_btn_okey">OK</string>
+
 
 
     <string name="notification_timer_title">You are DONE</string>

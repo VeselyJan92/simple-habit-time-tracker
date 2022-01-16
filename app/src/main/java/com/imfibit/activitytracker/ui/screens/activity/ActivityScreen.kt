@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -23,14 +24,18 @@ import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
+import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.ui.AppBottomNavigation
 import com.imfibit.activitytracker.ui.components.*
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.dialogs.*
 import com.imfibit.activitytracker.ui.screens.activity_list.ActionButton
 import kotlinx.coroutines.*
+import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.util.*
 
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
@@ -187,7 +192,9 @@ fun Live(
 
             if (activity.isInSession()){
                 Box(
-                    modifier = Modifier.size(50.dp, 30.dp).padding(end = 8.dp)
+                    modifier = Modifier
+                        .size(50.dp, 30.dp)
+                        .padding(end = 8.dp)
                         .background(Colors.ChipGray, RoundedCornerShape(50))
                         .clickable(onClick = onClear),
                     contentAlignment = Alignment.Center
@@ -357,6 +364,13 @@ private fun RecentActivity(nav: NavController, state: TrackedActivityState?) {
                 )
 
                 Spacer(Modifier.weight(1f))
+
+                TextButton(
+                    onClick = { if (state != null)
+                        nav.navigate("screen_activity_history/${state.activity.id}") }
+                ) {
+                    Text(text = stringResource(id = R.string.screen_title_record_history))
+                }
             }
 
 
@@ -391,19 +405,54 @@ private fun RecentActivity(nav: NavController, state: TrackedActivityState?) {
 
             Divider(Modifier.padding(8.dp))
 
-            RecentActivityGrid(state?.recent ?: listOf(), nav)
+            if (state != null)
+                RecentActivityGrid(state.activity, state.recent, nav)
 
             Divider(Modifier.padding(8.dp))
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 repeat(6) {
-                    MetricBlock(state?.months?.getOrNull(it)
-                            ?: MetricWidgetData.Labeled({ "-" }, { "" }, Colors.ChipGray))
+                    MetricBlock(state?.months?.getOrNull(it) ?: MetricWidgetData({ "-" }, Colors.ChipGray, { "" }))
                 }
             }
 
         }
     }
+}
+
+@Composable
+fun RecentActivityGrid(activity: TrackedActivity, months: List<RepositoryTrackedActivity.Month>, nav: NavController){
+
+    Column(Modifier.fillMaxWidth()) {
+
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+
+            DayOfWeek.values().forEach {
+                Box(Modifier.size(40.dp, 30.dp), contentAlignment = Alignment.Center){
+                    Text(
+                        text = it.getDisplayName(java.time.format.TextStyle.SHORT, Locale.getDefault()).toUpperCase(),
+                        textAlign = TextAlign.Center,
+                        style = TextStyle(
+                            fontWeight = FontWeight.W600,
+                            fontSize = 10.sp
+                        )
+                    )
+                }
+            }
+
+            Box(Modifier.size(40.dp, 30.dp), contentAlignment = Alignment.Center){
+                Icon(imageVector = Icons.Filled.Functions, contentDescription = null)
+            }
+
+        }
+
+        for(month in months){
+            val modifier = if (month.month.month == LocalDate.now().month) Modifier.background(Color(0xFFF5F5F5), RoundedCornerShape(5.dp)) else Modifier
+            Month(modifier, activity, month, nav)
+        }
+
+    }
+
 }
 
 

@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.konan.properties.Properties
 
 
-val COMPOSE_VERSION = "1.1.0-rc01"
+val COMPOSE_VERSION = "1.2.0-alpha01"
 
 
 plugins {
@@ -135,7 +135,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0")
 
 
-    val ROOM_VERSION = "2.4.0"
+    val ROOM_VERSION = "2.4.1"
 
     kapt("androidx.room:room-compiler:$ROOM_VERSION")
     implementation("androidx.room:room-runtime:$ROOM_VERSION")
@@ -143,14 +143,21 @@ dependencies {
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-    implementation("com.google.accompanist:accompanist-pager:0.18.0")
-    implementation("com.google.accompanist:accompanist-pager-indicators:0.18.0")
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.18.0")
+    implementation("com.google.accompanist:accompanist-pager:0.22.0-rc")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.22.0-rc")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.22.0-rc")
 
 
     implementation("org.burnoutcrew.composereorderable:reorderable:0.6.2")
 
     implementation( "com.github.alorma:compose-settings:0.3.0")
+    implementation( "com.github.madrapps:plot:0.1.1")
+
+
+    val paging_version = "3.1.0"
+
+    implementation("androidx.paging:paging-runtime:$paging_version")
+    implementation("androidx.paging:paging-compose:1.0.0-alpha14")
 
     implementation("com.google.dagger:hilt-android:2.38.1")
     kapt("com.google.dagger:hilt-android-compiler:2.38.1")

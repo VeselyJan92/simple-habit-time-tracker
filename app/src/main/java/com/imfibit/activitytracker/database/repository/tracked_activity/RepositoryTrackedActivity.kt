@@ -1,10 +1,8 @@
 package com.imfibit.activitytracker.database.repository.tracked_activity
 
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.Color
 import androidx.room.withTransaction
-import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.ComposeString
-import com.imfibit.activitytracker.core.sumByLong
 import com.imfibit.activitytracker.database.dao.tracked_activity.*
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.entities.*
@@ -27,6 +25,26 @@ import javax.inject.Inject
 class RepositoryTrackedActivity @Inject constructor(
     val db: AppDatabase
 ) {
+
+    data class Day(
+        val label: ComposeString,
+        val metric: Long,
+        val color: Color,
+        val date: LocalDate,
+        val type: TrackedActivity.Type
+    )
+
+    data class Week(
+        val from: LocalDateTime,
+        val to: LocalDateTime,
+        val days: List<Day>,
+        val total: Long,
+    )
+
+    data class Month(
+        val weeks:List<Week>,
+        val month: YearMonth,
+    )
 
     val completionDAO: DAOTrackedActivityChecked = db.completionDAO
     val activityDAO: DAOTrackedActivity = db.activityDAO
@@ -74,75 +92,55 @@ class RepositoryTrackedActivity @Inject constructor(
                         null
                 )
 
-
-                MetricWidgetData.Labeled(
-                    { activity.goal.range.getShortLabel(it.from) },
+                MetricWidgetData(
                     metric,
                     color,
-                    Editable(activity.type, it.metric, it.from.atStartOfDay(), it.to.atStartOfDay(), activity.id)
+                    { activity.goal.range.getShortLabel(it.from) },
                 )
             }
             TrackedActivityWithMetric(activity, groupedMetric, hasMetricToday)
         }
     }
 
-    suspend fun getRecentActivity(
+    suspend fun getMonthData(
         activityId: Long,
-        firstDayInWeek: LocalDate,
-        weeks: Int
+        yearMonth: YearMonth
     ) = db.withTransaction {
-        val from  = firstDayInWeek.minusWeeks(weeks.toLong()).plusDays(1)
+
+        val to  = yearMonth.atDay(1).plusMonths(1).with(ChronoField.DAY_OF_WEEK, 7)
+        val from = to.minusMonths(1).withDayOfMonth(1).with(ChronoField.DAY_OF_WEEK, 7).minusDays(6)
+
         val activity = activityDAO.getById(activityId)
 
-        return@withTransaction metricDAO.getMetricByDay(activityId, from, firstDayInWeek).chunked(7).map {
+        val weeks =  metricDAO.getMetricByDay(activityId, from, to).chunked(7).map {
 
             val days = it.map {
-                MetricWidgetData.Labeled(
+                Day(
                     label = {it.from.dayOfMonth.toString()},
-                    metric = activity.type.getComposeString(it.metric),
+                    metric = it.metric,
                     color = Colors.getMetricColor(activity.goal, it.metric, TimeRange.DAILY, Colors.ChipGray),
-                    editable = Editable(
-                            type = activity.type,
-                            metric = it.metric,
-                            from = it.from.atStartOfDay(),
-                            to = it.to.atStartOfDay().plusDays(1L),
-                            activityId = activityId
-                    )
+                    date = it.from,
+                    type = activity.type
                 )
             }
 
-            val metricSum = days.sumByLong { it.editable!!.metric}
+            val metricSum =  it.map { it.metric }.sum()
 
-            val metric:ComposeString = when (activity.type) {
-                TrackedActivity.Type.CHECKED -> {{ "$metricSum/7" }}
-                else -> activity.type.getComposeString(metricSum)
-            }
 
-            val color = when {
-                activity.goal.range == TimeRange.WEEKLY && activity.goal.isSet() -> {
-                    if (activity.goal.value <= metricSum)
-                        Colors.Completed
-                    else
-                        Colors.NotCompleted
-                }
-                else -> {
-                    Colors.AppAccent
-                }
-            }
 
             Week(
-                    from = it.first().from.atStartOfDay(),
-                    to =  it.last().from.atStartOfDay(),
-                    days = days.reversed(),
-                    stat = MetricWidgetData.Labeled(
-                            label = { stringResource(R.string.frequency_weekly)},
-                            metric = metric,
-                            color = color
-                    )
+                from = it.first().from.atStartOfDay(),
+                to =  it.last().to.atStartOfDay(),
+                days = days,
+                total = metricSum,
             )
-
         }
+
+        return@withTransaction Month(
+            weeks = weeks, month = yearMonth
+        )
     }
+
 
 
     suspend fun getRecords(

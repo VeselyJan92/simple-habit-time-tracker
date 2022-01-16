@@ -28,7 +28,7 @@ import javax.inject.Inject
 data class TrackedActivityState(
         val activity: TrackedActivity,
         val timers: MutableList<PresetTimer>,
-        val recent: List<Week>,
+        val recent: List<RepositoryTrackedActivity.Month>,
         val months: List<MetricWidgetData>,
         val groups: List<TrackerActivityGroup>,
         val metricToday: ComposeString,
@@ -47,7 +47,7 @@ class TrackedActivityViewModel @Inject constructor(
 
     val id: Long = savedStateHandle["activity_id"] ?: throw IllegalArgumentException()
 
-    val data = invalidationFlow(db, viewModelScope){
+    val data = invalidationFlow(db){
         val activity: TrackedActivity = rep.activityDAO.flowById(id).firstOrNull() ?: return@invalidationFlow null
         
         val now = LocalDate.now()
@@ -78,7 +78,11 @@ class TrackedActivityViewModel @Inject constructor(
             fraction = if (isChecked) 30L else null
         )
 
-        val recent = rep.getRecentActivity(id, endOfWeek, 12)
+        val recent = listOf(
+            //rep.getRecentActivityM(id, YearMonth.now().minusMonths(2)),
+            rep.getMonthData(id, YearMonth.now().minusMonths(1)),
+            rep.getMonthData(id, YearMonth.now()),
+        )
 
         val months = rep.metricDAO.getMetricByMonth(
             activity.id,
@@ -94,9 +98,9 @@ class TrackedActivityViewModel @Inject constructor(
             else
             { activity.type.getComposeString(it.metric) }
 
-            MetricWidgetData.Labeled(
+            MetricWidgetData(
                 label = { it.from.month.getDisplayName(TextStyle.SHORT, Locale.getDefault()) },
-                metric = metric,
+                value = metric,
                 color = color
             )
         }
