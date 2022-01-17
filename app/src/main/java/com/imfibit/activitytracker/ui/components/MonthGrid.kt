@@ -15,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -28,6 +30,8 @@ import com.imfibit.activitytracker.ui.components.dialogs.DialogScore
 import com.imfibit.activitytracker.ui.components.dialogs.DialogSession
 import com.imfibit.activitytracker.ui.viewmodels.RecordViewModel
 import java.time.*
+import java.time.format.TextStyle
+import java.util.*
 
 
 @Composable
@@ -37,7 +41,7 @@ fun Month(
     month: RepositoryTrackedActivity.Month,
     nav: NavController
 ){
-    MonthSplitter(month =  "${month.month.month.name} - ${month.month.year}")
+    MonthSplitter(month =  "${month.month.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault()).uppercase()} - ${month.month.year}")
 
     Column(modifier = modifier.padding(3.dp)) {
         month.weeks.forEach {
@@ -64,7 +68,7 @@ private fun Week(activity: TrackedActivity, week: RepositoryTrackedActivity.Week
                 TrackedActivity.Type.TIME -> DialogSession(
                     display = requestEdit,
                     record = TrackedActivityTime(0, activity.id, it.date.atTime(12, 0), it.date.atTime(13, 0)),
-                    onUpdate = { from, to -> vm.insertSession(1L, from, to) },
+                    onUpdate = { from, to -> vm.insertSession(activity.id, from, to) },
                 )
 
                 TrackedActivity.Type.SCORE  -> DialogScore(
@@ -123,12 +127,12 @@ private fun Week(activity: TrackedActivity, week: RepositoryTrackedActivity.Week
 
 @Composable
 private fun MonthSplitter(month: String){
-    Row(Modifier.fillMaxWidth()) {
+    Row(Modifier.fillMaxWidth().padding(top = 8.dp)) {
         Divider(
             Modifier
                 .padding(8.dp)
                 .weight(1f))
-        Text(text = month)
+        Text(text = month, fontWeight = FontWeight.W600)
         Divider(
             Modifier
                 .padding(8.dp)

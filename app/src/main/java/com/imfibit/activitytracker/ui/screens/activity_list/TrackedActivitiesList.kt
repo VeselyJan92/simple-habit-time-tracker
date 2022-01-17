@@ -140,18 +140,15 @@ fun TrackedActivity(
                 }
 
 
-
-
-
                 Row(modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    MetricBlock(item.past[4])
+                    MetricBlock(item.past[3] )
+                    MetricBlock(item.past[2] )
+                    MetricBlock(item.past[1] )
                     MetricBlock(item.past[0], width = 80.dp, metricStyle = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
-                    MetricBlock(item.past[1], )
-                    MetricBlock(item.past[2], )
-                    MetricBlock(item.past[3], )
-                    MetricBlock(item.past[4],)
                 }
             }
         }

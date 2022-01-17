@@ -87,7 +87,7 @@ class ActivitiesViewModel @Inject constructor(
     }
 
     fun dragActivity(from: Int, to: Int){
-        if (to == data.value.activities.size)
+        if (to == data.value.activities.size || to == 0)
             return
 
         val items = data.value.activities.toMutableList().apply { move(from, to) }
