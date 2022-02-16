@@ -124,7 +124,7 @@ fun ScreenActivities(
 private fun ScreenBody(
     nav: NavHostController,
     vm: ActivitiesViewModel,
-    activities: List<TrackedActivityWithMetric>,
+    activities: List<TrackedActivityRecentOverview>,
     today: List<ActivityWithMetric>,
     groups: List<TrackerActivityGroup>,
     live: List<TrackedActivity>,

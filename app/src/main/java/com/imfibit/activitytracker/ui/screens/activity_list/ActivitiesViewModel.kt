@@ -32,7 +32,7 @@ class ActivitiesViewModel @Inject constructor(
 ) : AppViewModel() {
 
     data class Data(
-        val activities: List<TrackedActivityWithMetric> = listOf(),
+        val activities: List<TrackedActivityRecentOverview> = listOf(),
         val live: List<TrackedActivity> = listOf(),
         val today: List<ActivityWithMetric> = listOf(),
         val groups: List<TrackerActivityGroup> = listOf()
@@ -59,7 +59,7 @@ class ActivitiesViewModel @Inject constructor(
             db.groupDAO.getAll()
         )
 
-        Log.e("Activities", data.today.size.toString())
+        Log.e("Activities", data.activities.toString())
 
         this@ActivitiesViewModel.data.value = data
     }

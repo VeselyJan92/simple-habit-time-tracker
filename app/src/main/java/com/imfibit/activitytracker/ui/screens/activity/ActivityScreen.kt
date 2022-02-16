@@ -30,6 +30,7 @@ import com.imfibit.activitytracker.ui.components.*
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.dialogs.*
 import com.imfibit.activitytracker.ui.screens.activity_list.ActionButton
+import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview
 import kotlinx.coroutines.*
 import me.bytebeats.views.charts.line.LineChart
 import me.bytebeats.views.charts.line.LineChartData
@@ -38,7 +39,6 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -109,7 +109,7 @@ fun ScreenBody(nav: NavController, state: TrackedActivityState?, vm: TrackedActi
             ActivitySettings(state, vm)
 
             if (state.activity.type == TrackedActivity.Type.TIME){
-                Live(
+                SessionActivityCustomStart(
                     activity = state.activity,
                     onActionClick = {
                         if (state.activity.isInSession()){
@@ -136,7 +136,7 @@ fun ScreenBody(nav: NavController, state: TrackedActivityState?, vm: TrackedActi
 }
 
 @Composable
-fun Live(
+fun SessionActivityCustomStart(
     activity: TrackedActivity,
     onActionClick: (LocalDateTime)->Unit,
     onUpdate: (LocalDateTime)->Unit,
@@ -161,7 +161,7 @@ fun Live(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
 
-            ActionButton(hasMetricToday = false, activity = activity, onClick = {
+            ActionButton(actionButton = TrackedActivityRecentOverview.ActionButton.DEFAULT, activity = activity, onClick = {
                 val validStart = start.value?.withSecond(LocalTime.now().second) ?: LocalDateTime.now()
 
                 if ( validStart > LocalDateTime.now())

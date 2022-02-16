@@ -35,7 +35,7 @@ import com.imfibit.activitytracker.ui.components.dialogs.DialogBaseHeader
 import com.imfibit.activitytracker.ui.components.dialogs.DialogInputText
 import com.imfibit.activitytracker.ui.components.helpers.draggedItem
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivity
-import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityWithMetric
+import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview
 import org.burnoutcrew.reorderable.*
 
 
@@ -74,7 +74,7 @@ private fun ScreenBody(
     nav: NavHostController,
     vm: ActivityGroupViewModel,
     group: TrackerActivityGroup?,
-    activities: List<TrackedActivityWithMetric>,
+    activities: List<TrackedActivityRecentOverview>,
     groups: List<TrackerActivityGroup>,
 ) {
     Column(
@@ -166,7 +166,7 @@ private fun Header(
 @Composable
 private fun Activities(
     nav: NavHostController,
-    activities: List<TrackedActivityWithMetric>,
+    activities: List<TrackedActivityRecentOverview>,
     onDragEnd: (from: Int, to: Int) -> Unit,
     onMove: (from: Int, to: Int) -> Unit,
 ) {

@@ -1,6 +1,5 @@
 package com.imfibit.activitytracker.database.dao.tracked_activity
 
-import android.util.Log
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
@@ -9,7 +8,6 @@ import com.imfibit.activitytracker.core.iter
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.composed.MetricAggregation
 import com.imfibit.activitytracker.database.composed.toHashMap
-import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -63,6 +61,8 @@ interface DAOTrackedActivityMetric {
         to: LocalDate // inclusive
     ): List<MetricAggregation>
 
+
+    //TODO There is probably bug where it ignores a day: select only one day ant the metric is zero
     @Transaction
     suspend fun getMetricByDay(
         activityId: Long,
@@ -171,7 +171,6 @@ interface DAOTrackedActivityMetric {
     }
 
 
-
-
+    suspend fun getMetricToday(activityId: Long): Long = getMetric(activityId, LocalDate.now(), LocalDate.now())
 
 }

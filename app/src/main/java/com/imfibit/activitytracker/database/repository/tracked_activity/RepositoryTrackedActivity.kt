@@ -9,7 +9,9 @@ import com.imfibit.activitytracker.database.entities.*
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.composed.RecordWithActivity
 import com.imfibit.activitytracker.ui.components.*
-import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityWithMetric
+import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview
+import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.*
+import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.ActionButton.*
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -66,14 +68,11 @@ class RepositoryTrackedActivity @Inject constructor(
                 TimeRange.MONTHLY -> metricDAO.getMetricByMonth(activity.id, YearMonth.now(), pastRanges).reversed()
             }
 
-            val hasMetricToday = if (activity.type == TrackedActivity.Type.CHECKED){
-                val metric = metricDAO.getMetricByDay(activity.id, LocalDate.now().minusDays(1), LocalDate.now())
-
-                metric.first().metric > 0
+            val actionButton = when {
+                TrackedActivity.Type.TIME == activity.type && activity.isInSession() -> IN_SESSION
+                TrackedActivity.Type.CHECKED == activity.type && metricDAO.getMetricToday(activity.id) > 0 -> CHECKED
+                else -> DEFAULT
             }
-            else false
-
-
 
             val groupedMetric = data.map {
                 val color = Colors.getMetricColor(
@@ -83,13 +82,9 @@ class RepositoryTrackedActivity @Inject constructor(
                     Colors.ChipGray
                 )
 
-
                 val metric: ComposeString = activity.type.getComposeString(
                     it.metric,
-                    if (activity.type == TrackedActivity.Type.CHECKED)
-                        activity.type.getCheckedFraction(activity.goal.range, it.from)
-                    else
-                        null
+                    if (activity.type == TrackedActivity.Type.CHECKED) activity.type.getCheckedFraction(activity.goal.range, it.from) else null
                 )
 
                 MetricWidgetData(
@@ -98,7 +93,7 @@ class RepositoryTrackedActivity @Inject constructor(
                     { activity.goal.range.getShortLabel(it.from) },
                 )
             }
-            TrackedActivityWithMetric(activity, groupedMetric, hasMetricToday)
+            TrackedActivityRecentOverview(activity, groupedMetric, actionButton)
         }
     }
 

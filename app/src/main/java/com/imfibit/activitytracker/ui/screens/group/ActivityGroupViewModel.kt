@@ -4,12 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.imfibit.activitytracker.core.activityInvalidationTracker
-import com.imfibit.activitytracker.core.invalidationFlow
 import com.imfibit.activitytracker.database.AppDatabase
-import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityWithMetric
+import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +25,7 @@ class ActivityGroupViewModel @Inject constructor(
     val id: Long = savedStateHandle["group_id"] ?: throw IllegalArgumentException()
 
 
-    val activities = MutableStateFlow<List<TrackedActivityWithMetric>>(listOf())
+    val activities = MutableStateFlow<List<TrackedActivityRecentOverview>>(listOf())
 
     val group = MutableStateFlow<TrackerActivityGroup?>(null)
 
