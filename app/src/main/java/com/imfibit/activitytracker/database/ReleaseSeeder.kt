@@ -157,8 +157,24 @@ object ReleaseSeeder {
             goal = TrackedActivityGoal(3, TimeRange.WEEKLY)
         ))
 
+        db.completionDAO.insert(TrackedActivityCompletion(
+            id = 0,
+            activity_id = activityId,
+            date_completed = LocalDate.of(2022, 1, 31),
+            time_completed = LocalTime.now(),
+        ))
 
         db.completionDAO.insert(TrackedActivityCompletion(
+            id = 0,
+            activity_id = activityId,
+            date_completed = LocalDate.of(2022, 2, 1),
+            time_completed = LocalTime.now(),
+        ))
+
+
+
+
+       /* db.completionDAO.insert(TrackedActivityCompletion(
             id = 0,
             activity_id = activityId,
             date_completed = LocalDate.now(),
@@ -174,7 +190,7 @@ object ReleaseSeeder {
                     time_completed = LocalTime.now(),
                 ))
             }
-        }
+        }*/
 
     }
 

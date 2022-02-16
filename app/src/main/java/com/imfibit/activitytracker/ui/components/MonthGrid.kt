@@ -3,6 +3,7 @@ package com.imfibit.activitytracker.ui.components
 import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape

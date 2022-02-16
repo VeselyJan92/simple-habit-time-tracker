@@ -173,7 +173,7 @@ fun RowScope.ActionButton(
         val icon = when (activity.type) {
             Type.TIME -> if (actionButton == ActionButton.IN_SESSION) Icons.Filled.Stop else Icons.Filled.PlayArrow
             Type.SCORE -> Icons.Filled.Add
-            Type.CHECKED -> if (actionButton == ActionButton.CHECKED) Icons.Filled.RadioButtonUnchecked else Icons.Filled.CheckCircle
+            Type.CHECKED -> if (actionButton == ActionButton.CHECKED) Icons.Filled.CheckCircle else Icons.Filled.RadioButtonUnchecked
         }
 
         val color = if (actionButton == ActionButton.IN_SESSION) Color.Red else Colors.AppAccent

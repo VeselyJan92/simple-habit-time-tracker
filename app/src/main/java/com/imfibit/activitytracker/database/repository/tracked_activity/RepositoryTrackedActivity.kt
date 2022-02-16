@@ -1,5 +1,6 @@
 package com.imfibit.activitytracker.database.repository.tracked_activity
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.room.withTransaction
 import com.imfibit.activitytracker.core.ComposeString
@@ -63,7 +64,7 @@ class RepositoryTrackedActivity @Inject constructor(
         return@withTransaction activities.map { activity ->
 
             val data = when(activity.goal.range){
-                TimeRange.DAILY -> metricDAO.getMetricByDay(activity.id,LocalDate.now().minusDays(pastRanges.toLong()-1), LocalDate.now())
+                TimeRange.DAILY -> metricDAO.getMetricByDay(activity.id,LocalDate.now().minusDays(pastRanges.toLong()), LocalDate.now())
                 TimeRange.WEEKLY -> metricDAO.getMetricByWeek(activity.id, LocalDate.now().with(ChronoField.DAY_OF_WEEK, 7), pastRanges).reversed()
                 TimeRange.MONTHLY -> metricDAO.getMetricByMonth(activity.id, YearMonth.now(), pastRanges).reversed()
             }
@@ -101,6 +102,7 @@ class RepositoryTrackedActivity @Inject constructor(
         activityId: Long,
         yearMonth: YearMonth
     ) = db.withTransaction {
+        Log.e("REP", "START")
 
         val to  = yearMonth.atDay(1).plusMonths(1).with(ChronoField.DAY_OF_WEEK, 7)
         val from = to.minusMonths(1).withDayOfMonth(1).with(ChronoField.DAY_OF_WEEK, 7).minusDays(6)
@@ -121,8 +123,6 @@ class RepositoryTrackedActivity @Inject constructor(
 
             val metricSum =  it.map { it.metric }.sum()
 
-
-
             Week(
                 from = it.first().from.atStartOfDay(),
                 to =  it.last().to.atStartOfDay(),
@@ -135,26 +135,6 @@ class RepositoryTrackedActivity @Inject constructor(
             weeks = weeks, month = yearMonth
         )
     }
-
-    suspend fun getWeeks(activityId: Long) = db.withTransaction {
-        val to  = LocalDate.now().with(ChronoField.DAY_OF_WEEK, 7)
-        val from = to.minusWeeks(12).with(ChronoField.DAY_OF_WEEK, 7).minusDays(6)
-
-        metricDAO.getMetricByDay(activityId, from, to).chunked(7).map {
-
-
-            val metricSum =  it.map { it.metric }.sum()
-
-            Week(
-                from = it.first().from.atStartOfDay(),
-                to =  it.last().to.atStartOfDay(),
-                days = listOf(),
-                total = metricSum,
-            )
-        }
-    }
-
-
 
     suspend fun getRecords(
         activityId: Long,

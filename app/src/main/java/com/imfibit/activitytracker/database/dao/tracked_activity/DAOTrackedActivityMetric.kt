@@ -50,19 +50,18 @@ interface DAOTrackedActivityMetric {
             date(date, '+1 day') as to_date,
             TOTAL(metric) as metric
         FROM tracked_activity_metric
-        WHERE  date > :from AND date <=:to AND tracked_activity_id=:activityId
+        WHERE  date >= :from AND date <=:to AND tracked_activity_id=:activityId
         GROUP BY from_date
         ORDER BY from_date ASC
     """
     )
     suspend fun getRawMetricDaily(
         activityId: Long,
-        from: LocalDate, //exclusive
-        to: LocalDate // inclusive
+        from: LocalDate,
+        to: LocalDate
     ): List<MetricAggregation>
 
 
-    //TODO There is probably bug where it ignores a day: select only one day ant the metric is zero
     @Transaction
     suspend fun getMetricByDay(
         activityId: Long,

@@ -56,12 +56,12 @@ private fun ScreenBody(){
         val context = LocalContext.current
         val vm = hiltViewModel<ScreenSettingVM>()
 
-        val export = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument()) {
-            vm.exportDB(context, it)
+        val export = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("*/*")) {
+            vm.exportDB(context, it!!)
         }
 
         val import = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) {
-            vm.importDB(context, it)
+            vm.importDB(context, it!!)
         }
 
 
