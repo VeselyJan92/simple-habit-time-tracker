@@ -73,8 +73,7 @@ android {
         targetSdk = 31
         versionCode = 10
         versionName = "1.2"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner  ="com.imfibit.activitytracker.HiltRunner"
     }
 
     buildTypes {
@@ -111,7 +110,7 @@ play {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
-    implementation("com.google.android.material:material:1.4.0")
+    implementation("com.google.android.material:material:1.5.0")
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.10")
     implementation("com.thedeanda:lorem:2.1")
@@ -129,6 +128,22 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:$COMPOSE_VERSION")
     implementation("androidx.compose.foundation:foundation:$COMPOSE_VERSION")
     implementation("androidx.compose.material:material-icons-extended:$COMPOSE_VERSION")
+
+
+
+    implementation("androidx.core:core-ktx:1.7.0")
+
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.3")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.38.1")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.38.1")
+    androidTestAnnotationProcessor("com.google.dagger:hilt-android-compiler:2.38.1")
+
+
+
+
     debugImplementation("androidx.compose.ui:ui-tooling:$COMPOSE_VERSION")
 
     implementation("androidx.navigation:navigation-compose:2.4.0-rc01")
