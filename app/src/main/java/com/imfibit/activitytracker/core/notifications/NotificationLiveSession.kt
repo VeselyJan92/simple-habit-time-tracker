@@ -3,39 +3,18 @@ package com.imfibit.activitytracker.core.notifications
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.media.AudioAttributes
-import android.media.RingtoneManager
-import android.net.Uri
 import android.os.Build
 import android.os.SystemClock
-import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.receivers.StopActivitySessionReceiver
-import com.imfibit.activitytracker.core.services.TrackTimeService
 import com.imfibit.activitytracker.database.entities.TrackedActivity
-import com.imfibit.activitytracker.database.AppDatabase
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import java.time.Instant
+import com.imfibit.activitytracker.ui.MainActivity
 import java.time.OffsetDateTime
-import java.time.ZoneId
-import java.time.ZoneOffset
-import javax.inject.Inject
-
-
-
-
-
-
 
 
 object NotificationLiveSession{
@@ -64,8 +43,9 @@ object NotificationLiveSession{
             true
         )
 
-        val flag =  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else PendingIntent.FLAG_UPDATE_CURRENT
+        /*
 
+        val flag =  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else PendingIntent.FLAG_UPDATE_CURRENT
         val stopIntent = PendingIntent.getBroadcast(
             context,
             item.id.toInt(),
@@ -73,19 +53,28 @@ object NotificationLiveSession{
             flag
         )
 
-        remoteViews.setOnClickPendingIntent(R.id.rv_live_tracked_task_btn_stop, stopIntent)
+        */
+
+        val contentIntent = PendingIntent.getActivity(
+            context,
+            System.currentTimeMillis().toInt(),
+            Intent(context, MainActivity::class.java),
+            PendingIntent.FLAG_IMMUTABLE
+        )
+
 
         val customNotification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_baseline_timer_24)
             .setContentTitle(context.getString(R.string.notification_session_channel_title))
             .setUsesChronometer(true)
             .setContent(remoteViews)
+            .setContentIntent(contentIntent)
             .setCustomBigContentView(remoteViews)
             .setSilent(true)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
-            .setAutoCancel(true)
+            .setAutoCancel(false)
 
 
        NotificationManagerCompat.from(context).notify(ID_BASE + item.id.toInt(), customNotification.build())
