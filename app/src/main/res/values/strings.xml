@@ -131,6 +131,14 @@
 
 
 
+    <string name="widget_time_activity">Study</string>
+    <string name="widget_time_description">Time tracked indicator</string>
+
+
+
+
+
+
 
     <string-array name="months">
         <item>January</item>

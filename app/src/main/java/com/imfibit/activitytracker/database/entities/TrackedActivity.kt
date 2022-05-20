@@ -1,5 +1,6 @@
 package com.imfibit.activitytracker.database.entities
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.imfibit.activitytracker.R
 import androidx.room.*
@@ -87,6 +88,9 @@ data class TrackedActivity(
                 }
             }
         }
+
+        @Composable
+        fun getMetricString(metric: Long, fraction:Long? = null) = getComposeString(metric, fraction)()
 
         fun getCheckedFraction(range: TimeRange, from: LocalDate): Long?{
             require(this == CHECKED)

@@ -19,7 +19,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.TextStyle
-import java.time.temporal.ChronoField
 import java.util.*
 import javax.inject.Inject
 
@@ -31,10 +30,6 @@ data class TrackedActivityState(
     val recent: List<RepositoryTrackedActivity.Month>,
     val months: List<MetricWidgetData>,
     val groups: List<TrackerActivityGroup>,
-    val metricToday: ComposeString,
-    val metricWeek: ComposeString,
-    val metricMonth: ComposeString,
-    val metric30Days: ComposeString,
     val graph: List<RepositoryTrackedActivity.Week>,
 )
 
@@ -51,6 +46,10 @@ class TrackedActivityViewModel @Inject constructor(
     val data = invalidationFlow(db){
         val activity: TrackedActivity = rep.activityDAO.flowById(id).firstOrNull() ?: return@invalidationFlow null
         
+
+
+
+        /*
         val now = LocalDate.now()
         val today = LocalDate.now()
         val endOfWeek = now.with(ChronoField.DAY_OF_WEEK, 7)
@@ -77,7 +76,7 @@ class TrackedActivityViewModel @Inject constructor(
         val metric30Days = activity.type.getComposeString(
             rep.metricDAO.getMetric(activity.id, days30, today),
             fraction = if (isChecked) 30L else null
-        )
+        )*/
 
         val recent = listOf(
             //rep.getRecentActivityM(id, YearMonth.now().minusMonths(2)),
@@ -116,7 +115,7 @@ class TrackedActivityViewModel @Inject constructor(
         val timers = rep.timers.getAll(activity.id).toMutableList()
 
         TrackedActivityState(
-            activity, timers, recent, months, groups, metricToday, metricWeek, metricMonth, metric30Days, graph
+            activity, timers, recent, months, groups,  graph
         )
     }
 

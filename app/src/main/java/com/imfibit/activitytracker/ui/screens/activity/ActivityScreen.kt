@@ -31,6 +31,8 @@ import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.dialogs.*
 import com.imfibit.activitytracker.ui.screens.activity_list.ActionButton
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview
+import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.ActionButton.DEFAULT
+import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.ActionButton.IN_SESSION
 import kotlinx.coroutines.*
 import me.bytebeats.views.charts.line.LineChart
 import me.bytebeats.views.charts.line.LineChartData
@@ -161,7 +163,9 @@ fun SessionActivityCustomStart(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
 
-            ActionButton(actionButton = TrackedActivityRecentOverview.ActionButton.DEFAULT, activity = activity, onClick = {
+            val action = if (activity.isInSession()) IN_SESSION else DEFAULT
+
+            ActionButton(actionButton = action, activity = activity, onClick = {
                 val validStart = start.value?.withSecond(LocalTime.now().second) ?: LocalDateTime.now()
 
                 if ( validStart > LocalDateTime.now())
@@ -357,7 +361,7 @@ private fun RecentActivity(nav: NavController, state: TrackedActivityState?) {
 
         Column(
             Modifier
-                .padding(8.dp)
+                .padding(bottom = 8.dp, start = 8.dp, end = 8.dp)
                 .background(Color.White)) {
 
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -380,36 +384,6 @@ private fun RecentActivity(nav: NavController, state: TrackedActivityState?) {
             }
 
 
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-
-                LabeledMetricBlock(
-                    metric = state?.metricToday?.invoke() ?: "-",
-                    label = stringResource(id = R.string.today),
-                    color = Colors.AppAccent,
-                    width = 80.dp,
-                    metricStyle = metricTextStyle.copy(fontWeight = FontWeight.Bold)
-                )
-                LabeledMetricBlock(
-                    metric = state?.metricWeek?.invoke() ?: "-",
-                    label = stringResource(id = R.string.week),
-                    color = Colors.AppAccent,
-                    width = 80.dp
-                )
-                LabeledMetricBlock(
-                    metric = state?.metricMonth?.invoke() ?: "-",
-                    label = stringResource(id = R.string.month),
-                    color = Colors.AppAccent,
-                    width = 80.dp
-                )
-                LabeledMetricBlock(
-                    metric = state?.metric30Days?.invoke() ?: "-",
-                    label = stringResource(id = R.string.days30),
-                    color = Colors.AppAccent,
-                    width = 80.dp
-                )
-            }
-
-            Divider(Modifier.padding(8.dp))
 
             if (state != null)
                 RecentActivityGrid(state.activity, state.recent, nav)

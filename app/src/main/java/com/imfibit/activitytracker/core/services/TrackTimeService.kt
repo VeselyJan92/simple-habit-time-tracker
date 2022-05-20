@@ -17,6 +17,9 @@ import com.imfibit.activitytracker.database.entities.TrackedActivityTime
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -29,6 +32,8 @@ class TrackTimeService @Inject constructor(
     private val repository: RepositoryTrackedActivity,
     private val haptics: UserHapticsService,
     @ApplicationContext private val context: Context,
+    private val widgetService: TimeWidgetService,
+    private val sessionService: SessionService
 ){
 
     suspend fun startSession(activity: TrackedActivity, start: LocalDateTime = LocalDateTime.now()){
@@ -42,8 +47,8 @@ class TrackTimeService @Inject constructor(
 
     suspend fun commitSession(activity: TrackedActivity){
         if (activity.inSessionSince != null){
-            val session = TrackedActivityTime(0, activity.id, activity.inSessionSince!!, LocalDateTime.now())
-            repository.sessionDAO.insert(session)
+            sessionService.insertSession(TrackedActivityTime(0, activity.id, activity.inSessionSince!!, LocalDateTime.now()))
+
             repository.activityDAO.update(activity.copy(inSessionSince = null))
         }else
             FirebaseCrashlytics.getInstance().recordException(IllegalArgumentException("Committing already committed session"))

@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.konan.properties.Properties
 
 
-val COMPOSE_VERSION = "1.2.0-alpha03"
+val COMPOSE_VERSION = "1.2.0-beta02"
 
 
 plugins {
@@ -71,7 +71,7 @@ android {
         applicationId = "com.imfibit.activitytracker"
         minSdk = 26
         targetSdk = 31
-        versionCode = 11
+        versionCode = 12
         versionName = "1.2.1"
         testInstrumentationRunner  ="com.imfibit.activitytracker.HiltRunner"
     }
@@ -99,6 +99,7 @@ android {
         }
 
     }
+    namespace = "com.imfibit.activitytracker"
 
 }
 
@@ -110,9 +111,9 @@ play {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
-    implementation("com.google.android.material:material:1.5.0")
+    implementation("com.google.android.material:material:1.6.0")
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.10")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.21")
     implementation("com.thedeanda:lorem:2.1")
 
     implementation(platform("com.google.firebase:firebase-bom:25.11.0"))
@@ -130,6 +131,8 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:$COMPOSE_VERSION")
 
 
+    implementation("androidx.glance:glance-appwidget:1.0.0-alpha03")
+
 
     implementation("androidx.core:core-ktx:1.7.0")
 
@@ -146,7 +149,7 @@ dependencies {
 
     debugImplementation("androidx.compose.ui:ui-tooling:$COMPOSE_VERSION")
 
-    implementation("androidx.navigation:navigation-compose:2.5.0-alpha02")
+    implementation("androidx.navigation:navigation-compose:2.5.0-rc01")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1")
 
 
