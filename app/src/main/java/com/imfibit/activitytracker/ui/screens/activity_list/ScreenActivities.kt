@@ -1,5 +1,6 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
@@ -42,6 +43,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.burnoutcrew.reorderable.*
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ScreenActivities(
     navController: NavHostController,
@@ -152,7 +154,9 @@ private fun ScreenBody(
 
             val pref by context.dataStore.data.collectAsState(initial = null)
 
-            if (pref?.get(PreferencesKeys.ERASE_OBOARDING_SHOW) != false){
+            val x = pref?.get(PreferencesKeys.ERASE_OBOARDING_SHOW) ?: false
+
+            if (x){
                 ClearAll(vm)
             }
 

@@ -107,7 +107,7 @@ class TrackedActivityViewModel @Inject constructor(
                 value = metric,
                 color = color
             )
-        }
+        }.reversed()
 
 
         val groups = db.groupDAO.getAll()

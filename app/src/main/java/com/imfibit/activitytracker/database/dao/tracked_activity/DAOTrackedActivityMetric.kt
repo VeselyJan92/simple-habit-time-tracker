@@ -124,7 +124,7 @@ interface DAOTrackedActivityMetric {
             )
         }
 
-        return list.asReversed()
+        return list
     }
 
     @Query(
@@ -166,7 +166,7 @@ interface DAOTrackedActivityMetric {
                 )
             )
         }
-        return list
+        return list.reversed().toMutableList()
     }
 
 

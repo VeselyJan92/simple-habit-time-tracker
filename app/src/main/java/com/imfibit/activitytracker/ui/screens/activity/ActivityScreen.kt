@@ -34,9 +34,6 @@ import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecen
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.ActionButton.DEFAULT
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.ActionButton.IN_SESSION
 import kotlinx.coroutines.*
-import me.bytebeats.views.charts.line.LineChart
-import me.bytebeats.views.charts.line.LineChartData
-import me.bytebeats.views.charts.line.render.yaxis.SimpleYAxisDrawer
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -434,32 +431,4 @@ fun RecentActivityGrid(activity: TrackedActivity, months: List<RepositoryTracked
     }
 
 }
-
-
-@Composable
-fun LineChartView(state: TrackedActivityState?) {
-
-    if (state == null)
-        return
-
-
-
-
-    Surface(elevation = 2.dp, shape = RoundedCornerShape(2.dp), modifier = Modifier.padding(8.dp).height(250.dp)) {
-        Column(Modifier.padding(8.dp)) {
-            LineChart(
-                lineChartData = LineChartData(
-                    points =  state.graph.mapIndexed { index, item ->  LineChartData.Point(item.total.toFloat()/(60*60), if (index%4 == 0) item.from.month.name else "") }
-                ,
-                ),
-                // Optional properties.
-                modifier = Modifier.fillMaxSize(),
-                yAxisDrawer = SimpleYAxisDrawer(),
-            )
-        }
-    }
-
-
-}
-
 

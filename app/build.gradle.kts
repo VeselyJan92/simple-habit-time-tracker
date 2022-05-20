@@ -71,8 +71,8 @@ android {
         applicationId = "com.imfibit.activitytracker"
         minSdk = 26
         targetSdk = 31
-        versionCode = 12
-        versionName = "1.2.1"
+        versionCode = 13
+        versionName = "1.2.2"
         testInstrumentationRunner  ="com.imfibit.activitytracker.HiltRunner"
     }
 
@@ -168,10 +168,10 @@ dependencies {
 
     implementation("org.burnoutcrew.composereorderable:reorderable:0.6.2")
 
-    implementation("io.github.bytebeats:compose-charts:0.1.0")
+
 
     implementation( "com.github.alorma:compose-settings:0.3.0")
-    implementation( "com.github.madrapps:plot:0.1.1")
+
 
 
     val paging_version = "3.1.0"

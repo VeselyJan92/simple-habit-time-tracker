@@ -59,14 +59,14 @@ class RepositoryTrackedActivity @Inject constructor(
 
     suspend fun getActivitiesOverview(activities: List<TrackedActivity>) =  db.withTransaction {
 
-        val pastRanges = 5
+        val pastRanges = 4
 
         return@withTransaction activities.map { activity ->
 
             val data = when(activity.goal.range){
-                TimeRange.DAILY -> metricDAO.getMetricByDay(activity.id,LocalDate.now().minusDays(pastRanges.toLong()), LocalDate.now())
-                TimeRange.WEEKLY -> metricDAO.getMetricByWeek(activity.id, LocalDate.now().with(ChronoField.DAY_OF_WEEK, 7), pastRanges).reversed()
-                TimeRange.MONTHLY -> metricDAO.getMetricByMonth(activity.id, YearMonth.now(), pastRanges).reversed()
+                TimeRange.DAILY -> metricDAO.getMetricByDay(activity.id, LocalDate.now().minusDays(pastRanges.toLong()), LocalDate.now())
+                TimeRange.WEEKLY -> metricDAO.getMetricByWeek(activity.id, LocalDate.now().with(ChronoField.DAY_OF_WEEK, 7), pastRanges+1)
+                TimeRange.MONTHLY -> metricDAO.getMetricByMonth(activity.id, YearMonth.now(), pastRanges+1)
             }
 
             val actionButton = when {
