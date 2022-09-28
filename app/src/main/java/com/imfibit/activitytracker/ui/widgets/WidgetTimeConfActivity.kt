@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -20,6 +19,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.glance.GlanceId
+import androidx.glance.LocalContext
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import com.imfibit.activitytracker.core.AppViewModel
@@ -40,13 +42,11 @@ class WidgetTimeConfActivityViewModel @Inject constructor(
 ) : AppViewModel() {
 
 
-    fun setupWidget(activityId: Long) = viewModelScope.launch(Dispatchers.IO) {
-        widgetService.setupWidget(activityId)
-        Log.e("xxxx", "setup done")
+    fun setupWidget(glanceId: GlanceId, activityId: Long) = viewModelScope.launch(Dispatchers.IO) {
+        widgetService.setupWidget(glanceId, activityId)
     }
 
     val data = MutableStateFlow(listOf<TrackedActivity>())
-
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -59,7 +59,6 @@ class WidgetTimeConfActivityViewModel @Inject constructor(
 @AndroidEntryPoint
 class WidgetTimeConfActivity : ComponentActivity() {
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -70,6 +69,9 @@ class WidgetTimeConfActivity : ComponentActivity() {
 
             val state by vm.data.collectAsState(initial = listOf())
 
+
+            val glanceId = GlanceAppWidgetManager(this).getGlanceIdBy(intent)
+
             LazyColumn(){
                 state.forEach {
                     item {
@@ -77,17 +79,14 @@ class WidgetTimeConfActivity : ComponentActivity() {
                             shape = RoundedCornerShape(8.dp),
                             elevation = 2.dp,
                             modifier = Modifier.padding(8.dp).fillMaxWidth().clickable {
-
-
                                 runBlocking {
-                                    vm.setupWidget(it.id).join()
-
-                                    delay(500)
+                                    if (glanceId != null){
+                                        vm.setupWidget(glanceId, it.id).join()
+                                        delay(500)
+                                    }
                                 }
-
                                 setResult(Activity.RESULT_OK)
 
-                                Log.e("xxx", "DONE")
                                 finish()
                             },
                         ) {

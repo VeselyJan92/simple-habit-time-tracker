@@ -15,10 +15,8 @@ class TimeWidgetService @Inject constructor(
     private val database: AppDatabase
 ) {
 
-    suspend fun setupWidget(activityId: Long){
+    suspend fun setupWidget(glanceId: GlanceId, activityId: Long){
 
-        //TODO there is no other way yet to get glanceId
-        val glanceId = GlanceAppWidgetManager(context).getGlanceIds(WidgetTime::class.java).last()
 
         updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { pref ->
 

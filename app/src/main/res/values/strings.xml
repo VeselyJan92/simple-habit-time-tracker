@@ -134,6 +134,10 @@
     <string name="widget_time_activity">Study</string>
     <string name="widget_time_description">Time tracked indicator</string>
 
+    <string name="widget_checked_habit_activity">Study</string>
+    <string name="widget_checked_habit_description">Habit  indicator</string>
+
+
 
 
 

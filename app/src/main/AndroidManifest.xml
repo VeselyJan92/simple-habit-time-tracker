@@ -58,12 +58,29 @@
                 android:resource="@xml/widget_time" />
         </receiver>
 
+
+        <receiver
+            android:name=".ui.widgets.WidgetCheckedHabitReceiver"
+            android:enabled="@bool/glance_appwidget_available"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_checked" />
+        </receiver>
+        
+
         <activity android:name=".ui.widgets.WidgetTimeConfActivity"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>
         </activity>
+
+
 
 
 

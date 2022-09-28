@@ -42,7 +42,7 @@ android {
 
     }
 
-    compileSdk = 31
+    compileSdk = 33
     buildToolsVersion = "30.0.3"
 
     buildFeatures {
@@ -70,7 +70,7 @@ android {
     defaultConfig {
         applicationId = "com.imfibit.activitytracker"
         minSdk = 26
-        targetSdk = 31
+        targetSdk = 33
         versionCode = 13
         versionName = "1.2.2"
         testInstrumentationRunner  ="com.imfibit.activitytracker.HiltRunner"
@@ -111,9 +111,9 @@ play {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
-    implementation("com.google.android.material:material:1.6.0")
+    implementation("com.google.android.material:material:1.6.1")
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.21")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10")
     implementation("com.thedeanda:lorem:2.1")
 
     implementation(platform("com.google.firebase:firebase-bom:25.11.0"))
@@ -131,26 +131,26 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:$COMPOSE_VERSION")
 
 
-    implementation("androidx.glance:glance-appwidget:1.0.0-alpha03")
+    implementation("androidx.glance:glance-appwidget:1.0.0-alpha04")
 
 
-    implementation("androidx.core:core-ktx:1.7.0")
+    implementation("androidx.core:core-ktx:1.9.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
 
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.38.1")
-    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.38.1")
-    androidTestAnnotationProcessor("com.google.dagger:hilt-android-compiler:2.38.1")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.42")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.42")
+    androidTestAnnotationProcessor("com.google.dagger:hilt-android-compiler:2.42")
 
 
 
 
     debugImplementation("androidx.compose.ui:ui-tooling:$COMPOSE_VERSION")
 
-    implementation("androidx.navigation:navigation-compose:2.5.0-rc01")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1")
+    implementation("androidx.navigation:navigation-compose:2.6.0-alpha01")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
 
 
     val ROOM_VERSION = "2.4.1"
@@ -177,10 +177,10 @@ dependencies {
     val paging_version = "3.1.0"
 
     implementation("androidx.paging:paging-runtime:$paging_version")
-    implementation("androidx.paging:paging-compose:1.0.0-alpha14")
+    implementation("androidx.paging:paging-compose:1.0.0-alpha16")
 
-    implementation("com.google.dagger:hilt-android:2.38.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.38.1")
+    implementation("com.google.dagger:hilt-android:2.44")
+    kapt("com.google.dagger:hilt-android-compiler:2.44")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
     kapt("androidx.hilt:hilt-compiler:1.0.0")
 }
