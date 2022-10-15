@@ -1,10 +1,8 @@
 package com.imfibit.activitytracker.database.entities
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
-import com.imfibit.activitytracker.R
 import androidx.room.*
-import com.imfibit.activitytracker.core.ComposeString
+import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.core.ContextString
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import java.time.LocalDate
@@ -66,11 +64,11 @@ data class TrackedActivity(
         
         private fun formatSession(metric: Long) = String.format("%02d:%02d", metric / (60*60), (metric/60) % 60)
 
-        fun getComposeString(
+        fun getLabel(
             metric: Long,
             fraction:Long? = null
-        ): ComposeString = {
-            when(this){
+        ): ContextString = {
+            when(this@Type){
                 TIME ->  when {
                     fraction != null -> "${formatSession(metric)} / $fraction"
                     else -> formatSession(metric)
@@ -82,15 +80,12 @@ data class TrackedActivity(
 
                 CHECKED -> when {
                     fraction != null -> "$metric / $fraction"
-                    metric == 0L -> stringResource(id = R.string.no).toUpperCase()
-                    metric == 1L  -> stringResource(id = R.string.yes).toUpperCase()
+                    metric == 0L -> resources.getString(R.string.no).uppercase()
+                    metric == 1L  -> resources.getString(R.string.yes).uppercase()
                     else -> metric.toString()
                 }
             }
         }
-
-        @Composable
-        fun getMetricString(metric: Long, fraction:Long? = null) = getComposeString(metric, fraction)()
 
         fun getCheckedFraction(range: TimeRange, from: LocalDate): Long?{
             require(this == CHECKED)

@@ -17,13 +17,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.core.value
 import com.imfibit.activitytracker.database.entities.*
 import com.imfibit.activitytracker.ui.components.dialogs.DialogScore
 import com.imfibit.activitytracker.ui.components.dialogs.DialogSession
-import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.ui.viewmodels.RecordViewModel
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
@@ -120,10 +118,13 @@ fun Record(
             toAnnotatedString()
         }
 
-        val metric = activity.type.getComposeString(record.metric).invoke()
+        val metric = activity.type.getLabel(record.metric).value()
 
 
-        Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(
                     modifier = Modifier.padding(4.dp),

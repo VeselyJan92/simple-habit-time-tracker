@@ -26,6 +26,7 @@ import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.PreferencesKeys
 import com.imfibit.activitytracker.core.dataStore
+import com.imfibit.activitytracker.core.value
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.entities.TrackedActivity
@@ -278,7 +279,7 @@ private fun Today(today: List<ActivityWithMetric>){
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    val label = item.activity.type.getComposeString(item.metric).invoke()
+                    val label = item.activity.type.getLabel(item.metric).value()
 
                     val color = if (xx) Colors.NotCompleted else Colors.AppAccent
 

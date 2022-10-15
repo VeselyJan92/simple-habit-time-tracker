@@ -1,8 +1,10 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
 import android.content.Context
+import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.os.VibratorManager
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,6 +24,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.imfibit.activitytracker.core.value
+import com.imfibit.activitytracker.database.composed.MetricAggregation
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivity.Type
 import com.imfibit.activitytracker.ui.components.Colors
@@ -37,10 +41,11 @@ import kotlinx.coroutines.isActive
 import java.time.LocalDateTime
 
 
-data class TrackedActivityRecentOverview constructor(
+data class TrackedActivityRecentOverview(
     val activity: TrackedActivity,
     val past: List<MetricWidgetData>,
-    val actionButton: ActionButton = ActionButton.DEFAULT
+    val actionButton: ActionButton = ActionButton.DEFAULT,
+    val today: MetricAggregation
 ){
     enum class ActionButton{
         DEFAULT, CHECKED, IN_SESSION
@@ -103,9 +108,16 @@ fun TrackedActivity(
                     recordVM.activityTriggered(activity)
                 },
                 onLongClick = {
-                    (context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator).vibrate(
-                        VibrationEffect.createOneShot(50L, 1)
-                    )
+
+                    //TODO Create service for this
+                    val x = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager?
+                        vibratorManager!!.defaultVibrator
+                    } else {
+                        context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator?
+                    }
+
+                    x?.vibrate(VibrationEffect.createOneShot(50L, 1))
 
                     when(activity.type){
                         Type.TIME -> openSessionDialog.value = true
@@ -129,7 +141,7 @@ fun TrackedActivity(
                     Spacer(modifier = Modifier.weight(1f))
 
                     if (activity.goal.isSet()) {
-                        Goal(activity.type.getComposeString(activity.goal.value).invoke())
+                        Goal(activity.type.getLabel(activity.goal.value).value())
                     }
 
                 }
@@ -211,7 +223,7 @@ fun Goal(label: String) {
             .size(70.dp, 20.dp)
             .background(Colors.ChipGray, RoundedCornerShape(50))
     ) {
-        Icon(Icons.Filled.Flag, contentDescription = null,)
+        Icon(Icons.Filled.Flag, contentDescription = null)
 
         Text(
             label,

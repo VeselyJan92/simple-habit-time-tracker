@@ -4,7 +4,7 @@ package com.imfibit.activitytracker.ui.screens.activity
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
 import com.imfibit.activitytracker.core.AppViewModel
-import com.imfibit.activitytracker.core.ComposeString
+import com.imfibit.activitytracker.core.ContextString
 import com.imfibit.activitytracker.core.invalidationFlow
 import com.imfibit.activitytracker.core.services.TrackTimeService
 import com.imfibit.activitytracker.database.embedable.TimeRange
@@ -15,7 +15,6 @@ import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.firstOrNull
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.TextStyle
@@ -97,10 +96,11 @@ class TrackedActivityViewModel @Inject constructor(
             else
                 Colors.AppAccent
 
-            val metric:ComposeString = if (activity.type == TrackedActivity.Type.CHECKED)
-            {{ "${it.metric} / ${it.from.month.length(it.from.isLeapYear)}" }}
-            else
-            { activity.type.getComposeString(it.metric) }
+            val metric:ContextString = if (activity.type == TrackedActivity.Type.CHECKED) {
+                { "${it.metric} / ${it.from.month.length(it.from.isLeapYear)}" }
+            } else {
+                activity.type.getLabel(it.metric)
+            }
 
             MetricWidgetData(
                 label = { it.from.month.getDisplayName(TextStyle.SHORT, Locale.getDefault()) },

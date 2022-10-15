@@ -71,8 +71,8 @@ android {
         applicationId = "com.imfibit.activitytracker"
         minSdk = 26
         targetSdk = 33
-        versionCode = 13
-        versionName = "1.2.2"
+        versionCode = 16
+        versionName = "1.2.4"
         testInstrumentationRunner  ="com.imfibit.activitytracker.HiltRunner"
     }
 
@@ -131,25 +131,28 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:$COMPOSE_VERSION")
 
 
-    implementation("androidx.glance:glance-appwidget:1.0.0-alpha04")
+    implementation("androidx.glance:glance-appwidget:1.0.0-alpha05")
 
 
     implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.hilt:hilt-common:1.0.0")
+
+
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
 
     androidTestImplementation("com.google.dagger:hilt-android-testing:2.42")
-    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.42")
-    androidTestAnnotationProcessor("com.google.dagger:hilt-android-compiler:2.42")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.44")
+    androidTestAnnotationProcessor("com.google.dagger:hilt-android-compiler:2.44")
 
 
 
 
     debugImplementation("androidx.compose.ui:ui-tooling:$COMPOSE_VERSION")
 
-    implementation("androidx.navigation:navigation-compose:2.6.0-alpha01")
+    implementation("androidx.navigation:navigation-compose:2.6.0-alpha02")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
 
 
@@ -183,4 +186,6 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:2.44")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
     kapt("androidx.hilt:hilt-compiler:1.0.0")
+
+
 }

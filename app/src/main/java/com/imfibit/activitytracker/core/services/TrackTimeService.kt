@@ -2,20 +2,18 @@ package com.imfibit.activitytracker.core.services
 
 import android.app.AlarmManager
 import android.app.PendingIntent
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.*
-import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.imfibit.activitytracker.core.notifications.NotificationLiveSession
 import com.imfibit.activitytracker.core.notifications.NotificationTimerOver
 import com.imfibit.activitytracker.core.receivers.ActivityTimerCompletedReceiver
+import com.imfibit.activitytracker.core.services.activity.TimeActivityService
 import com.imfibit.activitytracker.database.entities.PresetTimer
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import java.time.LocalDateTime
@@ -29,8 +27,7 @@ class TrackTimeService @Inject constructor(
     private val repository: RepositoryTrackedActivity,
     private val haptics: UserHapticsService,
     @ApplicationContext private val context: Context,
-    private val widgetService: TimeWidgetService,
-    private val sessionService: SessionService
+    private val sessionService: TimeActivityService
 ){
 
     suspend fun startSession(activity: TrackedActivity, start: LocalDateTime = LocalDateTime.now()){

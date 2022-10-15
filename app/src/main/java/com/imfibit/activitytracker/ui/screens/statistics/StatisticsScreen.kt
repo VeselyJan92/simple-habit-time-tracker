@@ -29,6 +29,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.sumByLong
+import com.imfibit.activitytracker.core.value
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.entities.TrackedActivity
@@ -249,7 +250,7 @@ private fun NavigationTitle(
             Spacer(Modifier.weight(1f))
 
             Text(
-                text = range.getDateLabel(rangeDate),
+                text = range.getDateLabel(rangeDate).value(),
                 fontSize = 19.sp,
                 fontWeight = FontWeight.ExtraBold
             )
@@ -305,8 +306,7 @@ private fun BlockTimeTracked(
                     contentAlignment = Alignment.Center
                 ) {
                     val sum =
-                        TrackedActivity.Type.TIME.getComposeString(data.sumByLong { it.metric })
-                            .invoke()
+                        TrackedActivity.Type.TIME.getLabel(data.sumByLong { it.metric }).value()
 
                     Text(
                         sum, style = TextStyle(
@@ -331,7 +331,7 @@ private fun BlockTimeTracked(
 
 
                     BaseMetricBlock(
-                        metric = it.activity.type.getComposeString(it.metric).invoke(),
+                        metric = it.activity.type.getLabel(it.metric).value(),
                         color = getColor(it, range),
                         metricStyle = TextStyle(
                             fontWeight = FontWeight.Bold,

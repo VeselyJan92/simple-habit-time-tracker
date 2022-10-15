@@ -2,11 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RTC_WAKEUP" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
@@ -44,23 +47,26 @@
             android:name="firebase_crashlytics_collection_enabled"
             android:value="${crashlyticsCollectionEnabled}" />
 
-
         <receiver
-            android:name=".ui.widgets.WidgetTimeReceiver"
-            android:enabled="@bool/glance_appwidget_available"
+            android:name=".core.services.RescheduleWidgetUpdates"
             android:exported="false">
+
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.DATE_CHANGED"/>
+                <action android:name="android.intent.action.TIME_SET"/>
+                <action android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
             </intent-filter>
 
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_time" />
+        </receiver>
+
+        <receiver
+            android:name=".core.services.UpdateWidgetsOnMidnightReceiver"
+            android:exported="false">
         </receiver>
 
 
         <receiver
-            android:name=".ui.widgets.WidgetCheckedHabitReceiver"
+            android:name=".ui.widgets.WidgetOverviewReceiver"
             android:enabled="@bool/glance_appwidget_available"
             android:exported="false">
             <intent-filter>
@@ -69,29 +75,24 @@
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/widget_checked" />
+                android:resource="@xml/widget_overview" />
         </receiver>
         
 
-        <activity android:name=".ui.widgets.WidgetTimeConfActivity"
+        <activity android:name=".ui.widgets.ConfActivityWidgetOverview"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>
         </activity>
 
-
-
-
-
-
-
+        <activity android:name=".ui.widgets.ConfActivityWidgetTime"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
+            </intent-filter>
+        </activity>
 
     </application>
-
-
-
-
-
 
 </manifest>

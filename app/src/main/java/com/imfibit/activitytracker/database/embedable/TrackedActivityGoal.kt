@@ -1,11 +1,8 @@
 package com.imfibit.activitytracker.database.embedable
 
-import android.graphics.Color
 import androidx.room.ColumnInfo
-import com.imfibit.activitytracker.core.ComposeString
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.components.Colors
-import java.time.LocalDate
 
 
 data class TrackedActivityGoal(

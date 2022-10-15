@@ -3,7 +3,6 @@ package com.imfibit.activitytracker.ui.components
 import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
-import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,14 +14,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.imfibit.activitytracker.R
-import com.imfibit.activitytracker.core.ComposeString
+import com.imfibit.activitytracker.core.ContextString
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivityScore
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
@@ -84,7 +81,7 @@ private fun Week(activity: TrackedActivity, week: RepositoryTrackedActivity.Week
 
             if(it.date.month == month){
                 MetricBlock(
-                    data = MetricWidgetData(it.type.getComposeString(it.metric), it.color, it.label),
+                    data = MetricWidgetData(it.type.getLabel(it.metric), it.color, it.label),
                     onClick = {
                         nav.navigate("screen_day_history/${activity.id}/${it.date}")
                     },
@@ -112,12 +109,12 @@ private fun Week(activity: TrackedActivity, week: RepositoryTrackedActivity.Week
             .background(Colors.ChipGray))
 
         if (week.to.month == month || week.to >= LocalDateTime.now() ){
-            val metric:ComposeString = when (activity.type) {
+            val metric:ContextString = when (activity.type) {
                 TrackedActivity.Type.CHECKED -> {{ "${week.total}/7" }}
-                else -> activity.type.getComposeString(week.total)
+                else -> activity.type.getLabel(week.total)
             }
 
-            MetricBlock(MetricWidgetData(metric, activity.goal.color(week.total), { stringResource(id = R.string.week)}))
+            MetricBlock(MetricWidgetData(metric, activity.goal.color(week.total), { resources.getString(R.string.week)}))
         }else{
             MetricBlock(MetricWidgetData({"-"}, Color.LightGray, {""}))
         }

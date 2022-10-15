@@ -1,13 +1,7 @@
 package com.imfibit.activitytracker.database.entities
 
-import androidx.compose.ui.res.stringResource
-import com.imfibit.activitytracker.R
 import androidx.room.*
-import com.imfibit.activitytracker.core.ComposeString
-import com.imfibit.activitytracker.database.embedable.TimeRange
-import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
-import java.time.LocalDate
-import java.time.LocalDateTime
+
 
 @Entity(
     tableName = PresetTimer.TABLE,

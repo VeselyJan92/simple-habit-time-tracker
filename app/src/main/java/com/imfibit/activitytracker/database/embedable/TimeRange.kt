@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.core.ContextString
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -21,24 +22,26 @@ enum class TimeRange(val label: Int) {
     WEEKLY(R.string.frequency_weekly),
     MONTHLY(R.string.frequency_monthly);
 
-
-    @Composable
-    fun getShortLabel(date: LocalDate) = when(this){
-        DAILY -> date.dayOfMonth.toString()
-        WEEKLY -> stringResource(id = R.string.week)
-        MONTHLY -> stringArrayResource(R.array.months)[date.monthValue-1]
-    }
-
-    @Composable
-    fun getDateLabel(date: LocalDate):String = when(this){
-        DAILY -> date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT))
-        WEEKLY -> this.getBoundaries(date).run {
-            first.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)) +
-            " - " +
-            second.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT))
+    fun getShortLabel(date: LocalDate): ContextString = {
+        when(this@TimeRange){
+            DAILY -> date.dayOfMonth.toString()
+            WEEKLY -> resources.getString(R.string.week)
+            MONTHLY -> resources.getStringArray(R.array.months)[date.monthValue-1]
         }
-        MONTHLY -> stringArrayResource(R.array.months)[date.monthValue-1]
     }
+
+    fun getDateLabel(date: LocalDate): ContextString =  {
+        val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
+
+        when(this@TimeRange){
+            DAILY -> date.format(formatter)
+            WEEKLY -> this@TimeRange.getBoundaries(date).run {
+                first.format(formatter) + " - " + second.format(formatter)
+            }
+            MONTHLY -> resources.getStringArray(R.array.months)[date.monthValue-1]
+        }
+    }
+
 
     fun getBoundaries(date: LocalDate) = when(this){
         DAILY -> Pair(date, date)

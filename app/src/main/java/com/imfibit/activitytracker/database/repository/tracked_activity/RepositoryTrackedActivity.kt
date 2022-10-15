@@ -3,7 +3,7 @@ package com.imfibit.activitytracker.database.repository.tracked_activity
 import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.room.withTransaction
-import com.imfibit.activitytracker.core.ComposeString
+import com.imfibit.activitytracker.core.ContextString
 import com.imfibit.activitytracker.database.dao.tracked_activity.*
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.entities.*
@@ -11,7 +11,6 @@ import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.composed.RecordWithActivity
 import com.imfibit.activitytracker.ui.components.*
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview
-import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.*
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.ActionButton.*
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -30,7 +29,7 @@ class RepositoryTrackedActivity @Inject constructor(
 ) {
 
     data class Day(
-        val label: ComposeString,
+        val label: ContextString,
         val metric: Long,
         val color: Color,
         val date: LocalDate,
@@ -57,45 +56,50 @@ class RepositoryTrackedActivity @Inject constructor(
     val timers: DAOPresetTimers = db.presetTimersDAO
 
 
-    suspend fun getActivitiesOverview(activities: List<TrackedActivity>) =  db.withTransaction {
-
+    suspend fun getActivityOverview(activity: TrackedActivity): TrackedActivityRecentOverview {
         val pastRanges = 4
 
-        return@withTransaction activities.map { activity ->
+        val today = metricDAO.getMetricByDay(activity.id, LocalDate.now().minusDays(pastRanges.toLong()), LocalDate.now())
 
-            val data = when(activity.goal.range){
-                TimeRange.DAILY -> metricDAO.getMetricByDay(activity.id, LocalDate.now().minusDays(pastRanges.toLong()), LocalDate.now())
-                TimeRange.WEEKLY -> metricDAO.getMetricByWeek(activity.id, LocalDate.now().with(ChronoField.DAY_OF_WEEK, 7), pastRanges+1)
-                TimeRange.MONTHLY -> metricDAO.getMetricByMonth(activity.id, YearMonth.now(), pastRanges+1)
-            }
-
-            val actionButton = when {
-                TrackedActivity.Type.TIME == activity.type && activity.isInSession() -> IN_SESSION
-                TrackedActivity.Type.CHECKED == activity.type && metricDAO.getMetricToday(activity.id) > 0 -> CHECKED
-                else -> DEFAULT
-            }
-
-            val groupedMetric = data.map {
-                val color = Colors.getMetricColor(
-                    activity.goal,
-                    it.metric,
-                    activity.goal.range,
-                    Colors.ChipGray
-                )
-
-                val metric: ComposeString = activity.type.getComposeString(
-                    it.metric,
-                    if (activity.type == TrackedActivity.Type.CHECKED) activity.type.getCheckedFraction(activity.goal.range, it.from) else null
-                )
-
-                MetricWidgetData(
-                    metric,
-                    color,
-                    { activity.goal.range.getShortLabel(it.from) },
-                )
-            }
-            TrackedActivityRecentOverview(activity, groupedMetric, actionButton)
+        val data = when(activity.goal.range){
+            TimeRange.DAILY -> today
+            TimeRange.WEEKLY -> metricDAO.getMetricByWeek(activity.id, LocalDate.now().with(ChronoField.DAY_OF_WEEK, 7), pastRanges+1)
+            TimeRange.MONTHLY -> metricDAO.getMetricByMonth(activity.id, YearMonth.now(), pastRanges+1)
         }
+
+        val actionButton = when {
+            TrackedActivity.Type.TIME == activity.type && activity.isInSession() -> IN_SESSION
+            TrackedActivity.Type.CHECKED == activity.type && metricDAO.getMetricToday(activity.id) > 0 -> CHECKED
+            else -> DEFAULT
+        }
+
+        val groupedMetric = data.map {
+            val color = Colors.getMetricColor(
+                activity.goal,
+                it.metric,
+                activity.goal.range,
+                Colors.ChipGray
+            )
+
+            val metric = activity.type.getLabel(
+                it.metric,
+                if (activity.type == TrackedActivity.Type.CHECKED) activity.type.getCheckedFraction(activity.goal.range, it.from) else null
+            )
+
+            MetricWidgetData(
+                metric,
+                color,
+                activity.goal.range.getShortLabel(it.from),
+            )
+        }
+
+
+        return TrackedActivityRecentOverview(activity, groupedMetric, actionButton, today.last())
+
+    }
+
+    suspend fun getActivitiesOverview(activities: List<TrackedActivity>) =  db.withTransaction {
+        return@withTransaction activities.map { activity -> getActivityOverview(activity) }
     }
 
     suspend fun getMonthData(

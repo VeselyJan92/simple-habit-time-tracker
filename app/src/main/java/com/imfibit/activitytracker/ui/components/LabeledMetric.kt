@@ -15,7 +15,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.imfibit.activitytracker.core.ComposeString
+import com.imfibit.activitytracker.core.ContextString
+import com.imfibit.activitytracker.core.value
 import com.imfibit.activitytracker.database.entities.*
 import java.time.LocalDateTime
 
@@ -37,9 +38,9 @@ data class Editable(
 
 
 class MetricWidgetData(
-    val value: ComposeString,
+    val value: ContextString,
     val color: Color,
-    val label: ComposeString? = null,
+    val label: ContextString? = null,
 )
 
 
@@ -145,7 +146,7 @@ fun MetricBlock(
 
     if(data.label == null) {
         BaseMetricBlock(
-            metric = data.value.invoke(),
+            metric = data.value.value(),
             color = data.color,
             onLongClick = onLongClick,
             modifier = modifier,
@@ -155,8 +156,8 @@ fun MetricBlock(
         )
     }else{
         LabeledMetricBlock(
-            metric = data.value.invoke(),
-            label = data.label.invoke(),
+            metric = data.value.value(),
+            label = data.label.value(),
             color = data.color,
             onLongClick = onLongClick,
             modifier = modifier,

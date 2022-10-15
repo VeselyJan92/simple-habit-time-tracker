@@ -2,7 +2,6 @@ package com.imfibit.activitytracker.ui.widgets
 
 import android.app.Activity
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
@@ -12,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -20,12 +20,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
-import androidx.glance.LocalContext
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import com.imfibit.activitytracker.core.AppViewModel
-import com.imfibit.activitytracker.core.services.TimeWidgetService
+import com.imfibit.activitytracker.core.services.OverviewWidgetService
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,29 +34,27 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 
 
-@HiltViewModel
-class WidgetTimeConfActivityViewModel @Inject constructor(
-    private val db: AppDatabase,
-    private val widgetService: TimeWidgetService
-) : AppViewModel() {
-
-
-    fun setupWidget(glanceId: GlanceId, activityId: Long) = viewModelScope.launch(Dispatchers.IO) {
-        widgetService.setupWidget(glanceId, activityId)
-    }
-
-    val data = MutableStateFlow(listOf<TrackedActivity>())
+abstract class WidgetPickerVM constructor(
+    private val database: AppDatabase
+): AppViewModel(){
+    val data: MutableStateFlow<List<TrackedActivity>> = MutableStateFlow(listOf())
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            data.value = db.activityDAO.getAll().filter { it.type == TrackedActivity.Type.TIME }
+            data.value = getActivities()
         }
     }
 
+    abstract suspend fun setupWidget(glanceId: GlanceId, activityId: Long)
+
+    open fun getActivities() = database.activityDAO.getAll()
 }
 
 @AndroidEntryPoint
-class WidgetTimeConfActivity : ComponentActivity() {
+abstract class ActivityChoseTrackedActivity : ComponentActivity() {
+
+    @Composable
+    abstract fun getViewModel() : WidgetPickerVM
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,30 +62,31 @@ class WidgetTimeConfActivity : ComponentActivity() {
         setResult(Activity.RESULT_CANCELED)
 
         setContent {
-            val vm = hiltViewModel<WidgetTimeConfActivityViewModel>()
+            val vm = getViewModel()
 
-            val state by vm.data.collectAsState(initial = listOf())
-
-
+            val activities by vm.data.collectAsState(initial = listOf())
             val glanceId = GlanceAppWidgetManager(this).getGlanceIdBy(intent)
 
             LazyColumn(){
-                state.forEach {
+                activities.forEach {
                     item {
                         Surface(
                             shape = RoundedCornerShape(8.dp),
                             elevation = 2.dp,
-                            modifier = Modifier.padding(8.dp).fillMaxWidth().clickable {
-                                runBlocking {
-                                    if (glanceId != null){
-                                        vm.setupWidget(glanceId, it.id).join()
-                                        delay(500)
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .fillMaxWidth()
+                                .clickable {
+                                    runBlocking(Dispatchers.IO) {
+                                        if (glanceId != null) {
+                                            vm.setupWidget(glanceId, it.id)
+                                            delay(500)
+                                        }
                                     }
-                                }
-                                setResult(Activity.RESULT_OK)
+                                    setResult(Activity.RESULT_OK)
 
-                                finish()
-                            },
+                                    finish()
+                                },
                         ) {
                             Text(text = it.name, modifier = Modifier.padding(16.dp), style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp))
                         }
@@ -98,7 +96,6 @@ class WidgetTimeConfActivity : ComponentActivity() {
             }
         }
     }
-
 }
 
 
