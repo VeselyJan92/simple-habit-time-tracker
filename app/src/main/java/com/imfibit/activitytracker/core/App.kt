@@ -1,8 +1,7 @@
 package com.imfibit.activitytracker.core
 
 import android.app.Application
-import com.imfibit.activitytracker.core.services.GlobalWidgetUpdateService
-import com.imfibit.activitytracker.database.AppDatabase
+import com.imfibit.activitytracker.core.services.WidgetUpdateService
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -10,18 +9,13 @@ import javax.inject.Inject
 open class App : Application(){
 
     @Inject
-    lateinit var database: AppDatabase
-
-    @Inject
-    lateinit var globalWidgetUpdateService: GlobalWidgetUpdateService
-
+    lateinit var widgetUpdateService: WidgetUpdateService
 
     override fun onCreate() {
         super.onCreate()
 
-        globalWidgetUpdateService.setAlarmManager()
-
-        database.invalidationTracker.addObserver(globalWidgetUpdateService.tracker)
+        widgetUpdateService.setLiveUpdates()
+        widgetUpdateService.setMidnightUpdate()
     }
 
 }
