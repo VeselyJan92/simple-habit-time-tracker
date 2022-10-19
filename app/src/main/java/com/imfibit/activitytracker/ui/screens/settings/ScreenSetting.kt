@@ -2,17 +2,15 @@ package com.imfibit.activitytracker.ui.screens.settings
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.FileUpload
-import androidx.compose.material.icons.filled.UploadFile
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -21,17 +19,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.alorma.settings.composables.SettingsMenuLink
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.ui.components.Colors
-import com.imfibit.activitytracker.ui.components.TrackerTopAppBar
+import com.imfibit.activitytracker.ui.components.SimpleTopBar
 
 @Composable
-fun ScreenSetting(navControl: NavHostController) {
+fun ScreenSetting(navControl: NavHostController, scaffoldState: ScaffoldState) {
+
+
+
     Scaffold(
+        scaffoldState = scaffoldState,
         topBar = {
-            TrackerTopAppBar(stringResource(id = R.string.screen_settings_title))
+            SimpleTopBar(navHostController = navControl, title =  stringResource(id = R.string.screen_settings_title))
         },
 
         content = {
@@ -65,29 +66,30 @@ private fun ScreenBody(){
         }
 
 
-        Column() {
+        Column(modifier = Modifier.padding(8.dp)) {
             Text(
                 modifier = Modifier
-                    .padding(8.dp)
-                    .padding(start = 16.dp),
+                    .padding(bottom = 16.dp),
                 text = stringResource(id = R.string.screen_settings_backup_section),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
 
-            SettingsMenuLink(
+            SettingsMenuItem(
                 icon = { Icon(imageVector = Icons.Default.FileDownload, null) },
-                title = { Text(text = stringResource(id = R.string.screen_settings_backup_label)) },
-                subtitle = { Text(text = stringResource(id = R.string.screen_settings_backup_explain)) },
+                title = stringResource(id = R.string.screen_settings_backup_label),
+                subtitle = stringResource(id = R.string.screen_settings_backup_explain) ,
                 onClick = {
                     export.launch(AppDatabase.DB_NAME)
                 },
             )
 
-            SettingsMenuLink(
+            Divider()
+
+            SettingsMenuItem(
                 icon = { Icon(imageVector = Icons.Default.FileUpload, null) },
-                title = { Text(text = stringResource(id = R.string.screen_settings_restore_label)) },
-                subtitle = { Text(text = stringResource(id = R.string.screen_settings_restore_explain)) },
+                title = stringResource(id = R.string.screen_settings_restore_label),
+                subtitle =  stringResource(id = R.string.screen_settings_restore_explain),
                 onClick = {
                     import.launch(arrayOf("application/octet-stream"))
                 },
@@ -95,3 +97,35 @@ private fun ScreenBody(){
         }
     }
 }
+
+
+
+@Composable
+fun SettingsMenuItem(
+    icon: @Composable () -> Unit,
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit
+){
+
+    Row( modifier = Modifier.clickable{ onClick()}) {
+        Box(modifier = Modifier.padding(8.dp), contentAlignment = Alignment.Center){
+            icon()
+        }
+
+        Column() {
+            Text(text = title, fontWeight = FontWeight.W600)
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(text = subtitle)
+        }
+
+    }
+}
+
+@Composable
+fun Divider(){
+    Divider(modifier = Modifier.padding(8.dp))
+}
+

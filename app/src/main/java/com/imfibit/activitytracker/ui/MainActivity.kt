@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.AssignmentTurnedIn
 import androidx.compose.material.icons.filled.InsertChart
 import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.runtime.*
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -28,12 +27,12 @@ import com.imfibit.activitytracker.ui.screens.activity.ScreenTrackedActivity
 import com.imfibit.activitytracker.ui.screens.activity_list.ScreenActivities
 import com.imfibit.activitytracker.ui.screens.onboarding.ScreenOnboarding
 import com.imfibit.activitytracker.ui.screens.statistics.ScreenStatistics
-import com.imfibit.activitytracker.ui.screens.timeline.ScreenTimeline
 import com.imfibit.activitytracker.ui.screens.upcomming.ScreenUpcoming
 import kotlinx.coroutines.runBlocking
 
 
 import com.imfibit.activitytracker.core.dataStore
+import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.dialogs.DialogRecords
 import com.imfibit.activitytracker.ui.screens.activity_history.ScreenActivityHistory
 import com.imfibit.activitytracker.ui.screens.group.ScreenActivityGroup
@@ -68,38 +67,6 @@ class MainActivity : ComponentActivity() {
 }
 
 
-sealed class Screen(val route: String, @StringRes val resourceId: Int, val icon: ImageVector) {
-    object Statistics : Screen(SCREEN_STATISTICS, R.string.screen_title_statistics, Icons.Filled.InsertChart)
-    object Activities : Screen(SCREEN_ACTIVITIES, R.string.screen_title_activities, Icons.Filled.AssignmentTurnedIn)
-    object Upcoming   : Screen(SCREEN_TIMELINE, R.string.screen_title_timeline, Icons.Filled.Timeline)
-}
-
-@Composable
-fun AppBottomNavigation(
-    navController: NavController
-) {
-    BottomNavigation {
-
-        val currentRoute = navController.currentBackStackEntry?.destination?.route
-
-        listOf(Screen.Statistics, Screen.Activities, Screen.Upcoming).forEach { screen ->
-            BottomNavigationItem(
-                    icon = { Icon(screen.icon, "todo") },
-
-                    label = { Text(stringResource(id = screen.resourceId)) },
-                    selected = currentRoute == screen.route,
-                    alwaysShowLabel = true,
-                    onClick = {
-                        // This if check gives us a "singleTop" behavior where we do not create a
-                        // second instance of the composable if we are already on that destination
-                        if (currentRoute != screen.route) {
-                            navController.navigate(screen.route)
-                        }
-                    }
-            )
-        }
-    }
-}
 
 @Composable
 fun Router(){
@@ -108,14 +75,10 @@ fun Router(){
     val useDarkIcons = MaterialTheme.colors.isLight
 
     SideEffect {
-        // Update all of the system bar colors to be transparent, and use
-        // dark icons if we're in light theme
         systemUiController.setSystemBarsColor(
-            color = Color.Transparent,
+            color = Colors.AppBackground,
             darkIcons = useDarkIcons
         )
-
-        // setStatusBarsColor() and setNavigationBarsColor() also exist
     }
 
 
@@ -131,32 +94,33 @@ fun Router(){
     val destination = if (onboarded) SCREEN_ACTIVITIES else SCREEN_ONBOARDING
 
 
+    val scaffoldState = rememberScaffoldState()
+
     NavHost(navController = navControl, startDestination = destination){
-        composable(SCREEN_STATISTICS){ ScreenStatistics(navControl) }
-        composable(SCREEN_TIMELINE){ ScreenTimeline(navControl) }
-        composable(SCREEN_ACTIVITIES){ ScreenActivities(navControl) }
-        composable(SCREEN_UPCOMING){ ScreenUpcoming(navControl) }
-        composable(SCREEN_ONBOARDING){ ScreenOnboarding(navControl) }
-        composable(SCREEN_SETTINGS){ ScreenSetting(navControl) }
+        composable(SCREEN_STATISTICS){ ScreenStatistics(navControl, scaffoldState) }
+        composable(SCREEN_ACTIVITIES){ ScreenActivities(navControl, scaffoldState) }
+        composable(SCREEN_UPCOMING){ ScreenUpcoming(navControl, scaffoldState) }
+        composable(SCREEN_ONBOARDING){ ScreenOnboarding(navControl, scaffoldState) }
+        composable(SCREEN_SETTINGS){ ScreenSetting(navControl, scaffoldState) }
 
         composable(
             route ="screen_activity_group/{group_id}",
             arguments = listOf(navArgument("group_id") { type = NavType.LongType })){
-            ScreenActivityGroup(navControl)
+            ScreenActivityGroup(navControl, scaffoldState)
         }
 
         composable(
                 route ="screen_activity/{activity_id}",
                 arguments = listOf(navArgument("activity_id") { type = NavType.LongType })
         ){
-            ScreenTrackedActivity(navControl)
+            ScreenTrackedActivity(navControl, scaffoldState)
         }
 
         composable(
             route ="screen_activity_history/{activity_id}",
             arguments = listOf(navArgument("activity_id") { type = NavType.LongType })
         ){
-            ScreenActivityHistory(navControl)
+            ScreenActivityHistory(navControl, scaffoldState)
         }
 
         dialog(
@@ -166,7 +130,7 @@ fun Router(){
                         navArgument("date") { type = NavType.StringType }
                 )
         ){
-            DialogRecords(navControl)
+            DialogRecords(navControl, scaffoldState)
         }
 
     }

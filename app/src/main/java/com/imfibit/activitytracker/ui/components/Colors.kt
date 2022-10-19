@@ -9,6 +9,7 @@ object Colors{
    val NotCompleted = Color(0xFFFF9800)
 
    val ChipGray = Color(0xFFE0E0E0)
+   val SuperLight = Color(0xFFF3F3F3)
    val ChipGraySelected = Color(0xFFBDBDBD)
 
    val ButtonGreen = Color(0xFF41C300)
@@ -16,6 +17,7 @@ object Colors{
    val BackgroundGray = Color(0xFFFAFAFA)
 
    val AppAccent = Color(0xFF4DB6AC)
+   val ButtonX = Color(0xFFB0BEC5)
    val AppPrimary = Color(0xFF4c37ef)
 
 

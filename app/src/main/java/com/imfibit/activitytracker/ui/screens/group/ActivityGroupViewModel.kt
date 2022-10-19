@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.imfibit.activitytracker.core.activityInvalidationTracker
+import com.imfibit.activitytracker.core.extensions.swap
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
@@ -12,7 +13,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import org.burnoutcrew.reorderable.move
 import javax.inject.Inject
 
 @HiltViewModel
@@ -52,7 +52,7 @@ class ActivityGroupViewModel @Inject constructor(
     }
 
     fun moveGroup(from: Int, to: Int) {
-        this.groups.value = this.groups.value.toMutableList().apply { move(from, to) }
+        this.groups.value = this.groups.value.toMutableList().apply { swap(from, to) }
     }
 
     fun onGroupDragEnd(from: Int, to: Int) = viewModelScope.launch {
@@ -64,7 +64,7 @@ class ActivityGroupViewModel @Inject constructor(
     }
 
     fun moveActivity(from: Int, to: Int) {
-        this.activities.value = this.activities.value.toMutableList().apply { move(from, to) }
+        this.activities.value = this.activities.value.toMutableList().apply { swap(from, to) }
     }
 
     fun onActivityDragEnd(from: Int, to: Int) = viewModelScope.launch(Dispatchers.IO){

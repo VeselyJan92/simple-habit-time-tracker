@@ -33,21 +33,25 @@ import com.imfibit.activitytracker.core.value
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.entities.TrackedActivity
-import com.imfibit.activitytracker.ui.AppBottomNavigation
 import com.imfibit.activitytracker.ui.components.BaseMetricBlock
 import com.imfibit.activitytracker.ui.components.Colors
-import com.imfibit.activitytracker.ui.components.TrackerTopAppBar
+import com.imfibit.activitytracker.ui.components.SimpleTopBar
 import com.imfibit.activitytracker.ui.screens.activity_list.Goal
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 
 @Composable
-fun ScreenStatistics(navController: NavHostController) {
+fun ScreenStatistics(navController: NavHostController, scaffoldState: ScaffoldState) {
     Scaffold(
-        topBar = { TrackerTopAppBar(stringResource(id = R.string.screen_title_statistics)) },
+        scaffoldState = scaffoldState,
+        topBar = {
+            SimpleTopBar(
+                navController,
+                stringResource(id = R.string.screen_title_statistics)
+            )
+        },
         content = { ScreenBody() },
-        bottomBar = { AppBottomNavigation(navController) },
         backgroundColor = Colors.AppBackground
     )
 }
@@ -58,9 +62,9 @@ private fun ScreenBody() = Column {
 
     val vm = hiltViewModel<StatisticsViewModel>()
 
-    val origin = remember { mutableStateOf(LocalDate.now())}
-    val range = remember { mutableStateOf(TimeRange.WEEKLY)}
-    val date = remember { mutableStateOf(LocalDate.now())}
+    val origin = remember { mutableStateOf(LocalDate.now()) }
+    val range = remember { mutableStateOf(TimeRange.WEEKLY) }
+    val date = remember { mutableStateOf(LocalDate.now()) }
 
     val state = rememberPagerState(
         initialPage = 51
@@ -73,10 +77,11 @@ private fun ScreenBody() = Column {
         date = date.value,
         goTo = {
             scope.launch {
-            origin.value = it
-            date.value = it
-            state.scrollToPage(51)
-        } },
+                origin.value = it
+                date.value = it
+                state.scrollToPage(51)
+            }
+        },
         setRange = {
             scope.launch {
                 origin.value = LocalDate.now()
@@ -99,7 +104,7 @@ private fun ScreenBody() = Column {
         val relativePage = (51 - page).toLong()
 
         val interval = range.value.getBoundaries(
-            when (range.value){
+            when (range.value) {
                 TimeRange.DAILY -> origin.value.minusDays(relativePage)
                 TimeRange.WEEKLY -> origin.value.minusWeeks(relativePage)
                 TimeRange.MONTHLY -> origin.value.minusMonths(relativePage)
@@ -108,10 +113,7 @@ private fun ScreenBody() = Column {
 
         Column {
 
-            NavigationTitle(
-                range = range.value,
-                rangeDate = interval.first,
-            )
+
 
             val keys = arrayOf(range.value, origin.value, date.value, page)
 
@@ -145,10 +147,27 @@ private fun ScreenBody() = Column {
                     }
                 }
             } else {
-                Column(Modifier.verticalScroll(rememberScrollState())) {
-                    BlockTimeTracked(data.value[TrackedActivity.Type.TIME], range.value)
-                    BlockScores(data.value[TrackedActivity.Type.SCORE], range.value)
-                    BlockCompleted(data.value[TrackedActivity.Type.CHECKED], range.value, date.value)
+                Surface(
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .padding(horizontal = 8.dp),
+                    elevation = 2.dp,
+                    shape = RoundedCornerShape(20.dp)
+                ) {
+                    Column() {
+                        NavigationTitle(
+                            range = range.value,
+                            rangeDate = interval.first,
+                        )
+
+                        BlockTimeTracked(data.value[TrackedActivity.Type.TIME], range.value)
+                        BlockScores(data.value[TrackedActivity.Type.SCORE], range.value)
+                        BlockCompleted(
+                            data.value[TrackedActivity.Type.CHECKED],
+                            range.value,
+                            date.value
+                        )
+                    }
                 }
             }
         }
@@ -168,7 +187,7 @@ private fun Navigation(
             .padding(top = 8.dp)
             .padding(horizontal = 8.dp),
         elevation = 2.dp,
-        shape = RoundedCornerShape(5.dp)
+        shape = RoundedCornerShape(20.dp)
     ) {
         Row(
             Modifier.padding(8.dp)
@@ -232,18 +251,10 @@ private fun NavigationTitle(
     range: TimeRange,
     rangeDate: LocalDate
 ) {
-    Surface(
-        modifier = Modifier
-            .padding(top = 16.dp)
-            .padding(horizontal = 8.dp)
-            .padding(bottom = 8.dp)
-            .height(40.dp),
-        elevation = 2.dp,
-        shape = RoundedCornerShape(5.dp)
-    ) {
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
+            modifier = Modifier.padding(8.dp)
         ) {
             Icon(Icons.Default.ArrowLeft, contentDescription = null)
 
@@ -260,7 +271,7 @@ private fun NavigationTitle(
             Icon(Icons.Default.ArrowRight, contentDescription = null)
         }
 
-    }
+
 
 }
 
@@ -296,7 +307,12 @@ private fun BlockTimeTracked(
 ) {
     if (data == null) return
 
-    Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp), shape = RoundedCornerShape(20.dp)) {
+    Surface(
+        elevation = 2.dp,
+        modifier = Modifier.padding(8.dp),
+        shape = RoundedCornerShape(20.dp),
+        color = Colors.SuperLight
+    ) {
         Column(Modifier.padding(8.dp)) {
             Header(title = stringResource(id = R.string.time), icon = Icons.Default.Timer) {
                 Box(
@@ -323,7 +339,7 @@ private fun BlockTimeTracked(
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    if (it.activity.isGoalSet() && it.activity.goal.range == range){
+                    if (it.activity.isGoalSet() && it.activity.goal.range == range) {
                         Goal(label = it.activity.formatGoal())
                         Spacer(modifier = Modifier.width(8.dp))
                     }
@@ -356,7 +372,12 @@ private fun BlockScores(
 ) {
     if (data == null) return
 
-    Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp), shape = RoundedCornerShape(20.dp)) {
+    Surface(
+        elevation = 2.dp,
+        modifier = Modifier.padding(8.dp),
+        shape = RoundedCornerShape(20.dp),
+        color = Colors.SuperLight
+    ) {
         Column(Modifier.padding(8.dp)) {
 
             Header(title = stringResource(id = R.string.score), Icons.Default.Score)
@@ -367,7 +388,7 @@ private fun BlockScores(
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    if (it.activity.isGoalSet() && it.activity.goal.range == range){
+                    if (it.activity.isGoalSet() && it.activity.goal.range == range) {
                         Goal(label = it.activity.formatGoal())
                         Spacer(modifier = Modifier.width(8.dp))
                     }
@@ -398,7 +419,12 @@ private fun BlockCompleted(
 ) {
     if (data == null) return
 
-    Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp), shape = RoundedCornerShape(20.dp)) {
+    Surface(
+        elevation = 2.dp,
+        modifier = Modifier.padding(8.dp),
+        shape = RoundedCornerShape(20.dp),
+        color = Colors.SuperLight
+    ) {
         Column(Modifier.padding(8.dp)) {
 
             Header(title = stringResource(id = R.string.habbits), Icons.Default.AssignmentTurnedIn)
@@ -409,7 +435,7 @@ private fun BlockCompleted(
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    if (it.activity.isGoalSet() && it.activity.goal.range == range && it.activity.goal.range != TimeRange.DAILY){
+                    if (it.activity.isGoalSet() && it.activity.goal.range == range && it.activity.goal.range != TimeRange.DAILY) {
                         Goal(label = it.activity.formatGoal())
                         Spacer(modifier = Modifier.width(8.dp))
                     }
@@ -438,9 +464,9 @@ private fun BlockCompleted(
 
 
 fun getColor(item: ActivityWithMetric, range: TimeRange): Color {
-    return if (item.activity.goal.range == range && item.metric < item.activity.goal.value){
+    return if (item.activity.goal.range == range && item.metric < item.activity.goal.value) {
         Colors.NotCompleted
-    }else{
+    } else {
         Colors.AppAccent
     }
 

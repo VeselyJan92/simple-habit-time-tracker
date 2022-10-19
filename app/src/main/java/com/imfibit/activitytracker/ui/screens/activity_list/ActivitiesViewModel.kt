@@ -8,6 +8,7 @@ import com.imfibit.activitytracker.core.AppViewModel
 import com.imfibit.activitytracker.core.PreferencesKeys
 import com.imfibit.activitytracker.core.activityInvalidationTracker
 import com.imfibit.activitytracker.core.dataStore
+import com.imfibit.activitytracker.core.extensions.swap
 import com.imfibit.activitytracker.core.services.TrackTimeService
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
@@ -19,7 +20,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import org.burnoutcrew.reorderable.move
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -87,10 +87,10 @@ class ActivitiesViewModel @Inject constructor(
     }
 
     fun dragActivity(from: Int, to: Int){
-        if (to == data.value.activities.size || to == 0)
+        if (to >= data.value.activities.size || from >= data.value.activities.size || to <0 )
             return
 
-        val items = data.value.activities.toMutableList().apply { move(from, to) }
+        val items = data.value.activities.toMutableList().apply { swap(from, to) }
         data.value = data.value.copy(activities = items)
     }
 

@@ -36,8 +36,7 @@ import java.time.LocalDateTime
 @Composable
 fun Timer(
     modifier: Modifier  = Modifier
-        .size(130.dp, 25.dp)
-        .padding(end = 8.dp),
+        .size(130.dp, 25.dp),
     startTime: LocalDateTime?,
     enable: Boolean = true,
     onClick: ((LocalDateTime) -> Unit)? = null,

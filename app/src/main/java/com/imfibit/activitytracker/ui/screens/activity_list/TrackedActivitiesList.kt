@@ -18,12 +18,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.value
 import com.imfibit.activitytracker.database.composed.MetricAggregation
 import com.imfibit.activitytracker.database.entities.TrackedActivity
@@ -31,6 +33,7 @@ import com.imfibit.activitytracker.database.entities.TrackedActivity.Type
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.MetricBlock
 import com.imfibit.activitytracker.ui.components.MetricWidgetData
+import com.imfibit.activitytracker.ui.components.Timer
 import com.imfibit.activitytracker.ui.components.dialogs.DialogScore
 import com.imfibit.activitytracker.ui.components.dialogs.DialogSession
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.*
@@ -39,6 +42,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 data class TrackedActivityRecentOverview(
@@ -84,6 +88,9 @@ fun TrackedActivity(
     )
 
 
+    val color = if (item.activity.isInSession()) Colors.SuperLight else Color.White
+
+
     Surface(
         modifier = modifier
             .clickable {
@@ -92,11 +99,11 @@ fun TrackedActivity(
             .padding(2.dp),
 
         elevation = 2.dp,
+        color = color,
         shape = RoundedCornerShape(20.dp)
     ) {
         Row(
             modifier = Modifier
-                .background(Color.White)
                 .padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
 
         ) {
@@ -157,6 +164,29 @@ fun TrackedActivity(
                     MetricBlock(item.past[1] )
                     MetricBlock(item.past[0])
                 }
+
+                if (item.activity.isInSession()){
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        Text(text = stringResource(id = R.string.activity_in_session) + " " + item.activity.inSessionSince!!.format(DateTimeFormatter.ofPattern("HH:mm")))
+
+                        Timer(
+                            startTime = item.activity.inSessionSince,
+                            onClick = {  }
+                        )
+                    }
+
+                }
+
+
+
+
             }
         }
     }

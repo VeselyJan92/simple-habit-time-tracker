@@ -19,15 +19,14 @@ import androidx.paging.compose.itemsIndexed
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.imfibit.activitytracker.ui.AppBottomNavigation
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.Month
-import com.imfibit.activitytracker.ui.components.TrackerTopAppBar
+import com.imfibit.activitytracker.ui.components.SimpleTopBar
 import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun ScreenActivityHistory(nav: NavHostController) {
+fun ScreenActivityHistory(nav: NavHostController, scaffoldState: ScaffoldState) {
 
     val vm = hiltViewModel<TrackedActivityHistoryVM>()
 
@@ -35,18 +34,12 @@ fun ScreenActivityHistory(nav: NavHostController) {
 
     val months = vm.months
 
-    val scaffoldState = rememberScaffoldState()
-
     Scaffold(
         topBar = {
-            TrackerTopAppBar(stringResource(id = R.string.screen_title_record_history))
+            SimpleTopBar(nav, stringResource(id = R.string.screen_title_record_history))
         },
         content = {
             ScreenBody(nav, activity, months)
-        },
-
-        bottomBar = {
-            AppBottomNavigation(nav)
         },
         backgroundColor = Colors.AppBackground,
         scaffoldState = scaffoldState
@@ -59,7 +52,7 @@ private fun ScreenBody(
     activity: TrackedActivity?,
     months: Flow<PagingData<RepositoryTrackedActivity.Month>>
 ){
-    Column(Modifier.padding(bottom = 50.dp)) {
+    Column(Modifier) {
 
         val x = months.collectAsLazyPagingItems()
 
@@ -69,8 +62,8 @@ private fun ScreenBody(
                     itemsIndexed(x){ index,  item ->
 
                         if (item != null){
-                            Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp), shape = RoundedCornerShape(5.dp)) {
-                                Column() {
+                            Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp), shape = RoundedCornerShape(20.dp)) {
+                                Column(Modifier.padding(8.dp)) {
                                     Month(activity = activity, month = item, nav = nav)
                                 }
                             }

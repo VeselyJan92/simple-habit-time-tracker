@@ -1,6 +1,7 @@
 package com.imfibit.activitytracker.ui.screens.activity
 
 
+import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
 import com.imfibit.activitytracker.core.AppViewModel
@@ -14,7 +15,10 @@ import com.imfibit.activitytracker.ui.components.*
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.runBlocking
+import java.io.Closeable
 import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.TextStyle
@@ -40,13 +44,31 @@ class TrackedActivityViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : AppViewModel() {
 
+    var deleted = false
+
+    override fun onCleared() {
+        super.onCleared()
+
+        if (!activityName.value.isNullOrBlank() && ! deleted)
+            runBlocking(Dispatchers.IO) {
+                updateName(activityName.value!!)
+            }
+    }
+
+
+
     val id: Long = savedStateHandle["activity_id"] ?: throw IllegalArgumentException()
+
+    //For better edittext performance save the name of the activity when user is done with the screen
+    val activityName = mutableStateOf<String?>(null)
 
     val data = invalidationFlow(db){
         val activity: TrackedActivity = rep.activityDAO.flowById(id).firstOrNull() ?: return@invalidationFlow null
-        
 
 
+        //Ignore subsequent changes
+        if(activityName.value == null)
+            activityName.value = activity.name
 
         /*
         val now = LocalDate.now()
@@ -120,9 +142,14 @@ class TrackedActivityViewModel @Inject constructor(
     }
 
 
-    fun updateName(name: String) = launchIO {
+    private suspend fun updateName(name: String){
+        Log.e("xxx", "updateName: $name")
         val activity = rep.activityDAO.getById(id)
         rep.activityDAO.update(activity.copy(name = name))
+    }
+
+    fun refreshName(name: String) = launchIO {
+        activityName.value = name
     }
 
     fun addTimer(timer: PresetTimer) = launchIO {
@@ -151,6 +178,7 @@ class TrackedActivityViewModel @Inject constructor(
     }
 
     fun deleteActivity(activity: TrackedActivity) = launchIO {
+        deleted = true
         rep.activityDAO.deleteById(activity.id)
     }
 

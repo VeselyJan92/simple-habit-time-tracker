@@ -32,12 +32,11 @@ import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
-import com.imfibit.activitytracker.ui.AppBottomNavigation
 import com.imfibit.activitytracker.ui.SCREEN_ACTIVITY
 import com.imfibit.activitytracker.ui.SCREEN_SETTINGS
+import com.imfibit.activitytracker.ui.SCREEN_STATISTICS
 import com.imfibit.activitytracker.ui.components.BaseMetricBlock
 import com.imfibit.activitytracker.ui.components.Colors
-import com.imfibit.activitytracker.ui.components.TrackerTopAppBar
 import com.imfibit.activitytracker.ui.components.dialogs.DialogAddActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,6 +47,7 @@ import org.burnoutcrew.reorderable.*
 @Composable
 fun ScreenActivities(
     navController: NavHostController,
+    scaffoldState: ScaffoldState,
 ) {
 
     val vm = hiltViewModel<ActivitiesViewModel>()
@@ -93,17 +93,36 @@ fun ScreenActivities(
     )
 
     Scaffold(
+        scaffoldState = scaffoldState,
         topBar = {
-            TrackerTopAppBar(stringResource(id = R.string.screen_title_activities)){
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp, start = 16.dp, bottom = 8.dp, end = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Simple Habit Tracker",
+                    fontWeight = FontWeight.Black, fontSize = 25.sp
+                )
+
                 Icon(
                     modifier = Modifier.clickable {
                         navController.navigate(SCREEN_SETTINGS)
                     },
                     imageVector = Icons.Default.Settings,
-                    tint = Color.White,
-                    contentDescription = null
+                    tint = Color.Black,
+                    contentDescription = null,
                 )
             }
+            
+            
+                 
+                 
+            /*TrackerTopAppBar(stringResource(id = R.string.screen_title_activities)){
+                
+            }*/
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { display.value = true }) {
@@ -114,10 +133,10 @@ fun ScreenActivities(
             ScreenBody(navController, vm, data.activities, data.today, data.groups, data.live)
         },
         bottomBar = {
-          Column {
+          /*Column {
                 LiveActivitiesList(vm, data.live)
                 AppBottomNavigation(navController)
-            }
+            }*/
         },
         backgroundColor = Colors.AppBackground
     )
@@ -133,7 +152,12 @@ private fun ScreenBody(
     live: List<TrackedActivity>,
 ) {
 
-    val state: ReorderableState = rememberReorderState()
+    val state = rememberReorderableLazyListState(
+        onDragEnd = { from, to -> vm.moveActivity() },
+        onMove = { from, to ->
+            vm.dragActivity(from.index - 1, to.index - 1)
+        }
+    )
 
     LazyColumn(
         state = state.listState,
@@ -141,10 +165,6 @@ private fun ScreenBody(
             .padding(8.dp)
             .reorderable(
                 state = state,
-                onDragEnd = { from, to -> vm.moveActivity() },
-                onMove = { from, to ->
-                    vm.dragActivity(from - 1, to - 1)
-                }
             ),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -163,21 +183,27 @@ private fun ScreenBody(
 
 
             if(today.isNotEmpty())
-                Today(today)
+                Today(nav, today)
+
         }
 
-        itemsIndexed(activities) { index, item ->
-            TrackedActivity(
-                item = item,
-                modifier = Modifier
-                    .draggedItem(state.offsetByIndex(index + 1))
-                    .detectReorderAfterLongPress(state),
-                onNavigate = {nav.navigate(SCREEN_ACTIVITY(it.id.toString()))}
-            )
+        items(activities, {it.activity.id}) { item ->
+
+            ReorderableItem(state, key = item.activity.id, modifier = Modifier.detectReorderAfterLongPress(state)) { isDragging ->
+                TrackedActivity(
+                    item = item,
+                    modifier = Modifier,
+                    onNavigate = {nav.navigate(SCREEN_ACTIVITY(it.id.toString()))}
+                )
+            }
+
+
         }
 
         item {
-            Categories(vm, groups, nav)
+            ReorderableItem(state, key = "categories", modifier = Modifier.detectReorderAfterLongPress(state)) { isDragging ->
+                Categories(vm, groups, nav)
+            }
         }
 
         item {
@@ -250,23 +276,42 @@ private fun ClearAll(vm: ActivitiesViewModel) {
 }
 
 @Composable
-private fun Today(today: List<ActivityWithMetric>){
+private fun Today(nav: NavHostController, today: List<ActivityWithMetric>){
     Surface(
         elevation = 2.dp,
-        shape = RoundedCornerShape(5.dp)
+        shape = RoundedCornerShape(20.dp)
     ) {
 
         Column(
-            Modifier.padding(8.dp)
+            Modifier.padding(horizontal = 8.dp).padding(bottom = 8.dp)
         ) {
 
-            Text(
-                text = stringResource(id = R.string.screen_activities_today),
-                style = TextStyle(
-                    fontWeight = FontWeight.W600,
-                    fontSize = 20.sp
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(id = R.string.screen_activities_today),
+                    style = TextStyle(
+                        fontWeight = FontWeight.W600,
+                        fontSize = 20.sp
+                    )
                 )
-            )
+
+
+                TextButton(
+                    onClick = {nav.navigate(SCREEN_STATISTICS)}
+                ){
+                    Text(
+                        text = stringResource(id = R.string.screen_title_statistics),
+                        style = TextStyle(
+                            fontWeight = FontWeight.W600,
+                        )
+                    )
+                }
+
+            }
 
             today.forEachIndexed{ index, item ->
 

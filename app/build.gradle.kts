@@ -1,9 +1,5 @@
 import org.jetbrains.kotlin.konan.properties.Properties
 
-
-val COMPOSE_VERSION = "1.2.0-beta02"
-
-
 plugins {
     id("com.android.application")
     id("com.github.triplet.play") version "3.6.0"
@@ -55,7 +51,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = COMPOSE_VERSION
+        kotlinCompilerExtensionVersion = "1.3.2"
     }
 
 
@@ -71,7 +67,7 @@ android {
         applicationId = "com.imfibit.activitytracker"
         minSdk = 26
         targetSdk = 33
-        versionCode = 17
+        versionCode = 18
         versionName = "1.2.4"
         testInstrumentationRunner  ="com.imfibit.activitytracker.HiltRunner"
     }
@@ -113,15 +109,17 @@ dependencies {
 
     implementation("com.google.android.material:material:1.6.1")
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.20")
     implementation("com.thedeanda:lorem:2.1")
 
-    implementation(platform("com.google.firebase:firebase-bom:25.11.0"))
+    implementation(platform("com.google.firebase:firebase-bom:31.0.0"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
 
 
 
-    implementation("androidx.compose.compiler:compiler:$COMPOSE_VERSION")
+    val COMPOSE_VERSION = "1.3.0-rc01"
+
+    implementation("androidx.compose.compiler:compiler:1.3.2")
     implementation("androidx.compose.animation:animation:$COMPOSE_VERSION")
     implementation("androidx.compose.ui:ui:$COMPOSE_VERSION")
     implementation("androidx.compose.material:material:$COMPOSE_VERSION")
@@ -143,7 +141,7 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
 
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.42")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.44")
     kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.44")
     androidTestAnnotationProcessor("com.google.dagger:hilt-android-compiler:2.44")
 
@@ -164,22 +162,15 @@ dependencies {
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-    implementation("com.google.accompanist:accompanist-pager:0.22.0-rc")
-    implementation("com.google.accompanist:accompanist-pager-indicators:0.22.0-rc")
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.22.0-rc")
+    implementation("com.google.accompanist:accompanist-pager:0.26.5-rc")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.26.5-rc")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.26.5-rc")
 
 
-    implementation("org.burnoutcrew.composereorderable:reorderable:0.6.2")
+    implementation("org.burnoutcrew.composereorderable:reorderable:0.9.2")
 
 
-
-    implementation( "com.github.alorma:compose-settings:0.3.0")
-
-
-
-    val paging_version = "3.1.0"
-
-    implementation("androidx.paging:paging-runtime:$paging_version")
+    implementation("androidx.paging:paging-runtime-ktx:3.1.1")
     implementation("androidx.paging:paging-compose:1.0.0-alpha16")
 
     implementation("com.google.dagger:hilt-android:2.44")

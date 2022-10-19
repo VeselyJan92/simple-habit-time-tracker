@@ -4,7 +4,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -23,35 +22,31 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.core.extensions.rememberReorderList
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
-import com.imfibit.activitytracker.ui.AppBottomNavigation
 import com.imfibit.activitytracker.ui.SCREEN_ACTIVITY
-import com.imfibit.activitytracker.ui.components.Colors
-import com.imfibit.activitytracker.ui.components.IconTextButton
-import com.imfibit.activitytracker.ui.components.TextBox
-import com.imfibit.activitytracker.ui.components.TrackerTopAppBar
 import com.imfibit.activitytracker.ui.components.dialogs.BaseDialog
 import com.imfibit.activitytracker.ui.components.dialogs.DialogBaseHeader
 import com.imfibit.activitytracker.ui.components.dialogs.DialogInputText
-import com.imfibit.activitytracker.ui.components.helpers.draggedItem
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivity
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview
 import org.burnoutcrew.reorderable.*
+import androidx.compose.foundation.lazy.items
+import com.imfibit.activitytracker.ui.components.*
+import com.imfibit.activitytracker.ui.components.Colors
 
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
-fun ScreenActivityGroup(nav: NavHostController) {
+fun ScreenActivityGroup(nav: NavHostController, scaffoldState: ScaffoldState) {
 
     val vm = hiltViewModel<ActivityGroupViewModel>()
 
 
-    val scaffoldState = rememberScaffoldState()
-
 
     Scaffold(
         topBar = {
-            TrackerTopAppBar(stringResource(id = R.string.screen_group_title))
+            SimpleTopBar(navHostController = nav, title = stringResource(id = R.string.screen_group_title))
         },
         content = {
             val activities by vm.activities.collectAsState()
@@ -62,7 +57,7 @@ fun ScreenActivityGroup(nav: NavHostController) {
         },
 
         bottomBar = {
-            AppBottomNavigation(nav)
+
         },
         backgroundColor = Colors.AppBackground,
         scaffoldState = scaffoldState
@@ -170,35 +165,38 @@ private fun Activities(
     onDragEnd: (from: Int, to: Int) -> Unit,
     onMove: (from: Int, to: Int) -> Unit,
 ) {
-    val state: ReorderableState = rememberReorderState()
+
+    val activities = rememberReorderList(items = activities)
+
+    val state = rememberReorderableLazyListState(
+        onDragEnd = onDragEnd,
+        onMove = {from, to -> onMove(from.index, to.index)}
+    )
 
     LazyColumn(
         state = state.listState,
         modifier = Modifier
-            .reorderable(
-                state = state,
-                onDragEnd = onDragEnd,
-                onMove = onMove
-            )
+            .reorderable(state = state)
+            .detectReorderAfterLongPress(state)
             .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
 
-        itemsIndexed(activities) { idx, item ->
-            TrackedActivity(
-                item = item,
-                modifier = Modifier
-                    .draggedItem(state.offsetByIndex(idx))
-                    .detectReorderAfterLongPress(state),
-                onNavigate = { nav.navigate(SCREEN_ACTIVITY(it.id.toString())) }
-            )
+        items(activities.value, key = {item -> item.activity.id },) { item ->
+            ReorderableItem(state, key = item.activity.id, defaultDraggingModifier = Modifier) { isDragging ->
+                TrackedActivity(
+                    item = item,
+                    modifier = Modifier,
+                    onNavigate = { nav.navigate(SCREEN_ACTIVITY(it.id.toString())) }
+                )
+            }
+
         }
 
     }
 }
 
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DialogReorderGroups(
     display: MutableState<Boolean>,
@@ -209,51 +207,51 @@ fun DialogReorderGroups(
 
     DialogBaseHeader(title = stringResource(R.string.dialog_preset_timers_title))
 
-    val state: ReorderableState = rememberReorderState()
+    val state = rememberReorderableLazyListState(
+        onDragEnd = onDragEnd,
+        onMove = {from, to -> onMove(from.index, to.index)}
+    )
 
     LazyColumn(
         state = state.listState,
         modifier = Modifier
             .padding(start = 8.dp, end = 8.dp, bottom = 8.dp, top = 8.dp)
-            .reorderable(
-                state = state,
-                onDragEnd = onDragEnd,
-                onMove = onMove
-            )
+            .reorderable(state = state,)
+            .detectReorderAfterLongPress(state)
     ) {
 
-        itemsIndexed(groups) { index, item ->
-
-            Row(
-                modifier = Modifier
-                    .draggedItem(state.offsetByIndex(index))
-                    .detectReorderAfterLongPress(state)
-                    .padding(bottom = 8.dp)
-                    .fillMaxWidth()
-                    .background(Color.LightGray, RoundedCornerShape(30))
-                    .padding(4.dp),
-
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                Box(
+        items(groups, {it.id}) { item ->
+            ReorderableItem(state, key = item.id, defaultDraggingModifier = Modifier) { isDragging ->
+                Row(
                     modifier = Modifier
-                        .width(100.dp)
-                        .height(30.dp)
-                        .background(Colors.ChipGray, RoundedCornerShape(50)),
-                    contentAlignment = Alignment.Center
+
+                        .padding(bottom = 8.dp)
+                        .fillMaxWidth()
+                        .background(Color.LightGray, RoundedCornerShape(30))
+                        .padding(4.dp),
+
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    Text(
-                        text = item.name,
-                        textAlign = TextAlign.Center,
-                        style = TextStyle(
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                }
+                    Box(
+                        modifier = Modifier
+                            .width(100.dp)
+                            .height(30.dp)
+                            .background(Colors.ChipGray, RoundedCornerShape(50)),
+                        contentAlignment = Alignment.Center
+                    ) {
 
+                        Text(
+                            text = item.name,
+                            textAlign = TextAlign.Center,
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    }
+
+                }
             }
 
 
