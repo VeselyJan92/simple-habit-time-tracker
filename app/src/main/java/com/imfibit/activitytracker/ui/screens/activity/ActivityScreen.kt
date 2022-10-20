@@ -1,5 +1,6 @@
 package com.imfibit.activitytracker.ui.screens.activity
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -68,6 +69,7 @@ fun ScreenTrackedActivity(nav: NavHostController, scaffoldState: ScaffoldState) 
                     onValueChange = {vm.refreshName(it)},
                     textStyle = TextStyle(fontWeight = FontWeight.Black, fontSize = 25.sp)
                 )
+
 
 
                 val dialogDelete = remember {

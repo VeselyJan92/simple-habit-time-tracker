@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,6 +58,7 @@ data class TrackedActivityRecentOverview(
 }
 
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun TrackedActivity(
     item: TrackedActivityRecentOverview,
@@ -104,7 +106,7 @@ fun TrackedActivity(
     ) {
         Row(
             modifier = Modifier
-                .padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
+                .padding(top = 8.dp, bottom = 8.dp, end = 8.dp).animateContentSize()
 
         ) {
 
@@ -165,24 +167,45 @@ fun TrackedActivity(
                     MetricBlock(item.past[0])
                 }
 
-                if (item.activity.isInSession()){
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+               // if (item.activity.isInSession()){
+
+
+                    AnimatedVisibility(
+                        visible = item.activity.isInSession(),
+                        enter = fadeIn(),
+                        exit = fadeOut()
                     ) {
+                        // Fade in/out the background and the foreground.
 
-                        Text(text = stringResource(id = R.string.activity_in_session) + " " + item.activity.inSessionSince!!.format(DateTimeFormatter.ofPattern("HH:mm")))
+                        Box(
+                            Modifier.animateEnterExit(
+                                    enter = slideInVertically(),
+                                    exit = slideOutVertically()
+                                )
+                        ) {
+                            if(item.activity.isInSession()) Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
 
-                        Timer(
-                            startTime = item.activity.inSessionSince,
-                            onClick = {  }
-                        )
+                                Text(text = stringResource(id = R.string.activity_in_session) + " " + item.activity.inSessionSince!!.format(DateTimeFormatter.ofPattern("HH:mm")))
+
+                                Timer(
+                                    startTime = item.activity.inSessionSince,
+                                    onClick = {  }
+                                )
+                            }
+                        }
+
                     }
 
-                }
+
+
+
+               // }
 
 
 

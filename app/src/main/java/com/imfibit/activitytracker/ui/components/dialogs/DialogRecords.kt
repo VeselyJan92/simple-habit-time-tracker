@@ -1,5 +1,6 @@
 package com.imfibit.activitytracker.ui.components.dialogs
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -50,26 +51,38 @@ fun DialogRecords(nav: NavHostController, scaffoldState: ScaffoldState) {
 
                 val data by vm.x.collectAsState(initial = listOf())
 
-                LazyColumn(modifier = Modifier.height(250.dp), contentPadding = PaddingValues(8.dp)){
-                    if (data.isNotEmpty()){
-                        items(data){
-                            Record(activity = it.activity, record = it.record)
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-                    }else{
-                        item {
-                            Text(text = stringResource(id = R.string.no_records), fontWeight= FontWeight.W600, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
-                        }
-                    }
-
-                }
-
-
                 DialogButtons {
                     TextButton(onClick = {nav.popBackStack()}) {
                         Text(text = stringResource(id = R.string.dialog_records_btn_okey))
                     }
                 }
+
+                Box(modifier = Modifier.padding(8.dp).fillMaxWidth()) {
+                    when{
+                        data.isEmpty() -> {
+                            Text(text = stringResource(id = R.string.no_records), fontWeight= FontWeight.W600, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                        }
+                        data.size < 5 -> {
+                            Column{
+                                data.forEach {
+                                    Record(activity = it.activity, record = it.record)
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                }
+                            }
+                        }
+                        else -> {
+                            LazyColumn(){
+                                items(data){
+                                    Record(activity = it.activity, record = it.record)
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+
 
             }
         }

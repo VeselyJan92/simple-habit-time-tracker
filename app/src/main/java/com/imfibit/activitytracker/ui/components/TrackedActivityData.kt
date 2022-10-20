@@ -96,7 +96,8 @@ fun Record(
                     is TrackedActivityTime -> openSessionDialog.value = true
                 }
             }),
-        shape = RoundedCornerShape(20.dp)
+        shape = RoundedCornerShape(20.dp),
+        color = Colors.SuperLight
     ) {
         val time = with(AnnotatedString.Builder()) {
             append(stringResource(id = R.string.time) + ": ")

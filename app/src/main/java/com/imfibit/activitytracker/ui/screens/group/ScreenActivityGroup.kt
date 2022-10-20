@@ -141,14 +141,6 @@ private fun Header(
                     reorderGroups.value = true
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
-
-                IconTextButton(
-                    Icons.Default.Palette,
-                    stringResource(id = R.string.screen_group_color)
-                ) {
-
-                }
             }
 
 

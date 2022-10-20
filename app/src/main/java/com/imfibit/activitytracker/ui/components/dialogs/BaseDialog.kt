@@ -38,14 +38,14 @@ inline fun BaseDialog(display: MutableState<Boolean>, noinline content: @Composa
 @Composable
 fun DialogBaseHeader(title: String){
     Row(
-        modifier = Modifier.fillMaxWidth().background(Colors.AppPrimary).padding(8.dp)
+        modifier = Modifier.fillMaxWidth().background(Color.White).padding(8.dp)
     ) {
         Text(
             text = title,
             style = TextStyle(
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
-                color = Color.White
+                color = Color.Black
             )
         )
     }
