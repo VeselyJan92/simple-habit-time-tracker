@@ -1,6 +1,7 @@
 package com.imfibit.activitytracker.database.entities
 
 import androidx.room.*
+import androidx.room.ForeignKey.CASCADE
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.ContextString
 import com.imfibit.activitytracker.database.embedable.TimeRange
@@ -16,6 +17,7 @@ import java.time.LocalDateTime
   ],
     foreignKeys = [
         ForeignKey(
+            onDelete = CASCADE,
             entity = TrackerActivityGroup::class,
             parentColumns = ["activity_group_id"],
             childColumns = ["activity_group_id"]

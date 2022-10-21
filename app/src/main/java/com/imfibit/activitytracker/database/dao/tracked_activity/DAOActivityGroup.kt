@@ -23,5 +23,12 @@ abstract class DAOActivityGroup : BaseEditableDAO<TrackerActivityGroup> {
     abstract fun getById(groupId: Long): TrackerActivityGroup
 
 
+    @Query("""
+        SELECT * FROM tracked_activity_group
+        where activity_group_id = :groupId
+   """)
+    abstract fun getByIdOrNull(groupId: Long): TrackerActivityGroup?
+
+
 
 }

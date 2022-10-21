@@ -1,8 +1,10 @@
 package com.imfibit.activitytracker.ui.screens.group
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.imfibit.activitytracker.core.AppViewModel
 import com.imfibit.activitytracker.core.activityInvalidationTracker
 import com.imfibit.activitytracker.core.extensions.swap
 import com.imfibit.activitytracker.database.AppDatabase
@@ -13,6 +15,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,9 +23,13 @@ class ActivityGroupViewModel @Inject constructor(
     private val rep: RepositoryTrackedActivity,
     private val db: AppDatabase,
     private val savedStateHandle: SavedStateHandle
-) : ViewModel() {
+) : AppViewModel() {
 
     val id: Long = savedStateHandle["group_id"] ?: throw IllegalArgumentException()
+
+
+    //For better edittext performance save the name of the activity when user is done with the screen
+    val groupName = mutableStateOf<String?>(null)
 
 
     val activities = MutableStateFlow<List<TrackedActivityRecentOverview>>(listOf())
@@ -37,9 +44,16 @@ class ActivityGroupViewModel @Inject constructor(
     }
 
     private fun fetch() = viewModelScope.launch(Dispatchers.IO) {
+        //there might be and update after delete group
+        val groupData = db.groupDAO.getByIdOrNull(id) ?: return@launch
+
+
+
         activities.value = rep.getActivitiesOverview(db.activityDAO.getActivitiesFromGroup(id))
-        group.value = db.groupDAO.getById(id)
         groups.value = db.groupDAO.getAll()
+
+        group.value = groupData
+        groupName.value = groupData.name
     }
 
     init {
@@ -47,8 +61,19 @@ class ActivityGroupViewModel @Inject constructor(
         fetch()
     }
 
-    override fun onCleared() {
+    override fun onCleared()  = runBlocking(Dispatchers.IO) {
         db.invalidationTracker.removeObserver(tracker)
+
+        val group = db.groupDAO.getByIdOrNull(id)
+
+        // If name is not filled or group was deleted
+        if (!groupName.value.isNullOrBlank() && group != null)
+            db.groupDAO.update(group.copy(name = groupName.value!!))
+
+    }
+
+    fun refreshName(name: String){
+        this.groupName.value = name
     }
 
     fun moveGroup(from: Int, to: Int) {
@@ -75,8 +100,8 @@ class ActivityGroupViewModel @Inject constructor(
         db.activityDAO.updateAll(*items)
     }
 
-    fun update(group: TrackerActivityGroup) = viewModelScope.launch {
-        db.groupDAO.update(group)
+    fun delete(item: TrackerActivityGroup) = launchIO {
+        db.groupDAO.delete(item)
     }
 
 }

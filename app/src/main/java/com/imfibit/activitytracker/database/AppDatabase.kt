@@ -54,7 +54,7 @@ object DatabaseModule {
     views = [
         TrackedActivityMetric::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 @TypeConverters(
@@ -89,10 +89,13 @@ abstract class AppDatabase : RoomDatabase() {
                 db
             }
             "debug" -> {
+                context.deleteDatabase(DB_NAME)
+
+
                 val db = Room
                     .inMemoryDatabaseBuilder(context, AppDatabase::class.java)
                     //.databaseBuilder(context, AppDatabase::class.java, DB_NAME)
-                    //.createFromAsset("activity_tracker.db")
+                    //.createFromAsset("activity_tracker20-10-22.db")
                     .addMigrations(*migrations)
                     .build()
 

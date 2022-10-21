@@ -8,6 +8,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -22,13 +23,20 @@ import com.imfibit.activitytracker.ui.components.Colors
 
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 inline fun BaseDialog(display: MutableState<Boolean>, noinline content: @Composable ColumnScope.() -> Unit){
-    if (display.value) Dialog(onDismissRequest = {display.value = false}) {
+    if (display.value) Dialog(
+        onDismissRequest = {display.value = false},
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+
+    ) {
 
         Surface(
-            modifier = Modifier.clip(RoundedCornerShape(10.dp)),
-            elevation = 2.dp
+            modifier = Modifier.width(320.dp),
+            shape = RoundedCornerShape(10.dp),
+            elevation = 2.dp,
+
         ){
             Column(content = content, )
         }

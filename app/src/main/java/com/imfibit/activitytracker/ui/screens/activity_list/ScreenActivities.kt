@@ -116,12 +116,12 @@ fun ScreenActivities(
                     contentDescription = null,
                 )
             }
-            
-            
-                 
-                 
+
+
+
+
             /*TrackerTopAppBar(stringResource(id = R.string.screen_title_activities)){
-                
+
             }*/
         },
         floatingActionButton = {
@@ -133,10 +133,10 @@ fun ScreenActivities(
             ScreenBody(navController, vm, data.activities, data.today, data.groups, data.live)
         },
         bottomBar = {
-          /*Column {
-                LiveActivitiesList(vm, data.live)
-                AppBottomNavigation(navController)
-            }*/
+            /*Column {
+                  LiveActivitiesList(vm, data.live)
+                  AppBottomNavigation(navController)
+              }*/
         },
         backgroundColor = Colors.AppBackground
     )

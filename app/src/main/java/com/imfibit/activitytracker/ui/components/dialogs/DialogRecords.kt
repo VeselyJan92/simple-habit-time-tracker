@@ -9,13 +9,17 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -33,56 +37,48 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun DialogRecords(nav: NavHostController, scaffoldState: ScaffoldState) {
     val vm = hiltViewModel<DayRecordsVM>()
 
-    Dialog(onDismissRequest = {}) {
+    //https://issuetracker.google.com/issues/221643630#comment8
+    Dialog(
+        onDismissRequest = {nav.popBackStack()},
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+    ) {
 
         Surface(
-            modifier = Modifier
-                .clip(RoundedCornerShape(10.dp)),
-            elevation = 2.dp
+            shape = RoundedCornerShape(10.dp),
+            elevation = 2.dp,
+            modifier = Modifier.width(320.dp)
         ){
-            Column(modifier = Modifier) {
+            Column() {
 
                 DialogBaseHeader(title = stringResource( R.string.dialog_records_title))
 
                 val data by vm.x.collectAsState(initial = listOf())
+
+                if (data.isEmpty()) {
+                    Text(text = stringResource(id = R.string.no_records), fontWeight= FontWeight.W600, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.heightIn(0.dp, 200.dp),
+                        contentPadding = PaddingValues(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+
+                    ){
+                        items(data){
+                            Record(activity = it.activity, record = it.record)
+                        }
+                    }
+                }
 
                 DialogButtons {
                     TextButton(onClick = {nav.popBackStack()}) {
                         Text(text = stringResource(id = R.string.dialog_records_btn_okey))
                     }
                 }
-
-                Box(modifier = Modifier.padding(8.dp).fillMaxWidth()) {
-                    when{
-                        data.isEmpty() -> {
-                            Text(text = stringResource(id = R.string.no_records), fontWeight= FontWeight.W600, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
-                        }
-                        data.size < 5 -> {
-                            Column{
-                                data.forEach {
-                                    Record(activity = it.activity, record = it.record)
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                }
-                            }
-                        }
-                        else -> {
-                            LazyColumn(){
-                                items(data){
-                                    Record(activity = it.activity, record = it.record)
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                }
-                            }
-                        }
-                    }
-
-                }
-
-
 
             }
         }

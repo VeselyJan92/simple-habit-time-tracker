@@ -2,12 +2,12 @@ package com.imfibit.activitytracker.ui.screens.group
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Reorder
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,8 +32,11 @@ import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivity
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview
 import org.burnoutcrew.reorderable.*
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.filled.Delete
 import com.imfibit.activitytracker.ui.components.*
 import com.imfibit.activitytracker.ui.components.Colors
+import com.imfibit.activitytracker.ui.components.dialogs.DialogAgree
 
 
 @Composable
@@ -42,16 +45,64 @@ fun ScreenActivityGroup(nav: NavHostController, scaffoldState: ScaffoldState) {
 
     val vm = hiltViewModel<ActivityGroupViewModel>()
 
+    val activities by vm.activities.collectAsState()
+    val group by vm.group.collectAsState()
+    val groups by vm.groups.collectAsState()
+
 
 
     Scaffold(
         topBar = {
-            SimpleTopBar(navHostController = nav, title = stringResource(id = R.string.screen_group_title))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+
+                TopBarBackButton(navHostController = nav)
+
+                BasicTextField(
+                    modifier = Modifier.weight(1f),
+                    value = vm.groupName.value ?: "",
+                    singleLine = true,
+                    onValueChange = {vm.refreshName(it)},
+                    textStyle = TextStyle(fontWeight = FontWeight.Black, fontSize = 25.sp)
+                )
+
+
+
+                val dialogDelete = remember {
+                    mutableStateOf(false)
+                }
+
+                DialogAgree(
+                    display = dialogDelete ,
+                    title = "xxxxxxxxxx" ,
+                    onAction = {
+                        group?.let {
+                            nav.popBackStack()
+                            vm.delete(it)
+                        }
+                    }
+                )
+
+                Icon(
+                    contentDescription = null,
+                    imageVector = Icons.Default.Delete,
+                    tint = Color.Black,
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                        .clickable(onClick = {
+                            dialogDelete.value = true
+                        })
+                )
+
+
+            }
+
         },
         content = {
-            val activities by vm.activities.collectAsState()
-            val group by vm.group.collectAsState()
-            val groups by vm.groups.collectAsState()
+
 
             ScreenBody(nav, vm, group, activities, groups)
         },
@@ -95,45 +146,22 @@ private fun Header(
     groups: List<TrackerActivityGroup>,
 ) {
     Surface(
-        modifier = Modifier.padding(8.dp),
+        modifier = Modifier.fillMaxWidth().padding(8.dp),
         elevation = 2.dp,
-        shape = RoundedCornerShape(5.dp)
+        shape = RoundedCornerShape(20.dp)
     ) {
-        val editName = remember { mutableStateOf(false) }
-
-        DialogInputText(
-            display = editName,
-            text = group?.name ?: "",
-            title = stringResource(id = R.string.screen_group_edit_name)
-        ) {
-            vm.update(group!!.copy(name = it))
-            editName.value = false
-        }
-
-        val reorderGroups = remember { mutableStateOf(false) }
-
-        DialogReorderGroups(
-            display = reorderGroups,
-            groups = groups ,
-            onDragEnd = { from: Int, to: Int -> vm.onGroupDragEnd(from, to)},
-            onMove = {from: Int, to: Int -> vm.moveGroup(from, to) }
-        )
-
-        Column(
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth()
-        ) {
-            TextBox(
-                text = group?.name ?: "",
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                editName.value = true
-            }
-
             Row(
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(8.dp)
             ) {
+                val reorderGroups = remember { mutableStateOf(false) }
+
+                DialogReorderGroups(
+                    display = reorderGroups,
+                    groups = groups ,
+                    onDragEnd = { from: Int, to: Int -> vm.onGroupDragEnd(from, to)},
+                    onMove = {from: Int, to: Int -> vm.moveGroup(from, to) }
+                )
+
                 IconTextButton(
                     Icons.Default.Reorder,
                     stringResource(id = R.string.screen_group_reorder)
@@ -144,7 +172,7 @@ private fun Header(
             }
 
 
-        }
+
 
 
     }
