@@ -40,7 +40,6 @@ class ActivitiesViewModel @Inject constructor(
 
     val data = MutableStateFlow(Data())
 
-
     val tracker = activityInvalidationTracker {
         viewModelScope.launch(Dispatchers.IO) {
             fetch()
@@ -58,9 +57,7 @@ class ActivitiesViewModel @Inject constructor(
             },
             db.groupDAO.getAll()
         )
-
-        Log.e("Activities", data.activities.toString())
-
+        
         this@ActivitiesViewModel.data.value = data
     }
 
@@ -73,32 +70,28 @@ class ActivitiesViewModel @Inject constructor(
         db.invalidationTracker.removeObserver(tracker)
     }
 
-    fun commitSession(activity: TrackedActivity) {
-        viewModelScope.launch(Dispatchers.IO) { timerService.commitSession(activity) }
-    }
-
-    fun updateSession(activity: TrackedActivity, start: LocalDateTime) = viewModelScope.launch {
-        timerService.updateSession(activity, start)
-    }
-
     suspend fun addActivity(activity: TrackedActivity): Long {
         return rep.activityDAO.insertSync(activity)
 
     }
 
-    fun dragActivity(from: Int, to: Int){
-        if (to >= data.value.activities.size || from >= data.value.activities.size || to <0 )
-            return
-
-        val items = data.value.activities.toMutableList().apply { swap(from, to) }
-        data.value = data.value.copy(activities = items)
+    fun onMoveActivity(from: Int, to: Int){
+        data.value = data.value.copy(activities = data.value.activities.toMutableList().apply { swap(from, to) })
     }
 
-    fun moveActivity(){
-        val items = data.value.activities.mapIndexed{ index, item -> item.activity.copy(position = index) }
+    fun onMoveGroup(from: Int, to: Int) {
+        data.value = data.value.copy(groups = data.value.groups.toMutableList().apply { swap(from, to) })
+    }
+
+
+    fun onDragEnd(){
+        val activities = data.value.activities.mapIndexed{ index, item -> item.activity.copy(position = index) }
+
+        val groups = data.value.groups.mapIndexed{ index, item -> item.copy(position = index) }
 
         viewModelScope.launch(Dispatchers.IO) {
-            rep.activityDAO.updateAll(*items.toTypedArray())
+            db.activityDAO.updateAll(*activities.toTypedArray())
+            db.groupDAO.updateAll(*groups.toTypedArray())
         }
     }
 
@@ -121,6 +114,7 @@ class ActivitiesViewModel @Inject constructor(
             it[PreferencesKeys.ERASE_OBOARDING_SHOW] = false
         }
     }
+
 
 
 }

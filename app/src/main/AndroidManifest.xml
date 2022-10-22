@@ -71,6 +71,7 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="androidx.glance.appwidget.action.DEBUG_UPDATE" />
             </intent-filter>
 
             <meta-data
@@ -80,13 +81,6 @@
         
 
         <activity android:name=".ui.widgets.ConfActivityWidgetOverview"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
-            </intent-filter>
-        </activity>
-
-        <activity android:name=".ui.widgets.ConfActivityWidgetTime"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>

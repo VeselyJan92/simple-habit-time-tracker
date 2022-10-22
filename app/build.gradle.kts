@@ -67,8 +67,8 @@ android {
         applicationId = "com.imfibit.activitytracker"
         minSdk = 26
         targetSdk = 33
-        versionCode = 18
-        versionName = "1.2.4"
+        versionCode = 19
+        versionName = "1.3.0"
         testInstrumentationRunner  ="com.imfibit.activitytracker.HiltRunner"
     }
 
@@ -117,7 +117,7 @@ dependencies {
 
 
 
-    val COMPOSE_VERSION = "1.3.0-rc01"
+    val COMPOSE_VERSION = "1.2.1"
 
     implementation("androidx.compose.compiler:compiler:1.3.2")
     implementation("androidx.compose.animation:animation:$COMPOSE_VERSION")

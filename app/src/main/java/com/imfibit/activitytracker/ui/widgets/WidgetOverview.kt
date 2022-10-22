@@ -2,20 +2,15 @@ package com.imfibit.activitytracker.ui.widgets
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.glance.GlanceId
-import androidx.glance.GlanceModifier
+import androidx.glance.*
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.cornerRadius
-import androidx.glance.background
-import androidx.glance.currentState
 import androidx.glance.layout.*
 import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.state.PreferencesGlanceStateDefinition
@@ -26,8 +21,6 @@ import androidx.glance.unit.ColorProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.imfibit.activitytracker.core.services.OverviewWidgetService
 import com.imfibit.activitytracker.database.AppDatabase
-import com.imfibit.activitytracker.database.entities.TrackedActivity
-import com.imfibit.activitytracker.ui.components.Colors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -58,7 +51,7 @@ class WidgetOverview : GlanceAppWidget() {
 
         fun keyValue(index: Int) = stringPreferencesKey("METRIC_${index}_VALUE")
         fun keyLabel(index: Int) = stringPreferencesKey("METRIC_${index}_LABEL")
-        fun keyColor(index: Int) = intPreferencesKey("METRIC_${index}_COLOR")
+        fun keyColor(index: Int) = stringPreferencesKey("METRIC_${index}_COLOR")
 
     }
 
@@ -103,24 +96,31 @@ class WidgetOverview : GlanceAppWidget() {
                             text = prefs[keyLabel(it)] ?: "",
                             style = TextStyle(
                                 color = ColorProvider(Color.Black),
-                                fontWeight = FontWeight.Medium,
+                                fontWeight = if (it == 0) FontWeight.Bold else FontWeight.Medium,
                                 fontSize = 10.sp
                             )
                         )
+
+                        //So far there is no cross compatible way to have round corners and color
+                        val resource = when (prefs[keyColor(it)]){
+                            "#FF9800" -> com.imfibit.activitytracker.R.drawable.widget_backgoround_orange
+                            "#E0E0E0" -> com.imfibit.activitytracker.R.drawable.widget_backgoround_gray
+                            "#59BF2D" -> com.imfibit.activitytracker.R.drawable.widget_backgoround_green
+                            else -> throw IllegalArgumentException()
+                        }
 
                         Box(
                             modifier = GlanceModifier
                                 .width(35.dp)
                                 .height(20.dp)
-                                .background(Color(prefs[keyColor(it)] ?: 0))
-                                .cornerRadius(10.dp),
+                                .background(ImageProvider(resource)),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 modifier = GlanceModifier,
                                 style = TextStyle(
                                     color = ColorProvider(Color.Black),
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = if (it == 0) FontWeight.Bold else FontWeight.Medium,
                                     fontSize = 10.sp
                                 ),
                                 text = prefs[keyValue(it)] ?: "y"

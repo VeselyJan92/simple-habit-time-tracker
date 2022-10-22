@@ -19,7 +19,7 @@
 
 
 
-    <string name="activity_screen_recent_activity">Recent Activity</string>
+    <string name="activity_screen_recent_activity">Recent activity</string>
     <string name="activity_screen_recent_group">Group</string>
 
     <string name="browse">Browse</string>
@@ -41,7 +41,7 @@
     <string name="time">Time</string>
     <string name="work_week">W. Week</string>
     <string name="score">Score</string>
-    <string name="habbits">Habbits</string>
+    <string name="habits">Habits</string>
     <string name="screen_title_timeline">Timeline</string>
     <string name="screen_title_statistics">Statistics</string>
     <string name="track_activity_name">Activity</string>
@@ -97,7 +97,7 @@
     <string name="screen_group_title">Group settings</string>
     <string name="screen_group_reorder">Reorder</string>
     <string name="screen_group_color">Color</string>
-    <string name="screen_group_edit_name">Edit group name</string>
+    <string name="screen_group_delete_group">Delete group and activities</string>
 
 
 

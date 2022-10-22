@@ -36,7 +36,6 @@ class ActivityGroupViewModel @Inject constructor(
 
     val group = MutableStateFlow<TrackerActivityGroup?>(null)
 
-    val groups = MutableStateFlow<List<TrackerActivityGroup>>(listOf())
 
 
     val tracker = activityInvalidationTracker {
@@ -50,7 +49,6 @@ class ActivityGroupViewModel @Inject constructor(
 
 
         activities.value = rep.getActivitiesOverview(db.activityDAO.getActivitiesFromGroup(id))
-        groups.value = db.groupDAO.getAll()
 
         group.value = groupData
         groupName.value = groupData.name
@@ -76,17 +74,6 @@ class ActivityGroupViewModel @Inject constructor(
         this.groupName.value = name
     }
 
-    fun moveGroup(from: Int, to: Int) {
-        this.groups.value = this.groups.value.toMutableList().apply { swap(from, to) }
-    }
-
-    fun onGroupDragEnd(from: Int, to: Int) = viewModelScope.launch {
-        val items = this@ActivityGroupViewModel.groups.value
-            .mapIndexed{index, item -> item.copy(position = index)}
-            .toTypedArray()
-
-        db.groupDAO.updateAll(*items)
-    }
 
     fun moveActivity(from: Int, to: Int) {
         this.activities.value = this.activities.value.toMutableList().apply { swap(from, to) }

@@ -47,9 +47,6 @@ fun ScreenActivityGroup(nav: NavHostController, scaffoldState: ScaffoldState) {
 
     val activities by vm.activities.collectAsState()
     val group by vm.group.collectAsState()
-    val groups by vm.groups.collectAsState()
-
-
 
     Scaffold(
         topBar = {
@@ -77,7 +74,7 @@ fun ScreenActivityGroup(nav: NavHostController, scaffoldState: ScaffoldState) {
 
                 DialogAgree(
                     display = dialogDelete ,
-                    title = "xxxxxxxxxx" ,
+                    title = stringResource(id = R.string.screen_group_delete_group).uppercase() ,
                     onAction = {
                         group?.let {
                             nav.popBackStack()
@@ -102,13 +99,7 @@ fun ScreenActivityGroup(nav: NavHostController, scaffoldState: ScaffoldState) {
 
         },
         content = {
-
-
-            ScreenBody(nav, vm, group, activities, groups)
-        },
-
-        bottomBar = {
-
+            ScreenBody(nav, vm, group, activities)
         },
         backgroundColor = Colors.AppBackground,
         scaffoldState = scaffoldState
@@ -121,13 +112,10 @@ private fun ScreenBody(
     vm: ActivityGroupViewModel,
     group: TrackerActivityGroup?,
     activities: List<TrackedActivityRecentOverview>,
-    groups: List<TrackerActivityGroup>,
 ) {
     Column(
 
     ) {
-        Header(nav, vm, group, groups)
-
         Activities(
             nav = nav,
             activities = activities,
@@ -136,46 +124,6 @@ private fun ScreenBody(
         )
     }
 
-}
-
-@Composable
-private fun Header(
-    nav: NavHostController,
-    vm: ActivityGroupViewModel,
-    group: TrackerActivityGroup?,
-    groups: List<TrackerActivityGroup>,
-) {
-    Surface(
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
-        elevation = 2.dp,
-        shape = RoundedCornerShape(20.dp)
-    ) {
-            Row(
-                modifier = Modifier.padding(8.dp)
-            ) {
-                val reorderGroups = remember { mutableStateOf(false) }
-
-                DialogReorderGroups(
-                    display = reorderGroups,
-                    groups = groups ,
-                    onDragEnd = { from: Int, to: Int -> vm.onGroupDragEnd(from, to)},
-                    onMove = {from: Int, to: Int -> vm.moveGroup(from, to) }
-                )
-
-                IconTextButton(
-                    Icons.Default.Reorder,
-                    stringResource(id = R.string.screen_group_reorder)
-                ) {
-                    reorderGroups.value = true
-                }
-
-            }
-
-
-
-
-
-    }
 }
 
 @Composable
@@ -207,73 +155,10 @@ private fun Activities(
                 TrackedActivity(
                     item = item,
                     modifier = Modifier,
-                    onNavigate = { nav.navigate(SCREEN_ACTIVITY(it.id.toString())) }
+                    onNavigate = { nav.navigate(SCREEN_ACTIVITY(it.id.toString())) },
+                    isDragging = isDragging
                 )
             }
-
-        }
-
-    }
-}
-
-
-@Composable
-fun DialogReorderGroups(
-    display: MutableState<Boolean>,
-    groups: List<TrackerActivityGroup>,
-    onDragEnd: (from: Int, to: Int) -> Unit,
-    onMove: (from: Int, to: Int) -> Unit
-) = BaseDialog(display = display) {
-
-    DialogBaseHeader(title = stringResource(R.string.dialog_preset_timers_title))
-
-    val state = rememberReorderableLazyListState(
-        onDragEnd = onDragEnd,
-        onMove = {from, to -> onMove(from.index, to.index)}
-    )
-
-    LazyColumn(
-        state = state.listState,
-        modifier = Modifier
-            .padding(start = 8.dp, end = 8.dp, bottom = 8.dp, top = 8.dp)
-            .reorderable(state = state,)
-            .detectReorderAfterLongPress(state)
-    ) {
-
-        items(groups, {it.id}) { item ->
-            ReorderableItem(state, key = item.id, defaultDraggingModifier = Modifier) { isDragging ->
-                Row(
-                    modifier = Modifier
-
-                        .padding(bottom = 8.dp)
-                        .fillMaxWidth()
-                        .background(Color.LightGray, RoundedCornerShape(30))
-                        .padding(4.dp),
-
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    Box(
-                        modifier = Modifier
-                            .width(100.dp)
-                            .height(30.dp)
-                            .background(Colors.ChipGray, RoundedCornerShape(50)),
-                        contentAlignment = Alignment.Center
-                    ) {
-
-                        Text(
-                            text = item.name,
-                            textAlign = TextAlign.Center,
-                            style = TextStyle(
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
-                    }
-
-                }
-            }
-
 
         }
 

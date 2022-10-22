@@ -5,6 +5,3 @@ Features
 - Habit tracking
 - Score tracking
 - Detailed statistics
-- Timeline of activities
-
-Feel free to send me constructive criticism or contribute to the App.

@@ -2,8 +2,12 @@ package com.imfibit.activitytracker.ui.screens.activity_list
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -57,9 +61,8 @@ fun ScreenActivities(
 
     val name = stringResource(id = R.string.new_activity_name)
 
-    val data by vm.data.collectAsState(initial = ActivitiesViewModel.Data())
-
-    val newGroup = TrackerActivityGroup(0, stringResource(id = R.string.screen_activities_new_group), 0)
+    val newGroup =
+        TrackerActivityGroup(0, stringResource(id = R.string.screen_activities_new_group), 0)
 
     DialogAddActivity(display = display,
         onAddFolder = {
@@ -118,8 +121,6 @@ fun ScreenActivities(
             }
 
 
-
-
             /*TrackerTopAppBar(stringResource(id = R.string.screen_title_activities)){
 
             }*/
@@ -130,7 +131,7 @@ fun ScreenActivities(
             }
         },
         content = {
-            ScreenBody(navController, vm, data.activities, data.today, data.groups, data.live)
+            ScreenBody(navController, vm)
         },
         bottomBar = {
             /*Column {
@@ -142,83 +143,90 @@ fun ScreenActivities(
     )
 }
 
+private fun Any?.type() = (this as String).split("_").first()
+
 @Composable
 private fun ScreenBody(
     nav: NavHostController,
-    vm: ActivitiesViewModel,
-    activities: List<TrackedActivityRecentOverview>,
-    today: List<ActivityWithMetric>,
-    groups: List<TrackerActivityGroup>,
-    live: List<TrackedActivity>,
+    vm: ActivitiesViewModel
 ) {
+    val data by vm.data.collectAsState(initial = ActivitiesViewModel.Data())
 
-    val state = rememberReorderableLazyListState(
-        onDragEnd = { from, to -> vm.moveActivity() },
+    val state = rememberReorderableLazyGridState(
+        onDragEnd = {
+                from, to -> vm.onDragEnd()
+        },
+        canDragOver = {
+                draggedOver, dragging -> draggedOver.key.type() == dragging.key.type()
+        },
         onMove = { from, to ->
-            vm.dragActivity(from.index - 1, to.index - 1)
+            val itemsBefore = data.activities.size + 1
+
+            when {
+                from.key.type() == "activity" && to.key.type() == "activity" -> vm.onMoveActivity(
+                    from.index - 1,
+                    to.index - 1
+                )
+                from.key.type() == "group" && to.key.type() == "group" -> vm.onMoveGroup(
+                    from.index - itemsBefore,
+                    to.index - itemsBefore
+                )
+                else -> throw IllegalArgumentException()
+            }
         }
     )
 
-    LazyColumn(
-        state = state.listState,
+    LazyVerticalGrid(
+        state = state.gridState,
         modifier = Modifier
-            .padding(8.dp)
             .reorderable(
                 state = state,
             ),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        columns = GridCells.Fixed(2),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(8.dp)
     ) {
 
-        item {
-
+        item("head", span = { GridItemSpan(2) }) {
             val context = LocalContext.current
-
             val pref by context.dataStore.data.collectAsState(initial = null)
 
-            val x = pref?.get(PreferencesKeys.ERASE_OBOARDING_SHOW) ?: false
-
-            if (x){
+            if (pref?.get(PreferencesKeys.ERASE_OBOARDING_SHOW) == true) {
                 ClearAll(vm)
             }
 
 
-            if(today.isNotEmpty())
-                Today(nav, today)
-
+            Today(nav, data.today)
         }
 
-        items(activities, {it.activity.id}) { item ->
-
-            ReorderableItem(state, key = item.activity.id, modifier = Modifier.detectReorderAfterLongPress(state)) { isDragging ->
+        items(
+            data.activities,
+            { "activity_${it.activity.id}" },
+            span = { GridItemSpan(2) }) { item ->
+            ReorderableItem(
+                state,
+                key = "activity_${item.activity.id}",
+                modifier = Modifier.detectReorderAfterLongPress(state)
+            ) { isDragging ->
                 TrackedActivity(
                     item = item,
                     modifier = Modifier,
-                    onNavigate = {nav.navigate(SCREEN_ACTIVITY(it.id.toString()))}
+                    onNavigate = { nav.navigate(SCREEN_ACTIVITY(it.id.toString())) },
+                    isDragging = isDragging
                 )
             }
-
-
         }
 
-        item {
-            ReorderableItem(state, key = "categories", modifier = Modifier.detectReorderAfterLongPress(state)) { isDragging ->
-                Categories(vm, groups, nav)
+        items(data.groups, { "group_${it.id}" }, span = { GridItemSpan(1) }) { item ->
+            ReorderableItem(
+                state,
+                "group_${item.id}",
+                modifier = Modifier.detectReorderAfterLongPress(state)
+            ) { isDragging ->
+                Category(nav, item, if (isDragging) Color.LightGray else Color.White )
             }
         }
-
-        item {
-            val bottom = 50.dp
-            val add = 70.dp
-            val live = (live.size * 56).dp
-
-            Box(modifier = Modifier
-                .height(bottom + add + live)
-                .fillMaxWidth()
-            )
-        }
-
-
-
     }
 }
 
@@ -229,7 +237,6 @@ private fun ClearAll(vm: ActivitiesViewModel) {
     val context = LocalContext.current
 
     Surface(
-        modifier = Modifier.padding(bottom = 8.dp),
         elevation = 2.dp,
         shape = RoundedCornerShape(5.dp)
     ) {
@@ -238,7 +245,7 @@ private fun ClearAll(vm: ActivitiesViewModel) {
                 .fillMaxWidth()
                 .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
-        ){
+        ) {
             Spacer(modifier = Modifier.width(8.dp))
 
             Icon(
@@ -267,7 +274,7 @@ private fun ClearAll(vm: ActivitiesViewModel) {
                         vm.clearOnboardingData(context)
                     }),
                 contentAlignment = Alignment.Center
-            ){
+            ) {
                 Text(text = "Erase")
             }
 
@@ -276,14 +283,16 @@ private fun ClearAll(vm: ActivitiesViewModel) {
 }
 
 @Composable
-private fun Today(nav: NavHostController, today: List<ActivityWithMetric>){
+private fun Today(nav: NavHostController, today: List<ActivityWithMetric>) {
     Surface(
         elevation = 2.dp,
         shape = RoundedCornerShape(20.dp)
     ) {
 
         Column(
-            Modifier.padding(horizontal = 8.dp).padding(bottom = 8.dp)
+            Modifier
+                .padding(horizontal = 8.dp)
+                .padding(bottom = 8.dp)
         ) {
 
             Row(
@@ -301,8 +310,8 @@ private fun Today(nav: NavHostController, today: List<ActivityWithMetric>){
 
 
                 TextButton(
-                    onClick = {nav.navigate(SCREEN_STATISTICS)}
-                ){
+                    onClick = { nav.navigate(SCREEN_STATISTICS) }
+                ) {
                     Text(
                         text = stringResource(id = R.string.screen_title_statistics),
                         style = TextStyle(
@@ -313,93 +322,80 @@ private fun Today(nav: NavHostController, today: List<ActivityWithMetric>){
 
             }
 
-            today.forEachIndexed{ index, item ->
+            if (today.isEmpty()){
+                Box(
+                    modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                    contentAlignment = Alignment.Center){
+                    Text(text = stringResource(id = R.string.no_records), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                }
+            }else{
+                today.forEachIndexed { index, item ->
+                    val xx = item.activity.goal.range == TimeRange.DAILY && item.metric < item.activity.goal.value;
 
-                val xx = item.activity.goal.range == TimeRange.DAILY && item.metric < item.activity.goal.value ;
+                    Row(Modifier.padding(start = 8.dp, end = 8.dp)) {
 
-                Row(Modifier.padding(start = 8.dp, end = 8.dp)) {
+                        Text(text = item.activity.name, fontSize = 16.sp)
 
+                        Spacer(modifier = Modifier.weight(1f))
 
-                    Text(text = item.activity.name, fontSize = 16.sp)
+                        val label = item.activity.type.getLabel(item.metric).value()
 
-                    Spacer(modifier = Modifier.weight(1f))
+                        val color = if (xx) Colors.NotCompleted else Colors.AppAccent
 
-                    val label = item.activity.type.getLabel(item.metric).value()
-
-                    val color = if (xx) Colors.NotCompleted else Colors.AppAccent
-
-                    BaseMetricBlock(
-                        metric = label,
-                        color = color, metricStyle = TextStyle(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp
+                        BaseMetricBlock(
+                            metric = label,
+                            color = color, metricStyle = TextStyle(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp
+                            )
                         )
-                    )
+                    }
+
+                    if (index != today.size - 1)
+                        Divider(Modifier.padding(top = 4.dp, bottom = 4.dp))
                 }
 
-                if (index != today.size - 1)
-                    Divider(Modifier.padding(top = 4.dp, bottom = 4.dp))
             }
+
+
         }
 
     }
-
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun Categories(
-    vm: ActivitiesViewModel,
-    groups: List<TrackerActivityGroup>,
-    nav: NavHostController
-) {
+private fun Category(nav: NavHostController, item: TrackerActivityGroup, color: Color = Color.White) {
+    Surface(
+        elevation = 2.dp,
+        modifier = Modifier
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) { nav.navigate("screen_activity_group/${item.id}") }
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        color = color
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(8.dp)
+                .height(30.dp),
+            verticalAlignment = Alignment.CenterVertically,
 
-    Column {
-        for (row in groups.chunked(2)) {
-            Row {
-                for ((index, item) in row.withIndex()) {
-                    Surface(
-                        elevation = 2.dp,
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .weight(1f)
-                            .clickable {
-                                nav.navigate("screen_activity_group/${item.id}")
-                            },
-                        shape = RoundedCornerShape(20.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .height(30.dp),
-                            verticalAlignment = Alignment.CenterVertically,
+            ) {
+            Icon(
+                modifier = Modifier.padding(end = 8.dp),
+                imageVector = Icons.Outlined.Topic,
+                contentDescription = null
+            )
 
-                            ) {
-                            Icon(
-                                modifier = Modifier.padding(end = 8.dp),
-                                imageVector = Icons.Outlined.Topic,
-                                contentDescription = null
-                            )
-
-                            Text(
-                                text = item.name,
-                                style = TextStyle(
-                                    fontWeight = FontWeight.W500,
-                                    fontSize = 16.sp
-                                )
-                            )
-                        }
-                    }
-
-                    if(index == 0)
-                        Spacer(modifier = Modifier.width(8.dp))
-                }
-
-                if (row.size == 1){
-                    Spacer(modifier = Modifier.weight(1f))
-                }
-
-            }
+            Text(
+                text = item.name,
+                style = TextStyle(
+                    fontWeight = FontWeight.W500,
+                    fontSize = 16.sp
+                )
+            )
         }
     }
 

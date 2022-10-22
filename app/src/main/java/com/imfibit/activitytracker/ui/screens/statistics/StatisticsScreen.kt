@@ -422,7 +422,7 @@ private fun BlockCompleted(
     ) {
         Column(Modifier.padding(8.dp)) {
 
-            Header(title = stringResource(id = R.string.habbits), Icons.Default.AssignmentTurnedIn)
+            Header(title = stringResource(id = R.string.habits), Icons.Default.AssignmentTurnedIn)
 
             data.forEach {
                 Row(Modifier.padding(start = 8.dp, end = 8.dp)) {

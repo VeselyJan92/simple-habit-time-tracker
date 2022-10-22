@@ -32,7 +32,6 @@ import com.imfibit.activitytracker.ui.components.EditText
 import com.imfibit.activitytracker.ui.components.icons.MinusOne
 
 
-@OptIn(ExperimentalMaterialApi::class)
 @ExperimentalFoundationApi
 @Composable
 fun NumberSelector(
@@ -45,26 +44,28 @@ fun NumberSelector(
 
         val focusManager = LocalFocusManager.current
 
-        IconButton(
-            onClick = {
-                focusManager.clearFocus()
+        Box(modifier = Modifier.padding(top = 15.dp).weight(50f)){
+            IconButton(
+                onClick = {
+                    focusManager.clearFocus()
 
-                if (number - 1 in range){
-                    onNumberEdit.invoke(number-1)
-                }
-            },
-            modifier = Modifier
-                .padding(end = 8.dp, top = 15.dp)
-                .height(30.dp)
-                .weight(50f)
-                .background(Colors.ChipGray, RoundedCornerShape(50)),
+                    if (number - 1 in range){
+                        onNumberEdit.invoke(number-1)
+                    }
+                },
+                modifier = Modifier
+                    .height(30.dp)
+                    .fillMaxWidth()
+                    .background(Colors.ChipGray, RoundedCornerShape(50)),
 
-            ) {
-            Icon(Icons.Filled.MinusOne, contentDescription = null)
+                ) {
+                Icon(Icons.Filled.MinusOne, contentDescription = null)
+            }
         }
 
         Column(
             modifier = Modifier
+                .padding(horizontal = 8.dp)
                 .weight(25f)
                 .height(45.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -83,7 +84,9 @@ fun NumberSelector(
             }
 
             EditText(
-                modifier = Modifier.height(30.dp).focusRequester(FocusRequester.Default),
+                modifier = Modifier
+                    .height(30.dp)
+                    .focusRequester(FocusRequester.Default),
                 text = localValue.value,
 
                 onValueChange = {
@@ -110,14 +113,7 @@ fun NumberSelector(
             )
         }
 
-        Box(
-            modifier = Modifier
-                .padding(start = 8.dp, top = 15.dp)
-                .weight(50f)
-                .background(Colors.ChipGray, RoundedCornerShape(50))
-                .padding(start = 8.dp),
-            contentAlignment = Alignment.Center
-        ) {
+        Box(modifier = Modifier.padding(top = 15.dp).weight(50f)){
             IconButton(
                 onClick = {
                     focusManager.clearFocus()
@@ -126,11 +122,16 @@ fun NumberSelector(
                         onNumberEdit.invoke(number + 1)
                     }
                 },
-                modifier = Modifier.height(30.dp)
+                modifier = Modifier
+                    .height(30.dp)
+                    .fillMaxWidth()
+                    .background(Colors.ChipGray, RoundedCornerShape(50)),
             ) {
                 Icon(Icons.Filled.PlusOne, contentDescription = null)
             }
+
         }
+
 
     }
 

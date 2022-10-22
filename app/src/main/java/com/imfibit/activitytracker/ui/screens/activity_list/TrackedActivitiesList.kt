@@ -7,6 +7,7 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -44,6 +45,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import kotlin.random.Random
 
 
 data class TrackedActivityRecentOverview(
@@ -55,6 +57,10 @@ data class TrackedActivityRecentOverview(
     enum class ActionButton{
         DEFAULT, CHECKED, IN_SESSION
     }
+
+    override fun equals(other: Any?) = false
+
+    override fun hashCode() = Random.nextInt()
 }
 
 
@@ -63,7 +69,8 @@ data class TrackedActivityRecentOverview(
 fun TrackedActivity(
     item: TrackedActivityRecentOverview,
     modifier: Modifier = Modifier,
-    onNavigate: (activity: TrackedActivity) -> Unit
+    onNavigate: (activity: TrackedActivity) -> Unit,
+    isDragging: Boolean = false
 ) {
     val context = LocalContext.current
     val activity = item.activity
@@ -89,16 +96,18 @@ fun TrackedActivity(
         onUpdate = {time, score -> recordVM.addScore(activity.id, time, score )}
     )
 
-
-    val color = if (item.activity.isInSession()) Colors.SuperLight else Color.White
+    val color = when{
+        isDragging -> Color.LightGray
+        activity.isInSession() -> Colors.SuperLight
+        else -> Color.White
+    }
 
 
     Surface(
         modifier = modifier
-            .clickable {
+            .clickable(interactionSource = remember { MutableInteractionSource() } , indication = null) {
                 onNavigate(activity)
-            }
-            .padding(2.dp),
+            },
 
         elevation = 2.dp,
         color = color,

@@ -12,6 +12,7 @@ import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.ui.widgets.WidgetOverview
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.lang.String
 import javax.inject.Inject
 
 class OverviewWidgetService @Inject constructor(
@@ -61,8 +62,8 @@ class OverviewWidgetService @Inject constructor(
 
         for ((index, past) in overview.past.reversed().withIndex()){
             pref[WidgetOverview.keyValue(index)] = past.value.value(context)
-            pref[WidgetOverview.keyLabel(index)] = past.label?.value(context) ?: "x"
-            pref[WidgetOverview.keyColor(index)] = past.color.toArgb()
+            pref[WidgetOverview.keyLabel(index)] = past.label?.value(context) ?: ""
+            pref[WidgetOverview.keyColor(index)] = String.format("#%06X", 0xFFFFFF and past.color.toArgb()).uppercase()
         }
     }
 
