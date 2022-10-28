@@ -117,7 +117,7 @@ dependencies {
 
 
 
-    val COMPOSE_VERSION = "1.2.1"
+    val COMPOSE_VERSION = "1.3.0"
 
     implementation("androidx.compose.compiler:compiler:1.3.2")
     implementation("androidx.compose.animation:animation:$COMPOSE_VERSION")

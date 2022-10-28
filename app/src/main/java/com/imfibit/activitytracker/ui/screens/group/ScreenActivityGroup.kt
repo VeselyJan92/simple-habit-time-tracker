@@ -113,16 +113,12 @@ private fun ScreenBody(
     group: TrackerActivityGroup?,
     activities: List<TrackedActivityRecentOverview>,
 ) {
-    Column(
-
-    ) {
-        Activities(
-            nav = nav,
-            activities = activities,
-            onMove = { from, to -> vm.moveActivity(from, to) },
-            onDragEnd = { from, to -> vm.onActivityDragEnd(from, to) }
-        )
-    }
+    Activities(
+        nav = nav,
+        activities = activities,
+        onMove = { from, to -> vm.moveActivity(from, to) },
+        onDragEnd = { from, to -> vm.onActivityDragEnd(from, to) }
+    )
 
 }
 
@@ -145,9 +141,9 @@ private fun Activities(
         state = state.listState,
         modifier = Modifier
             .reorderable(state = state)
-            .detectReorderAfterLongPress(state)
-            .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            .detectReorderAfterLongPress(state),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(8.dp)
     ) {
 
         items(activities.value, key = {item -> item.activity.id },) { item ->
