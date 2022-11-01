@@ -152,11 +152,11 @@ inline fun DialogTimers(
                 onTimerDelete.invoke(item)
             }
             ReorderableItem(state, key = item.id, defaultDraggingModifier = Modifier) { isDragging ->
-               /* SwipeToDismiss(
+                SwipeToDismiss(
                     state = dismissState,
                     modifier = Modifier.clickable { runTimer.invoke(item) },
                     background = {},
-                ) {*/
+                ) {
                     Row(modifier = Modifier
                         .padding(bottom = 8.dp)
                         .fillMaxWidth()
@@ -185,10 +185,7 @@ inline fun DialogTimers(
                     }
 
                 }
-
-           /* }*/
-
-
+            }
         }
 
     }
