@@ -1,44 +1,51 @@
 package com.imfibit.activitytracker.ui
 
+
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.StringRes
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AssignmentTurnedIn
-import androidx.compose.material.icons.filled.InsertChart
-import androidx.compose.material.icons.filled.Timeline
-import androidx.compose.runtime.*
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import androidx.core.util.Consumer
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
-import androidx.navigation.compose.*
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.PreferencesKeys
+import com.imfibit.activitytracker.core.dataStore
 import com.imfibit.activitytracker.core.notifications.NotificationLiveSession
 import com.imfibit.activitytracker.core.notifications.NotificationTimerOver
-import com.imfibit.activitytracker.ui.screens.activity.ScreenTrackedActivity
-import com.imfibit.activitytracker.ui.screens.activity_list.ScreenActivities
-import com.imfibit.activitytracker.ui.screens.onboarding.ScreenOnboarding
-import com.imfibit.activitytracker.ui.screens.statistics.ScreenStatistics
-import com.imfibit.activitytracker.ui.screens.upcomming.ScreenUpcoming
-import kotlinx.coroutines.runBlocking
-
-
-import com.imfibit.activitytracker.core.dataStore
+import com.imfibit.activitytracker.database.AppDatabase
+import com.imfibit.activitytracker.ui.MainActivity.Companion.NOTIFICATION_NAVIGATE_TO_ACTIVITY
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.dialogs.DialogRecords
+import com.imfibit.activitytracker.ui.screens.activity.ScreenTrackedActivity
 import com.imfibit.activitytracker.ui.screens.activity_history.ScreenActivityHistory
+import com.imfibit.activitytracker.ui.screens.activity_list.ScreenActivities
 import com.imfibit.activitytracker.ui.screens.group.ScreenActivityGroup
+import com.imfibit.activitytracker.ui.screens.onboarding.ScreenOnboarding
 import com.imfibit.activitytracker.ui.screens.settings.ScreenSetting
+import com.imfibit.activitytracker.ui.screens.statistics.ScreenStatistics
+import com.imfibit.activitytracker.ui.screens.upcomming.ScreenUpcoming
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 
 fun SCREEN_ACTIVITY(activity: String = "{activity_id}") = "screen_activity/$activity"
@@ -54,6 +61,14 @@ const val SCREEN_SETTINGS= "SCREEN_SETTINGS"
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var db: AppDatabase
+
+    companion object {
+        const val NOTIFICATION_NAVIGATE_TO_ACTIVITY = "NAV_TO_ACTIVITY"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -64,12 +79,13 @@ class MainActivity : ComponentActivity() {
             Router()
         }
     }
+
 }
 
 
 
 @Composable
-fun Router(){
+fun MainActivity.Router(){
 
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = MaterialTheme.colors.isLight
@@ -92,7 +108,6 @@ fun Router(){
     }
 
     val destination = if (onboarded) SCREEN_ACTIVITIES else SCREEN_ONBOARDING
-
 
     val scaffoldState = rememberScaffoldState()
 
@@ -132,6 +147,46 @@ fun Router(){
         ){
             DialogRecords(navControl, scaffoldState)
         }
+    }
 
+    launchActivityScreenFromNotification(navControl)
+}
+
+
+@Composable
+private fun MainActivity.launchActivityScreenFromNotification(navControl: NavHostController) {
+    val scope = rememberCoroutineScope()
+
+    val listener = Consumer<Intent> {
+        scope.launch {
+            launchActivityScreenFromNotification(it, navControl)
+        }
+    }
+
+    // No activity is in the background
+    listener.accept(intent)
+
+    // Activity is in the background
+    DisposableEffect(Unit) {
+        addOnNewIntentListener(listener)
+        onDispose { removeOnNewIntentListener(listener) }
     }
 }
+
+
+private suspend fun MainActivity.launchActivityScreenFromNotification(intent: Intent, navControl: NavHostController){
+    if (!intent.hasExtra(NOTIFICATION_NAVIGATE_TO_ACTIVITY))
+        return
+
+    val activity = withContext(Dispatchers.IO){
+       db.activityDAO.tryGetById(intent.getLongExtra(NOTIFICATION_NAVIGATE_TO_ACTIVITY, -1))
+    }
+
+    if (activity != null){
+        withContext(Dispatchers.Main){
+            navControl.navigate("screen_activity/${activity.id}")
+        }
+    }
+
+}
+

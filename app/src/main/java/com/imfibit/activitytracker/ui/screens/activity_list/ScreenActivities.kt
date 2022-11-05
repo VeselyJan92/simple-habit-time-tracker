@@ -1,6 +1,10 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -25,6 +29,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.core.edit
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
@@ -42,9 +47,8 @@ import com.imfibit.activitytracker.ui.SCREEN_STATISTICS
 import com.imfibit.activitytracker.ui.components.BaseMetricBlock
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.dialogs.DialogAddActivity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
 import org.burnoutcrew.reorderable.*
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -53,6 +57,26 @@ fun ScreenActivities(
     navController: NavHostController,
     scaffoldState: ScaffoldState,
 ) {
+    val context = LocalContext.current
+
+    val coroutineScope = rememberCoroutineScope()
+
+    val startForResult = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        runBlocking {
+            context.dataStore.edit { settings -> settings[PreferencesKeys.NOTIFICATION_ALLOWED] = true }
+        }
+    }
+
+    coroutineScope.launch(Dispatchers.IO) {
+        val promptNotification = context.dataStore.data.first()[PreferencesKeys.NOTIFICATION_ALLOWED] ?: false
+
+        delay(2000)
+
+        if (promptNotification){
+            startForResult.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
 
     val vm = hiltViewModel<ActivitiesViewModel>()
     val display = remember { mutableStateOf(false) }
@@ -152,6 +176,8 @@ private fun ScreenBody(
 ) {
     val data by vm.data.collectAsState(initial = ActivitiesViewModel.Data())
 
+    Log.e("Screen", "invalidate")
+
     val state = rememberReorderableLazyGridState(
         onDragEnd = {
                 from, to -> vm.onDragEnd()
@@ -160,12 +186,12 @@ private fun ScreenBody(
                 draggedOver, dragging -> draggedOver.key.type() == dragging.key.type()
         },
         onMove = { from, to ->
-            val itemsBefore = data.activities.size + 1
+            val itemsBefore = data.activities.size + data.live.size + 1
 
             when {
                 from.key.type() == "activity" && to.key.type() == "activity" -> vm.onMoveActivity(
-                    from.index - 1,
-                    to.index - 1
+                    from.index - (data.live.size + 1),
+                    to.index - (data.live.size + 1)
                 )
                 from.key.type() == "group" && to.key.type() == "group" -> vm.onMoveGroup(
                     from.index - itemsBefore,
@@ -200,10 +226,21 @@ private fun ScreenBody(
             Today(nav, data.today)
         }
 
-        items(
-            data.activities,
-            { "activity_${it.activity.id}" },
-            span = { GridItemSpan(2) }) { item ->
+
+        //https://issuetracker.google.com/issues/257488930
+        /*items(data.live, {"other_${it.activity.id}"},span = { GridItemSpan(2) }) { itmainem->
+            ReorderableItem(reorderableState = state , key = "other_${item.activity.id}") {
+                TrackedActivity(
+                    item = item,
+                    modifier = Modifier,
+                    onNavigate = { nav.navigate(SCREEN_ACTIVITY(it.id.toString())) },
+                    isDragging = false
+                )
+            }
+
+        }*/
+
+        items(data.activities, { "activity_${it.activity.id}" }, span = { GridItemSpan(2) }) { item ->
             ReorderableItem(
                 state,
                 key = "activity_${item.activity.id}",

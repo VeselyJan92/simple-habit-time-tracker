@@ -1,7 +1,6 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
 import android.content.Context
-import android.util.Log
 import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.viewModelScope
 import com.imfibit.activitytracker.core.AppViewModel
@@ -21,7 +20,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,7 +31,7 @@ class ActivitiesViewModel @Inject constructor(
 
     data class Data(
         val activities: List<TrackedActivityRecentOverview> = listOf(),
-        val live: List<TrackedActivity> = listOf(),
+        val live: List<TrackedActivityRecentOverview> = listOf(),
         val today: List<ActivityWithMetric> = listOf(),
         val groups: List<TrackerActivityGroup> = listOf()
     )
@@ -51,7 +49,7 @@ class ActivitiesViewModel @Inject constructor(
 
         val data =  Data(
             rep.getActivitiesOverview(activities).toMutableList(),
-            rep.activityDAO.liveActive(),
+            rep.getActivitiesOverview(rep.activityDAO.liveActive().filter { it.groupId != null }),
             rep.metricDAO.getActivitiesWithMetric(LocalDate.now(), LocalDate.now()).filter {
                 (it.activity.goal.range == TimeRange.DAILY && it.activity.goal.isSet()) || it.metric > 0
             },

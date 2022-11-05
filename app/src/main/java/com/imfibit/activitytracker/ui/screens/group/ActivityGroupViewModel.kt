@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -50,8 +51,10 @@ class ActivityGroupViewModel @Inject constructor(
 
         activities.value = rep.getActivitiesOverview(db.activityDAO.getActivitiesFromGroup(id))
 
-        group.value = groupData
-        groupName.value = groupData.name
+        withContext(Dispatchers.Main){
+            group.value = groupData
+            groupName.value = groupData.name
+        }
     }
 
     init {

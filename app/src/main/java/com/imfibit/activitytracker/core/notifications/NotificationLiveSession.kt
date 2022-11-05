@@ -5,13 +5,11 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.SystemClock
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.imfibit.activitytracker.R
-import com.imfibit.activitytracker.core.receivers.StopActivitySessionReceiver
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.MainActivity
 import java.time.OffsetDateTime
@@ -22,18 +20,18 @@ object NotificationLiveSession{
     val CHANNEL_ID = "NotificationLiveSession"
 
 
-    fun show(context: Context, item: TrackedActivity){
+    fun show(context: Context, trackedActivity: TrackedActivity){
 
-        if (item.id <= 0){
+        if (trackedActivity.id <= 0){
             throw IllegalArgumentException("Notification without uninitialized TrackedActivity is not allowed ")
         }
 
         val remoteViews = RemoteViews(context.packageName, R.layout.notification)
 
-        remoteViews.setTextViewText(R.id.tracked_task_notification_tv_name, item.name)
+        remoteViews.setTextViewText(R.id.tracked_task_notification_tv_name, trackedActivity.name)
 
 
-        val lastSuccess: Long = item.inSessionSince!!.toEpochSecond(OffsetDateTime.now().offset) * 1000
+        val lastSuccess: Long = trackedActivity.inSessionSince!!.toEpochSecond(OffsetDateTime.now().offset) * 1000
         val elapsedRealtimeOffset = System.currentTimeMillis() - SystemClock.elapsedRealtime()
 
         remoteViews.setChronometer(
@@ -58,7 +56,9 @@ object NotificationLiveSession{
         val contentIntent = PendingIntent.getActivity(
             context,
             System.currentTimeMillis().toInt(),
-            Intent(context, MainActivity::class.java),
+            Intent(context, MainActivity::class.java).apply {
+                putExtra(MainActivity.NOTIFICATION_NAVIGATE_TO_ACTIVITY, trackedActivity.id)
+            },
             PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -77,7 +77,7 @@ object NotificationLiveSession{
             .setAutoCancel(false)
 
 
-       NotificationManagerCompat.from(context).notify(ID_BASE + item.id.toInt(), customNotification.build())
+       NotificationManagerCompat.from(context).notify(ID_BASE + trackedActivity.id.toInt(), customNotification.build())
     }
 
 

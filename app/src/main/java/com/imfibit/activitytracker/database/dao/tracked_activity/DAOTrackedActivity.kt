@@ -25,6 +25,12 @@ abstract class DAOTrackedActivity : BaseEditableDAO<TrackedActivity> {
     abstract fun getById(id: Long): TrackedActivity
 
     @Query("""
+        SELECT * FROM tracked_activity 
+        WHERE tracked_activity_id =:id
+    """)
+    abstract fun tryGetById(id: Long): TrackedActivity?
+
+    @Query("""
         DELETE FROM tracked_activity 
         WHERE tracked_activity_id =:id
     """)
