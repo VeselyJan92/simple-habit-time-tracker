@@ -157,12 +157,6 @@ fun ScreenActivities(
         content = {
             ScreenBody(navController, vm)
         },
-        bottomBar = {
-            /*Column {
-                  LiveActivitiesList(vm, data.live)
-                  AppBottomNavigation(navController)
-              }*/
-        },
         backgroundColor = Colors.AppBackground
     )
 }
@@ -222,13 +216,11 @@ private fun ScreenBody(
                 ClearAll(vm)
             }
 
-
             Today(nav, data.today)
         }
 
 
-        //https://issuetracker.google.com/issues/257488930
-        /*items(data.live, {"other_${it.activity.id}"},span = { GridItemSpan(2) }) { itmainem->
+        items(data.live, {"other_${it.activity.id}"},span = { GridItemSpan(2) }) { item->
             ReorderableItem(reorderableState = state , key = "other_${item.activity.id}") {
                 TrackedActivity(
                     item = item,
@@ -238,7 +230,7 @@ private fun ScreenBody(
                 )
             }
 
-        }*/
+        }
 
         items(data.activities, { "activity_${it.activity.id}" }, span = { GridItemSpan(2) }) { item ->
             ReorderableItem(
@@ -254,6 +246,7 @@ private fun ScreenBody(
                 )
             }
         }
+
 
         items(data.groups, { "group_${it.id}" }, span = { GridItemSpan(1) }) { item ->
             ReorderableItem(

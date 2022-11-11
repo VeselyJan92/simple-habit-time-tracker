@@ -105,27 +105,18 @@ play {
 }
 
 dependencies {
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-
-    implementation("com.google.android.material:material:1.6.1")
-
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.20")
-    implementation("com.thedeanda:lorem:2.1")
 
     implementation(platform("com.google.firebase:firebase-bom:31.0.0"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
 
 
 
-    val COMPOSE_VERSION = "1.3.0"
-
+    val COMPOSE_VERSION = "1.3.1"
     implementation("androidx.compose.compiler:compiler:1.3.2")
     implementation("androidx.compose.animation:animation:$COMPOSE_VERSION")
-    implementation("androidx.compose.ui:ui:$COMPOSE_VERSION")
-    implementation("androidx.compose.material:material:$COMPOSE_VERSION")
-    implementation("androidx.compose.runtime:runtime:$COMPOSE_VERSION")
-    implementation("androidx.compose.runtime:runtime-livedata:$COMPOSE_VERSION")
     implementation("androidx.compose.foundation:foundation:$COMPOSE_VERSION")
+    implementation("androidx.compose.material:material:$COMPOSE_VERSION")
     implementation("androidx.compose.material:material-icons-extended:$COMPOSE_VERSION")
 
 
@@ -135,27 +126,11 @@ dependencies {
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.hilt:hilt-common:1.0.0")
 
-
-
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.3")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
-
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.44")
-    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.44")
-    androidTestAnnotationProcessor("com.google.dagger:hilt-android-compiler:2.44")
-
-
-
-
-    debugImplementation("androidx.compose.ui:ui-tooling:$COMPOSE_VERSION")
-
     implementation("androidx.navigation:navigation-compose:2.6.0-alpha02")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
 
 
     val ROOM_VERSION = "2.4.1"
-
     kapt("androidx.room:room-compiler:$ROOM_VERSION")
     implementation("androidx.room:room-runtime:$ROOM_VERSION")
     implementation("androidx.room:room-ktx:$ROOM_VERSION")
@@ -166,9 +141,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-pager-indicators:0.26.5-rc")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.26.5-rc")
 
-
-    implementation("org.burnoutcrew.composereorderable:reorderable:0.9.2")
-
+    implementation("org.burnoutcrew.composereorderable:reorderable:0.9.4")
 
     implementation("androidx.paging:paging-runtime-ktx:3.1.1")
     implementation("androidx.paging:paging-compose:1.0.0-alpha16")
@@ -177,6 +150,15 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:2.44")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
     kapt("androidx.hilt:hilt-compiler:1.0.0")
+
+
+    /* testImplementation("junit:junit:4.13.2")
+ androidTestgetLineIndexOfItemImplementation("androidx.test.ext:junit:1.1.3")
+ androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+
+ androidTestImplementation("com.google.dagger:hilt-android-testing:2.44")
+ kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.44")
+ androidTestAnnotationProcessor("com.google.dagger:hilt-android-compiler:2.44")*/
 
 
 }

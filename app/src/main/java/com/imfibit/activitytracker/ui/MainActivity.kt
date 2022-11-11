@@ -97,8 +97,6 @@ fun MainActivity.Router(){
         )
     }
 
-
-
     val navControl = rememberNavController()
 
     val context: Context = LocalContext.current
@@ -149,44 +147,6 @@ fun MainActivity.Router(){
         }
     }
 
-    launchActivityScreenFromNotification(navControl)
 }
 
-
-@Composable
-private fun MainActivity.launchActivityScreenFromNotification(navControl: NavHostController) {
-    val scope = rememberCoroutineScope()
-
-    val listener = Consumer<Intent> {
-        scope.launch {
-            launchActivityScreenFromNotification(it, navControl)
-        }
-    }
-
-    // No activity is in the background
-    listener.accept(intent)
-
-    // Activity is in the background
-    DisposableEffect(Unit) {
-        addOnNewIntentListener(listener)
-        onDispose { removeOnNewIntentListener(listener) }
-    }
-}
-
-
-private suspend fun MainActivity.launchActivityScreenFromNotification(intent: Intent, navControl: NavHostController){
-    if (!intent.hasExtra(NOTIFICATION_NAVIGATE_TO_ACTIVITY))
-        return
-
-    val activity = withContext(Dispatchers.IO){
-       db.activityDAO.tryGetById(intent.getLongExtra(NOTIFICATION_NAVIGATE_TO_ACTIVITY, -1))
-    }
-
-    if (activity != null){
-        withContext(Dispatchers.Main){
-            navControl.navigate("screen_activity/${activity.id}")
-        }
-    }
-
-}
 
