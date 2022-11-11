@@ -1,5 +1,6 @@
 package com.imfibit.activitytracker.ui.screens.settings
 
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -57,14 +58,21 @@ private fun ScreenBody(){
         val context = LocalContext.current
         val vm = hiltViewModel<ScreenSettingVM>()
 
+        val unsupported = stringResource(id = R.string.screen_settings_backup_unsupported)
+
         val export = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("*/*")) {
-            vm.exportDB(context, it!!)
+            if(it == null)
+                Toast.makeText(context,unsupported , Toast.LENGTH_LONG).show()
+            else
+                vm.exportDB(context, it)
         }
 
         val import = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) {
-            vm.importDB(context, it!!)
+            if(it == null)
+                Toast.makeText(context,unsupported , Toast.LENGTH_LONG).show()
+            else
+                vm.importDB(context, it)
         }
-
 
         Column(modifier = Modifier.padding(8.dp)) {
             Text(

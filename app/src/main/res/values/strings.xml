@@ -11,6 +11,7 @@
     <string name="screen_settings_backup_explain">Backup your app data</string>
     <string name="screen_settings_restore_label">Restore</string>
     <string name="screen_settings_restore_explain">Restore your app data</string>
+    <string name="screen_settings_backup_unsupported">You must download some app for managing files: Google Files</string>
 
 
     <string name="frequency_daily">Daily</string>
