@@ -66,8 +66,6 @@ fun ScreenActivityGroup(nav: NavHostController, scaffoldState: ScaffoldState) {
                     textStyle = TextStyle(fontWeight = FontWeight.Black, fontSize = 25.sp)
                 )
 
-
-
                 val dialogDelete = remember {
                     mutableStateOf(false)
                 }
@@ -75,10 +73,14 @@ fun ScreenActivityGroup(nav: NavHostController, scaffoldState: ScaffoldState) {
                 DialogAgree(
                     display = dialogDelete ,
                     title = stringResource(id = R.string.screen_group_delete_group).uppercase() ,
-                    onAction = {
-                        group?.let {
+                    onAction = { delete ->
+                        dialogDelete.value = false
+
+                        val tobeDeleted = group
+
+                        if(delete && tobeDeleted != null){
                             nav.popBackStack()
-                            vm.delete(it)
+                            vm.delete(tobeDeleted)
                         }
                     }
                 )

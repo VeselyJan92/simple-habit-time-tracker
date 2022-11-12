@@ -4,6 +4,7 @@ package com.imfibit.activitytracker.ui.screens.activity
 import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
+import androidx.room.withTransaction
 import com.imfibit.activitytracker.core.AppViewModel
 import com.imfibit.activitytracker.core.ContextString
 import com.imfibit.activitytracker.core.invalidationFlow
@@ -63,7 +64,7 @@ class TrackedActivityViewModel @Inject constructor(
     val activityName = mutableStateOf<String?>(null)
 
     val data = invalidationFlow(db){
-        val activity: TrackedActivity = rep.activityDAO.flowById(id).firstOrNull() ?: return@invalidationFlow null
+        val activity: TrackedActivity = rep.activityDAO.tryGetById(id) ?: return@invalidationFlow null
 
 
         //Ignore subsequent changes
@@ -143,7 +144,6 @@ class TrackedActivityViewModel @Inject constructor(
 
 
     private suspend fun updateName(name: String){
-        Log.e("xxx", "updateName: $name")
         val activity = rep.activityDAO.getById(id)
         rep.activityDAO.update(activity.copy(name = name))
     }
@@ -178,8 +178,16 @@ class TrackedActivityViewModel @Inject constructor(
     }
 
     fun deleteActivity(activity: TrackedActivity) = launchIO {
-        deleted = true
-        rep.activityDAO.deleteById(activity.id)
+        Log.e("XXX", "DELETE")
+
+        db.withTransaction {
+            if (activity.type == TrackedActivity.Type.TIME)
+                timerService.cancelSession(activity)
+
+            deleted = true
+            rep.activityDAO.deleteById(activity.id)
+        }
+
     }
 
     fun setGroup(group: TrackerActivityGroup?) = launchIO {

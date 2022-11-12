@@ -70,19 +70,21 @@ fun ScreenTrackedActivity(nav: NavHostController, scaffoldState: ScaffoldState) 
                     textStyle = TextStyle(fontWeight = FontWeight.Black, fontSize = 25.sp)
                 )
 
-
-
                 val dialogDelete = remember {
                     mutableStateOf(false)
                 }
 
                 DialogAgree(
-                    display = dialogDelete ,
-                    title = msg ,
-                    onAction = {
-                        state?.activity?.let {
+                    display = dialogDelete,
+                    title = msg,
+                    onAction = { delete ->
+                        dialogDelete.value = false
+
+                        val activity = state?.activity
+
+                        if(delete && activity != null){
                             nav.popBackStack()
-                            vm.deleteActivity(it)
+                            vm.deleteActivity(activity)
                         }
                     }
                 )

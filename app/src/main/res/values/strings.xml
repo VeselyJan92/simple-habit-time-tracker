@@ -58,18 +58,17 @@
     <string name="dialog_action_delete">DELETE</string>
     <string name="dialog_action_cancel">CANCEL</string>
     <string name="dialog_action_continue">CONTINUE</string>
-    <string name="dialo_score_title_add">ADD SCORE</string>
-    <string name="dialo_score_title_edit">EDIT SCORE</string>
+    <string name="dialo_score_title_add">Add score</string>
+    <string name="dialo_score_title_edit">Edit score</string>
     <string name="dialog_action_edit">EDIT</string>
     <string name="dialog_action_add">ADD</string>
-    <string name="dialog_session_title_edit">EDIT SESSION</string>
-    <string name="dialog_session_title_add">ADD SESSION</string>
+    <string name="dialog_session_title_edit">Edit session</string>
+    <string name="dialog_session_title_add">Add session</string>
     <string name="session_start">From</string>
     <string name="session_end">To</string>
     <string name="invalid_entry">Invalid data</string>
-    <string name="dialog_priority_title">ACTIVITY PRIORITY</string>
     <string name="priority">Priority</string>
-    <string name="dialog_time_range_title">SELECT RANGE</string>
+    <string name="dialog_time_range_title">Select goal range</string>
     <string name="hours">Hours</string>
     <string name="minutes">Minutes</string>
     <string name="confirm_delete">Really delete</string>
@@ -112,7 +111,7 @@
     <string name="dialog_preset_timers_single">Start a timer</string>
 
     <string name="dialog_group_picker_title">Select activity group</string>
-    <string name="dialog_group_picker_default">Main Screen</string>
+    <string name="dialog_group_picker_default">Dashboard</string>
 
     <string name="dialog_records_title">Records</string>
     <string name="dialog_records_btn_okey">OK</string>
@@ -140,6 +139,7 @@
 
 
     <string name="activity_in_session">In session: </string>
+    <string name="activity_in_timer">Timer: </string>
 
 
 

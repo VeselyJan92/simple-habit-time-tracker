@@ -115,7 +115,8 @@ fun TrackedActivity(
     ) {
         Row(
             modifier = Modifier
-                .padding(top = 8.dp, bottom = 8.dp, end = 8.dp).animateContentSize()
+                .padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
+                .animateContentSize()
 
         ) {
 
@@ -190,22 +191,28 @@ fun TrackedActivity(
                             Modifier.animateEnterExit(
                                     enter = slideInVertically(),
                                     exit = slideOutVertically()
-                                )
+                                ),
                         ) {
-                            if(item.activity.isInSession()) Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 8.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
+                            if(item.activity.isInSession()){
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
 
-                                Text(text = stringResource(id = R.string.activity_in_session) + " " + item.activity.inSessionSince!!.format(DateTimeFormatter.ofPattern("HH:mm")))
+                                    if (activity.timer != null) {
+                                        Text(text = stringResource(id = R.string.activity_in_timer) + " " + activity.type.getLabel(activity.timer.toLong()).value())
+                                    }else{
+                                        Text(text = stringResource(id = R.string.activity_in_session) + " " + item.activity.inSessionSince!!.format(DateTimeFormatter.ofPattern("HH:mm")))
+                                    }
 
-                                Timer(
-                                    startTime = item.activity.inSessionSince,
-                                    onClick = {  }
-                                )
+                                    Timer(
+                                        startTime = item.activity.inSessionSince,
+                                        onClick = {  }
+                                    )
+                                }
                             }
                         }
 
