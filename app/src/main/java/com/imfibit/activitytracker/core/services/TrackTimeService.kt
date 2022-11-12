@@ -80,12 +80,13 @@ class TrackTimeService @Inject constructor(
     }
 
     suspend fun updateSession(activity: TrackedActivity, start: LocalDateTime){
-        repository.activityDAO.update(activity.copy(inSessionSince = start, timer = null))
+        val updated = activity.copy(inSessionSince = start, timer = null)
+        repository.activityDAO.update(updated)
 
-        cancelTimer(activity)
+        cancelTimer(updated)
 
-        NotificationLiveSession.show(context, activity)
-        NotificationTimerOver.remove(context, activity.id)
+        NotificationLiveSession.show(context, updated)
+        NotificationTimerOver.remove(context, updated.id)
     }
 
     private fun getTimerIntent(activity: TrackedActivity, flag: Int = PendingIntent.FLAG_UPDATE_CURRENT): PendingIntent? {
