@@ -126,7 +126,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.hilt:hilt-common:1.0.0")
 
-    implementation("androidx.navigation:navigation-compose:2.6.0-alpha02")
+    implementation("androidx.navigation:navigation-compose:2.6.0-alpha04")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
 
 
@@ -141,10 +141,10 @@ dependencies {
     implementation("com.google.accompanist:accompanist-pager-indicators:0.26.5-rc")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.26.5-rc")
 
-    implementation("org.burnoutcrew.composereorderable:reorderable:0.9.4")
+    implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
 
     implementation("androidx.paging:paging-runtime-ktx:3.1.1")
-    implementation("androidx.paging:paging-compose:1.0.0-alpha16")
+    implementation("androidx.paging:paging-compose:1.0.0-alpha17")
 
     implementation("com.google.dagger:hilt-android:2.44")
     kapt("com.google.dagger:hilt-android-compiler:2.44")

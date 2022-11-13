@@ -1,8 +1,2 @@
 include ':app'
 rootProject.name = "activity-tracker"
-
-includeBuild('../ComposeReorderable') {
-    dependencySubstitution {
-        substitute module('org.burnoutcrew.composereorderable:reorderable') using project(':reorderable')
-    }
-}
