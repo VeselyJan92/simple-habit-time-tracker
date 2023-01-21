@@ -54,7 +54,7 @@ object DatabaseModule {
     views = [
         TrackedActivityMetric::class
     ],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 @TypeConverters(
@@ -99,7 +99,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(*migrations)
                     .build()
 
-                runBlocking(Dispatchers.IO) { ReleaseSeeder.seed(db) }
+                //runBlocking(Dispatchers.IO) { ReleaseSeeder.seed(db) }
 
                 db
             }

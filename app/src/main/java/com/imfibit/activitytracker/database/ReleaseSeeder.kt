@@ -2,6 +2,7 @@ package com.imfibit.activitytracker.database
 
 import android.util.Log
 import com.imfibit.activitytracker.database.embedable.TimeRange
+import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import com.imfibit.activitytracker.database.entities.*
 import java.time.LocalDate
@@ -62,7 +63,8 @@ object ReleaseSeeder {
                 position = 1,
                 type = TrackedActivity.Type.TIME,
                 inSessionSince = null,
-                goal = TrackedActivityGoal(0, TimeRange.WEEKLY)
+                goal = TrackedActivityGoal(0, TimeRange.WEEKLY),
+                challenge = TrackedActivityChallenge("Reserch", 40 * 3600, LocalDate.now().minusMonths(1), LocalDate.now().plusMonths(1))
             )
         )
 
@@ -103,7 +105,8 @@ object ReleaseSeeder {
             position = 1,
             type = TrackedActivity.Type.TIME,
             inSessionSince = LocalDateTime.now(),
-            goal = TrackedActivityGoal(0, TimeRange.DAILY)
+            goal = TrackedActivityGoal(0, TimeRange.DAILY),
+            challenge = TrackedActivityChallenge.empty
         ))
 
         db.sessionDAO.insert(TrackedActivityTime(
@@ -154,7 +157,8 @@ object ReleaseSeeder {
             position = 1,
             type = TrackedActivity.Type.CHECKED,
             inSessionSince = null,
-            goal = TrackedActivityGoal(3, TimeRange.WEEKLY)
+            goal = TrackedActivityGoal(3, TimeRange.WEEKLY),
+            challenge = TrackedActivityChallenge.empty
         ))
 
         db.completionDAO.insert(TrackedActivityCompletion(
@@ -202,7 +206,8 @@ object ReleaseSeeder {
             position = 1,
             type = TrackedActivity.Type.SCORE,
             inSessionSince = null,
-            goal = TrackedActivityGoal(3, TimeRange.WEEKLY)
+            goal = TrackedActivityGoal(3, TimeRange.WEEKLY),
+            challenge = TrackedActivityChallenge.empty
         ))
 
         db.scoreDAO.insert(TrackedActivityScore(
@@ -241,7 +246,8 @@ object ReleaseSeeder {
             position = 1,
             groupId = categoryId,
             type = TrackedActivity.Type.TIME,
-            goal = TrackedActivityGoal(0, TimeRange.DAILY)
+            goal = TrackedActivityGoal(0, TimeRange.DAILY),
+            challenge = TrackedActivityChallenge.empty
         ))
 
         db.activityDAO.insert(TrackedActivity(
@@ -250,7 +256,8 @@ object ReleaseSeeder {
             position = 2,
             groupId = categoryId,
             type = TrackedActivity.Type.TIME,
-            goal = TrackedActivityGoal(0, TimeRange.DAILY)
+            goal = TrackedActivityGoal(0, TimeRange.DAILY),
+            challenge = TrackedActivityChallenge.empty
         ))
 
         db.sessionDAO.insert(TrackedActivityTime(

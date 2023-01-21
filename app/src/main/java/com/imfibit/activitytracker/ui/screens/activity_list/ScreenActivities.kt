@@ -38,6 +38,7 @@ import com.imfibit.activitytracker.core.dataStore
 import com.imfibit.activitytracker.core.value
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.embedable.TimeRange
+import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
@@ -104,7 +105,8 @@ fun ScreenActivities(
                     position = 0,
                     type = it,
                     inSessionSince = null,
-                    goal = TrackedActivityGoal(0L, TimeRange.WEEKLY)
+                    goal = TrackedActivityGoal(0L, TimeRange.WEEKLY),
+                    challenge = TrackedActivityChallenge.empty
                 )
 
                 val id = withContext(Dispatchers.IO) {

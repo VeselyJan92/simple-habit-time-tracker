@@ -8,6 +8,6 @@ import kotlinx.coroutines.launch
 
 open class AppViewModel : ViewModel() {
 
-    inline fun launchIO(noinline block: suspend CoroutineScope.()->Unit) = viewModelScope.launch(Dispatchers.IO, block = block)
+    fun launchIO( block: suspend CoroutineScope.()->Unit) = viewModelScope.launch(Dispatchers.IO, block = block)
 
 }

@@ -93,10 +93,14 @@ class RepositoryTrackedActivity @Inject constructor(
             )
         }
 
+        val challengeMetric = getChallengeMetric(activity.id, activity.challenge.from, activity.challenge.to)
 
-        return TrackedActivityRecentOverview(activity, groupedMetric, actionButton, today.last())
+
+        return TrackedActivityRecentOverview(activity, challengeMetric, groupedMetric, actionButton, today.last())
 
     }
+
+    suspend fun getChallengeMetric(activityId: Long, from: LocalDate?, to: LocalDate?) = metricDAO.getMetric(activityId, from ?: LocalDate.of(2000, 1, 1), to ?: LocalDate.of(2100, 1, 1))
 
     suspend fun getActivitiesOverview(activities: List<TrackedActivity>) =  db.withTransaction {
         return@withTransaction activities.map { activity -> getActivityOverview(activity) }

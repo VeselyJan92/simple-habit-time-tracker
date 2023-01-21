@@ -40,6 +40,7 @@ import com.imfibit.activitytracker.ui.components.dialogs.DialogScore
 import com.imfibit.activitytracker.ui.components.dialogs.DialogSession
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.*
 import com.imfibit.activitytracker.ui.viewmodels.RecordViewModel
+import com.imfibit.activitytracker.ui.widgets.custom.GoalProgressBar
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -50,6 +51,7 @@ import kotlin.random.Random
 
 data class TrackedActivityRecentOverview(
     val activity: TrackedActivity,
+    val challengeMetric: Long,
     val past: List<MetricWidgetData>,
     val actionButton: ActionButton = ActionButton.DEFAULT,
     val today: MetricAggregation
@@ -113,71 +115,72 @@ fun TrackedActivity(
         color = color,
         shape = RoundedCornerShape(20.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
-                .animateContentSize()
+        Column(modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier
+                    .padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
+                    .animateContentSize()
 
-        ) {
+            ) {
 
-            ActionButton(
-                actionButton = item.actionButton,
-                activity = item.activity,
-                onClick = {
-                    recordVM.activityTriggered(activity)
-                },
-                onLongClick = {
+                ActionButton(
+                    actionButton = item.actionButton,
+                    activity = item.activity,
+                    onClick = {
+                        recordVM.activityTriggered(activity)
+                    },
+                    onLongClick = {
 
-                    //TODO Create service for this
-                    val x = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager?
-                        vibratorManager!!.defaultVibrator
-                    } else {
-                        context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator?
+                        //TODO Create service for this
+                        val x = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager?
+                            vibratorManager!!.defaultVibrator
+                        } else {
+                            context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator?
+                        }
+
+                        x?.vibrate(VibrationEffect.createOneShot(50L, 1))
+
+                        when(activity.type){
+                            Type.TIME -> openSessionDialog.value = true
+                            Type.SCORE -> openScoreDialog.value = true
+                            Type.CHECKED -> {}
+                        }
                     }
-
-                    x?.vibrate(VibrationEffect.createOneShot(50L, 1))
-
-                    when(activity.type){
-                        Type.TIME -> openSessionDialog.value = true
-                        Type.SCORE -> openScoreDialog.value = true
-                        Type.CHECKED -> {}
-                    }
-                }
-            )
+                )
 
 
-            Column(Modifier.fillMaxWidth()) {
-                Row {
-                    Text(
-                        activity.name,
-                        style = TextStyle(
-                            fontWeight = FontWeight.W600,
-                            fontSize = 18.sp,
-                            textAlign = TextAlign.Start
+                Column(Modifier.fillMaxWidth()) {
+                    Row {
+                        Text(
+                            activity.name,
+                            style = TextStyle(
+                                fontWeight = FontWeight.W600,
+                                fontSize = 18.sp,
+                                textAlign = TextAlign.Start
+                            )
                         )
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
+                        Spacer(modifier = Modifier.weight(1f))
 
-                    if (activity.goal.isSet()) {
-                        Goal(activity.type.getLabel(activity.goal.value).value())
+                        if (activity.goal.isSet()) {
+                            Goal(activity.type.getLabel(activity.goal.value).value())
+                        }
+
                     }
 
-                }
 
+                    Row(modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        MetricBlock(item.past[4], width = 80.dp, metricStyle = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
+                        MetricBlock(item.past[3] )
+                        MetricBlock(item.past[2] )
+                        MetricBlock(item.past[1] )
+                        MetricBlock(item.past[0])
+                    }
 
-                Row(modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    MetricBlock(item.past[4], width = 80.dp, metricStyle = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
-                    MetricBlock(item.past[3] )
-                    MetricBlock(item.past[2] )
-                    MetricBlock(item.past[1] )
-                    MetricBlock(item.past[0])
-                }
-
-               // if (item.activity.isInSession()){
+                    // if (item.activity.isInSession()){
 
 
                     AnimatedVisibility(
@@ -189,9 +192,9 @@ fun TrackedActivity(
 
                         Box(
                             Modifier.animateEnterExit(
-                                    enter = slideInVertically(),
-                                    exit = slideOutVertically()
-                                ),
+                                enter = slideInVertically(),
+                                exit = slideOutVertically()
+                            ),
                         ) {
                             if(item.activity.isInSession()){
                                 Row(
@@ -217,15 +220,15 @@ fun TrackedActivity(
                         }
 
                     }
+                }
+            }
 
-
-
-
-               // }
-
-
-
-
+            if (item.activity.challenge.isSet()){
+                GoalProgressBar(
+                    item.activity.challenge,
+                    item.challengeMetric,
+                    item.activity.type
+                )
             }
         }
     }

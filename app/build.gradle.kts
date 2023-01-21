@@ -9,6 +9,7 @@ plugins {
 
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+    id("com.google.devtools.ksp") version "1.8.0-1.0.8"
 
 }
 
@@ -51,7 +52,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.3.2"
+        kotlinCompilerExtensionVersion = "1.4.0"
     }
 
 
@@ -105,7 +106,10 @@ play {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.20")
+    implementation("com.google.devtools.ksp:symbol-processing-api:1.8.0-1.0.8")
+
+
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.0")
 
     implementation(platform("com.google.firebase:firebase-bom:31.0.0"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
@@ -113,7 +117,7 @@ dependencies {
 
 
     val COMPOSE_VERSION = "1.3.1"
-    implementation("androidx.compose.compiler:compiler:1.3.2")
+    implementation("androidx.compose.compiler:compiler:1.4.0")
     implementation("androidx.compose.animation:animation:$COMPOSE_VERSION")
     implementation("androidx.compose.foundation:foundation:$COMPOSE_VERSION")
     implementation("androidx.compose.material:material:$COMPOSE_VERSION")
@@ -130,16 +134,16 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
 
 
-    val ROOM_VERSION = "2.4.1"
-    kapt("androidx.room:room-compiler:$ROOM_VERSION")
+    val ROOM_VERSION = "2.5.0"
+    ksp("androidx.room:room-compiler:$ROOM_VERSION")
     implementation("androidx.room:room-runtime:$ROOM_VERSION")
     implementation("androidx.room:room-ktx:$ROOM_VERSION")
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-    implementation("com.google.accompanist:accompanist-pager:0.26.5-rc")
-    implementation("com.google.accompanist:accompanist-pager-indicators:0.26.5-rc")
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.26.5-rc")
+    implementation("com.google.accompanist:accompanist-pager:0.28.0")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.28.0")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.28.0")
 
     implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
 
@@ -150,6 +154,10 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:2.44")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
     kapt("androidx.hilt:hilt-compiler:1.0.0")
+
+
+    debugImplementation( "androidx.compose.ui:ui-tooling:1.3.3")
+    implementation( "androidx.compose.ui:ui-tooling-preview:1.3.3")
 
 
     /* testImplementation("junit:junit:4.13.2")

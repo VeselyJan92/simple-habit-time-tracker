@@ -93,7 +93,6 @@ fun Timer(
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             )
-
         )
     }
 }

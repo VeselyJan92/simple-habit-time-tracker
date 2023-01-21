@@ -94,9 +94,9 @@ class TrackTimeService @Inject constructor(
             putExtra(ActivityTimerCompletedReceiver.ACTIVITY_ID, activity.id)
         }
 
-        val flag =  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else flag
+        val _flag =  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else flag
 
-        return PendingIntent.getBroadcast(context, activity.id.toInt(), intent, flag)
+        return PendingIntent.getBroadcast(context, activity.id.toInt(), intent, _flag)
     }
 
     private fun cancelTimer(activity: TrackedActivity){

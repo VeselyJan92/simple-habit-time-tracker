@@ -17,14 +17,15 @@ import java.util.concurrent.Flow
 
 inline fun createInvalidationTacker(
     vararg tables: String,
-    crossinline onInvalidated: (MutableSet<String>)->Unit
+    crossinline onInvalidated: (Set<String>)->Unit
 ): InvalidationTracker.Observer {
     return object : InvalidationTracker.Observer(tables) {
-        override fun onInvalidated(tables: MutableSet<String>) = onInvalidated(tables)
+
+        override fun onInvalidated(tables: Set<String>) =  onInvalidated(tables)
     }
 }
 
-fun activityInvalidationTracker( onInvalidated: (MutableSet<String>)->Unit) = createInvalidationTacker(
+fun activityInvalidationTracker( onInvalidated: (Set<String>)->Unit) = createInvalidationTacker(
     TrackedActivity.TABLE,
     TrackedActivityTime.TABLE,
     TrackedActivityCompletion.TABLE,

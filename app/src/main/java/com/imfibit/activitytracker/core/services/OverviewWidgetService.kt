@@ -12,7 +12,6 @@ import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.ui.widgets.WidgetOverview
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.lang.String
 import javax.inject.Inject
 
 class OverviewWidgetService @Inject constructor(

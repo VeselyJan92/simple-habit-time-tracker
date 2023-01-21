@@ -1,10 +1,11 @@
 package com.imfibit.activitytracker.database.entities
 
 import androidx.room.*
-import androidx.room.ForeignKey.CASCADE
+import androidx.room.ForeignKey.Companion.CASCADE
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.ContextString
 import com.imfibit.activitytracker.database.embedable.TimeRange
+import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -49,6 +50,9 @@ data class TrackedActivity(
 
     @Embedded
     var goal: TrackedActivityGoal,
+
+    @Embedded
+    var challenge: TrackedActivityChallenge,
 
     @ColumnInfo(name = "timer")
     val timer: Int? = null,

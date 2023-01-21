@@ -2,7 +2,7 @@ package com.imfibit.activitytracker.database.entities
 
 import androidx.annotation.NonNull
 import androidx.room.*
-import androidx.room.ForeignKey.CASCADE
+import androidx.room.ForeignKey.Companion.CASCADE
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime

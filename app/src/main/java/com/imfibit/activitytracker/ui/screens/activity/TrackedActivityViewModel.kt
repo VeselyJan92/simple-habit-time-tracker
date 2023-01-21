@@ -14,12 +14,12 @@ import com.imfibit.activitytracker.database.entities.*
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.ui.components.*
 import com.imfibit.activitytracker.database.AppDatabase
+import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
-import java.io.Closeable
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.TextStyle
@@ -35,6 +35,7 @@ data class TrackedActivityState(
     val months: List<MetricWidgetData>,
     val groups: List<TrackerActivityGroup>,
     val graph: List<RepositoryTrackedActivity.Week>,
+    val challengeMetric: Long,
 )
 
 @HiltViewModel
@@ -137,8 +138,10 @@ class TrackedActivityViewModel @Inject constructor(
 
         val timers = rep.timers.getAll(activity.id).toMutableList()
 
+        val challengeMetric = rep.getChallengeMetric(activity.id, activity.challenge.from, activity.challenge.to)
+
         TrackedActivityState(
-            activity, timers, recent, months, groups,  graph
+            activity, timers, recent, months, groups,  graph, challengeMetric
         )
     }
 
@@ -210,6 +213,14 @@ class TrackedActivityViewModel @Inject constructor(
 
     fun clearRunning(activity: TrackedActivity) = launchIO {
         timerService.cancelSession(activity)
+    }
+
+    suspend fun getChallengeMetric(from: LocalDate?, to: LocalDate?): Long {
+        return rep.getChallengeMetric(id, from, to)
+    }
+
+    fun updateActivity(activity: TrackedActivity) = launchIO {
+        rep.activityDAO.update(activity)
     }
 
 

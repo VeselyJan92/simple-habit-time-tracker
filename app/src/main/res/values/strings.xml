@@ -142,10 +142,14 @@
     <string name="activity_in_timer">Timer: </string>
 
 
-
-
-
-
+    <string name="dialog_challenge_title">Set challenge</string>
+    <string name="dialog_challenge_name">"Name: "</string>
+    <string name="dialog_challenge_from">"From: "</string>
+    <string name="dialog_challenge_to">"To: "</string>
+    <string name="dialog_challenge_target_time">"Hours: "</string>
+    <string name="dialog_challenge_target_score">"Score: "</string>
+    <string name="dialog_challenge_target_completions">"Completions: "</string>
+    <string name="dialog_challenge_date_not_set">Not set</string>
 
 
     <string-array name="months">
