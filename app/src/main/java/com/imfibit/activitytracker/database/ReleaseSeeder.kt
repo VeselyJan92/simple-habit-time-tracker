@@ -64,7 +64,7 @@ object ReleaseSeeder {
                 type = TrackedActivity.Type.TIME,
                 inSessionSince = null,
                 goal = TrackedActivityGoal(0, TimeRange.WEEKLY),
-                challenge = TrackedActivityChallenge("Reserch", 40 * 3600, LocalDate.now().minusMonths(1), LocalDate.now().plusMonths(1))
+                challenge = TrackedActivityChallenge("Research", 40 * 3600, LocalDate.now().minusMonths(1), LocalDate.now().plusMonths(1))
             )
         )
 
