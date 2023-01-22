@@ -11,8 +11,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.imfibit.activitytracker.R
@@ -159,6 +162,27 @@ fun DialogProgressGoal(
 
         GoalProgressBar(challenge.value, actual = metric.value, activity.type)
 
+        if (activity.goal.isSet() && challenge.value.isSet() && challenge.value.target > metric.value){
+            Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()) {
+                val totalDays = ((challenge.value.target - metric.value) / activity.goal.metricPerDay()).toInt()
+
+                val estimated = if (totalDays / 30 == 0){
+                    stringResource(id = R.string.dialog_challenge_estimated_days, totalDays)
+                }else{
+                    stringResource(id = R.string.dialog_challenge_estimated_month_days, totalDays / 30, totalDays % 30)
+                }
+
+                val estimatedString = buildAnnotatedString {
+                    append(stringResource(R.string.dialog_challenge_estimated_prefix))
+
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold,)) {
+                        append(estimated)
+                    }
+                }
+
+                Text(text = estimatedString )
+            }
+        }
 
         DialogButtons {
             TextButton(onClick = { display.value = false} ) {

@@ -30,4 +30,10 @@ data class TrackedActivityGoal(
             Colors.AppAccent
         }
     }
+
+    fun metricPerDay() = when(range){
+        TimeRange.DAILY -> value.toFloat()
+        TimeRange.WEEKLY -> value.toFloat() / 7f
+        TimeRange.MONTHLY -> value.toFloat() / 30f
+    }
 }
