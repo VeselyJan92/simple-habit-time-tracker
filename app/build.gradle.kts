@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.konan.properties.Properties
 
 plugins {
     id("com.android.application")
-    id("com.github.triplet.play") version "3.6.0"
+    id("com.github.triplet.play") version "3.7.0"
     id("kotlin-android")
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
@@ -68,7 +68,7 @@ android {
         applicationId = "com.imfibit.activitytracker"
         minSdk = 26
         targetSdk = 33
-        versionCode = 26
+        versionCode = 27
         versionName = "1.3.2"
         testInstrumentationRunner  ="com.imfibit.activitytracker.HiltRunner"
     }
@@ -111,7 +111,7 @@ dependencies {
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.0")
 
-    implementation(platform("com.google.firebase:firebase-bom:31.0.0"))
+    implementation(platform("com.google.firebase:firebase-bom:31.2.0"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
 
 
