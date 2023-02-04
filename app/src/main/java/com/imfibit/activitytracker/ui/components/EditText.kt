@@ -1,8 +1,8 @@
 package com.imfibit.activitytracker.ui.components
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,11 +21,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 
+@Composable
+fun BasicEditTextDecorationBox(innerTextField: @Composable () -> Unit){
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(
+                Colors.ChipGray,
+                RoundedCornerShape(50)
+            )
+            .padding(horizontal = 8.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        innerTextField()
+    }
+}
 
-
-
-
-@OptIn(ExperimentalFoundationApi::class)
 
 @Composable
 fun EditText(

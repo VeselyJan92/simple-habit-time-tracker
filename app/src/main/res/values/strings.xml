@@ -150,9 +150,13 @@
     <string name="dialog_challenge_target_score">"Score: "</string>
     <string name="dialog_challenge_target_completions">"Completions: "</string>
     <string name="dialog_challenge_date_not_set">Not set</string>
-    <string name="dialog_challenge_estimated_prefix">"Estimated: "</string>
+    <string name="dialog_challenge_estimated_prefix">"Estimated completion: "</string>
     <string name="dialog_challenge_estimated_days">%1$d days</string>
     <string name="dialog_challenge_estimated_month_days">%1$d months, %2$d days</string>
+    <string name="dialog_challenge_estimated_completed">Completed</string>
+    <string name="dialog_challenge_impossible">Habit goal is too small to complete challenge.</string>
+    <string name="dialog_challenge_not_set">Set habit goal and target.</string>
+    <string name="dialog_challenge_name_default">Level 1</string>
 
 
     <string-array name="months">

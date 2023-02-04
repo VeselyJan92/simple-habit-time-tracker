@@ -9,9 +9,11 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -21,13 +23,13 @@ import androidx.compose.ui.unit.sp
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
 import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.ui.components.BasicEditTextDecorationBox
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.dialogs.system.DialogDatePicker
 import com.imfibit.activitytracker.ui.widgets.custom.GoalProgressBar
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-
 
 @Composable
 fun DialogProgressGoal(
@@ -41,115 +43,94 @@ fun DialogProgressGoal(
 
         DialogBaseHeader(title = stringResource(R.string.dialog_challenge_title))
 
-        val modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth()
-
+        val defaultName  = stringResource(R.string.dialog_challenge_name_default)
 
         val challenge = remember(activity.challenge) {
-            mutableStateOf(activity.challenge)
+
+            val value = if (activity.challenge.isSet()){
+                activity.challenge
+            }else{
+                TrackedActivityChallenge(defaultName, 0, LocalDate.now(), LocalDate.now().plusMonths(1L))
+            }
+
+            mutableStateOf(value)
         }
 
-        Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically, ) {
-            Label(stringResource(R.string.dialog_challenge_name))
-
-            Box(
+        FormRow(name = stringResource(R.string.dialog_challenge_name)) {
+            BasicTextField(
                 modifier = Modifier
-                    .height(30.dp)
                     .fillMaxWidth()
-                    .background(
-                        Colors.ChipGray,
-                        RoundedCornerShape(50)
-                    ),
-
-                contentAlignment = Alignment.Center
-            ) {
-                BasicTextField(
-                    value = challenge.value.name,
-                    singleLine = true,
-                    textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-                    onValueChange = {
-                        if(it.length < 30){
-                            challenge.value = challenge.value.copy(name = it)
-                        }
-                    },
-                )
-            }
+                    .height(30.dp),
+                value = challenge.value.name,
+                singleLine = true,
+                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                onValueChange = {
+                    if(it.length < 30){
+                        challenge.value = challenge.value.copy(name = it)
+                    }
+                },
+                decorationBox = { BasicEditTextDecorationBox (it) }
+            )
         }
 
         val context = LocalContext.current
 
         val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
 
-        Row(
-            modifier = modifier.clickable {
-                DialogDatePicker(
-                    date = challenge.value.from ?: LocalDate.now(),
-                    onDateSet = {
-                        challenge.value = challenge.value.copy(from = it)
-                    },
-                    context = context
-                )
-            },
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-                Label(text = stringResource(R.string.dialog_challenge_from))
-
-                RangeItem(name = challenge.value.from?.format(formatter) ?: stringResource(R.string.dialog_challenge_date_not_set) )
+        FormRow(name = stringResource(R.string.dialog_challenge_from)) {
+            RangeItem(
+                modifier = Modifier.clickable {
+                    DialogDatePicker(
+                        date = challenge.value.from ?: LocalDate.now(),
+                        onDateSet = {
+                            challenge.value = challenge.value.copy(from = it)
+                        },
+                        context = context
+                    )
+                },
+                name = challenge.value.from?.format(formatter) ?: stringResource(R.string.dialog_challenge_date_not_set)
+            )
         }
 
-        Row(
-            modifier = modifier.clickable {
-                DialogDatePicker(
-                    date = challenge.value.to ?: LocalDate.now(),
-                    onDateSet = {
-                        challenge.value = challenge.value.copy(to = it)
-                    },
-                    context = context
-                )
-            },
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Label(text = stringResource(R.string.dialog_challenge_to))
-
-            RangeItem(name = challenge.value.to?.format(formatter) ?: stringResource(R.string.dialog_challenge_date_not_set)  )
+        FormRow (stringResource(R.string.dialog_challenge_to)){
+            RangeItem(
+                modifier = Modifier.clickable {
+                    DialogDatePicker(
+                        date = challenge.value.to ?: LocalDate.now(),
+                        onDateSet = {
+                            challenge.value = challenge.value.copy(to = it)
+                        },
+                        context = context
+                    )
+                },
+                name = challenge.value.to?.format(formatter) ?: stringResource(R.string.dialog_challenge_date_not_set)
+            )
         }
 
-        Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically, ) {
-            val label = when(activity.type){
-                TrackedActivity.Type.TIME -> stringResource(R.string.dialog_challenge_target_time)
-                TrackedActivity.Type.SCORE -> stringResource(R.string.dialog_challenge_target_score)
-                TrackedActivity.Type.CHECKED -> stringResource(R.string.dialog_challenge_target_completions)
-            }
+        val label = when(activity.type){
+            TrackedActivity.Type.TIME -> stringResource(R.string.dialog_challenge_target_time)
+            TrackedActivity.Type.SCORE -> stringResource(R.string.dialog_challenge_target_score)
+            TrackedActivity.Type.CHECKED -> stringResource(R.string.dialog_challenge_target_completions)
+        }
 
-            Label(label)
+        FormRow(name = label) {
+            val toDisplay = if (challenge.value.target == 0L) "" else challenge.value.format(activity.type).toString()
 
-            Box(
+            BasicTextField(
                 modifier = Modifier
-                    .height(30.dp)
                     .fillMaxWidth()
-                    .background(
-                        Colors.ChipGray,
-                        RoundedCornerShape(50)
-                    ),
+                    .height(30.dp),
+                value = toDisplay ,
+                singleLine = true,
+                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
 
-                contentAlignment = Alignment.Center
-            ) {
+                onValueChange = {
+                    val value = try { it.toLong() } catch (e: Exception) { 0L }
 
-                val toDisplay = if (challenge.value.target == 0L) "" else challenge.value.format(activity.type).toString()
-
-                BasicTextField(
-                    value = toDisplay ,
-                    singleLine = true,
-                    textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-
-                    onValueChange = {
-                        val value = try { it.toLong() } catch (e: Exception) { 0L }
-
-                        challenge.value = challenge.value.copy(target = if (activity.type == TrackedActivity.Type.TIME) value * 3600 else value)
-                    },
-                )
-            }
+                    challenge.value = challenge.value.copy(target = if (activity.type == TrackedActivity.Type.TIME) value * 3600 else value)
+                },
+                decorationBox = { BasicEditTextDecorationBox (it) }
+            )
         }
 
         val metric = remember{
@@ -162,8 +143,20 @@ fun DialogProgressGoal(
 
         GoalProgressBar(challenge.value, actual = metric.value, activity.type)
 
-        if (activity.goal.isSet() && challenge.value.isSet() && challenge.value.target > metric.value){
-            Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()) {
+        if (!activity.goal.isSet() || !challenge.value.isSet()){
+            Text(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .fillMaxWidth(),
+                text = stringResource(R.string.dialog_challenge_not_set), style = TextStyle(textAlign = TextAlign.Center)
+            )
+        }else if (challenge.value.target > metric.value){
+            Column( modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
                 val totalDays = ((challenge.value.target - metric.value) / activity.goal.metricPerDay()).toInt()
 
                 val estimated = if (totalDays / 30 == 0){
@@ -173,14 +166,19 @@ fun DialogProgressGoal(
                 }
 
                 val estimatedString = buildAnnotatedString {
-                    append(stringResource(R.string.dialog_challenge_estimated_prefix))
-
                     withStyle(style = SpanStyle(fontWeight = FontWeight.Bold,)) {
                         append(estimated)
                     }
+
+                    append(" - " + LocalDate.now().plusDays(totalDays.toLong()).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)))
                 }
 
+                Text(text = stringResource(R.string.dialog_challenge_estimated_prefix))
                 Text(text = estimatedString )
+
+                if (challenge.value.to != null && LocalDate.now().plusDays(totalDays.toLong()) > challenge.value.to ){
+                    Text(text = stringResource(R.string.dialog_challenge_impossible), style = TextStyle(color = Color.Red, textAlign = TextAlign.Center) )
+                }
             }
         }
 
@@ -206,26 +204,31 @@ fun DialogProgressGoal(
             }
         }
     }
-
-
 }
 
 @Composable
-private fun Label(text: String){
-    Text(text = text, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.width(130.dp))
-}
-
-@Composable
-private fun RangeItem(name: String){
-    Box(
+private fun FormRow(name: String, content: @Composable ()->Unit){
+    Row(
         modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = name, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.width(130.dp))
+        content()
+    }
+}
+
+@Composable
+private fun RangeItem(modifier: Modifier = Modifier, name: String){
+    Box(
+        modifier = modifier
             .height(30.dp)
             .fillMaxWidth()
             .background(
                 Colors.ChipGray,
                 RoundedCornerShape(50)
             ),
-
         contentAlignment = Alignment.Center
     ) {
         Text(text = name)
