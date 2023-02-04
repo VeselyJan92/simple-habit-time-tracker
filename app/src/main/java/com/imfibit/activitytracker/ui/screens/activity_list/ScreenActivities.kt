@@ -318,7 +318,8 @@ private fun ClearAll(vm: ActivitiesViewModel) {
 private fun Today(nav: NavHostController, today: List<ActivityWithMetric>) {
     Surface(
         elevation = 2.dp,
-        shape = RoundedCornerShape(20.dp)
+        shape = RoundedCornerShape(20.dp),
+        color = Colors.SuperLight
     ) {
 
         Column(
