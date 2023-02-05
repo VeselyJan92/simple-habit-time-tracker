@@ -9,7 +9,7 @@ plugins {
 
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
-    id("com.google.devtools.ksp") version "1.8.0-1.0.8"
+    id("com.google.devtools.ksp") version "1.8.0-1.0.9"
 
 }
 
@@ -47,8 +47,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     composeOptions {
@@ -57,7 +57,7 @@ android {
 
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
         freeCompilerArgs = listOf(
             "-Xopt-in=kotlin.Experimental",
             "-Xopt-in=kotlin.RequiresOptIn"
@@ -106,10 +106,10 @@ play {
 }
 
 dependencies {
-    implementation("com.google.devtools.ksp:symbol-processing-api:1.8.0-1.0.8")
+    implementation("com.google.devtools.ksp:symbol-processing-api:1.8.10-1.0.9")
 
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.0")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib")
 
     implementation(platform("com.google.firebase:firebase-bom:31.2.0"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
