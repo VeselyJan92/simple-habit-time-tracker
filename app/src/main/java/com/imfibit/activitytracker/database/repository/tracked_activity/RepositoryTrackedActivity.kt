@@ -37,8 +37,8 @@ class RepositoryTrackedActivity @Inject constructor(
     )
 
     data class Week(
-        val from: LocalDateTime,
-        val to: LocalDateTime,
+        val from: LocalDate,
+        val to: LocalDate,
         val days: List<Day>,
         val total: Long,
     )
@@ -132,8 +132,8 @@ class RepositoryTrackedActivity @Inject constructor(
             val metricSum =  it.map { it.metric }.sum()
 
             Week(
-                from = it.first().from.atStartOfDay(),
-                to =  it.last().to.atStartOfDay(),
+                from = it.first().from,
+                to =  it.last().to.minusDays(1),
                 days = days,
                 total = metricSum,
             )

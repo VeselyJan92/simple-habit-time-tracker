@@ -45,12 +45,15 @@ fun Month(
         month.weeks.forEach {
             Week(activity, it, nav, month.month.month)
         }
-
     }
 }
 
 @Composable
-private fun Week(activity: TrackedActivity, week: RepositoryTrackedActivity.Week, nav: NavController, month: Month){
+private fun Week(
+    activity: TrackedActivity,
+    week: RepositoryTrackedActivity.Week,
+    nav: NavController, month: Month
+){
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         week.days.forEach {
             val modifier = if (it.date == LocalDate.now())
@@ -108,7 +111,10 @@ private fun Week(activity: TrackedActivity, week: RepositoryTrackedActivity.Week
             .size(1.dp, 30.dp)
             .background(Colors.ChipGray))
 
-        if (week.to.month == month || week.to >= LocalDateTime.now() ){
+        val currentMonth = LocalDate.now().month
+        val showMetricForCurrentWeek = week.from.month == currentMonth && week.to.month != currentMonth
+
+        if (week.to.month == month || showMetricForCurrentWeek ){
             val metric:ContextString = when (activity.type) {
                 TrackedActivity.Type.CHECKED -> {{ "${week.total}/7" }}
                 else -> activity.type.getLabel(week.total)
