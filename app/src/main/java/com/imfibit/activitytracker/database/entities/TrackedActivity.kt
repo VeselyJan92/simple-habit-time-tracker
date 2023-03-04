@@ -55,7 +55,7 @@ data class TrackedActivity(
     var challenge: TrackedActivityChallenge,
 
     @ColumnInfo(name = "timer")
-    val timer: Int? = null,
+    var timer: Int? = null,
 ) {
     companion object{
         const val TABLE = "tracked_activity"

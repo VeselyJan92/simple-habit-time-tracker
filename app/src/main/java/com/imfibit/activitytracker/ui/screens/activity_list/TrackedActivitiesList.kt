@@ -130,16 +130,7 @@ fun TrackedActivity(
                         recordVM.activityTriggered(activity)
                     },
                     onLongClick = {
-
-                        //TODO Create service for this
-                        val x = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                            val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager?
-                            vibratorManager!!.defaultVibrator
-                        } else {
-                            context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator?
-                        }
-
-                        x?.vibrate(VibrationEffect.createOneShot(50L, 1))
+                        recordVM.hapticsService.activityFeedback()
 
                         when(activity.type){
                             Type.TIME -> openSessionDialog.value = true
@@ -206,7 +197,7 @@ fun TrackedActivity(
                                 ) {
 
                                     if (activity.timer != null) {
-                                        Text(text = stringResource(id = R.string.activity_in_timer) + " " + activity.type.getLabel(activity.timer.toLong()).value())
+                                        Text(text = stringResource(id = R.string.activity_in_timer) + " " + activity.type.getLabel(activity.timer?.toLong() ?: 0L).value())
                                     }else{
                                         Text(text = stringResource(id = R.string.activity_in_session) + " " + item.activity.inSessionSince!!.format(DateTimeFormatter.ofPattern("HH:mm")))
                                     }

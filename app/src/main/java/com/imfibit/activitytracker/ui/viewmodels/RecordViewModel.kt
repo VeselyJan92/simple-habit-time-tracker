@@ -2,9 +2,11 @@ package com.imfibit.activitytracker.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.imfibit.activitytracker.core.AppViewModel
 import com.imfibit.activitytracker.core.services.activity.TimeActivityService
 import com.imfibit.activitytracker.core.services.activity.ToggleActivityService
 import com.imfibit.activitytracker.core.services.TrackTimeService
+import com.imfibit.activitytracker.core.services.UserHapticsService
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivityScore
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
@@ -21,8 +23,9 @@ class RecordViewModel @Inject constructor(
     private val rep: RepositoryTrackedActivity,
     private val timerService: TrackTimeService,
     private val toggleService: ToggleActivityService,
-    private val sessionService: TimeActivityService
-): ViewModel() {
+    private val sessionService: TimeActivityService,
+    public val hapticsService: UserHapticsService
+): AppViewModel() {
 
     fun deleteRecord(recordId: Long, type: TrackedActivity.Type) = viewModelScope.launch {
         when(type){
@@ -59,7 +62,7 @@ class RecordViewModel @Inject constructor(
         toggleService.toggleActivity(activityId, datetime)
     }
 
-    fun activityTriggered(activity: TrackedActivity) = viewModelScope.launch {
+    fun activityTriggered(activity: TrackedActivity) = launchIO {
         when (activity.type) {
             TrackedActivity.Type.TIME -> {
                 if (activity.inSessionSince != null){
