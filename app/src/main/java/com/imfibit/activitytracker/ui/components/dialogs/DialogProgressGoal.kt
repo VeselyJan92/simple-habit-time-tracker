@@ -82,14 +82,14 @@ fun DialogProgressGoal(
             RangeItem(
                 modifier = Modifier.clickable {
                     DialogDatePicker(
-                        date = challenge.value.from ?: LocalDate.now(),
+                        date = challenge.value.from,
                         onDateSet = {
                             challenge.value = challenge.value.copy(from = it)
                         },
                         context = context
                     )
                 },
-                name = challenge.value.from?.format(formatter) ?: stringResource(R.string.dialog_challenge_date_not_set)
+                name = challenge.value.from.format(formatter)
             )
         }
 
@@ -97,14 +97,14 @@ fun DialogProgressGoal(
             RangeItem(
                 modifier = Modifier.clickable {
                     DialogDatePicker(
-                        date = challenge.value.to ?: LocalDate.now(),
+                        date = challenge.value.to,
                         onDateSet = {
                             challenge.value = challenge.value.copy(to = it)
                         },
                         context = context
                     )
                 },
-                name = challenge.value.to?.format(formatter) ?: stringResource(R.string.dialog_challenge_date_not_set)
+                name = challenge.value.to.format(formatter)
             )
         }
 

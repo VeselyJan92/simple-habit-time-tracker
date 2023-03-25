@@ -54,7 +54,7 @@ object DatabaseModule {
     views = [
         TrackedActivityMetric::class
     ],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 @TypeConverters(
