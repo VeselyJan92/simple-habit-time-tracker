@@ -107,7 +107,7 @@ fun ScreenTrackedActivity(nav: NavHostController, scaffoldState: ScaffoldState) 
             }
         },
         content = {
-            Column(Modifier.verticalScroll(rememberScrollState())) {
+            Column(Modifier.verticalScroll(rememberScrollState()).padding(it)) {
                 ScreenBody(nav, state, vm)
 
                 //LineChartView(state)
@@ -504,6 +504,16 @@ private fun RecentActivity(nav: NavController, state: TrackedActivityState?) {
 
             if(state != null && state.activity.challenge.isSet()){
                 GoalProgressBar(challenge = state.activity.challenge, actual = state.challengeMetric, type = state.activity.type )
+
+                if(state.activity.isGoalSet()){
+                    val aheadInDays = state.activity.getChallengeAheadDays(state.challengeMetric)
+
+                    Text(
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                        text = stringResource(R.string.ahead_of_challenge_deadline_note, aheadInDays),
+                        style = TextStyle(color = Color.DarkGray, textAlign = TextAlign.Center, fontSize = 12.sp)
+                    )
+                }
             }
 
 

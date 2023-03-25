@@ -13,13 +13,13 @@ data class TrackedActivityChallenge(
     val target: Long,
 
     @ColumnInfo(name = "challenge_from")
-    val from: LocalDate?,
+    val from: LocalDate,
 
     @ColumnInfo(name = "challenge_to")
-    val to: LocalDate?
+    val to: LocalDate
 ){
     companion object{
-        val empty = TrackedActivityChallenge("", 0, null, null)
+        val empty = TrackedActivityChallenge("", 0, LocalDate.now(), LocalDate.now())
     }
 
     fun format(type: TrackedActivity.Type) = when (type){

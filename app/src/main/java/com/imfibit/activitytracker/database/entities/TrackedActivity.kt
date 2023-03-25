@@ -9,6 +9,7 @@ import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Period
 
 @Entity(
     tableName = TrackedActivity.TABLE,
@@ -107,10 +108,16 @@ data class TrackedActivity(
 
     fun isInSession() = inSessionSince != null
 
+    fun getChallengeRemainingDays(metric: Long): Int {
+        return  ((challenge.target - metric) / goal.metricPerDay()).toInt()
+    }
+    fun getChallengeEstimatedCompletionDate(metric: Long): LocalDate {
+        return LocalDate.now().plusDays(getChallengeRemainingDays(metric).toLong())
+    }
 
-
-
-
+    fun getChallengeAheadDays(metric: Long): Int {
+        return Period.between(getChallengeEstimatedCompletionDate(metric), challenge.to).days
+    }
 
     fun formatGoal() : String{
         return when(type){

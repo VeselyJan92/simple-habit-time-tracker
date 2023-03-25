@@ -28,6 +28,7 @@ import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.dialogs.system.DialogDatePicker
 import com.imfibit.activitytracker.ui.widgets.custom.GoalProgressBar
 import java.time.LocalDate
+import java.time.Period
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
@@ -165,20 +166,29 @@ fun DialogProgressGoal(
                     stringResource(id = R.string.dialog_challenge_estimated_month_days, totalDays / 30, totalDays % 30)
                 }
 
+                val estimatedEndDate = LocalDate.now().plusDays(totalDays.toLong());
+
                 val estimatedString = buildAnnotatedString {
                     withStyle(style = SpanStyle(fontWeight = FontWeight.Bold,)) {
                         append(estimated)
                     }
 
-                    append(" - " + LocalDate.now().plusDays(totalDays.toLong()).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)))
+                    append(" - " + estimatedEndDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)))
                 }
 
                 Text(text = stringResource(R.string.dialog_challenge_estimated_prefix))
                 Text(text = estimatedString )
+                
+                Spacer(modifier = Modifier.padding(vertical = 8.dp))
 
-                if (challenge.value.to != null && LocalDate.now().plusDays(totalDays.toLong()) > challenge.value.to ){
+                val aheadInDays = Period.between(estimatedEndDate, challenge.value.to).days
+
+                if (estimatedEndDate  > challenge.value.to ){
                     Text(text = stringResource(R.string.dialog_challenge_impossible), style = TextStyle(color = Color.Red, textAlign = TextAlign.Center) )
+                }else{
+                    Text(text =  stringResource(R.string.ahead_of_challenge_deadline_note, aheadInDays), style = TextStyle(color = Color.DarkGray, textAlign = TextAlign.Center) )
                 }
+
             }
         }
 
