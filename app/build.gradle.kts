@@ -9,7 +9,7 @@ plugins {
 
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
-    id("com.google.devtools.ksp") version "1.8.0-1.0.9"
+    id("com.google.devtools.ksp") version "1.8.20-1.0.11"
 
 }
 
@@ -47,34 +47,37 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.0"
+        kotlinCompilerExtensionVersion = "1.4.5"
     }
 
 
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
         freeCompilerArgs = listOf(
             "-Xopt-in=kotlin.Experimental",
             "-Xopt-in=kotlin.RequiresOptIn"
         )
+
+
     }
 
     defaultConfig {
         applicationId = "com.imfibit.activitytracker"
         minSdk = 26
         targetSdk = 33
-        versionCode = 30
+        versionCode = 31
         versionName = "1.3.3"
         testInstrumentationRunner  ="com.imfibit.activitytracker.HiltRunner"
     }
 
     buildTypes {
         getByName("release") {
+
             isMinifyEnabled = false
 
             manifestPlaceholders["crashlyticsCollectionEnabled"] = true
@@ -96,6 +99,7 @@ android {
         }
 
     }
+
     namespace = "com.imfibit.activitytracker"
 
 }
@@ -106,7 +110,7 @@ play {
 }
 
 dependencies {
-    implementation("com.google.devtools.ksp:symbol-processing-api:1.8.10-1.0.9")
+    implementation("com.google.devtools.ksp:symbol-processing-api:1.8.20-1.0.11")
 
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
@@ -116,8 +120,8 @@ dependencies {
 
 
 
-    val COMPOSE_VERSION = "1.3.1"
-    implementation("androidx.compose.compiler:compiler:1.4.3")
+    val COMPOSE_VERSION = "1.4.1"
+    implementation("androidx.compose.compiler:compiler:1.4.5")
     implementation("androidx.compose.animation:animation:$COMPOSE_VERSION")
     implementation("androidx.compose.foundation:foundation:$COMPOSE_VERSION")
     implementation("androidx.compose.material:material:$COMPOSE_VERSION")
@@ -127,11 +131,11 @@ dependencies {
     implementation("androidx.glance:glance-appwidget:1.0.0-alpha05")
 
 
-    implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.core:core-ktx:1.10.0")
     implementation("androidx.hilt:hilt-common:1.0.0")
 
-    implementation("androidx.navigation:navigation-compose:2.6.0-alpha06")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
+    implementation("androidx.navigation:navigation-compose:2.6.0-alpha09")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
 
 
     val ROOM_VERSION = "2.5.0"
@@ -156,8 +160,8 @@ dependencies {
     kapt("androidx.hilt:hilt-compiler:1.0.0")
 
 
-    debugImplementation( "androidx.compose.ui:ui-tooling:1.3.3")
-    implementation( "androidx.compose.ui:ui-tooling-preview:1.3.3")
+    debugImplementation( "androidx.compose.ui:ui-tooling:1.4.1")
+    implementation( "androidx.compose.ui:ui-tooling-preview:1.4.1")
 
 
     /* testImplementation("junit:junit:4.13.2")

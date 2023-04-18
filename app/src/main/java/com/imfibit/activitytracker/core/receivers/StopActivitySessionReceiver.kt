@@ -23,7 +23,7 @@ class StopActivitySessionReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) = runBlocking(Dispatchers.IO) {
         val id = intent.getLongExtra("activity_id", 0)
 
-        val activity = db.activityDAO.flowById(id).firstOrNull() ?: throw Exception("Unknown activity")
+        val activity = db.activityDAO().flowById(id).firstOrNull() ?: throw Exception("Unknown activity")
 
         service.commitSession(activity)
     }
