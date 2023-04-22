@@ -64,13 +64,13 @@ object DatabaseModule {
 )
 abstract class AppDatabase : RoomDatabase() {
 
-    abstract val activityDAO: DAOTrackedActivity
-    abstract val scoreDAO: DAOTrackedActivityScore
-    abstract val sessionDAO: DAOTrackedActivityTime
-    abstract val completionDAO: DAOTrackedActivityChecked
-    abstract val metricDAO: DAOTrackedActivityMetric
-    abstract val presetTimersDAO: DAOPresetTimers
-    abstract val groupDAO: DAOActivityGroup
+    abstract fun activityDAO(): DAOTrackedActivity
+    abstract fun scoreDAO(): DAOTrackedActivityScore
+    abstract fun sessionDAO(): DAOTrackedActivityTime
+    abstract fun completionDAO(): DAOTrackedActivityChecked
+    abstract fun metricDAO(): DAOTrackedActivityMetric
+    abstract fun presetTimersDAO(): DAOPresetTimers
+    abstract fun groupDAO(): DAOActivityGroup
 
     companion object {
         const val DB_NAME ="activity_tracker.db"

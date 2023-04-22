@@ -7,7 +7,7 @@ import javax.inject.Inject
 class TimeActivityService @Inject constructor(
     private val db: AppDatabase
 ){
-    val sessionDAO = db.sessionDAO
+    val sessionDAO = db.sessionDAO()
 
     suspend fun updateSession(record: TrackedActivityTime){
         sessionDAO.update(record)

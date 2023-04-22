@@ -39,6 +39,6 @@ class ExampleInstrumentedTest {
 
     @Test
     fun useAppContext() {
-        assert(rep.activityDAO.getAll().isNotEmpty())
+        assert(rep.activityDAO().getAll().isNotEmpty())
     }
 }*/

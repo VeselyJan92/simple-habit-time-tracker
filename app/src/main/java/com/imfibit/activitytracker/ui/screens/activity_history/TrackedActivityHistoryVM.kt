@@ -22,7 +22,7 @@ class TrackedActivityHistoryVM @Inject constructor(
 
     val id: Long = savedStateHandle["activity_id"] ?: throw IllegalArgumentException()
 
-    val activity = rep.db.activityDAO.flowById(id);
+    val activity = rep.db.activityDAO().flowById(id);
 
     val months: Flow<PagingData<RepositoryTrackedActivity.Month>> = Pager(PagingConfig(MonthsPagingSource.PAGE_SIZE), ){
         MonthsPagingSource(rep, id)

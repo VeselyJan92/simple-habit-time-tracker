@@ -134,7 +134,7 @@ class TrackedActivityViewModel @Inject constructor(
         }.reversed()
 
 
-        val groups = db.groupDAO.getAll()
+        val groups = db.groupDAO().getAll()
 
         val timers = rep.timers.getAll(activity.id).toMutableList()
 

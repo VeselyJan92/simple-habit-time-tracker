@@ -48,12 +48,12 @@ class RepositoryTrackedActivity @Inject constructor(
         val month: YearMonth,
     )
 
-    val completionDAO: DAOTrackedActivityChecked = db.completionDAO
-    val activityDAO: DAOTrackedActivity = db.activityDAO
-    val scoreDAO: DAOTrackedActivityScore = db.scoreDAO
-    val sessionDAO: DAOTrackedActivityTime = db.sessionDAO
-    val metricDAO: DAOTrackedActivityMetric = db.metricDAO
-    val timers: DAOPresetTimers = db.presetTimersDAO
+    val completionDAO: DAOTrackedActivityChecked = db.completionDAO()
+    val activityDAO: DAOTrackedActivity = db.activityDAO()
+    val scoreDAO: DAOTrackedActivityScore = db.scoreDAO()
+    val sessionDAO: DAOTrackedActivityTime = db.sessionDAO()
+    val metricDAO: DAOTrackedActivityMetric = db.metricDAO()
+    val timers: DAOPresetTimers = db.presetTimersDAO()
 
 
     suspend fun getActivityOverview(activity: TrackedActivity): TrackedActivityRecentOverview {

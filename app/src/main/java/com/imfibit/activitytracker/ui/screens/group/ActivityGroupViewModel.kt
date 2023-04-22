@@ -45,11 +45,11 @@ class ActivityGroupViewModel @Inject constructor(
 
     private fun fetch() = viewModelScope.launch(Dispatchers.IO) {
         //there might be and update after delete group
-        val groupData = db.groupDAO.getByIdOrNull(id) ?: return@launch
+        val groupData = db.groupDAO().getByIdOrNull(id) ?: return@launch
 
 
 
-        activities.value = rep.getActivitiesOverview(db.activityDAO.getActivitiesFromGroup(id))
+        activities.value = rep.getActivitiesOverview(db.activityDAO().getActivitiesFromGroup(id))
 
         withContext(Dispatchers.Main){
             group.value = groupData
@@ -65,11 +65,11 @@ class ActivityGroupViewModel @Inject constructor(
     override fun onCleared()  = runBlocking(Dispatchers.IO) {
         db.invalidationTracker.removeObserver(tracker)
 
-        val group = db.groupDAO.getByIdOrNull(id)
+        val group = db.groupDAO().getByIdOrNull(id)
 
         // If name is not filled or group was deleted
         if (!groupName.value.isNullOrBlank() && group != null)
-            db.groupDAO.update(group.copy(name = groupName.value!!))
+            db.groupDAO().update(group.copy(name = groupName.value!!))
 
     }
 
@@ -87,11 +87,11 @@ class ActivityGroupViewModel @Inject constructor(
             .mapIndexed{index, item -> item.activity.copy(groupPosition = index)}
             .toTypedArray()
 
-        db.activityDAO.updateAll(*items)
+        db.activityDAO().updateAll(*items)
     }
 
     fun delete(item: TrackerActivityGroup) = launchIO {
-        db.groupDAO.delete(item)
+        db.groupDAO().delete(item)
     }
 
 }

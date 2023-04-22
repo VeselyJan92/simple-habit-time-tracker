@@ -53,7 +53,7 @@ class ActivitiesViewModel @Inject constructor(
             rep.metricDAO.getActivitiesWithMetric(LocalDate.now(), LocalDate.now()).filter {
                 (it.activity.goal.range == TimeRange.DAILY && it.activity.goal.isSet()) || it.metric > 0
             },
-            db.groupDAO.getAll()
+            db.groupDAO().getAll()
         )
         
         this@ActivitiesViewModel.data.value = data
@@ -88,14 +88,14 @@ class ActivitiesViewModel @Inject constructor(
         val groups = data.value.groups.mapIndexed{ index, item -> item.copy(position = index) }
 
         viewModelScope.launch(Dispatchers.IO) {
-            db.activityDAO.updateAll(*activities.toTypedArray())
-            db.groupDAO.updateAll(*groups.toTypedArray())
+            db.activityDAO().updateAll(*activities.toTypedArray())
+            db.groupDAO().updateAll(*groups.toTypedArray())
         }
     }
 
 
     fun addGroup(group: TrackerActivityGroup) = launchIO {
-        db.groupDAO.insert(group)
+        db.groupDAO().insert(group)
     }
 
     fun clearOnboardingData(context: Context) = launchIO  {

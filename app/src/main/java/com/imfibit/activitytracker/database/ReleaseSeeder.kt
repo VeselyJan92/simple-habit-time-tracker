@@ -29,7 +29,7 @@ object ReleaseSeeder {
 
        /* var activityId: Long = 0
 
-        activityId = db.activityDAO.insert(
+        activityId = db.activityDAO().insert(
             TrackedActivity(
                 id = 0, name = "TEST",
                 position = 1,
@@ -42,7 +42,7 @@ object ReleaseSeeder {
 
 
         repeat(7){
-            db.sessionDAO.insert(TrackedActivityTime(0, activityId, x.atTime(12, 0), x.atTime(13, 0)))
+            db.sessionDAO().insert(TrackedActivityTime(0, activityId, x.atTime(12, 0), x.atTime(13, 0)))
             x = x.plusDays(1)
         }*/
 
@@ -57,7 +57,7 @@ object ReleaseSeeder {
     suspend fun activity_the_awesome_project(db: AppDatabase) {
         var activityId: Long = 0
 
-        activityId = db.activityDAO.insert(
+        activityId = db.activityDAO().insert(
             TrackedActivity(
                 id = 0, name = "The awesome project",
                 position = 1,
@@ -69,12 +69,12 @@ object ReleaseSeeder {
         )
 
 
-        db.presetTimersDAO.insert(PresetTimer(0,activityId, 60, 0))
-        db.presetTimersDAO.insert(PresetTimer(0,activityId, 120, 0))
-        db.presetTimersDAO.insert(PresetTimer(0,activityId, 60*30, 0))
+        db.presetTimersDAO().insert(PresetTimer(0,activityId, 60, 0))
+        db.presetTimersDAO().insert(PresetTimer(0,activityId, 120, 0))
+        db.presetTimersDAO().insert(PresetTimer(0,activityId, 60*30, 0))
 
 
-        db.sessionDAO.insert(
+        db.sessionDAO().insert(
             TrackedActivityTime(
                 activity_id = activityId,
                 id = 0,
@@ -85,7 +85,7 @@ object ReleaseSeeder {
 
         repeat(20){
             if (Random.nextBoolean()){
-                db.sessionDAO.insert(TrackedActivityTime(
+                db.sessionDAO().insert(TrackedActivityTime(
                         activity_id = activityId,
                         id = 0,
                         datetime_start = LocalDateTime.now().minusHours(2).minusDays(it.toLong() + 1),
@@ -100,7 +100,7 @@ object ReleaseSeeder {
     suspend fun activity_exploring(db: AppDatabase) {
         var activityId: Long = 0
 
-        activityId = db.activityDAO.insert(TrackedActivity(
+        activityId = db.activityDAO().insert(TrackedActivity(
             id = 0, name = "Exploring new App",
             position = 1,
             type = TrackedActivity.Type.TIME,
@@ -109,14 +109,14 @@ object ReleaseSeeder {
             challenge = TrackedActivityChallenge.empty
         ))
 
-        db.sessionDAO.insert(TrackedActivityTime(
+        db.sessionDAO().insert(TrackedActivityTime(
             activity_id = activityId,
             id = 0,
             datetime_start = LocalDateTime.now().minusHours(2),
             datetime_end = LocalDateTime.now().minusHours(1)
         ))
 
-        db.sessionDAO.insert(TrackedActivityTime(
+        db.sessionDAO().insert(TrackedActivityTime(
             activity_id = activityId,
             id = 0,
             datetime_start = LocalDateTime.now().minusHours(4),
@@ -124,21 +124,21 @@ object ReleaseSeeder {
         ))
 
 
-        db.sessionDAO.insert(TrackedActivityTime(
+        db.sessionDAO().insert(TrackedActivityTime(
             activity_id = activityId,
             id = 0,
             datetime_start = LocalDateTime.now().minusHours(4).minusDays(1),
             datetime_end = LocalDateTime.now().minusHours(3).minusDays(1)
         ))
 
-        db.sessionDAO.insert(TrackedActivityTime(
+        db.sessionDAO().insert(TrackedActivityTime(
             activity_id = activityId,
             id = 0,
             datetime_start = LocalDateTime.now().minusHours(4).minusDays(3),
             datetime_end = LocalDateTime.now().minusHours(3).minusDays(3)
         ))
 
-        db.sessionDAO.insert(TrackedActivityTime(
+        db.sessionDAO().insert(TrackedActivityTime(
             activity_id = activityId,
             id = 0,
             datetime_start = LocalDateTime.now().minusHours(4).minusDays(10),
@@ -152,7 +152,7 @@ object ReleaseSeeder {
     suspend fun activity_workout(db: AppDatabase) {
         var activityId: Long = 0
 
-        activityId = db.activityDAO.insert(TrackedActivity(
+        activityId = db.activityDAO().insert(TrackedActivity(
             id = 0, name = "Workout routine",
             position = 1,
             type = TrackedActivity.Type.CHECKED,
@@ -161,14 +161,14 @@ object ReleaseSeeder {
             challenge = TrackedActivityChallenge.empty
         ))
 
-        db.completionDAO.insert(TrackedActivityCompletion(
+        db.completionDAO().insert(TrackedActivityCompletion(
             id = 0,
             activity_id = activityId,
             date_completed = LocalDate.of(2022, 1, 31),
             time_completed = LocalTime.now(),
         ))
 
-        db.completionDAO.insert(TrackedActivityCompletion(
+        db.completionDAO().insert(TrackedActivityCompletion(
             id = 0,
             activity_id = activityId,
             date_completed = LocalDate.of(2022, 2, 1),
@@ -178,7 +178,7 @@ object ReleaseSeeder {
 
 
 
-       /* db.completionDAO.insert(TrackedActivityCompletion(
+       /* db.completionDAO().insert(TrackedActivityCompletion(
             id = 0,
             activity_id = activityId,
             date_completed = LocalDate.now(),
@@ -187,7 +187,7 @@ object ReleaseSeeder {
 
         repeat(20){
             if (Random.nextBoolean()){
-                db.completionDAO.insert(TrackedActivityCompletion(
+                db.completionDAO().insert(TrackedActivityCompletion(
                     id = 0,
                     activity_id = activityId,
                     date_completed = LocalDate.now().minusDays(it + 1L),
@@ -201,7 +201,7 @@ object ReleaseSeeder {
     suspend fun activity_point(db: AppDatabase) {
         var activityId: Long = 0
 
-        activityId = db.activityDAO.insert(TrackedActivity(
+        activityId = db.activityDAO().insert(TrackedActivity(
             id = 0, name = "Acquired points",
             position = 1,
             type = TrackedActivity.Type.SCORE,
@@ -210,7 +210,7 @@ object ReleaseSeeder {
             challenge = TrackedActivityChallenge.empty
         ))
 
-        db.scoreDAO.insert(TrackedActivityScore(
+        db.scoreDAO().insert(TrackedActivityScore(
             id = 0,
             activity_id = activityId,
             datetime_completed = LocalDateTime.now(),
@@ -219,7 +219,7 @@ object ReleaseSeeder {
 
         repeat(20){
             if (Random.nextBoolean()){
-                db.scoreDAO.insert(TrackedActivityScore(
+                db.scoreDAO().insert(TrackedActivityScore(
                     id = 0,
                     activity_id = activityId,
                     datetime_completed = LocalDateTime.now().minusDays(it + 1L ),
@@ -230,17 +230,17 @@ object ReleaseSeeder {
     }
 
     suspend fun categories(db: AppDatabase){
-        val categoryId = db.groupDAO.insert(TrackerActivityGroup(0, "Work", 1))
+        val categoryId = db.groupDAO().insert(TrackerActivityGroup(0, "Work", 1))
 
-        db.groupDAO.insert(TrackerActivityGroup(0, "Hobbies", 2))
+        db.groupDAO().insert(TrackerActivityGroup(0, "Hobbies", 2))
 
-        db.groupDAO.insert(TrackerActivityGroup(0, "Other", 2))
+        db.groupDAO().insert(TrackerActivityGroup(0, "Other", 2))
 
-        db.groupDAO.insert(TrackerActivityGroup(0, "Workout", 2))
+        db.groupDAO().insert(TrackerActivityGroup(0, "Workout", 2))
 
-        db.groupDAO.insert(TrackerActivityGroup(0, "Gym", 2))
+        db.groupDAO().insert(TrackerActivityGroup(0, "Gym", 2))
 
-        val activityId = db.activityDAO.insert(TrackedActivity(
+        val activityId = db.activityDAO().insert(TrackedActivity(
             id = 0,
             name = "Project management",
             position = 1,
@@ -250,7 +250,7 @@ object ReleaseSeeder {
             challenge = TrackedActivityChallenge.empty
         ))
 
-        db.activityDAO.insert(TrackedActivity(
+        db.activityDAO().insert(TrackedActivity(
             id = 0,
             name = "Project management 2",
             position = 2,
@@ -260,14 +260,14 @@ object ReleaseSeeder {
             challenge = TrackedActivityChallenge.empty
         ))
 
-        db.sessionDAO.insert(TrackedActivityTime(
+        db.sessionDAO().insert(TrackedActivityTime(
             activity_id = activityId,
             id = 0,
             datetime_start = LocalDateTime.now().minusHours(2).minusDays(2),
             datetime_end = LocalDateTime.now().minusHours(1).minusDays(2)
         ))
 
-        db.sessionDAO.insert(TrackedActivityTime(
+        db.sessionDAO().insert(TrackedActivityTime(
             activity_id = activityId,
             id = 0,
             datetime_start = LocalDateTime.now().minusHours(4).minusDays(2),

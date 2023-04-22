@@ -47,7 +47,7 @@ abstract class WidgetPickerVM constructor(
 
     abstract suspend fun setupWidget(glanceId: GlanceId, activityId: Long)
 
-    open fun getActivities() = database.activityDAO.getAll()
+    open fun getActivities() = database.activityDAO().getAll()
 }
 
 @AndroidEntryPoint

@@ -55,6 +55,9 @@ android {
         kotlinCompilerExtensionVersion = "1.4.5"
     }
 
+    ksp{
+        arg("room.generateKotlin", "true")
+    }
 
     kotlinOptions {
         jvmTarget = "17"
@@ -138,7 +141,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
 
 
-    val ROOM_VERSION = "2.5.0"
+    val ROOM_VERSION = "2.6.0-alpha01"
     ksp("androidx.room:room-compiler:$ROOM_VERSION")
     implementation("androidx.room:room-runtime:$ROOM_VERSION")
     implementation("androidx.room:room-ktx:$ROOM_VERSION")

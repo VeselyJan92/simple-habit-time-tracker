@@ -52,7 +52,7 @@ class OverviewWidgetService @Inject constructor(
     }
 
     private suspend fun updateContent(pref: MutablePreferences, activityId: Long){
-        val activity = database.activityDAO.getById(activityId)
+        val activity = database.activityDAO().getById(activityId)
 
         val overview = rep.getActivityOverview(activity)
 
