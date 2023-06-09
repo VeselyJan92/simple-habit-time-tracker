@@ -1,5 +1,6 @@
 package com.imfibit.activitytracker.ui.widgets
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -11,6 +12,7 @@ import androidx.glance.*
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.cornerRadius
+import androidx.glance.appwidget.provideContent
 import androidx.glance.layout.*
 import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.state.PreferencesGlanceStateDefinition
@@ -56,104 +58,105 @@ class WidgetOverview : GlanceAppWidget() {
     }
 
     override var stateDefinition: GlanceStateDefinition<*> = PreferencesGlanceStateDefinition
+    override suspend fun provideGlance(context: Context, id: GlanceId) {
+        //TODO possibly move to database
 
-    @Composable
-    override fun Content() {
+        provideContent {
+            val prefs = currentState<Preferences>()
 
-        val prefs = currentState<Preferences>()
-
-        Column(
-            modifier = GlanceModifier
-                .padding(5.dp)
-                .fillMaxSize()
-                .background(color = Color.White),
-            verticalAlignment = Alignment.Vertical.CenterVertically
-        ) {
-            Text(
-                text = prefs[ACTIVITY_NAME] ?: "",
-                style = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    textAlign = androidx.glance.text.TextAlign.Start,
-                    color = ColorProvider(Color.Black)
+            Column(
+                modifier = GlanceModifier
+                    .padding(5.dp)
+                    .fillMaxSize()
+                    .background(color = Color.White),
+                verticalAlignment = Alignment.Vertical.CenterVertically
+            ) {
+                Text(
+                    text = prefs[ACTIVITY_NAME] ?: "",
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        textAlign = androidx.glance.text.TextAlign.Start,
+                        color = ColorProvider(Color.Black)
+                    )
                 )
-            )
 
-            Spacer(modifier = GlanceModifier.height(5.dp))
+                Spacer(modifier = GlanceModifier.height(5.dp))
 
-            Row(modifier = GlanceModifier.fillMaxWidth()) {
+                Row(modifier = GlanceModifier.fillMaxWidth()) {
 
-                repeat(5) {
+                    repeat(5) {
 
-                    if (it != 0)
-                        Spacer(modifier = GlanceModifier.defaultWeight())
+                        if (it != 0)
+                            Spacer(modifier = GlanceModifier.defaultWeight())
 
-                    Column(
-                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally
-                    ) {
-
-                        Text(
-                            text = prefs[keyLabel(it)] ?: "",
-                            style = TextStyle(
-                                color = ColorProvider(Color.Black),
-                                fontWeight = if (it == 0) FontWeight.Bold else FontWeight.Medium,
-                                fontSize = 10.sp
-                            )
-                        )
-
-                        //So far there is no cross compatible way to have round corners and color
-                        val resource = when (prefs[keyColor(it)]){
-                            "#FF9800" -> com.imfibit.activitytracker.R.drawable.widget_backgoround_orange
-                            "#E0E0E0" -> com.imfibit.activitytracker.R.drawable.widget_backgoround_gray
-                            "#59BF2D" -> com.imfibit.activitytracker.R.drawable.widget_backgoround_green
-                            else -> throw IllegalArgumentException()
-                        }
-
-                        Box(
-                            modifier = GlanceModifier
-                                .width(35.dp)
-                                .height(20.dp)
-                                .background(ImageProvider(resource)),
-                            contentAlignment = Alignment.Center
+                        Column(
+                            horizontalAlignment = Alignment.Horizontal.CenterHorizontally
                         ) {
+
                             Text(
-                                modifier = GlanceModifier,
+                                text = prefs[keyLabel(it)] ?: "",
                                 style = TextStyle(
                                     color = ColorProvider(Color.Black),
                                     fontWeight = if (it == 0) FontWeight.Bold else FontWeight.Medium,
                                     fontSize = 10.sp
-                                ),
-                                text = prefs[keyValue(it)] ?: "y"
+                                )
                             )
+
+                            //So far there is no cross compatible way to have round corners and color
+                            val resource = when (prefs[keyColor(it)]){
+                                "#FF9800" -> com.imfibit.activitytracker.R.drawable.widget_backgoround_orange
+                                "#E0E0E0" -> com.imfibit.activitytracker.R.drawable.widget_backgoround_gray
+                                "#59BF2D" -> com.imfibit.activitytracker.R.drawable.widget_backgoround_green
+                                else -> throw IllegalArgumentException()
+                            }
+
+                            Box(
+                                modifier = GlanceModifier
+                                    .width(35.dp)
+                                    .height(20.dp)
+                                    .background(ImageProvider(resource)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    modifier = GlanceModifier,
+                                    style = TextStyle(
+                                        color = ColorProvider(Color.Black),
+                                        fontWeight = if (it == 0) FontWeight.Bold else FontWeight.Medium,
+                                        fontSize = 10.sp
+                                    ),
+                                    text = prefs[keyValue(it)] ?: "y"
+                                )
+                            }
                         }
                     }
                 }
-            }
 
-            Spacer(modifier = GlanceModifier.height(5.dp))
+                Spacer(modifier = GlanceModifier.height(5.dp))
 
 
-            Row {
-                Text(
-                    text = "Today:",
-                    style = TextStyle(
-                        fontSize = 15.sp,
-                        textAlign = androidx.glance.text.TextAlign.Start,
-                        color = ColorProvider(Color.Black)
+                Row {
+                    Text(
+                        text = "Today:",
+                        style = TextStyle(
+                            fontSize = 15.sp,
+                            textAlign = androidx.glance.text.TextAlign.Start,
+                            color = ColorProvider(Color.Black)
+                        )
                     )
-                )
 
-                Spacer(GlanceModifier.width(5.dp))
+                    Spacer(GlanceModifier.width(5.dp))
 
-                Text(
-                    text = prefs[METRIC_TODAY] ?: "",
-                    style = TextStyle(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp,
-                        textAlign = androidx.glance.text.TextAlign.Start,
-                        color = ColorProvider(Color.Black)
+                    Text(
+                        text = prefs[METRIC_TODAY] ?: "",
+                        style = TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp,
+                            textAlign = androidx.glance.text.TextAlign.Start,
+                            color = ColorProvider(Color.Black)
+                        )
                     )
-                )
+                }
             }
         }
     }

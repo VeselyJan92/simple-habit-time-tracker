@@ -123,21 +123,21 @@ dependencies {
 
 
 
-    val COMPOSE_VERSION = "1.4.1"
-    implementation("androidx.compose.compiler:compiler:1.4.5")
+    val COMPOSE_VERSION = "1.4.3"
+    implementation("androidx.compose.compiler:compiler:1.4.7")
     implementation("androidx.compose.animation:animation:$COMPOSE_VERSION")
     implementation("androidx.compose.foundation:foundation:$COMPOSE_VERSION")
     implementation("androidx.compose.material:material:$COMPOSE_VERSION")
     implementation("androidx.compose.material:material-icons-extended:$COMPOSE_VERSION")
 
 
-    implementation("androidx.glance:glance-appwidget:1.0.0-alpha05")
+    implementation("androidx.glance:glance-appwidget:1.0.0-beta01")
 
 
-    implementation("androidx.core:core-ktx:1.10.0")
+    implementation("androidx.core:core-ktx:1.10.1")
     implementation("androidx.hilt:hilt-common:1.0.0")
 
-    implementation("androidx.navigation:navigation-compose:2.6.0-alpha09")
+    implementation("androidx.navigation:navigation-compose:2.7.0-beta01")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
 
 
@@ -155,7 +155,7 @@ dependencies {
     implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
 
     implementation("androidx.paging:paging-runtime-ktx:3.1.1")
-    implementation("androidx.paging:paging-compose:1.0.0-alpha18")
+    implementation("androidx.paging:paging-compose:3.2.0-beta01")
 
     implementation("com.google.dagger:hilt-android:2.44")
     kapt("com.google.dagger:hilt-android-compiler:2.44")
@@ -163,8 +163,8 @@ dependencies {
     kapt("androidx.hilt:hilt-compiler:1.0.0")
 
 
-    debugImplementation( "androidx.compose.ui:ui-tooling:1.4.1")
-    implementation( "androidx.compose.ui:ui-tooling-preview:1.4.1")
+    debugImplementation( "androidx.compose.ui:ui-tooling:1.4.3")
+    implementation( "androidx.compose.ui:ui-tooling-preview:1.4.3")
 
 
     /* testImplementation("junit:junit:4.13.2")

@@ -1,11 +1,9 @@
 package com.imfibit.activitytracker.ui.components.dialogs
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -26,9 +24,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.paging.compose.items
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.TimeUtils
+import com.imfibit.activitytracker.core.extensions.rememberReorderList
 import com.imfibit.activitytracker.core.extensions.swap
 import com.imfibit.activitytracker.database.entities.PresetTimer
 import com.imfibit.activitytracker.database.entities.TrackedActivity
@@ -37,27 +35,6 @@ import com.imfibit.activitytracker.ui.components.IconButton
 import com.imfibit.activitytracker.ui.components.dialogs.system.DialogTimePicker
 import org.burnoutcrew.reorderable.*
 import java.time.LocalTime
-
-import androidx.compose.foundation.lazy.items
-import com.imfibit.activitytracker.core.extensions.rememberReorderList
-
-
-/*fun Modifier.draggedItemx(
-    offset: Float?,
-    orientation: Orientation = Orientation.Vertical,
-): Modifier = composed {
-    Modifier
-        .zIndex(offset?.let { 1f } ?: 0f)
-        .graphicsLayer {
-            with(offset ?: 0f) {
-                if (orientation == Orientation.Vertical) {
-                    translationY = this
-                } else {
-                    translationX = this
-                }
-            }
-        }
-}*/
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable

@@ -15,7 +15,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemsIndexed
+import androidx.paging.compose.itemKey
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
@@ -24,7 +24,6 @@ import com.imfibit.activitytracker.ui.components.Month
 import com.imfibit.activitytracker.ui.components.SimpleTopBar
 import kotlinx.coroutines.flow.Flow
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun ScreenActivityHistory(nav: NavHostController, scaffoldState: ScaffoldState) {
 
@@ -54,12 +53,15 @@ private fun ScreenBody(
 ){
     Column(Modifier) {
 
-        val x = months.collectAsLazyPagingItems()
+        val monthsData = months.collectAsLazyPagingItems()
 
         if (activity != null){
-
                 LazyColumn(reverseLayout = true){
-                    itemsIndexed(x){ index,  item ->
+                    items(
+                        count = monthsData.itemCount,
+                        key = monthsData.itemKey { it.month },
+                    ){ lazyItem ->
+                        val item = monthsData[lazyItem]
 
                         if (item != null){
                             Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp), shape = RoundedCornerShape(20.dp)) {
@@ -68,9 +70,7 @@ private fun ScreenBody(
                                 }
                             }
                         }
-
                     }
-
                     item {
                         Spacer(modifier = Modifier.height(100.dp))
                     }
