@@ -9,7 +9,7 @@ plugins {
 
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
-    id("com.google.devtools.ksp") version "1.8.20-1.0.11"
+    id("com.google.devtools.ksp") version "1.9.0-1.0.12"
 
 }
 
@@ -40,7 +40,7 @@ android {
     }
 
     compileSdk = 34
-    buildToolsVersion = "33.0.1"
+    buildToolsVersion = "34.0.0"
 
     buildFeatures {
         compose = true
@@ -52,7 +52,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.5"
+        kotlinCompilerExtensionVersion = "1.5.1"
     }
 
     ksp{
@@ -72,9 +72,9 @@ android {
     defaultConfig {
         applicationId = "com.imfibit.activitytracker"
         minSdk = 26
-        targetSdk = 33
-        versionCode = 31
-        versionName = "1.3.3"
+        targetSdk = 34
+        versionCode = 32
+        versionName = "1.3.4"
         testInstrumentationRunner  ="com.imfibit.activitytracker.HiltRunner"
     }
 
@@ -113,7 +113,7 @@ play {
 }
 
 dependencies {
-    implementation("com.google.devtools.ksp:symbol-processing-api:1.8.20-1.0.11")
+    implementation("com.google.devtools.ksp:symbol-processing-api:1.9.0-1.0.12")
 
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
@@ -123,7 +123,7 @@ dependencies {
 
 
 
-    val COMPOSE_VERSION = "1.4.3"
+    val COMPOSE_VERSION = "1.6.0-alpha02"
     implementation("androidx.compose.compiler:compiler:1.5.1")
     implementation("androidx.compose.animation:animation:$COMPOSE_VERSION")
     implementation("androidx.compose.foundation:foundation:$COMPOSE_VERSION")
@@ -157,8 +157,8 @@ dependencies {
     implementation("androidx.paging:paging-runtime-ktx:3.2.0")
     implementation("androidx.paging:paging-compose:3.2.0")
 
-    implementation("com.google.dagger:hilt-android:2.44")
-    kapt("com.google.dagger:hilt-android-compiler:2.44")
+    implementation("com.google.dagger:hilt-android:2.46.1")
+    kapt("com.google.dagger:hilt-android-compiler:2.46.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
     kapt("androidx.hilt:hilt-compiler:1.0.0")
 
