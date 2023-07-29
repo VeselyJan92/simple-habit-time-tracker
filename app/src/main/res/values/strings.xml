@@ -158,6 +158,8 @@
     <string name="dialog_challenge_not_set">Set habit goal and target.</string>
     <string name="dialog_challenge_name_default">Level 1</string>
     <string name="ahead_of_challenge_deadline_note">You are %1$d days ahead of challenge deadline.</string>
+    <string name="dialog_exact_alarm_title">Permission for notification</string>
+    <string name="dialog_exact_alarm_body">We need permission to remind you at the exact time.</string>
 
 
     <string-array name="months">

@@ -1,5 +1,8 @@
 package com.imfibit.activitytracker.ui.screens.activity
 
+import android.app.AlarmManager
+import android.content.Context
+import android.os.Build
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -107,7 +110,10 @@ fun ScreenTrackedActivity(nav: NavHostController, scaffoldState: ScaffoldState) 
             }
         },
         content = {
-            Column(Modifier.verticalScroll(rememberScrollState()).padding(it)) {
+            Column(
+                Modifier
+                    .verticalScroll(rememberScrollState())
+                    .padding(it)) {
                 ScreenBody(nav, state, vm)
 
                 //LineChartView(state)
@@ -264,6 +270,12 @@ fun SessionActivityCustomStart(
                     }
                 )
             }else{
+                val context : Context = androidx.compose.ui.platform.LocalContext.current
+
+                val askForExactAlarm = remember { mutableStateOf(false) }
+
+                DialogAskForExactAlarm(askForExactAlarm)
+
                 val display = remember { mutableStateOf(false) }
 
                 DialogTimers(
@@ -273,7 +285,17 @@ fun SessionActivityCustomStart(
                     onTimerAdd = { timer -> vm.addTimer(timer)},
                     onTimersReorganized = { items -> vm.reorganizeTimers(items) },
                     onTimerDelete = { timer -> vm.deleteTimer(timer) },
-                    runTimer = { timer -> vm.scheduleTimer(timer)  ; display.value = false  }
+                    runTimer = {
+                        display.value = false
+
+                        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+                            askForExactAlarm.value = true
+                        }else{
+                            vm.scheduleTimer(it)
+                        }
+                    }
                 )
 
                 Row(
@@ -509,7 +531,9 @@ private fun RecentActivity(nav: NavController, state: TrackedActivityState?) {
                     val aheadInDays = state.activity.getChallengeAheadDays(state.challengeMetric)
 
                     Text(
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
                         text = stringResource(R.string.ahead_of_challenge_deadline_note, aheadInDays),
                         style = TextStyle(color = Color.DarkGray, textAlign = TextAlign.Center, fontSize = 12.sp)
                     )

@@ -2,20 +2,23 @@ package com.imfibit.activitytracker.ui.screens.activity
 
 
 import android.util.Log
-import androidx.compose.runtime.*
-import androidx.lifecycle.*
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.room.withTransaction
 import com.imfibit.activitytracker.core.AppViewModel
 import com.imfibit.activitytracker.core.ContextString
 import com.imfibit.activitytracker.core.invalidationFlow
 import com.imfibit.activitytracker.core.services.TrackTimeService
-import com.imfibit.activitytracker.database.embedable.TimeRange
-import com.imfibit.activitytracker.database.entities.*
-import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.imfibit.activitytracker.ui.components.*
 import com.imfibit.activitytracker.database.AppDatabase
-import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
+import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
+import com.imfibit.activitytracker.database.entities.PresetTimer
+import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
+import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
+import com.imfibit.activitytracker.ui.components.Colors
+import com.imfibit.activitytracker.ui.components.MetricWidgetData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -23,7 +26,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.TextStyle
-import java.util.*
+import java.util.Locale
 import javax.inject.Inject
 
 

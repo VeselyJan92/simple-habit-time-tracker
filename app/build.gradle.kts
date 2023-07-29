@@ -39,8 +39,8 @@ android {
 
     }
 
-    compileSdk = 33
-    buildToolsVersion = "30.0.3"
+    compileSdk = 34
+    buildToolsVersion = "33.0.1"
 
     buildFeatures {
         compose = true
@@ -124,24 +124,24 @@ dependencies {
 
 
     val COMPOSE_VERSION = "1.4.3"
-    implementation("androidx.compose.compiler:compiler:1.4.7")
+    implementation("androidx.compose.compiler:compiler:1.5.1")
     implementation("androidx.compose.animation:animation:$COMPOSE_VERSION")
     implementation("androidx.compose.foundation:foundation:$COMPOSE_VERSION")
     implementation("androidx.compose.material:material:$COMPOSE_VERSION")
     implementation("androidx.compose.material:material-icons-extended:$COMPOSE_VERSION")
 
 
-    implementation("androidx.glance:glance-appwidget:1.0.0-beta01")
+    implementation("androidx.glance:glance-appwidget:1.0.0-rc01")
 
 
     implementation("androidx.core:core-ktx:1.10.1")
     implementation("androidx.hilt:hilt-common:1.0.0")
 
-    implementation("androidx.navigation:navigation-compose:2.7.0-beta01")
+    implementation("androidx.navigation:navigation-compose:2.7.0-rc01")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
 
 
-    val ROOM_VERSION = "2.6.0-alpha01"
+    val ROOM_VERSION = "2.6.0-alpha02"
     ksp("androidx.room:room-compiler:$ROOM_VERSION")
     implementation("androidx.room:room-runtime:$ROOM_VERSION")
     implementation("androidx.room:room-ktx:$ROOM_VERSION")
@@ -154,26 +154,14 @@ dependencies {
 
     implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
 
-    implementation("androidx.paging:paging-runtime-ktx:3.1.1")
-    implementation("androidx.paging:paging-compose:3.2.0-beta01")
+    implementation("androidx.paging:paging-runtime-ktx:3.2.0")
+    implementation("androidx.paging:paging-compose:3.2.0")
 
     implementation("com.google.dagger:hilt-android:2.44")
     kapt("com.google.dagger:hilt-android-compiler:2.44")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
     kapt("androidx.hilt:hilt-compiler:1.0.0")
 
-
     debugImplementation( "androidx.compose.ui:ui-tooling:1.4.3")
     implementation( "androidx.compose.ui:ui-tooling-preview:1.4.3")
-
-
-    /* testImplementation("junit:junit:4.13.2")
- androidTestgetLineIndexOfItemImplementation("androidx.test.ext:junit:1.1.3")
- androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
-
- androidTestImplementation("com.google.dagger:hilt-android-testing:2.44")
- kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.44")
- androidTestAnnotationProcessor("com.google.dagger:hilt-android-compiler:2.44")*/
-
-
 }
