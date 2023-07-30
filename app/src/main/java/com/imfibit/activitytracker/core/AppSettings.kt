@@ -13,6 +13,6 @@ val Context.dataStore by preferencesDataStore(
 
 object PreferencesKeys {
     val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
-    val NOTIFICATION_ALLOWED = booleanPreferencesKey("notification_allowed")
+    val ASK_FOR_NOTIFICATION = booleanPreferencesKey("ask_for_notifications")
     val ERASE_OBOARDING_SHOW = booleanPreferencesKey("erase_onboarding_data_card")
 }

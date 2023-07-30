@@ -1,5 +1,8 @@
 package com.imfibit.activitytracker.ui.screens.settings
 
+import android.Manifest
+import android.app.NotificationManager
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -10,7 +13,10 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.FileUpload
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -18,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
@@ -28,8 +35,6 @@ import com.imfibit.activitytracker.ui.components.SimpleTopBar
 @Composable
 fun ScreenSetting(navControl: NavHostController, scaffoldState: ScaffoldState) {
 
-
-
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
@@ -37,23 +42,50 @@ fun ScreenSetting(navControl: NavHostController, scaffoldState: ScaffoldState) {
         },
 
         content = {
-            ScreenBody()
+            Column(Modifier.padding(it)) {
+                AppSettings()
+                BackupDatabase()
+            }
         },
 
         backgroundColor = Colors.AppBackground
     )
-
 }
 
 @Composable
-private fun ScreenBody(){
-    Surface(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        elevation = 2.dp
-    ) {
+fun AppSettings() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val context = LocalContext.current
+
+        val notificationState = remember {
+            mutableStateOf(NotificationManagerCompat.from(context).areNotificationsEnabled())
+        }
+
+        val startForResult = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()){
+            notificationState.value = it
+        }
+
+        val notificationLabel = if (notificationState.value)
+            stringResource(id = R.string.screen_settings_application_group_notifications_enabled)
+        else
+            stringResource(id = R.string.screen_settings_application_group_notifications_disabled)
+
+        SettingsGroup(stringResource(id = R.string.screen_settings_application_group)){
+            SettingsMenuItem(
+                icon = { Icon(imageVector = Icons.Default.Notifications, null) },
+                title = stringResource(id = R.string.screen_settings_application_group_notifications),
+                subtitle = notificationLabel,
+                onClick = {
+                    startForResult.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun BackupDatabase() {
+    SettingsGroup(stringResource(id = R.string.screen_settings_backup_section)){
 
         val context = LocalContext.current
         val vm = hiltViewModel<ScreenSettingVM>()
@@ -74,36 +106,55 @@ private fun ScreenBody(){
                 vm.importDB(context, it)
         }
 
+        SettingsMenuItem(
+            icon = { Icon(imageVector = Icons.Default.FileDownload, null) },
+            title = stringResource(id = R.string.screen_settings_backup_label),
+            subtitle = stringResource(id = R.string.screen_settings_backup_explain) ,
+            onClick = {
+                export.launch(AppDatabase.DB_NAME)
+            },
+        )
+
+        Divider()
+
+        SettingsMenuItem(
+            icon = { Icon(imageVector = Icons.Default.FileUpload, null) },
+            title = stringResource(id = R.string.screen_settings_restore_label),
+            subtitle =  stringResource(id = R.string.screen_settings_restore_explain),
+            onClick = {
+                import.launch(arrayOf("application/octet-stream"))
+            },
+        )
+    }
+
+
+}
+
+@Composable
+private fun SettingsGroup(
+    title: String,
+    content: @Composable () -> Unit) {
+
+    Surface(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        elevation = 2.dp
+    ) {
         Column(modifier = Modifier.padding(8.dp)) {
             Text(
                 modifier = Modifier
                     .padding(bottom = 16.dp),
-                text = stringResource(id = R.string.screen_settings_backup_section),
+                text = title,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
 
-            SettingsMenuItem(
-                icon = { Icon(imageVector = Icons.Default.FileDownload, null) },
-                title = stringResource(id = R.string.screen_settings_backup_label),
-                subtitle = stringResource(id = R.string.screen_settings_backup_explain) ,
-                onClick = {
-                    export.launch(AppDatabase.DB_NAME)
-                },
-            )
-
-            Divider()
-
-            SettingsMenuItem(
-                icon = { Icon(imageVector = Icons.Default.FileUpload, null) },
-                title = stringResource(id = R.string.screen_settings_restore_label),
-                subtitle =  stringResource(id = R.string.screen_settings_restore_explain),
-                onClick = {
-                    import.launch(arrayOf("application/octet-stream"))
-                },
-            )
+            content()
         }
     }
+
 }
 
 

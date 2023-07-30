@@ -13,6 +13,13 @@
     <string name="screen_settings_restore_explain">Restore your app data</string>
     <string name="screen_settings_backup_unsupported">You must download some app for managing files: Google Files</string>
 
+    <string name="screen_settings_application_group">Application</string>
+    <string name="screen_settings_application_group_notifications">Notifications</string>
+    <string name="screen_settings_application_group_notifications_enabled">Notifications are enabled</string>
+    <string name="screen_settings_application_group_notifications_disabled">Click to enable</string>
+
+
+
 
     <string name="frequency_daily">Daily</string>
     <string name="frequency_weekly">Weekly</string>
@@ -160,7 +167,11 @@
     <string name="ahead_of_challenge_deadline_note">You are %1$d days ahead of challenge deadline.</string>
     <string name="dialog_exact_alarm_title">Permission for notification</string>
     <string name="dialog_exact_alarm_body">We need permission to remind you at the exact time.</string>
-
+    <string name="dialog_ask_for_notifications_title">Permission for notifications</string>
+    <string-array name="dialog_ask_for_notifications_list">
+        <item>• Showing time tracking progress.</item>
+        <item>• Notifying when timer is over.</item>
+    </string-array>
 
     <string-array name="months">
         <item>January</item>

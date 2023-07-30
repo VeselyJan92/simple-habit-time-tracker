@@ -43,7 +43,6 @@ import kotlinx.coroutines.*
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
 import java.util.*
 
 
@@ -55,8 +54,9 @@ fun ScreenTrackedActivity(nav: NavHostController, scaffoldState: ScaffoldState) 
 
     val state by vm.data.collectAsState(initial = null)
 
-
     val msg = stringResource(id = R.string.confirm_delete)
+
+    CheckNotificationPermission()
 
     Scaffold(
         topBar = {
@@ -230,7 +230,6 @@ fun SessionActivityCustomStart(
         mutableStateOf(activity.inSessionSince)
     }
 
-
     Surface(
         elevation = 2.dp,
         modifier = Modifier
@@ -247,9 +246,9 @@ fun SessionActivityCustomStart(
             val action = if (activity.isInSession()) IN_SESSION else DEFAULT
 
             ActionButton(actionButton = action, activity = activity, onClick = {
-                val validStart = start.value?.withSecond(LocalTime.now().second) ?: LocalDateTime.now()
+                val validStart = start.value ?: LocalDateTime.now()
 
-                if ( validStart > LocalDateTime.now())
+                if (validStart >= LocalDateTime.now())
                     return@ActionButton
 
                 onActionClick(validStart)

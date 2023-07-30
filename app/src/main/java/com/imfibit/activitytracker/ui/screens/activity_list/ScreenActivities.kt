@@ -1,10 +1,7 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -29,7 +26,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.preferences.core.edit
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
@@ -39,8 +35,8 @@ import com.imfibit.activitytracker.core.value
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
-import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
+import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.ui.SCREEN_ACTIVITY
 import com.imfibit.activitytracker.ui.SCREEN_SETTINGS
@@ -49,7 +45,6 @@ import com.imfibit.activitytracker.ui.components.BaseMetricBlock
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.dialogs.DialogAddActivity
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.first
 import org.burnoutcrew.reorderable.*
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -58,28 +53,8 @@ fun ScreenActivities(
     navController: NavHostController,
     scaffoldState: ScaffoldState,
 ) {
-    val context = LocalContext.current
-
-    val coroutineScope = rememberCoroutineScope()
-
-    val startForResult = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        runBlocking {
-            context.dataStore.edit { settings -> settings[PreferencesKeys.NOTIFICATION_ALLOWED] = true }
-        }
-    }
-
-    coroutineScope.launch(Dispatchers.IO) {
-        val promptNotification = context.dataStore.data.first()[PreferencesKeys.NOTIFICATION_ALLOWED] ?: false
-
-        delay(2000)
-
-        if (promptNotification){
-            startForResult.launch(Manifest.permission.POST_NOTIFICATIONS)
-        }
-    }
-
-
     val vm = hiltViewModel<ActivitiesViewModel>()
+
     val display = remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
