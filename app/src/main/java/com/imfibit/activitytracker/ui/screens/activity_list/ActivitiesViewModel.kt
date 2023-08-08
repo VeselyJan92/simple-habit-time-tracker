@@ -12,6 +12,8 @@ import com.imfibit.activitytracker.core.services.TrackTimeService
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.embedable.TimeRange
+import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
+import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
@@ -26,7 +28,7 @@ import javax.inject.Inject
 class ActivitiesViewModel @Inject constructor(
     private val db: AppDatabase,
     private val timerService: TrackTimeService,
-    private val  rep: RepositoryTrackedActivity
+    private val  rep: RepositoryTrackedActivity,
 ) : AppViewModel() {
 
     data class Data(
@@ -68,9 +70,18 @@ class ActivitiesViewModel @Inject constructor(
         db.invalidationTracker.removeObserver(tracker)
     }
 
-    suspend fun addActivity(activity: TrackedActivity): Long {
-        return rep.activityDAO.insertSync(activity)
+    suspend fun createNewActivity(name: String, type: TrackedActivity.Type) =  asyncIO {
+        val activity = TrackedActivity(
+            id = 0L,
+            name = name,
+            position = 0,
+            type = type,
+            inSessionSince = null,
+            goal = TrackedActivityGoal(0L, TimeRange.WEEKLY),
+            challenge = TrackedActivityChallenge.empty
+        )
 
+        rep.activityDAO.insertSync(activity)
     }
 
     fun onMoveActivity(from: Int, to: Int){
@@ -112,7 +123,4 @@ class ActivitiesViewModel @Inject constructor(
             it[PreferencesKeys.ERASE_OBOARDING_SHOW] = false
         }
     }
-
-
-
 }

@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import org.burnoutcrew.reorderable.ItemPosition
 
 fun <T> MutableList<T>.swap(from: Int, to: Int) {
@@ -19,10 +20,14 @@ fun <T>  MutableState<List<T>>.swap(from: ItemPosition, to: ItemPosition){
     }
 }
 
+fun <T>  SnapshotStateList<T>.swap(from: ItemPosition, to: ItemPosition){
+    this.swap(from.index, to.index)
+}
+
 
 @Composable
 fun <T> rememberReorderList(items: List<T>): MutableState<List<T>> {
-    val state =  remember(items) {
+    val state =  remember {
         mutableStateOf(items)
     }
     return state

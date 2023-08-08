@@ -1,10 +1,12 @@
 package com.imfibit.activitytracker.database
 
 import android.util.Log
+import androidx.compose.ui.graphics.toArgb
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import com.imfibit.activitytracker.database.entities.*
+import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryFocusBoard
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -12,9 +14,13 @@ import kotlin.random.Random
 
 object ReleaseSeeder {
 
+    lateinit var focusBoardRepository: RepositoryFocusBoard
+
     suspend fun seed(db: AppDatabase){
 
         Log.e("SEED", "SEED")
+
+        focusBoardRepository = RepositoryFocusBoard(db)
 
         activity_the_awesome_project(db)
 
@@ -26,30 +32,7 @@ object ReleaseSeeder {
 
         categories(db)
 
-
-       /* var activityId: Long = 0
-
-        activityId = db.activityDAO().insert(
-            TrackedActivity(
-                id = 0, name = "TEST",
-                position = 1,
-                type = TrackedActivity.Type.TIME,
-                inSessionSince = null,
-                goal = TrackedActivityGoal(0, TimeRange.WEEKLY)
-            )
-        )
-        var x = LocalDate.of(2021, 12, 27)
-
-
-        repeat(7){
-            db.sessionDAO().insert(TrackedActivityTime(0, activityId, x.atTime(12, 0), x.atTime(13, 0)))
-            x = x.plusDays(1)
-        }*/
-
-
-
-
-
+        createFocusBoard(db)
 
     }
 
@@ -275,5 +258,55 @@ object ReleaseSeeder {
         ))
     }
 
+
+    suspend fun createFocusBoard(db: AppDatabase){
+
+        val habitTag = FocusBoardItemTag(0, "Habits", FocusBoardItemTag.colors[1].toArgb(), 1).let {
+            it.copy(id = db.focusBoardItemTagDAO().insert(it))
+        }
+
+        val focusTag = FocusBoardItemTag(0, "Focus", FocusBoardItemTag.colors[5].toArgb(), 1).let {
+                it.copy(id = db.focusBoardItemTagDAO().insert(it))
+        }
+
+        val sideGoalsTag = FocusBoardItemTag(0, "Side goals", FocusBoardItemTag.colors[6].toArgb(), 1).let {
+                it.copy(id = db.focusBoardItemTagDAO().insert(it))
+        }
+
+        focusBoardRepository.insertFocusItemWithTags(
+            FocusBoardItem(title = "Working out"),
+            listOf(habitTag)
+        )
+
+        focusBoardRepository.insertFocusItemWithTags(
+            FocusBoardItem(title = "Learning spanish"),
+            listOf(habitTag)
+        )
+
+        focusBoardRepository.insertFocusItemWithTags(
+            FocusBoardItem(
+                title = "Business and trends research",
+                content = "Google doc of business research: \n" + "• Trends, industry, research" + "\n" + "• Technology" + "\n" + "• Understanding business models"
+            ),
+            listOf(focusTag)
+        )
+
+        focusBoardRepository.insertFocusItemWithTags(
+            FocusBoardItem(
+                title = "My book list",
+                content = "Atomic habits: \n" + "• The 7 Habits of Highly Effective People" + "\n" + "• The Richest Man in Babylon",
+            ),
+            listOf(focusTag)
+        )
+
+        focusBoardRepository.insertFocusItemWithTags(
+            FocusBoardItem(
+                title = "Sell old stuff",
+                content = "I need to sell things that I no longer need that just take up space",
+            ),
+            listOf(sideGoalsTag)
+        )
+
+    }
 
 }

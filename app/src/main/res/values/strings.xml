@@ -57,11 +57,12 @@
     <string name="new_activity_name">New activity</string>
     <string name="new_activity_time">Time</string>
     <string name="new_activity_score">Score</string>
-    <string name="new_activity_checked">Habbit</string>
+    <string name="new_activity_checked">Habit</string>
     <string name="new_activity_folder">Group</string>
+    <string name="new_activity_focus_item">Focus item</string>
     <string name="cancel">CANCEL</string>
     <string name="dialog_goal_title">PICK GOAL</string>
-    <string name="repetitions">Repetititons</string>
+    <string name="repetitions">Repetitions</string>
     <string name="dialog_action_delete">DELETE</string>
     <string name="dialog_action_cancel">CANCEL</string>
     <string name="dialog_action_continue">CONTINUE</string>
@@ -172,6 +173,19 @@
         <item>• Showing time tracking progress.</item>
         <item>• Notifying when timer is over.</item>
     </string-array>
+
+
+    <string name="dialog_create_focus_item_title">Create focus item</string>
+    <string name="dialog_edt_focus_item_title">Edit focus item</string>
+
+    <string name="dialog_edit_tag_title">Edit tag</string>
+    <string name="dialog_create_tag_title">Create tag</string>
+    <string name="focus_board_no_focus_items">No focus items</string>
+    <string name="focus_board_title">Focus Board</string>
+    <string name="focus_board_edit_focus_item_title_placeholder">Title</string>
+    <string name="focus_board_edit_focus_item_content_placeholder">Content</string>
+    <string name="focus_board_edit_tag_name_placeholder">Tag name</string>
+
 
     <string-array name="months">
         <item>January</item>

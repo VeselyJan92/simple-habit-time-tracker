@@ -10,6 +10,9 @@ import com.imfibit.activitytracker.BuildConfig
 import com.imfibit.activitytracker.database.converters.LocalDateConverter
 import com.imfibit.activitytracker.database.converters.LocalDateTimeConverter
 import com.imfibit.activitytracker.database.converters.LocalTimeConverter
+import com.imfibit.activitytracker.database.dao.DAOFocusBoardItem
+import com.imfibit.activitytracker.database.dao.DAOFocusBoardItemTagRelation
+import com.imfibit.activitytracker.database.dao.DAOFocusBoardItemTags
 import com.imfibit.activitytracker.database.dao.tracked_activity.*
 import com.imfibit.activitytracker.database.entities.*
 import com.imfibit.activitytracker.database.migrations.migrations
@@ -49,12 +52,15 @@ object DatabaseModule {
         TrackedActivityScore::class,
         TrackedActivityCompletion::class,
         PresetTimer::class,
-        TrackerActivityGroup::class
+        TrackerActivityGroup::class,
+        FocusBoardItem::class,
+        FocusBoardItemTag::class,
+        FocusBoardItemTagRelation::class
     ],
     views = [
         TrackedActivityMetric::class
     ],
-    version = 8,
+    version = 9,
     exportSchema = false
 )
 @TypeConverters(
@@ -71,6 +77,10 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun metricDAO(): DAOTrackedActivityMetric
     abstract fun presetTimersDAO(): DAOPresetTimers
     abstract fun groupDAO(): DAOActivityGroup
+
+    abstract fun focusBoardItemDAO(): DAOFocusBoardItem
+    abstract fun focusBoardItemTagDAO(): DAOFocusBoardItemTags
+    abstract fun focusBoardItemTagRelationDAO(): DAOFocusBoardItemTagRelation
 
     companion object {
         const val DB_NAME ="activity_tracker.db"

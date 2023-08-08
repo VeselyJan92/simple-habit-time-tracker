@@ -55,3 +55,24 @@ fun  <T> ViewModel.invalidationFlow(db: AppDatabase, source: suspend ()->T) = ca
     }
 
 }
+
+
+
+fun  <T> ViewModel.invalidationFlow(db: AppDatabase, vararg tables: String, source: suspend ()->T) = callbackFlow {
+    viewModelScope.launch(Dispatchers.IO) {
+        trySend(source.invoke())
+    }
+
+    val tracker = createInvalidationTacker(tables = tables){
+        viewModelScope.launch(Dispatchers.IO) {
+            trySend(source.invoke())
+        }
+    }
+
+    db.invalidationTracker.addObserver(tracker)
+
+    awaitClose {
+        db.invalidationTracker.removeObserver(tracker)
+    }
+
+}

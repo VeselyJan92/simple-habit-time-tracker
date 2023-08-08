@@ -2,7 +2,6 @@ package com.imfibit.activitytracker.ui.screens.group
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.imfibit.activitytracker.core.AppViewModel
 import com.imfibit.activitytracker.core.activityInvalidationTracker

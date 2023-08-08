@@ -1,17 +1,57 @@
 package com.imfibit.activitytracker.database
 
-import com.imfibit.activitytracker.database.embedable.TimeRange
-import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
-import com.imfibit.activitytracker.database.entities.TrackedActivity
+import androidx.compose.ui.graphics.toArgb
+import com.imfibit.activitytracker.database.composed.FocusBoardItemWithTags
+import com.imfibit.activitytracker.database.entities.FocusBoardItem
+import com.imfibit.activitytracker.database.entities.FocusBoardItemTag
 import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
 import com.imfibit.activitytracker.database.entities.TrackedActivityScore
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 import kotlin.random.Random.Default.nextInt
 
-class Seeder {
+object DevSeeder {
+
+    public fun getTags() = listOf(
+        FocusBoardItemTag(id = 1, name = "Habits", color = FocusBoardItemTag.colors[0].toArgb()),
+        FocusBoardItemTag(id = 2, name = "Tasks", color = FocusBoardItemTag.colors[1].toArgb()),
+        FocusBoardItemTag(id = 3, name = "Side Quests", color = FocusBoardItemTag.colors[2].toArgb())
+    )
+
+    public fun getFocusBoardItemTag() = getTags()[0]
+
+    public fun getFocusBoardItems() = listOf(
+
+        FocusBoardItem(
+            id = 3,
+            title = "Business and trends research",
+            content = "Google doc of business research: \n" + "• Trends, industry, research" + "\n" + "• Technology" + "\n" + "• Understanding business models",
+        ),
+
+        FocusBoardItem(
+            id = 1,
+            title = "Working out"
+        ),
+
+        FocusBoardItem(
+            id = 2,
+            title = "Learning spanish"
+        ),
+
+        FocusBoardItem(
+            id = 4,
+            title = "My book list",
+            content = "Atomic habits: \n" + "• The 7 Habits of Highly Effective People" + "\n" + "• The Richest Man in Babylon",
+        ),
+    )
+
+    public fun getFocusBoardItem() = getFocusBoardItems()[0]
+
+
+    public fun getFocusItemWithTags() = FocusBoardItemWithTags(getFocusBoardItem(), getTags().take(2))
+
+
 
     private fun randomWord(): String{
         val words = arrayOf("Lorem", "Ipsum", "dolor", "sit", "amet")

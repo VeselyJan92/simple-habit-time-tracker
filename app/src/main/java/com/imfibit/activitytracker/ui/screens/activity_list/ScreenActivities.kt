@@ -38,6 +38,7 @@ import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
+import com.imfibit.activitytracker.ui.MainBody
 import com.imfibit.activitytracker.ui.SCREEN_ACTIVITY
 import com.imfibit.activitytracker.ui.SCREEN_SETTINGS
 import com.imfibit.activitytracker.ui.SCREEN_STATISTICS
@@ -51,91 +52,41 @@ import org.burnoutcrew.reorderable.*
 @Composable
 fun ScreenActivities(
     navController: NavHostController,
-    scaffoldState: ScaffoldState,
 ) {
     val vm = hiltViewModel<ActivitiesViewModel>()
 
-    val display = remember { mutableStateOf(false) }
 
-    val scope = rememberCoroutineScope()
+    MainBody {
+        TopBar(nav = navController)
 
-    val name = stringResource(id = R.string.new_activity_name)
+        ScreenBody(navController, vm)
+    }
+}
 
-    val newGroup =
-        TrackerActivityGroup(0, stringResource(id = R.string.screen_activities_new_group), 0)
+@Composable
+private fun TopBar(nav: NavHostController){
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp, start = 16.dp, bottom = 8.dp, end = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Simple Habit Tracker",
+            fontWeight = FontWeight.Black, fontSize = 25.sp
+        )
 
-    DialogAddActivity(display = display,
-        onAddFolder = {
-            scope.launch {
-                vm.addGroup(newGroup)
-                display.value = false
-            }
-        },
-        onAdd = {
-            scope.launch {
+        Icon(
+            modifier = Modifier.clickable {
+                nav.navigate(SCREEN_SETTINGS)
+            },
+            imageVector = Icons.Default.Settings,
+            tint = Color.Black,
+            contentDescription = null,
+        )
+    }
 
-                val activity = TrackedActivity(
-                    id = 0L,
-                    name = name,
-                    position = 0,
-                    type = it,
-                    inSessionSince = null,
-                    goal = TrackedActivityGoal(0L, TimeRange.WEEKLY),
-                    challenge = TrackedActivityChallenge.empty
-                )
-
-                val id = withContext(Dispatchers.IO) {
-                    vm.addActivity(activity)
-                }
-
-                withContext(Dispatchers.Main) {
-                    display.value = false
-                    navController.navigate("screen_activity/$id")
-                }
-            }
-        }
-    )
-
-    Scaffold(
-        scaffoldState = scaffoldState,
-        topBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp, start = 16.dp, bottom = 8.dp, end = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Simple Habit Tracker",
-                    fontWeight = FontWeight.Black, fontSize = 25.sp
-                )
-
-                Icon(
-                    modifier = Modifier.clickable {
-                        navController.navigate(SCREEN_SETTINGS)
-                    },
-                    imageVector = Icons.Default.Settings,
-                    tint = Color.Black,
-                    contentDescription = null,
-                )
-            }
-
-
-            /*TrackerTopAppBar(stringResource(id = R.string.screen_title_activities)){
-
-            }*/
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { display.value = true }) {
-                Icon(Icons.Filled.Add, null)
-            }
-        },
-        content = {
-            ScreenBody(navController, vm)
-        },
-        backgroundColor = Colors.AppBackground
-    )
 }
 
 private fun Any?.type() = (this as String).split("_").first()
