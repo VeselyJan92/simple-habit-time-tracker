@@ -4,11 +4,11 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.AssignmentTurnedIn
 import androidx.compose.material.icons.filled.Score
 import androidx.compose.material.icons.filled.Timer
@@ -28,44 +28,40 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.navigation.NavController
-import androidx.navigation.compose.*
 import com.imfibit.activitytracker.R
-import com.imfibit.activitytracker.database.embedable.TimeRange
-import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.components.Colors
-import com.imfibit.activitytracker.database.AppDatabase
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 @Composable
 fun DialogAddActivity(
     display: MutableState<Boolean>,
-    onAdd: (type: TrackedActivity.Type)->Unit,
-    onAddFolder: ()->Unit
+    onAddActivity: (type: TrackedActivity.Type)->Unit,
+    onAddFolder: ()->Unit,
+    onAddFocusItem: ()->Unit
 ) = BaseDialog(display = display ) {
 
     DialogBaseHeader(title = stringResource(id = R.string.create_new_activity))
 
 
     TrackedActivities(Icons.Default.Timer, stringResource(id = R.string.new_activity_time)){
-        onAdd.invoke(TrackedActivity.Type.TIME)
+        onAddActivity.invoke(TrackedActivity.Type.TIME)
     }
 
     TrackedActivities(Icons.Default.Score, stringResource(id = R.string.new_activity_score)){
-        onAdd.invoke(TrackedActivity.Type.SCORE)
+        onAddActivity.invoke(TrackedActivity.Type.SCORE)
     }
 
     TrackedActivities(Icons.Default.AssignmentTurnedIn, stringResource(id = R.string.new_activity_checked)) {
-        onAdd.invoke(TrackedActivity.Type.CHECKED)
+        onAddActivity.invoke(TrackedActivity.Type.CHECKED)
     }
 
     TrackedActivities(Icons.Default.Topic, stringResource(id = R.string.new_activity_folder)) {
         onAddFolder()
+    }
+
+    TrackedActivities(Icons.Default.Assignment, stringResource(id = R.string.new_activity_focus_item)) {
+        onAddFocusItem()
     }
 
     DialogButtons {

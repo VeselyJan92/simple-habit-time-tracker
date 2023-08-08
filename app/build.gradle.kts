@@ -123,7 +123,7 @@ dependencies {
 
 
 
-    val COMPOSE_VERSION = "1.6.0-alpha02"
+    val COMPOSE_VERSION = "1.5.0"
     implementation("androidx.compose.compiler:compiler:1.5.1")
     implementation("androidx.compose.animation:animation:$COMPOSE_VERSION")
     implementation("androidx.compose.foundation:foundation:$COMPOSE_VERSION")
@@ -148,8 +148,12 @@ dependencies {
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
+
+    //TODO remove in future releases
     implementation("com.google.accompanist:accompanist-pager:0.28.0")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.28.0")
+
+
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.28.0")
 
     implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
@@ -162,6 +166,6 @@ dependencies {
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
     kapt("androidx.hilt:hilt-compiler:1.0.0")
 
-    debugImplementation( "androidx.compose.ui:ui-tooling:1.4.3")
-    implementation( "androidx.compose.ui:ui-tooling-preview:1.4.3")
+    debugImplementation( "androidx.compose.ui:ui-tooling:1.5.0")
+    debugImplementation( "androidx.compose.ui:ui-tooling-preview:1.5.0")
 }
