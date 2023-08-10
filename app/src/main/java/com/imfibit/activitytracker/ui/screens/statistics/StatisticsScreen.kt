@@ -1,9 +1,12 @@
 package com.imfibit.activitytracker.ui.screens.statistics
 
 import android.app.DatePickerDialog
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -22,9 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
+
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.sumByLong
 import com.imfibit.activitytracker.core.value
@@ -54,7 +55,7 @@ fun ScreenStatistics(navController: NavHostController, scaffoldState: ScaffoldSt
     )
 }
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ScreenBody() = Column {
 
@@ -64,8 +65,10 @@ private fun ScreenBody() = Column {
     val range = remember { mutableStateOf(TimeRange.WEEKLY) }
     val date = remember { mutableStateOf(LocalDate.now()) }
 
-    val state = rememberPagerState(
-        initialPage = 51
+    val pagerState = rememberPagerState(
+        initialPage = 51,
+        initialPageOffsetFraction = 0f,
+        pageCount = {100}
     )
 
     val scope = rememberCoroutineScope()
@@ -77,7 +80,7 @@ private fun ScreenBody() = Column {
             scope.launch {
                 origin.value = it
                 date.value = it
-                state.scrollToPage(51)
+                pagerState.scrollToPage(51)
             }
         },
         setRange = {
@@ -85,18 +88,17 @@ private fun ScreenBody() = Column {
                 origin.value = LocalDate.now()
                 date.value = LocalDate.now()
                 range.value = it
-                state.scrollToPage(51)
+                pagerState.scrollToPage(51)
             }
 
         }
     )
 
     HorizontalPager(
-        state = state,
+        state = pagerState,
         modifier = Modifier
             .fillMaxHeight(),
-        verticalAlignment = Alignment.Top,
-        count = 100
+        verticalAlignment = Alignment.Top
     ) { page ->
 
         val relativePage = (51 - page).toLong()
@@ -240,7 +242,6 @@ private fun Navigation(
     }
 }
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
 private fun NavigationTitle(
     range: TimeRange,

@@ -2,8 +2,11 @@ package com.imfibit.activitytracker.ui.screens.onboarding
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -23,10 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.edit
 import androidx.navigation.NavHostController
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.HorizontalPagerIndicator
-import com.google.accompanist.pager.rememberPagerState
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.PreferencesKeys
 import com.imfibit.activitytracker.core.dataStore
@@ -43,7 +42,7 @@ data class Page(
 
 
 
-@OptIn(ExperimentalPagerApi::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ScreenOnboarding(
     nav: NavHostController,
@@ -75,7 +74,11 @@ fun ScreenOnboarding(
     )
 
 
-    val pagerState = rememberPagerState()
+    val pagerState = rememberPagerState(
+        initialPage = 1,
+        initialPageOffsetFraction = 0f,
+        pageCount = {3}
+    )
 
     Column() {
 
@@ -90,14 +93,9 @@ fun ScreenOnboarding(
         HorizontalPager(state = pagerState,
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f), count = 3 ) { page -> PageUI(page = onboardPages[page]) }
+                .weight(1f)) { page -> PageUI(page = onboardPages[page]) }
 
-        HorizontalPagerIndicator(pagerState = pagerState,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(bottom = 8.dp),
-            activeColor = Color.Black
-        )
+
 
         AnimatedVisibility(visible = pagerState.currentPage == 2 ) {
             OutlinedButton(shape = RoundedCornerShape(20.dp) ,
