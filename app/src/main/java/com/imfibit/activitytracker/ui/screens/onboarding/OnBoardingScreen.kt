@@ -75,7 +75,7 @@ fun ScreenOnboarding(
 
 
     val pagerState = rememberPagerState(
-        initialPage = 1,
+        initialPage = 0,
         initialPageOffsetFraction = 0f,
         pageCount = {3}
     )
