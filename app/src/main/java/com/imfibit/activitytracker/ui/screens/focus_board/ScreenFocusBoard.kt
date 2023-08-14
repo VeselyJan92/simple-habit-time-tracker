@@ -2,6 +2,7 @@ package com.imfibit.activitytracker.ui.screens.focus_board
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -138,7 +139,7 @@ private fun Body(
     onTagDelete: (FocusBoardItemTag) -> Unit
 ) {
     MainBody {
-        TopBar()
+        TopBar(tags, reorderTags, swapTags, onTagEdit, onTagDelete)
 
         Column(Modifier.padding(8.dp)) {
 
@@ -178,7 +179,13 @@ private fun Body(
 }
 
 @Composable
-private fun TopBar() {
+private fun TopBar(
+    tagsState: SnapshotStateList<FocusBoardItemTag>,
+    reorderTags: () -> Unit,
+    swapTags: (ItemPosition, ItemPosition) -> Unit,
+    onTagEdit: (FocusBoardItemTag) -> Unit,
+    onTagDelete: (FocusBoardItemTag) -> Unit,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -190,6 +197,32 @@ private fun TopBar() {
             text = stringResource(R.string.focus_board_title),
             fontWeight = FontWeight.Black, fontSize = 25.sp
         )
+
+        val createEditTag = rememberDialog()
+
+
+        DialogFocusBoardSettings(
+            display = createEditTag,
+            tags = tagsState,
+            reorderTags = reorderTags,
+            swapTags = swapTags,
+            onTagEdit = onTagEdit,
+            onTagDelete = onTagDelete
+        )
+        
+        Row(
+            modifier = Modifier
+                .background(Colors.SuperLight, RoundedCornerShape(5.dp))
+                .padding(4.dp)
+                .clickable { createEditTag.value = true },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(imageVector = Icons.Default.Edit, contentDescription = null )
+
+            Spacer(modifier = Modifier.width(8.dp))
+            
+            Text(text = "Tags", fontSize = 18.sp, fontWeight = FontWeight.Medium )
+        }
     }
 
 }
@@ -262,7 +295,6 @@ fun HeaderWithTags(
     onTagDelete: (FocusBoardItemTag) -> Unit,
 ) {
 
-    val createEditTag = rememberDialog()
 
 
     LazyRow(
@@ -278,26 +310,6 @@ fun HeaderWithTags(
                 name = item.name,
                 color = item.color.toColor(),
                 tagModifier = Modifier.padding(vertical = 2.dp),
-            )
-        }
-
-        item {
-
-            DialogFocusBoardSettings(
-                display = createEditTag,
-                tags = tagsState,
-                reorderTags = reorderTags,
-                swapTags = swapTags,
-                onTagEdit = onTagEdit,
-                onTagDelete = onTagDelete
-            )
-
-            FocusItemTag(
-                tagModifier = Modifier.padding(vertical = 2.dp),
-                iconStart = Icons.Default.Edit,
-                onClick =  { createEditTag.value = true },
-                name = "Manage tags",
-                color = Colors.SuperLight,
             )
         }
     }
