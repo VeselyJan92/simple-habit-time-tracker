@@ -216,11 +216,7 @@ object ReleaseSeeder {
         val categoryId = db.groupDAO().insert(TrackerActivityGroup(0, "Work", 1))
 
         db.groupDAO().insert(TrackerActivityGroup(0, "Hobbies", 2))
-
-        db.groupDAO().insert(TrackerActivityGroup(0, "Other", 2))
-
-        db.groupDAO().insert(TrackerActivityGroup(0, "Workout", 2))
-
+        
         db.groupDAO().insert(TrackerActivityGroup(0, "Gym", 2))
 
         val activityId = db.activityDAO().insert(TrackedActivity(
@@ -261,16 +257,20 @@ object ReleaseSeeder {
 
     suspend fun createFocusBoard(db: AppDatabase){
 
-        val habitTag = FocusBoardItemTag(0, "Habits", FocusBoardItemTag.colors[1].toArgb(), 1).let {
+        val habitTag = FocusBoardItemTag(0, "Habits", FocusBoardItemTag.colors[3].toArgb(), 1).let {
             it.copy(id = db.focusBoardItemTagDAO().insert(it))
         }
 
-        val focusTag = FocusBoardItemTag(0, "Focus", FocusBoardItemTag.colors[5].toArgb(), 1).let {
+        val focusTag = FocusBoardItemTag(0, "Focus", FocusBoardItemTag.colors[7].toArgb(), 1).let {
                 it.copy(id = db.focusBoardItemTagDAO().insert(it))
         }
 
-        val sideGoalsTag = FocusBoardItemTag(0, "Side goals", FocusBoardItemTag.colors[6].toArgb(), 1).let {
+        val sideGoalsTag = FocusBoardItemTag(0, "Side goals", FocusBoardItemTag.colors[9].toArgb(), 1).let {
                 it.copy(id = db.focusBoardItemTagDAO().insert(it))
+        }
+
+        val work = FocusBoardItemTag(0, "Work", FocusBoardItemTag.colors[13].toArgb(), 1).let {
+            it.copy(id = db.focusBoardItemTagDAO().insert(it))
         }
 
         focusBoardRepository.insertFocusItemWithTags(
@@ -296,7 +296,7 @@ object ReleaseSeeder {
                 title = "My book list",
                 content = "Atomic habits: \n" + "• The 7 Habits of Highly Effective People" + "\n" + "• The Richest Man in Babylon",
             ),
-            listOf(focusTag)
+            listOf(focusTag, work)
         )
 
         focusBoardRepository.insertFocusItemWithTags(
