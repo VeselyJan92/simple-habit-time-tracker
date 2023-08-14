@@ -73,8 +73,8 @@ android {
         applicationId = "com.imfibit.activitytracker"
         minSdk = 26
         targetSdk = 34
-        versionCode = 32
-        versionName = "1.3.4"
+        versionCode = 33
+        versionName = "1.3.5"
         testInstrumentationRunner  ="com.imfibit.activitytracker.HiltRunner"
     }
 
@@ -148,10 +148,7 @@ dependencies {
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-
     //TODO remove in future releases
-
-
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.28.0")
 
     implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
@@ -165,5 +162,5 @@ dependencies {
     kapt("androidx.hilt:hilt-compiler:1.0.0")
 
     debugImplementation( "androidx.compose.ui:ui-tooling:1.5.0")
-    debugImplementation( "androidx.compose.ui:ui-tooling-preview:1.5.0")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.5.0")
 }
