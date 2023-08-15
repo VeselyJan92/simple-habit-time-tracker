@@ -32,7 +32,7 @@ fun <T>  SnapshotStateList<T>.swapByIndex(from: Int, to: Int){
 
 @Composable
 fun <T> rememberReorderList(items: List<T>): MutableState<List<T>> {
-    val state =  remember {
+    val state =  remember(items) {
         mutableStateOf(items)
     }
     return state
