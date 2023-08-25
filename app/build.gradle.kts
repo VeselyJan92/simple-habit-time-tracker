@@ -4,12 +4,11 @@ plugins {
     id("com.android.application")
     id("com.github.triplet.play") version "3.7.0"
     id("kotlin-android")
-    id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
 
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
-    id("com.google.devtools.ksp") version "1.9.0-1.0.12"
+    id("com.google.devtools.ksp")
 
 }
 
@@ -55,7 +54,7 @@ android {
         kotlinCompilerExtensionVersion = "1.5.1"
     }
 
-    ksp{
+    ksp {
         arg("room.generateKotlin", "true")
     }
 
@@ -113,7 +112,6 @@ play {
 }
 
 dependencies {
-    implementation("com.google.devtools.ksp:symbol-processing-api:1.9.0-1.0.12")
 
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
@@ -121,15 +119,12 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:31.2.0"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
 
-
-
     val COMPOSE_VERSION = "1.5.0"
-    implementation("androidx.compose.compiler:compiler:1.5.1")
+    implementation("androidx.compose.compiler:compiler:1.5.2")
     implementation("androidx.compose.animation:animation:$COMPOSE_VERSION")
     implementation("androidx.compose.foundation:foundation:$COMPOSE_VERSION")
     implementation("androidx.compose.material:material:$COMPOSE_VERSION")
     implementation("androidx.compose.material:material-icons-extended:$COMPOSE_VERSION")
-
 
     implementation("androidx.glance:glance-appwidget:1.0.0-rc01")
 
@@ -137,11 +132,11 @@ dependencies {
     implementation("androidx.core:core-ktx:1.10.1")
     implementation("androidx.hilt:hilt-common:1.0.0")
 
-    implementation("androidx.navigation:navigation-compose:2.7.0-rc01")
+    implementation("androidx.navigation:navigation-compose:2.7.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
 
 
-    val ROOM_VERSION = "2.6.0-alpha02"
+    val ROOM_VERSION = "2.6.0-beta01"
     ksp("androidx.room:room-compiler:$ROOM_VERSION")
     implementation("androidx.room:room-runtime:$ROOM_VERSION")
     implementation("androidx.room:room-ktx:$ROOM_VERSION")
@@ -156,10 +151,12 @@ dependencies {
     implementation("androidx.paging:paging-runtime-ktx:3.2.0")
     implementation("androidx.paging:paging-compose:3.2.0")
 
-    implementation("com.google.dagger:hilt-android:2.46.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.46.1")
+    implementation("com.google.dagger:hilt-android:2.47")
+    ksp("com.google.dagger:hilt-android-compiler:2.47")
+    ksp("androidx.hilt:hilt-compiler:1.1.0-alpha01")
+
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
-    kapt("androidx.hilt:hilt-compiler:1.0.0")
+
 
     debugImplementation( "androidx.compose.ui:ui-tooling:1.5.0")
     implementation("androidx.compose.ui:ui-tooling-preview:1.5.0")
