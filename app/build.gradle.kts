@@ -66,8 +66,8 @@ android {
         applicationId = "com.imfibit.activitytracker"
         minSdk = 26
         targetSdk = 34
-        versionCode = 34
-        versionName = "1.3.5"
+        versionCode = 35
+        versionName = "1.3.6"
         testInstrumentationRunner  ="com.imfibit.activitytracker.HiltRunner"
     }
 
