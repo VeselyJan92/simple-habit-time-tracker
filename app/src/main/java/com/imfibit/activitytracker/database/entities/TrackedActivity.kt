@@ -1,7 +1,12 @@
 package com.imfibit.activitytracker.database.entities
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.ForeignKey.Companion.CASCADE
+import androidx.room.Index
+import androidx.room.PrimaryKey
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.ContextString
 import com.imfibit.activitytracker.database.embedable.TimeRange
@@ -9,7 +14,7 @@ import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.Period
+import java.time.temporal.ChronoUnit
 
 @Entity(
     tableName = TrackedActivity.TABLE,
@@ -116,7 +121,7 @@ data class TrackedActivity(
     }
 
     fun getChallengeAheadDays(metric: Long): Int {
-        return Period.between(getChallengeEstimatedCompletionDate(metric), challenge.to).days
+        return ChronoUnit.DAYS.between(getChallengeEstimatedCompletionDate(metric), challenge.to).toInt()
     }
 
     fun formatGoal() : String{
