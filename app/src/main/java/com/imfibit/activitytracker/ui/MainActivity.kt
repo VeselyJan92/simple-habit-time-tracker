@@ -13,18 +13,17 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,7 +34,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.PreferencesKeys
 import com.imfibit.activitytracker.core.dataStore
@@ -61,12 +59,10 @@ import com.imfibit.activitytracker.ui.screens.settings.ScreenSetting
 import com.imfibit.activitytracker.ui.screens.statistics.ScreenStatistics
 import com.imfibit.activitytracker.ui.screens.upcomming.ScreenUpcoming
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -83,8 +79,8 @@ const val SCREEN_SETTINGS= "SCREEN_SETTINGS"
 
 
 
-const val SCREEN_FOCUS_BOARD_PAGER_ID = 0;
-const val SCREEN_ACTIVITIES_PAGER_ID = 1;
+const val SCREEN_FOCUS_BOARD_PAGER_ID = 0
+const val SCREEN_ACTIVITIES_PAGER_ID = 1
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -102,6 +98,10 @@ class MainActivity : ComponentActivity() {
         NotificationTimerOver.createChannel(this)
         NotificationLiveSession.createChannel(this)
 
+        val barColor = Colors.AppBackground.toArgb()
+        window.statusBarColor = barColor
+        window.navigationBarColor = barColor
+
         setContent {
             Router()
         }
@@ -113,17 +113,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainActivity.Router(){
-
-    val systemUiController = rememberSystemUiController()
-    val useDarkIcons = MaterialTheme.colors.isLight
-
-    SideEffect {
-        systemUiController.setSystemBarsColor(
-            color = Colors.AppBackground,
-            darkIcons = useDarkIcons
-        )
-    }
-
     val navControl = rememberNavController()
 
     val context: Context = LocalContext.current
