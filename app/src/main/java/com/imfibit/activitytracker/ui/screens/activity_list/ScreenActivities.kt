@@ -151,6 +151,7 @@ private fun ScreenBody(
         items(data.live, {"other_${it.activity.id}"},span = { GridItemSpan(2) }) { item->
             ReorderableItem(reorderableState = state , key = "other_${item.activity.id}") {
                 TrackedActivity(
+                    nav = nav,
                     item = item,
                     modifier = Modifier,
                     onNavigate = { nav.navigate(SCREEN_ACTIVITY(it.id.toString())) },
@@ -167,6 +168,7 @@ private fun ScreenBody(
                 modifier = Modifier.detectReorderAfterLongPress(state)
             ) { isDragging ->
                 TrackedActivity(
+                    nav = nav,
                     item = item,
                     modifier = Modifier,
                     onNavigate = { nav.navigate(SCREEN_ACTIVITY(it.id.toString())) },

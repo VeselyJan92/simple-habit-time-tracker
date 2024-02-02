@@ -8,6 +8,8 @@ import com.imfibit.activitytracker.core.services.activity.ToggleActivityService
 import com.imfibit.activitytracker.core.services.TrackTimeService
 import com.imfibit.activitytracker.core.services.UserHapticsService
 import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
+import com.imfibit.activitytracker.database.entities.TrackedActivityRecord
 import com.imfibit.activitytracker.database.entities.TrackedActivityScore
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
@@ -26,6 +28,8 @@ class RecordViewModel @Inject constructor(
     private val sessionService: TimeActivityService,
     public val hapticsService: UserHapticsService
 ): AppViewModel() {
+
+    fun getActivity(activityId: Long) = rep.activityDAO.getById(activityId)
 
     fun deleteRecord(recordId: Long, type: TrackedActivity.Type) = viewModelScope.launch {
         when(type){
@@ -73,6 +77,14 @@ class RecordViewModel @Inject constructor(
             }
             TrackedActivity.Type.SCORE -> rep.scoreDAO.commitScore(activity.id, LocalDateTime.now(), 1)
             TrackedActivity.Type.CHECKED -> toggleService.toggleActivity(activity.id, LocalDateTime.now())
+        }
+    }
+
+    fun updateRecord(record: TrackedActivityRecord) = launchIO {
+        when(record){
+            is TrackedActivityCompletion -> rep.completionDAO.update(record)
+            is TrackedActivityScore -> rep.scoreDAO.update(record)
+            is TrackedActivityTime -> rep.sessionDAO.update(record)
         }
     }
 

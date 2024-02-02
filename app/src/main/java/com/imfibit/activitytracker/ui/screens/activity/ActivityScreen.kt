@@ -23,7 +23,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.embedable.TimeRange
@@ -38,21 +37,54 @@ import com.imfibit.activitytracker.ui.components.dialogs.*
 import com.imfibit.activitytracker.ui.screens.activity_list.ActionButton
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.ActionButton.DEFAULT
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.ActionButton.IN_SESSION
+import com.imfibit.activitytracker.ui.viewmodels.RecordNavigatorImpl
+import com.imfibit.activitytracker.ui.viewmodels.RecordViewModel
 import com.imfibit.activitytracker.ui.widgets.custom.GoalProgressBar
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
+@Composable
+fun ScreenTrackedActivity(
+    nav: NavHostController,
+    scaffoldState: ScaffoldState
+){
+    val recordVM = hiltViewModel<RecordViewModel>()
+    val vm = hiltViewModel<TrackedActivityViewModel>()
+
+    ScreenTrackedActivity(
+        nav = nav,
+        scaffoldState = scaffoldState,
+        vm = vm,
+        activityName = vm.activityName,
+        activityState = vm.data,
+        onDayClicked = { activity, date -> RecordNavigatorImpl.onDayClicked(nav, activity, date) },
+        onDayLongClicked = { activity, date -> RecordNavigatorImpl.onDaylongClicked(nav, recordVM, activity, date)},
+        onDeleteActivity = vm::deleteActivity,
+        onActivityNameUpdate = vm::refreshName,
+        onNavigateToHistory = { nav.navigate("screen_activity_history/${it.id}") }
+    )
+}
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun ScreenTrackedActivity(nav: NavHostController, scaffoldState: ScaffoldState) {
+fun ScreenTrackedActivity(
+    nav: NavHostController,
+    vm: TrackedActivityViewModel,
+    scaffoldState: ScaffoldState,
+    activityName: MutableState<String?>,
+    activityState: Flow<TrackedActivityState?>,
+    onDayClicked: (TrackedActivity, LocalDate) -> Unit,
+    onDayLongClicked: (TrackedActivity, LocalDate) -> Unit,
+    onDeleteActivity: (TrackedActivity)->Unit,
+    onActivityNameUpdate: (String)->Unit,
+    onNavigateToHistory: (TrackedActivity) -> Unit
+) {
 
-    val vm = hiltViewModel<TrackedActivityViewModel>()
-
-    val state by vm.data.collectAsState(initial = null)
+    val state by activityState.collectAsState(initial = null)
 
     val msg = stringResource(id = R.string.confirm_delete)
 
@@ -70,9 +102,9 @@ fun ScreenTrackedActivity(nav: NavHostController, scaffoldState: ScaffoldState) 
 
                 BasicTextField(
                     modifier = Modifier.weight(1f),
-                    value = vm.activityName.value ?: "",
+                    value = activityName.value ?: "",
                     singleLine = true,
-                    onValueChange = {vm.refreshName(it)},
+                    onValueChange = onActivityNameUpdate,
                     textStyle = TextStyle(fontWeight = FontWeight.Black, fontSize = 25.sp)
                 )
 
@@ -90,7 +122,7 @@ fun ScreenTrackedActivity(nav: NavHostController, scaffoldState: ScaffoldState) 
 
                         if(delete && activity != null){
                             nav.popBackStack()
-                            vm.deleteActivity(activity)
+                            onDeleteActivity(activity)
                         }
                     }
                 )
@@ -114,7 +146,7 @@ fun ScreenTrackedActivity(nav: NavHostController, scaffoldState: ScaffoldState) 
                 Modifier
                     .verticalScroll(rememberScrollState())
                     .padding(it)) {
-                ScreenBody(nav, state, vm)
+                ScreenBody(state,vm, onNavigateToHistory, onDayClicked, onDayLongClicked)
 
                 //LineChartView(state)
 
@@ -132,7 +164,13 @@ fun ScreenTrackedActivity(nav: NavHostController, scaffoldState: ScaffoldState) 
 
 @ExperimentalFoundationApi
 @Composable
-fun ScreenBody(nav: NavController, state: TrackedActivityState?, vm: TrackedActivityViewModel) {
+fun ScreenBody(
+    state: TrackedActivityState?,
+    vm: TrackedActivityViewModel,
+    onNavigateToHistory: (TrackedActivity) -> Unit,
+    onDayClicked: (TrackedActivity, LocalDate) -> Unit,
+    onDayLongClicked: (TrackedActivity, LocalDate) -> Unit,
+) {
     if (state != null){
         Column {
             ActivitySettings(state, vm)
@@ -159,10 +197,7 @@ fun ScreenBody(nav: NavController, state: TrackedActivityState?, vm: TrackedActi
                 )
             }
 
-            RecentActivity(nav, state)
-
-
-            //TextRecords()
+            RecentActivity(state, onNavigateToHistory, onDayClicked, onDayLongClicked)
         }
     }
 
@@ -397,26 +432,6 @@ private fun ActivitySettings(state: TrackedActivityState?, vm: TrackedActivityVi
 
 }
 
-/*@Composable
-private fun ActivityName(vm: TrackedActivityViewModel, activity: TrackedActivity?) {
-    val display = remember { mutableStateOf(false) }
-
-    if (activity != null) DialogInputText(
-            display = display,
-            text = activity.name,
-            title = stringResource(id = R.string.track_activity_name),
-            onTextSet = {
-                //vm.updateName(it)
-                display.value = false
-            }
-    )
-
-    TextBox(text = activity?.name ?: "-", modifier = Modifier.fillMaxWidth()){
-        display.value = true
-    }
-
-}*/
-
 @Composable
 private fun RowScope.Goal(vm: TrackedActivityViewModel, activity: TrackedActivity?) {
     val display = remember { mutableStateOf(false) }
@@ -496,7 +511,12 @@ private fun RowScope.Group(vm: TrackedActivityViewModel, groups: List<TrackerAct
 
 
 @Composable
-private fun RecentActivity(nav: NavController, state: TrackedActivityState?) {
+private fun RecentActivity(
+    state: TrackedActivityState?,
+    onNavigateToHistory: (TrackedActivity)->Unit,
+    onDayClicked: (TrackedActivity, LocalDate) -> Unit,
+    onDayLongClicked: (TrackedActivity, LocalDate) -> Unit,
+) {
     Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp), shape = RoundedCornerShape(20.dp)) {
 
         Column(
@@ -516,8 +536,11 @@ private fun RecentActivity(nav: NavController, state: TrackedActivityState?) {
                 Spacer(Modifier.weight(1f))
 
                 TextButton(
-                    onClick = { if (state != null)
-                        nav.navigate("screen_activity_history/${state.activity.id}") }
+                    onClick = {
+                        if (state != null){
+                            onNavigateToHistory(state.activity)
+                        }
+                    }
                 ) {
                     Text(text = stringResource(id = R.string.screen_title_record_history))
                 }
@@ -542,7 +565,7 @@ private fun RecentActivity(nav: NavController, state: TrackedActivityState?) {
 
 
             if (state != null)
-                RecentActivityGrid(state.activity, state.recent, nav)
+                RecentActivityGrid(state.activity, state.recent, onDayClicked, onDayLongClicked)
 
             Divider(Modifier.padding(8.dp))
 
@@ -557,7 +580,12 @@ private fun RecentActivity(nav: NavController, state: TrackedActivityState?) {
 }
 
 @Composable
-fun RecentActivityGrid(activity: TrackedActivity, months: List<RepositoryTrackedActivity.Month>, nav: NavController){
+fun RecentActivityGrid(
+    activity: TrackedActivity,
+    months: List<RepositoryTrackedActivity.Month>,
+    onDayClicked: (TrackedActivity, LocalDate) -> Unit,
+    onDayLongClicked: (TrackedActivity, LocalDate) -> Unit,
+){
 
     Column(Modifier.fillMaxWidth()) {
 
@@ -584,7 +612,7 @@ fun RecentActivityGrid(activity: TrackedActivity, months: List<RepositoryTracked
 
         for(month in months){
             val modifier = if (month.month.month == LocalDate.now().month) Modifier.background(Color(0xFFF5F5F5), RoundedCornerShape(5.dp)) else Modifier
-            Month(modifier, activity, month, nav)
+            Month(modifier, activity, month, onDayClicked, onDayLongClicked)
         }
 
     }

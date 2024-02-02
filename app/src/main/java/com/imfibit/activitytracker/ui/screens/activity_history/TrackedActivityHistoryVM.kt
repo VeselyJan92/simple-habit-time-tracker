@@ -5,10 +5,14 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.imfibit.activitytracker.core.AppViewModel
+import com.imfibit.activitytracker.core.services.activity.ToggleActivityService
 import com.imfibit.activitytracker.database.AppDatabase
+import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.YearMonth
 import javax.inject.Inject
 
@@ -17,6 +21,7 @@ import javax.inject.Inject
 class TrackedActivityHistoryVM @Inject constructor(
     private val db: AppDatabase,
     private val rep: RepositoryTrackedActivity,
+    private val toggleActivityService: ToggleActivityService,
     private val savedStateHandle: SavedStateHandle
 ) : AppViewModel() {
 
@@ -27,6 +32,10 @@ class TrackedActivityHistoryVM @Inject constructor(
     val months: Flow<PagingData<RepositoryTrackedActivity.Month>> = Pager(PagingConfig(MonthsPagingSource.PAGE_SIZE), ){
         MonthsPagingSource(rep, id)
     }.flow.cachedIn(viewModelScope)
+
+    fun toggleTrackedActivity(activity: TrackedActivity, date: LocalDateTime) = launchIO {
+        toggleActivityService.toggleActivity(activity.id, date)
+    }
 }
 
 

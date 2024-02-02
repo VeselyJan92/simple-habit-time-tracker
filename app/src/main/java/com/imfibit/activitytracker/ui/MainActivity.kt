@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -42,10 +43,12 @@ import com.imfibit.activitytracker.core.notifications.NotificationTimerOver
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.composed.FocusBoardItemWithTags
 import com.imfibit.activitytracker.database.entities.FocusBoardItem
+import com.imfibit.activitytracker.database.entities.TrackedActivityRecord
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.dialogs.DialogAddActivity
 import com.imfibit.activitytracker.ui.components.dialogs.DialogRecords
+import com.imfibit.activitytracker.ui.navigation.EditRecord
 import com.imfibit.activitytracker.ui.screens.activity.ScreenTrackedActivity
 import com.imfibit.activitytracker.ui.screens.activity_history.ScreenActivityHistory
 import com.imfibit.activitytracker.ui.screens.activity_list.ActivitiesViewModel
@@ -78,7 +81,6 @@ const val SCREEN_ONBOARDING= "SCREEN_ONBOARDING"
 const val SCREEN_SETTINGS= "SCREEN_SETTINGS"
 
 
-
 const val SCREEN_FOCUS_BOARD_PAGER_ID = 0
 const val SCREEN_ACTIVITIES_PAGER_ID = 1
 
@@ -97,10 +99,6 @@ class MainActivity : ComponentActivity() {
 
         NotificationTimerOver.createChannel(this)
         NotificationLiveSession.createChannel(this)
-
-        val barColor = Colors.AppBackground.toArgb()
-        window.statusBarColor = barColor
-        window.navigationBarColor = barColor
 
         setContent {
             Router()
@@ -160,6 +158,16 @@ fun MainActivity.Router(){
                 )
         ){
             DialogRecords(navControl, scaffoldState)
+        }
+
+
+        dialog(
+            route = "dialog_edit_record/{record}",
+            arguments = listOf(
+                navArgument("record") { type = NavType.ParcelableType(TrackedActivityRecord::class.java)},
+            )
+        ){
+            EditRecord(navControl)
         }
     }
 

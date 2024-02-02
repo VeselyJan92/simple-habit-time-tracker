@@ -1,14 +1,19 @@
 package com.imfibit.activitytracker.database.entities
 
-import androidx.annotation.NonNull
-import androidx.room.*
+import android.os.Parcelable
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.ForeignKey.Companion.CASCADE
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import kotlinx.parcelize.Parcelize
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
-sealed class TrackedActivityRecord{
+sealed class TrackedActivityRecord : Parcelable {
     abstract var id: Long
     abstract var activity_id: Long
     abstract val metric: Long
@@ -16,6 +21,8 @@ sealed class TrackedActivityRecord{
     abstract val order: LocalDateTime
 }
 
+
+@Parcelize
 @Entity(
     tableName = TrackedActivityCompletion.TABLE,
     indices = [
@@ -35,7 +42,7 @@ sealed class TrackedActivityRecord{
 data class TrackedActivityCompletion(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "tracked_activity_completion_id")
-    override var id: Long,
+    override var id: Long = 0,
 
     @ColumnInfo(name = "tracked_activity_id")
     override var activity_id: Long,
@@ -61,6 +68,7 @@ data class TrackedActivityCompletion(
 
 }
 
+@Parcelize
 @Entity(
     tableName = TrackedActivityScore.TABLE,
     indices = [
@@ -79,7 +87,7 @@ data class TrackedActivityCompletion(
 data class TrackedActivityScore(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "tracked_activity_score_id")
-    override var id: Long,
+    override var id: Long = 0,
 
     @ColumnInfo(name = "tracked_activity_id")
     override var activity_id: Long,
@@ -93,6 +101,12 @@ data class TrackedActivityScore(
 
     companion object{
         const val TABLE = "tracked_activity_score"
+
+        fun getEmpty(activityId: Long) = TrackedActivityScore(
+            activity_id = activityId,
+            datetime_completed = LocalDateTime.now(),
+            score = 1
+        )
     }
 
     @Transient
@@ -103,8 +117,7 @@ data class TrackedActivityScore(
 }
 
 
-
-
+@Parcelize
 @Entity(
     tableName = TrackedActivityTime.TABLE,
     indices = [
@@ -123,20 +136,26 @@ data class TrackedActivityScore(
 data class TrackedActivityTime(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "tracked_activity_session_id")
-    override var id: Long,
+    override var id: Long = 0,
 
     @ColumnInfo(name = "tracked_activity_id")
     override var activity_id:  Long,
 
-    @NonNull
     @ColumnInfo(name = "datetime_start")
     var datetime_start: LocalDateTime,
 
     @ColumnInfo(name = "datetime_end")
     var datetime_end: LocalDateTime
 ) : TrackedActivityRecord() {
+
     companion object{
         const val TABLE = "tracked_activity_session"
+
+        fun getEmpty(activityId: Long) = TrackedActivityTime(
+            activity_id = activityId,
+            datetime_start = LocalDateTime.now(),
+            datetime_end = LocalDateTime.now()
+        )
     }
 
     override val metric: Long

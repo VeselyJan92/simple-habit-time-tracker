@@ -1,10 +1,14 @@
 package com.imfibit.activitytracker.ui.screens.activity_history
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -22,23 +26,56 @@ import com.imfibit.activitytracker.database.repository.tracked_activity.Reposito
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.Month
 import com.imfibit.activitytracker.ui.components.SimpleTopBar
+import com.imfibit.activitytracker.ui.viewmodels.RecordNavigatorImpl
+import com.imfibit.activitytracker.ui.viewmodels.RecordViewModel
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
+
 
 @Composable
-fun ScreenActivityHistory(nav: NavHostController, scaffoldState: ScaffoldState) {
-
+fun ScreenActivityHistory(
+    nav: NavHostController,
+    scaffoldState: ScaffoldState,
+) {
     val vm = hiltViewModel<TrackedActivityHistoryVM>()
-
+    val recordViewModel = hiltViewModel<RecordViewModel>()
     val activity by vm.activity.collectAsState(initial = null)
-
     val months = vm.months
 
+    ScreenActivityHistory(
+        nav = nav,
+        scaffoldState = scaffoldState,
+        activity = activity,
+        months = months,
+        onDayClicked = { activity, date -> RecordNavigatorImpl.onDayClicked(nav, activity, date) },
+        onDayLongClicked = { activity, date -> RecordNavigatorImpl.onDaylongClicked(nav, recordViewModel ,activity, date) }
+    )
+}
+
+
+@Composable
+fun ScreenActivityHistory(
+    scaffoldState: ScaffoldState,
+    nav: NavHostController,
+    activity: TrackedActivity?,
+    months: Flow<PagingData<RepositoryTrackedActivity.Month>>,
+    onDayClicked: (TrackedActivity, LocalDate) -> Unit,
+    onDayLongClicked: (TrackedActivity, LocalDate) -> Unit
+) {
     Scaffold(
         topBar = {
             SimpleTopBar(nav, stringResource(id = R.string.screen_title_record_history))
         },
         content = {
-            ScreenBody(nav, activity, months)
+          if (activity!= null){
+              HistoryList(
+                  activity = activity,
+                  months = months,
+                  onDayClicked = onDayClicked,
+                  onDayLongClicked = onDayLongClicked
+              )
+          }
+
         },
         backgroundColor = Colors.AppBackground,
         scaffoldState = scaffoldState
@@ -46,36 +83,41 @@ fun ScreenActivityHistory(nav: NavHostController, scaffoldState: ScaffoldState) 
 }
 
 @Composable
-private fun ScreenBody(
-    nav: NavHostController,
-    activity: TrackedActivity?,
-    months: Flow<PagingData<RepositoryTrackedActivity.Month>>
-){
-    Column(Modifier) {
+private fun HistoryList(
+    activity: TrackedActivity,
+    months: Flow<PagingData<RepositoryTrackedActivity.Month>>,
+    onDayClicked: (TrackedActivity, LocalDate) -> Unit,
+    onDayLongClicked: (TrackedActivity, LocalDate) -> Unit
+) {
 
-        val monthsData = months.collectAsLazyPagingItems()
+    val monthsData = months.collectAsLazyPagingItems()
 
-        if (activity != null){
-                LazyColumn(reverseLayout = true){
-                    items(
-                        count = monthsData.itemCount,
-                        key = monthsData.itemKey { it.month },
-                    ){ lazyItem ->
-                        val item = monthsData[lazyItem]
+    LazyColumn(reverseLayout = true) {
+        items(
+            count = monthsData.itemCount,
+            key = monthsData.itemKey { it.month },
+        ) { lazyItem ->
+            val item = monthsData[lazyItem]
 
-                        if (item != null){
-                            Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp), shape = RoundedCornerShape(20.dp)) {
-                                Column(Modifier.padding(8.dp)) {
-                                    Month(activity = activity, month = item, nav = nav)
-                                }
-                            }
-                        }
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(100.dp))
+            if (item != null) {
+                Surface(
+                    elevation = 2.dp,
+                    modifier = Modifier.padding(8.dp),
+                    shape = RoundedCornerShape(20.dp)
+                ) {
+                    Column(Modifier.padding(8.dp)) {
+                        Month(
+                            activity = activity,
+                            month = item,
+                            onDayClicked = onDayClicked,
+                            onDayLongClicked = onDayLongClicked
+                        )
                     }
                 }
             }
         }
-
+        item {
+            Spacer(modifier = Modifier.height(100.dp))
+        }
+    }
 }

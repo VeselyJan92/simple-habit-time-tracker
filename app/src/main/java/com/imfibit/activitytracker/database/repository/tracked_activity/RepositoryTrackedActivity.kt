@@ -165,6 +165,16 @@ class RepositoryTrackedActivity @Inject constructor(
         }
     }
 
+    suspend fun getRecordById(activityId: Long, recordId: Long) = db.withTransaction {
+        val activity = activityDAO.flowById(activityId).first()
+
+        when(activity.type) {
+            TrackedActivity.Type.TIME -> sessionDAO.getById(recordId)
+            TrackedActivity.Type.SCORE -> scoreDAO.getById(recordId)
+            TrackedActivity.Type.CHECKED ->  completionDAO.getById(recordId)
+        }
+    }
+
 
     suspend fun getAllRecords(
         from: LocalDateTime,

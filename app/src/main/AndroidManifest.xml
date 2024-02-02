@@ -15,7 +15,7 @@
 
 
     <application
-        android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar"
+        android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         android:name="com.imfibit.activitytracker.core.App"
         android:allowBackup="false"

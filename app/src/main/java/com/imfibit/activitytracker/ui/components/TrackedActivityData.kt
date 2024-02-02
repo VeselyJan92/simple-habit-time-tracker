@@ -64,37 +64,18 @@ fun TrackedActivityRecord(
 @Composable
 fun Record(
     activity: TrackedActivity,
-    record: TrackedActivityRecord
+    record: TrackedActivityRecord,
+    onCLick: (TrackedActivityRecord)->Unit = {}
 ){
     val openSessionDialog  = remember { mutableStateOf(false) }
     val openScoreDialog  = remember { mutableStateOf(false) }
-
-    val recordVM = hiltViewModel<RecordViewModel>()
-
-    if (openSessionDialog.value) DialogSession(
-        display = openSessionDialog,
-        record = (record as TrackedActivityTime),
-        onUpdate = {from, to -> recordVM.updateSession(record.id, from, to)},
-        onDelete = {recordVM.deleteRecord(record.id, TrackedActivity.Type.TIME)}
-    )
-
-    if (openScoreDialog.value) DialogScore(
-        display = openScoreDialog,
-        record = (record as TrackedActivityScore),
-        onUpdate = {from, score -> recordVM.updateScore(record.id, from, score)},
-        onDelete = {recordVM.deleteRecord(record.id, TrackedActivity.Type.SCORE)}
-    )
 
 
     Surface(
         elevation = 2.dp,
         modifier = Modifier
             .clickable(onClick = {
-                when(record){
-                    is TrackedActivityCompletion -> {}
-                    is TrackedActivityScore -> openScoreDialog.value = true
-                    is TrackedActivityTime -> openSessionDialog.value = true
-                }
+                onCLick(record)
             }),
         shape = RoundedCornerShape(20.dp),
         color = Colors.SuperLight

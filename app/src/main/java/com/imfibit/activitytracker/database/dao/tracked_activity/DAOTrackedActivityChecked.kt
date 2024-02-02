@@ -45,6 +45,12 @@ interface DAOTrackedActivityChecked: BaseEditableDAO<TrackedActivityCompletion> 
     """)
     suspend fun deleteById(id: Long)
 
+    @Query("""
+        select * FROM tracked_activity_completion
+        where tracked_activity_completion_id = :id
+    """)
+    suspend fun getById(id: Long): TrackedActivityCompletion
+
 
     @Transaction
     suspend fun toggle(activityId: Long, date: LocalDateTime){

@@ -151,6 +151,7 @@ private fun Activities(
         items(activities.value, key = {item -> item.activity.id },) { item ->
             ReorderableItem(state, key = item.activity.id, defaultDraggingModifier = Modifier) { isDragging ->
                 TrackedActivity(
+                    nav = nav,
                     item = item,
                     modifier = Modifier,
                     onNavigate = { nav.navigate(SCREEN_ACTIVITY(it.id.toString())) },

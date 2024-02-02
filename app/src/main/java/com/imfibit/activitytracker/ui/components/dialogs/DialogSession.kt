@@ -23,6 +23,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.TimeUtils
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
@@ -30,46 +32,60 @@ import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.EditableDatetime
 import com.imfibit.activitytracker.ui.components.dialogs.system.DialogTimePicker
 import com.imfibit.activitytracker.ui.components.layout.LabeledColumn
+import java.time.Duration
 import java.time.LocalDateTime
 import java.time.LocalTime
 
 
 
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DialogSession(
-    display: MutableState<Boolean> = mutableStateOf(true),
     record: TrackedActivityTime,
     onUpdate: ((LocalDateTime, LocalDateTime)->Unit),
-    onDelete: (()->Unit)? = null
-) = DialogSession(display, record.id != 0L,record.datetime_start, record.datetime_end, onUpdate, onDelete )
+    onDelete: (()->Unit)? = null,
+    onDismissRequest: (()->Unit)
+) = DialogSession(record.id > 0, record.datetime_start, record.datetime_end, onUpdate, onDismissRequest, onDelete )
 
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DialogSession(
-    display: MutableState<Boolean> = mutableStateOf(true),
     allowDelete: Boolean,
     from: LocalDateTime,
     to: LocalDateTime,
     onUpdate: ((LocalDateTime, LocalDateTime)->Unit),
+    onDismissRequest: (()->Unit),
     onDelete: (()->Unit)? = null
-)  = BaseDialog(display = display) {
+) = BaseDialogV2(onDismissRequest) {
+    DialogSessionContent(allowDelete, from, to, onUpdate,onDismissRequest, onDelete)
+}
 
+@Composable
+fun DialogSessionContent(
+    allowDelete: Boolean,
+    from: LocalDateTime,
+    to: LocalDateTime,
+    onUpdate: ((LocalDateTime, LocalDateTime)->Unit),
+    onDismissRequest: (()->Unit),
+    onDelete: (()->Unit)? = null
+) = BaseDialogV2(
+    onDismissRequest = onDismissRequest,
+) {
     val from = remember { mutableStateOf(from) }
     val to = remember { mutableStateOf(to) }
 
-    val seconds = java.time.Duration.between(from.value , to.value).seconds
+    val seconds = Duration.between(from.value, to.value).seconds
 
-    val valid = from.value < to.value && seconds <= 60*60*24
+    val valid = from.value < to.value && seconds <= 60 * 60 * 24
 
     val context = LocalContext.current
 
     DialogBaseHeader(title = stringResource(id = if (allowDelete) R.string.dialog_session_title_edit else R.string.dialog_session_title_add))
 
     Row(
-        modifier = Modifier.padding(top = 16.dp).fillMaxWidth(),
+        modifier = Modifier
+            .padding(top = 16.dp)
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround
     ) {
 
@@ -77,7 +93,7 @@ fun DialogSession(
             EditableDatetime(
                 datetime = from.value,
                 onDatetimeEdit = {
-                    from.value =  it
+                    from.value = it
                 }
             )
         }
@@ -86,25 +102,33 @@ fun DialogSession(
             val interaction = remember { MutableInteractionSource() }
 
             Box(
-                modifier = Modifier.height(30.dp).width(60.dp)
+                modifier = Modifier
+                    .height(30.dp)
+                    .width(60.dp)
                     .background(Colors.AppAccent, RoundedCornerShape(50))
                     .clickable(
                         interactionSource = interaction,
                         onClick = {
                             DialogTimePicker(
-                                time = LocalTime.of(0 , 0),
-                                onTimeSet = {to.value = from.value.plusMinutes(it.hour * 60L + it.minute)},
+                                time = LocalTime.of(0, 0),
+                                onTimeSet = {
+                                    to.value = from.value.plusMinutes(it.hour * 60L + it.minute)
+                                },
                                 context = context
                             )
                         },
                         indication = rememberRipple(bounded = false)
-                    ).padding(horizontal = 8.dp),
+                    )
+                    .padding(horizontal = 8.dp),
                 contentAlignment = Alignment.Center,
 
                 ) {
                 Text(
                     textAlign = TextAlign.Center,
-                    text = if (valid) TimeUtils.secondsToMetricShort(from.value, to.value) else "-",
+                    text = if (valid) TimeUtils.secondsToMetricShort(
+                        from.value,
+                        to.value
+                    ) else "-",
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
@@ -118,7 +142,7 @@ fun DialogSession(
             EditableDatetime(
                 datetime = to.value,
                 onDatetimeEdit = {
-                    to.value =  it
+                    to.value = it
                 }
             )
         }
@@ -128,10 +152,9 @@ fun DialogSession(
 
 
     DialogButtons {
-        if(allowDelete){
+        if (allowDelete) {
             TextButton(
                 onClick = {
-                    display.value = false
                     onDelete!!.invoke()
                 }
             ) {
@@ -139,7 +162,7 @@ fun DialogSession(
             }
         }
 
-        TextButton(onClick = {  display.value = false }) {
+        TextButton(onClick = { onDismissRequest() }) {
             Text(text = stringResource(id = R.string.dialog_action_cancel))
         }
 
@@ -148,7 +171,6 @@ fun DialogSession(
 
         TextButton(onClick = {
             if (valid) {
-                display.value = false
                 onUpdate.invoke(from.value, to.value)
             } else {
                 Toast.makeText(context, invalidMessage, Toast.LENGTH_LONG).show()

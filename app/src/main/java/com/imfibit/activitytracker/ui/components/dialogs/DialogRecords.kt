@@ -1,6 +1,6 @@
 package com.imfibit.activitytracker.ui.components.dialogs
 
-import androidx.compose.animation.animateContentSize
+import android.os.Bundle
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -9,23 +9,24 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptions
+import androidx.navigation.Navigator
 import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.core.extensions.navigate
 import com.imfibit.activitytracker.core.invalidationFlow
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.composed.RecordWithActivity
@@ -44,7 +45,7 @@ fun DialogRecords(nav: NavHostController, scaffoldState: ScaffoldState) {
 
     //https://issuetracker.google.com/issues/221643630#comment8
     Dialog(
-        onDismissRequest = {nav.popBackStack()},
+        onDismissRequest = { nav.popBackStack() },
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
 
@@ -57,7 +58,7 @@ fun DialogRecords(nav: NavHostController, scaffoldState: ScaffoldState) {
 
                 DialogBaseHeader(title = stringResource( R.string.dialog_records_title))
 
-                val data by vm.x.collectAsState(initial = listOf())
+                val data by vm.data.collectAsState(initial = listOf())
 
                 if (data.isEmpty()) {
                     Text(text = stringResource(id = R.string.no_records), fontWeight= FontWeight.W600, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
@@ -69,7 +70,11 @@ fun DialogRecords(nav: NavHostController, scaffoldState: ScaffoldState) {
 
                     ){
                         items(data){
-                            Record(activity = it.activity, record = it.record)
+                            val record = it.record
+
+                            Record(activity = it.activity, record = it.record, onCLick = {
+                                nav.navigate("dialog_edit_record/{record}", bundleOf("record" to record))
+                            })
                         }
                     }
                 }
@@ -96,10 +101,7 @@ class DayRecordsVM @Inject constructor(
     val activityId: Long = savedStateHandle["activity_id"] ?: throw IllegalArgumentException()
     val date: LocalDate = LocalDate.parse(savedStateHandle["date"])?: throw IllegalArgumentException()
 
-    val records = MutableLiveData<List<RecordWithActivity>>()
-
-
-    val x = invalidationFlow(db){
+    val data = invalidationFlow(db){
         val activity = rep.activityDAO.flowById(activityId).first()
 
         val from = date.atStartOfDay()
@@ -111,4 +113,3 @@ class DayRecordsVM @Inject constructor(
         }
     }
 }
-

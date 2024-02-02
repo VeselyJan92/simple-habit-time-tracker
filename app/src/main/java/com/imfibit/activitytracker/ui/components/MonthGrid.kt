@@ -1,32 +1,19 @@
 package com.imfibit.activitytracker.ui.components
 
-import android.content.Context
-import android.os.VibrationEffect
-import android.os.Vibrator
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.ContextString
 import com.imfibit.activitytracker.database.entities.TrackedActivity
-import com.imfibit.activitytracker.database.entities.TrackedActivityScore
-import com.imfibit.activitytracker.database.entities.TrackedActivityTime
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.imfibit.activitytracker.ui.components.dialogs.DialogScore
-import com.imfibit.activitytracker.ui.components.dialogs.DialogSession
-import com.imfibit.activitytracker.ui.viewmodels.RecordViewModel
 import java.time.*
 import java.time.format.TextStyle
 import java.util.*
@@ -37,13 +24,14 @@ fun Month(
     modifier: Modifier = Modifier,
     activity: TrackedActivity,
     month: RepositoryTrackedActivity.Month,
-    nav: NavController
+    onDayClicked: (TrackedActivity, LocalDate) -> Unit,
+    onDayLongClicked: (TrackedActivity, LocalDate) -> Unit
 ){
     MonthSplitter(month =  "${month.month.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault()).uppercase()} - ${month.month.year}")
 
     Column(modifier = modifier.padding(3.dp)) {
         month.weeks.forEach {
-            Week(activity, it, nav, month.month.month)
+            Week(activity, it, month.month.month, onDayClicked, onDayLongClicked)
         }
     }
 }
@@ -52,7 +40,10 @@ fun Month(
 private fun Week(
     activity: TrackedActivity,
     week: RepositoryTrackedActivity.Week,
-    nav: NavController, month: Month
+    month: Month,
+    onDayClicked: (TrackedActivity, LocalDate) -> Unit,
+    onDayLongClicked: (TrackedActivity, LocalDate) -> Unit
+
 ){
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         week.days.forEach {
@@ -61,43 +52,16 @@ private fun Week(
             else
                 Modifier
 
-            val context = LocalContext.current
-            val requestEdit = remember { mutableStateOf(false) }
-            val vm = hiltViewModel<RecordViewModel>()
 
-            if (requestEdit.value ) when (it.type){
-                TrackedActivity.Type.TIME -> DialogSession(
-                    display = requestEdit,
-                    record = TrackedActivityTime(0, activity.id, it.date.atTime(12, 0), it.date.atTime(13, 0)),
-                    onUpdate = { from, to -> vm.insertSession(activity.id, from, to) },
-                )
-
-                TrackedActivity.Type.SCORE  -> DialogScore(
-                    display = requestEdit,
-                    record = TrackedActivityScore(0, activity.id, it.date.atTime(12, 0), 1),
-                    onUpdate = {time, score -> vm.addScore(activity.id, time, score) },
-                )
-
-                else -> {}
-            }
 
 
             if(it.date.month == month){
                 MetricBlock(
                     data = MetricWidgetData(it.type.getLabel(it.metric), it.color, it.label),
                     onClick = {
-                        nav.navigate("screen_day_history/${activity.id}/${it.date}")
+                        onDayClicked(activity, it.date)
                     },
-                    onLongClick = {
-                        val viber = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                        viber.vibrate(VibrationEffect.createOneShot(50L, 1))
-
-                          when(it.type){
-                              TrackedActivity.Type.TIME, TrackedActivity.Type.SCORE -> requestEdit.value = true
-                              TrackedActivity.Type.CHECKED ->  vm.toggleHabit(activity.id, it.date.atTime(LocalTime.now()))
-                          }
-
-                    },
+                    onLongClick = { onDayLongClicked(activity, it.date) },
                     modifier = modifier
                 )
             }else{
@@ -131,7 +95,10 @@ private fun Week(
 
 @Composable
 private fun MonthSplitter(month: String){
-    Row(Modifier.fillMaxWidth().padding(top = 8.dp)) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp)) {
         Divider(
             Modifier
                 .padding(8.dp)

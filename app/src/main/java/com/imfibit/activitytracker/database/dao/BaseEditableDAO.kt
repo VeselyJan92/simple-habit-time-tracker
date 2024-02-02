@@ -20,9 +20,9 @@ interface BaseEditableDAO<T>{
     suspend fun insert(vararg users: T)
 
     @Insert
-    suspend fun insert(user: T): Long
+    suspend fun insert(item: T): Long
 
     @Upsert
-    suspend fun upsert(user: T): Long
+    suspend fun upsert(item: T): Long
 
 }

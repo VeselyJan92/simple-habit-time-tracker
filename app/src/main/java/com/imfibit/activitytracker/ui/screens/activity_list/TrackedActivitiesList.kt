@@ -26,18 +26,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.core.extensions.navigate
 import com.imfibit.activitytracker.core.value
 import com.imfibit.activitytracker.database.composed.MetricAggregation
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivity.Type
+import com.imfibit.activitytracker.database.entities.TrackedActivityScore
+import com.imfibit.activitytracker.database.entities.TrackedActivityTime
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.MetricBlock
 import com.imfibit.activitytracker.ui.components.MetricWidgetData
 import com.imfibit.activitytracker.ui.components.Timer
 import com.imfibit.activitytracker.ui.components.dialogs.DialogScore
 import com.imfibit.activitytracker.ui.components.dialogs.DialogSession
+import com.imfibit.activitytracker.ui.components.dialogs.ShowDialog
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.*
 import com.imfibit.activitytracker.ui.viewmodels.RecordViewModel
 import com.imfibit.activitytracker.ui.widgets.custom.GoalProgressBar
@@ -69,34 +75,16 @@ data class TrackedActivityRecentOverview(
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun TrackedActivity(
+    nav: NavHostController,
     item: TrackedActivityRecentOverview,
     modifier: Modifier = Modifier,
     onNavigate: (activity: TrackedActivity) -> Unit,
     isDragging: Boolean = false
 ) {
-    val context = LocalContext.current
     val activity = item.activity
-
-    val openSessionDialog = remember { mutableStateOf(false) }
-    val openScoreDialog = remember { mutableStateOf(false) }
 
     val recordVM = hiltViewModel<RecordViewModel>()
 
-    DialogSession(
-        allowDelete = false,
-        display = openSessionDialog,
-        from = LocalDateTime.now(),
-        to = LocalDateTime.now(),
-        onUpdate = {from, to -> recordVM.insertSession(activity.id, from, to)}
-    )
-
-    DialogScore(
-        allowDelete = false,
-        display = openScoreDialog,
-        datetime = LocalDateTime.now(),
-        score = 1,
-        onUpdate = {time, score -> recordVM.addScore(activity.id, time, score )}
-    )
 
     val color = when{
         isDragging -> Color.LightGray
@@ -133,8 +121,8 @@ fun TrackedActivity(
                         recordVM.hapticsService.activityFeedback()
 
                         when(activity.type){
-                            Type.TIME -> openSessionDialog.value = true
-                            Type.SCORE -> openScoreDialog.value = true
+                            Type.TIME ->  nav.navigate("dialog_edit_record/{record}", bundleOf("record" to TrackedActivityTime(activity_id = activity.id, datetime_start = LocalDateTime.now(), datetime_end = LocalDateTime.now())))
+                            Type.SCORE ->  nav.navigate("dialog_edit_record/{record}", bundleOf("record" to TrackedActivityScore(activity_id = activity.id, datetime_completed = LocalDateTime.now(), score = 1)))
                             Type.CHECKED -> {}
                         }
                     }
@@ -158,7 +146,6 @@ fun TrackedActivity(
                         }
 
                     }
-
 
                     Row(modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
