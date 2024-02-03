@@ -1,13 +1,18 @@
 package com.imfibit.activitytracker.ui.screens.settings
 
 import android.Manifest
-import android.app.NotificationManager
 import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -28,9 +33,10 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
-import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.SimpleTopBar
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun ScreenSetting(navControl: NavHostController, scaffoldState: ScaffoldState) {
@@ -111,7 +117,7 @@ fun BackupDatabase() {
             title = stringResource(id = R.string.screen_settings_backup_label),
             subtitle = stringResource(id = R.string.screen_settings_backup_explain) ,
             onClick = {
-                export.launch(AppDatabase.DB_NAME)
+                export.launch("activity_tracker_${LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)}.db")
             },
         )
 

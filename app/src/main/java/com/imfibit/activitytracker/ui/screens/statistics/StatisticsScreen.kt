@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Analytics
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,7 +21,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -124,25 +124,7 @@ private fun ScreenBody() = Column {
             }
 
             if (data.value.isEmpty()) {
-                Surface(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .background(Color.White), elevation = 2.dp
-                ) {
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp), contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.no_records), style = TextStyle(
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Center
-                            )
-                        )
-                    }
-                }
+                EmptyData(range.value, interval.first)
             } else {
                 Surface(
                     modifier = Modifier
@@ -152,7 +134,7 @@ private fun ScreenBody() = Column {
                     shape = RoundedCornerShape(20.dp)
                 ) {
                     Column() {
-                        NavigationTitle(
+                        NavigationHeader(
                             range = range.value,
                             rangeDate = interval.first,
                         )
@@ -170,6 +152,70 @@ private fun ScreenBody() = Column {
         }
 
     }
+}
+
+@Composable
+private fun EmptyData(
+    range: TimeRange,
+    date: LocalDate
+) {
+    Surface(
+        modifier = Modifier
+            .padding(8.dp)
+            .height(300.dp),
+        elevation = 2.dp,
+        shape = RoundedCornerShape(20.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            NavigationTitle(
+                range = range,
+                rangeDate = date,
+            )
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+            ) {
+                Icon(Icons.Default.ArrowLeft, contentDescription = null)
+
+
+                Column(
+                    modifier = Modifier.padding(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+
+                    Icon(
+                        modifier = Modifier
+                            .size(80.dp)
+                            .padding(bottom = 8.dp),
+                        imageVector = Icons.Outlined.Analytics,
+                        contentDescription = "Focus item"
+                    )
+
+                    Text(
+                        modifier = Modifier.padding(bottom = 4.dp),
+                        text = stringResource(id = R.string.no_records),
+                        fontWeight = FontWeight.Bold, fontSize = 18.sp
+                    )
+
+                    Text(text = "Swipe left or right.")
+                }
+
+
+                Icon(Icons.Default.ArrowRight, contentDescription = null)
+            }
+        }
+    }
+
 }
 
 @Composable
@@ -243,32 +289,37 @@ private fun Navigation(
 }
 
 @Composable
-private fun NavigationTitle(
+private fun NavigationHeader(
     range: TimeRange,
     rangeDate: LocalDate
 ) {
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(8.dp)
-        ) {
-            Icon(Icons.Default.ArrowLeft, contentDescription = null)
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(8.dp)
+    ) {
+        Icon(Icons.Default.ArrowLeft, contentDescription = null)
 
-            Spacer(Modifier.weight(1f))
+        Spacer(Modifier.weight(1f))
 
-            Text(
-                text = range.getDateLabel(rangeDate).value(),
-                fontSize = 19.sp,
-                fontWeight = FontWeight.ExtraBold
-            )
+        NavigationTitle(range, rangeDate)
 
-            Spacer(Modifier.weight(1f))
+        Spacer(Modifier.weight(1f))
 
-            Icon(Icons.Default.ArrowRight, contentDescription = null)
-        }
+        Icon(Icons.Default.ArrowRight, contentDescription = null)
+    }
+}
 
-
-
+@Composable
+private fun NavigationTitle(
+    range: TimeRange,
+    rangeDate: LocalDate
+) {
+    Text(
+        text = range.getDateLabel(rangeDate).value(),
+        fontSize = 19.sp,
+        fontWeight = FontWeight.ExtraBold
+    )
 }
 
 @Composable

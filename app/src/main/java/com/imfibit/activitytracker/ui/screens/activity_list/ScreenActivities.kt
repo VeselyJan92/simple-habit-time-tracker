@@ -1,22 +1,41 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
 import android.annotation.SuppressLint
-import android.util.Log
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.AssignmentTurnedIn
+import androidx.compose.material.icons.outlined.SwipeLeft
 import androidx.compose.material.icons.outlined.Topic
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,9 +53,6 @@ import com.imfibit.activitytracker.core.dataStore
 import com.imfibit.activitytracker.core.value
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.embedable.TimeRange
-import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
-import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
-import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.ui.MainBody
 import com.imfibit.activitytracker.ui.SCREEN_ACTIVITY
@@ -44,9 +60,10 @@ import com.imfibit.activitytracker.ui.SCREEN_SETTINGS
 import com.imfibit.activitytracker.ui.SCREEN_STATISTICS
 import com.imfibit.activitytracker.ui.components.BaseMetricBlock
 import com.imfibit.activitytracker.ui.components.Colors
-import com.imfibit.activitytracker.ui.components.dialogs.DialogAddActivity
-import kotlinx.coroutines.*
-import org.burnoutcrew.reorderable.*
+import org.burnoutcrew.reorderable.ReorderableItem
+import org.burnoutcrew.reorderable.detectReorderAfterLongPress
+import org.burnoutcrew.reorderable.rememberReorderableLazyGridState
+import org.burnoutcrew.reorderable.reorderable
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -98,8 +115,61 @@ private fun ScreenBody(
 ) {
     val data by vm.data.collectAsState(initial = ActivitiesViewModel.Data())
 
-    Log.e("Screen", "invalidate")
+    Box {
+        if (data.activities.isEmpty() && data.live.isEmpty()){
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
 
+                Icon(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .padding(bottom = 8.dp),
+                    imageVector = Icons.Outlined.AssignmentTurnedIn,
+                    contentDescription = "Focus item"
+                )
+
+                Text(
+                    modifier = Modifier.padding(bottom = 4.dp),
+                    text = "Add tracked habit",
+                    fontWeight = FontWeight.Bold, fontSize = 18.sp
+                )
+
+                Text(text = "You can track: completion, time, score.")
+
+
+                
+                Spacer(modifier = Modifier.padding(top = 200.dp))
+
+                Icon(
+                    modifier = Modifier
+                        .size(50.dp)
+                        .padding(bottom = 8.dp),
+                    imageVector = Icons.Outlined.SwipeLeft,
+                    contentDescription = "Focus item"
+                )
+
+                Text(text = "Go to Focus Board")
+
+            }
+        }
+
+        Activities(nav, vm, data)
+
+    }
+}
+
+@Composable
+private fun Activities(
+    nav: NavHostController,
+    vm: ActivitiesViewModel,
+    data: ActivitiesViewModel.Data
+) {
     val state = rememberReorderableLazyGridState(
         onDragEnd = {
                 from, to -> vm.onDragEnd()

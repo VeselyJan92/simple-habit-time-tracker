@@ -158,8 +158,6 @@ fun TrackedActivity(
                         MetricBlock(item.past[0])
                     }
 
-                    // if (item.activity.isInSession()){
-
 
                     AnimatedVisibility(
                         visible = item.activity.isInSession(),

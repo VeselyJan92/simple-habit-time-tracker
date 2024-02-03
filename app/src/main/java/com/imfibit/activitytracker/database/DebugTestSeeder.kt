@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import kotlin.random.Random
 
-object ReleaseSeeder {
+object DebugTestSeeder {
 
     lateinit var focusBoardRepository: RepositoryFocusBoard
 

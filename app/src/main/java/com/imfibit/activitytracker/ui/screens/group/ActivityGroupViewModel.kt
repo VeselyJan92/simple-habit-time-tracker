@@ -4,7 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.imfibit.activitytracker.core.AppViewModel
-import com.imfibit.activitytracker.core.activityInvalidationTracker
+import com.imfibit.activitytracker.core.createActivityInvalidationTracker
 import com.imfibit.activitytracker.core.extensions.swap
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
@@ -38,7 +38,7 @@ class ActivityGroupViewModel @Inject constructor(
 
 
 
-    val tracker = activityInvalidationTracker {
+    val tracker = createActivityInvalidationTracker {
         fetch()
     }
 

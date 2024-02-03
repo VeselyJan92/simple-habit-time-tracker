@@ -1,10 +1,14 @@
 package com.imfibit.activitytracker.ui.screens.activity_history
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.VerticalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
@@ -100,24 +104,34 @@ private fun HistoryList(
             val item = monthsData[lazyItem]
 
             if (item != null) {
-                Surface(
-                    elevation = 2.dp,
-                    modifier = Modifier.padding(8.dp),
-                    shape = RoundedCornerShape(20.dp)
-                ) {
-                    Column(Modifier.padding(8.dp)) {
-                        Month(
-                            activity = activity,
-                            month = item,
-                            onDayClicked = onDayClicked,
-                            onDayLongClicked = onDayLongClicked
-                        )
-                    }
-                }
+                MonthImpl(activity, item, onDayClicked, onDayLongClicked)
             }
         }
         item {
             Spacer(modifier = Modifier.height(100.dp))
+        }
+    }
+}
+
+@Composable
+private fun MonthImpl(
+    activity: TrackedActivity,
+    month: RepositoryTrackedActivity.Month,
+    onDayClicked: (TrackedActivity, LocalDate) -> Unit,
+    onDayLongClicked: (TrackedActivity, LocalDate) -> Unit
+){
+    Surface(
+        elevation = 2.dp,
+        modifier = Modifier.padding(8.dp),
+        shape = RoundedCornerShape(20.dp)
+    ) {
+        Column(Modifier.padding(8.dp)) {
+            Month(
+                activity = activity,
+                month = month,
+                onDayClicked = onDayClicked,
+                onDayLongClicked = onDayLongClicked
+            )
         }
     }
 }

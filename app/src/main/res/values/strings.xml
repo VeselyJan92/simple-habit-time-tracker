@@ -92,14 +92,15 @@
     <string name="screen_activities_new_group">New Group</string>
 
 
-    <string name="screen_onboarding_page_1_title">Get Insights</string>
-    <string name="screen_onboarding_page_1_text">Habit tracking will motivate you to keep on going. Track your time, score and habits.</string>
-    <string name="screen_onboarding_page_2_title">Easily Add Record</string>
-    <string name="screen_onboarding_page_2_text">Add record easily by long pressing on any date.</string>
-    <string name="screen_onboarding_page_3_title">Improve Yourself</string>
-    <string name="screen_onboarding_page_3_text">"Success is the product of daily habits—not once-in-a-lifetime transformations." - James Clear</string>
+    <string name="screen_onboarding_page_1_title">Track habits</string>
+    <string name="screen_onboarding_page_1_text">Track: completion, time, score\nAdd record easily by long pressing on any date.</string>
+
+    <string name="screen_onboarding_page_2_title">Focus board</string>
+    <string name="screen_onboarding_page_2_text">Keep goals that don\'t require tracking.</string>
+    <string name="screen_onboarding_page_3_title">Activity overview</string>
+    <string name="screen_onboarding_page_3_text">See you progress, set up daily, weekly goal.</string>
     <string name="screen_onboarding_skip">Skip</string>
-    <string name="screen_onboarding_track">I want to track!</string>
+    <string name="screen_onboarding_track">Go to activities</string>
 
 
     <string name="screen_group_title">Group settings</string>

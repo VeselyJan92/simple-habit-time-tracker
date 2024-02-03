@@ -3,16 +3,17 @@ package com.imfibit.activitytracker.ui.screens.activity_history
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import androidx.paging.*
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
+import androidx.paging.cachedIn
 import com.imfibit.activitytracker.core.AppViewModel
+import com.imfibit.activitytracker.core.activityInvalidationTracker
 import com.imfibit.activitytracker.core.services.activity.ToggleActivityService
 import com.imfibit.activitytracker.database.AppDatabase
-import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.YearMonth
 import javax.inject.Inject
 
@@ -29,13 +30,18 @@ class TrackedActivityHistoryVM @Inject constructor(
 
     val activity = rep.db.activityDAO().flowById(id);
 
-    val months: Flow<PagingData<RepositoryTrackedActivity.Month>> = Pager(PagingConfig(MonthsPagingSource.PAGE_SIZE), ){
-        MonthsPagingSource(rep, id)
-    }.flow.cachedIn(viewModelScope)
+    private lateinit var source: MonthsPagingSource
 
-    fun toggleTrackedActivity(activity: TrackedActivity, date: LocalDateTime) = launchIO {
-        toggleActivityService.toggleActivity(activity.id, date)
+    init {
+        activityInvalidationTracker(db){
+            source.invalidate()
+        }
     }
+
+    val months = Pager(PagingConfig(MonthsPagingSource.PAGE_SIZE) ){
+        source = MonthsPagingSource(rep, id)
+        source
+    }.flow.cachedIn(viewModelScope)
 }
 
 
@@ -64,10 +70,7 @@ class MonthsPagingSource(
     }
 
     override fun getRefreshKey(state: PagingState<Int, RepositoryTrackedActivity.Month>): Int? {
-        return state.anchorPosition?.let { anchorPosition ->
-            val anchorPage = state.closestPageToPosition(anchorPosition)
-            anchorPage?.prevKey?.plus(1) ?: anchorPage?.nextKey?.minus(1)
-        }
+    return 0
     }
 }
 

@@ -5,7 +5,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.viewModelScope
 import com.imfibit.activitytracker.core.AppViewModel
 import com.imfibit.activitytracker.core.PreferencesKeys
-import com.imfibit.activitytracker.core.activityInvalidationTracker
+import com.imfibit.activitytracker.core.createActivityInvalidationTracker
 import com.imfibit.activitytracker.core.dataStore
 import com.imfibit.activitytracker.core.extensions.swap
 import com.imfibit.activitytracker.core.services.TrackTimeService
@@ -40,7 +40,7 @@ class ActivitiesViewModel @Inject constructor(
 
     val data = MutableStateFlow(Data())
 
-    val tracker = activityInvalidationTracker {
+    val tracker = createActivityInvalidationTracker {
         viewModelScope.launch(Dispatchers.IO) {
             fetch()
         }

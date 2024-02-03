@@ -34,6 +34,8 @@ import org.burnoutcrew.reorderable.*
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.outlined.AssignmentTurnedIn
+import androidx.compose.material.icons.outlined.SwipeLeft
 import com.imfibit.activitytracker.ui.components.*
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.dialogs.DialogAgree
@@ -134,33 +136,67 @@ private fun Activities(
 
     val activities = rememberReorderList(items = activities)
 
-    val state = rememberReorderableLazyListState(
-        onDragEnd = onDragEnd,
-        onMove = {from, to -> onMove(from.index, to.index)}
-    )
 
-    LazyColumn(
-        state = state.listState,
-        modifier = Modifier
-            .reorderable(state = state)
-            .detectReorderAfterLongPress(state),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(8.dp)
-    ) {
 
-        items(activities.value, key = {item -> item.activity.id },) { item ->
-            ReorderableItem(state, key = item.activity.id, defaultDraggingModifier = Modifier) { isDragging ->
-                TrackedActivity(
-                    nav = nav,
-                    item = item,
-                    modifier = Modifier,
-                    onNavigate = { nav.navigate(SCREEN_ACTIVITY(it.id.toString())) },
-                    isDragging = isDragging
-                )
+
+    if (activities.value.isEmpty()){
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+
+            Icon(
+                modifier = Modifier
+                    .size(80.dp)
+                    .padding(bottom = 8.dp),
+                imageVector = Icons.Outlined.AssignmentTurnedIn,
+                contentDescription = null
+            )
+
+            Text(
+                modifier = Modifier.padding(bottom = 4.dp),
+                text = "Add tracked habit",
+                fontWeight = FontWeight.Bold, fontSize = 18.sp
+            )
+        }
+    } else {
+        val state = rememberReorderableLazyListState(
+            onDragEnd = onDragEnd,
+            onMove = {from, to -> onMove(from.index, to.index)}
+        )
+
+        LazyColumn(
+            state = state.listState,
+            modifier = Modifier
+                .reorderable(state = state)
+                .detectReorderAfterLongPress(state),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(8.dp)
+        ) {
+
+            items(activities.value, key = {item -> item.activity.id },) { item ->
+                ReorderableItem(state, key = item.activity.id, defaultDraggingModifier = Modifier) { isDragging ->
+                    TrackedActivity(
+                        nav = nav,
+                        item = item,
+                        modifier = Modifier,
+                        onNavigate = { nav.navigate(SCREEN_ACTIVITY(it.id.toString())) },
+                        isDragging = isDragging
+                    )
+                }
+
             }
 
         }
-
     }
+
+
+
+
+
 }
 

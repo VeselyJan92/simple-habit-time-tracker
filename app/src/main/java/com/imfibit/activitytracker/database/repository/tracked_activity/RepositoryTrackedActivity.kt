@@ -110,8 +110,6 @@ class RepositoryTrackedActivity @Inject constructor(
         activityId: Long,
         yearMonth: YearMonth
     ) = db.withTransaction {
-        Log.e("REP", "START")
-
         val to  = yearMonth.atDay(1).plusMonths(1).with(ChronoField.DAY_OF_WEEK, 7)
         val from = to.minusMonths(1).withDayOfMonth(1).with(ChronoField.DAY_OF_WEEK, 7).minusDays(6)
 

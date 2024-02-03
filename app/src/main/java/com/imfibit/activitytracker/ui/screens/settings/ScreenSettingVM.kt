@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.imfibit.activitytracker.database.AppDatabase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlin.system.exitProcess
 
 @HiltViewModel
 class ScreenSettingVM @Inject constructor() : ViewModel(){
@@ -26,5 +27,6 @@ class ScreenSettingVM @Inject constructor() : ViewModel(){
         db.writeBytes(bytes)
 
         (context as Activity).finishAffinity()
+        exitProcess(0);
     }
 }

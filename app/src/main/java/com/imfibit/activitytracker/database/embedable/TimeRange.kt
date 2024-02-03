@@ -31,7 +31,7 @@ enum class TimeRange(val label: Int) {
     }
 
     fun getDateLabel(date: LocalDate): ContextString =  {
-        val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
+        val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
 
         when(this@TimeRange){
             DAILY -> date.format(formatter)

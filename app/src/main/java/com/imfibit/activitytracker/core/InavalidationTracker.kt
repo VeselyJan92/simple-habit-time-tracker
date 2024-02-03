@@ -1,18 +1,14 @@
 package com.imfibit.activitytracker.core
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.room.InvalidationTracker
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.entities.*
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import java.util.concurrent.Flow
 
 
 inline fun createInvalidationTacker(
@@ -25,7 +21,7 @@ inline fun createInvalidationTacker(
     }
 }
 
-fun activityInvalidationTracker( onInvalidated: (Set<String>)->Unit) = createInvalidationTacker(
+fun createActivityInvalidationTracker(onInvalidated: (Set<String>)->Unit) = createInvalidationTacker(
     TrackedActivity.TABLE,
     TrackedActivityTime.TABLE,
     TrackedActivityCompletion.TABLE,
@@ -35,6 +31,21 @@ fun activityInvalidationTracker( onInvalidated: (Set<String>)->Unit) = createInv
     onInvalidated = onInvalidated
 )
 
+fun  <T> ViewModel.activityInvalidationTracker(db: AppDatabase, source: ()->T){
+
+
+    val tracker = createActivityInvalidationTracker {
+        source.invoke()
+    }
+
+    db.invalidationTracker.addObserver(tracker)
+
+
+    this.addCloseable {
+        db.invalidationTracker.removeObserver(tracker)
+    }
+}
+
 
 fun  <T> ViewModel.invalidationFlow(db: AppDatabase, source: suspend ()->T) = callbackFlow {
 
@@ -42,7 +53,7 @@ fun  <T> ViewModel.invalidationFlow(db: AppDatabase, source: suspend ()->T) = ca
         trySend(source.invoke())
     }
 
-    val tracker = activityInvalidationTracker {
+    val tracker = createActivityInvalidationTracker {
         viewModelScope.launch(Dispatchers.IO) {
             trySend(source.invoke())
         }

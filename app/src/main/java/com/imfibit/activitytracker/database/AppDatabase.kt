@@ -1,7 +1,6 @@
 package com.imfibit.activitytracker.database
 
 import android.content.Context
-import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -87,29 +86,23 @@ abstract class AppDatabase : RoomDatabase() {
 
         fun init(context: Context): AppDatabase = when(BuildConfig.BUILD_TYPE){
             "release"->{
-                val dbExists = context.getDatabasePath(DB_NAME).exists()
-
                 val db = Room.databaseBuilder(context, AppDatabase::class.java, DB_NAME)
                     .addMigrations(*migrations)
                     .build()
 
-                if (!dbExists)
-                    runBlocking(Dispatchers.IO) { ReleaseSeeder.seed(db) }
-
                 db
             }
             "debug" -> {
-                context.deleteDatabase(DB_NAME)
-
+                //context.deleteDatabase(DB_NAME)
 
                 val db = Room
                     .inMemoryDatabaseBuilder(context, AppDatabase::class.java)
                     //.databaseBuilder(context, AppDatabase::class.java, DB_NAME)
-                    //.createFromAsset("activity_tracker20-10-22.db")
+                    //.createFromAsset("test.db")
                     .addMigrations(*migrations)
                     .build()
 
-                runBlocking(Dispatchers.IO) { ReleaseSeeder.seed(db) }
+                runBlocking(Dispatchers.IO) { DebugTestSeeder.seed(db) }
 
                 db
             }
