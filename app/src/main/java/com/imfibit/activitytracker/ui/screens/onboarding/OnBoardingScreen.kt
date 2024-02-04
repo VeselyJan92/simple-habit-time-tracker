@@ -3,10 +3,13 @@ package com.imfibit.activitytracker.ui.screens.onboarding
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -95,6 +98,25 @@ fun ScreenOnboarding(
                 .weight(1f)
         ) {
             page -> PageUI(page = onboardPages[page])
+        }
+
+        LazyRow(
+            modifier = Modifier
+                .height(50.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ){
+            repeat(pagerState.pageCount) { iteration ->
+                val color = if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
+                item(key = "item$iteration"){
+                    Box(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .background(color, CircleShape)
+                            .size(10.dp)
+                    )
+                }
+            }
         }
 
 
