@@ -5,10 +5,12 @@ import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
 import com.imfibit.activitytracker.core.AppViewModel
 import com.imfibit.activitytracker.core.ContextString
-import com.imfibit.activitytracker.core.invalidationFlow
+import com.imfibit.activitytracker.core.activityTables
+import com.imfibit.activitytracker.core.invalidationStateFlow
 import com.imfibit.activitytracker.core.services.TrackTimeService
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.embedable.TimeRange
@@ -21,6 +23,7 @@ import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.MetricWidgetData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -52,6 +55,7 @@ class TrackedActivityViewModel @Inject constructor(
     var deleted = false
 
     override fun onCleared() {
+        Log.e("TrackedActivityViewModel", "clear")
         super.onCleared()
 
         if (!activityName.value.isNullOrBlank() && ! deleted)
@@ -60,20 +64,19 @@ class TrackedActivityViewModel @Inject constructor(
             }
     }
 
-
-
     val id: Long = savedStateHandle["activity_id"] ?: throw IllegalArgumentException()
 
     //For better edittext performance save the name of the activity when user is done with the screen
     val activityName = mutableStateOf<String?>(null)
 
-    val data = invalidationFlow(db){
-        val activity: TrackedActivity = rep.activityDAO.tryGetById(id) ?: return@invalidationFlow null
-
+    val data = invalidationStateFlow(db, null, *activityTables ){
+        val activity: TrackedActivity = rep.activityDAO.tryGetById(id) ?: return@invalidationStateFlow null
 
         //Ignore subsequent changes
-        if(activityName.value == null)
+        viewModelScope.launch(Dispatchers.Main) {
             activityName.value = activity.name
+        }
+
 
         /*
         val now = LocalDate.now()

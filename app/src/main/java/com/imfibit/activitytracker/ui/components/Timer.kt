@@ -54,7 +54,7 @@ fun Timer(
     var time  by remember { mutableStateOf(LocalDateTime.now()) }
 
     if (enable){
-        LaunchedEffect(time) {
+        LaunchedEffect(Unit) {
             while (this.coroutineContext.isActive) {
                 time = LocalDateTime.now()
                 delay(1000)

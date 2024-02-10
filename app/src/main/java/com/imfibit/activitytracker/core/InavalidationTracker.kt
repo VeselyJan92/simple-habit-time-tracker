@@ -1,45 +1,63 @@
 package com.imfibit.activitytracker.core
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.room.InvalidationTracker
+import androidx.room.RoomDatabase
 import com.imfibit.activitytracker.database.AppDatabase
-import com.imfibit.activitytracker.database.entities.*
+import com.imfibit.activitytracker.database.entities.FocusBoardItem
+import com.imfibit.activitytracker.database.entities.FocusBoardItemTag
+import com.imfibit.activitytracker.database.entities.FocusBoardItemTagRelation
+import com.imfibit.activitytracker.database.entities.PresetTimer
+import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
+import com.imfibit.activitytracker.database.entities.TrackedActivityScore
+import com.imfibit.activitytracker.database.entities.TrackedActivityTime
+import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
-
-inline fun createInvalidationTacker(
-    vararg tables: String,
-    crossinline onInvalidated: (Set<String>)->Unit
-): InvalidationTracker.Observer {
-    return object : InvalidationTracker.Observer(tables) {
-
-        override fun onInvalidated(tables: Set<String>) =  onInvalidated(tables)
-    }
-}
-
-fun createActivityInvalidationTracker(onInvalidated: (Set<String>)->Unit) = createInvalidationTacker(
+val activityTables = arrayOf(
     TrackedActivity.TABLE,
     TrackedActivityTime.TABLE,
     TrackedActivityCompletion.TABLE,
     TrackedActivityScore.TABLE,
     PresetTimer.TABLE,
     TrackerActivityGroup.TABLE,
-    onInvalidated = onInvalidated
 )
 
-fun  <T> ViewModel.activityInvalidationTracker(db: AppDatabase, source: ()->T){
+val focusBoardTables = arrayOf(
+    FocusBoardItem.TABLE,
+    FocusBoardItemTag.TABLE,
+    FocusBoardItemTagRelation.TABLE
+)
 
+inline fun createInvalidationTacker(
+    vararg tables: String,
+    crossinline onInvalidated: (Set<String>)->Unit
+): InvalidationTracker.Observer {
+    return object : InvalidationTracker.Observer(tables) {
+        override fun onInvalidated(tables: Set<String>) =  onInvalidated(tables)
+    }
+}
 
-    val tracker = createActivityInvalidationTracker {
-        source.invoke()
+fun  <T> ViewModel.registerInvalidationTracker(db: AppDatabase, vararg tables: String,  source: suspend ()->T){
+
+    val tracker = createInvalidationTacker(*tables) {
+        viewModelScope.launch(Dispatchers.IO) {
+            source.invoke()
+        }
     }
 
     db.invalidationTracker.addObserver(tracker)
-
 
     this.addCloseable {
         db.invalidationTracker.removeObserver(tracker)
@@ -47,43 +65,54 @@ fun  <T> ViewModel.activityInvalidationTracker(db: AppDatabase, source: ()->T){
 }
 
 
-fun  <T> ViewModel.invalidationFlow(db: AppDatabase, source: suspend ()->T) = callbackFlow {
+fun  <T> ViewModel.invalidationStateFlow(
+    db: AppDatabase,
+    initialValue: T,
+    vararg tables: String,
+    source: suspend () -> T
+): MutableStateFlow<T> {
+    val state = MutableStateFlow(initialValue)
 
-    viewModelScope.launch(Dispatchers.IO) {
-        trySend(source.invoke())
+    viewModelScope.launch(Dispatchers.IO)  {
+        state.emit(source())
     }
 
-    val tracker = createActivityInvalidationTracker {
-        viewModelScope.launch(Dispatchers.IO) {
-            trySend(source.invoke())
-        }
+    viewModelScope.launch(Dispatchers.IO)  {
+        observerDBAsFlow(db, *tables)
+            .combine(state.subscriptionCount){ change, observers -> observers > 0 }
+            .filter { it }
+            .collectLatest {
+                Log.e("InvalidationTracker", "Query DB")
+
+                state.emit(source())
+            }
     }
 
-    db.invalidationTracker.addObserver(tracker)
-
-    awaitClose {
-        db.invalidationTracker.removeObserver(tracker)
-    }
-
+    return state;
 }
 
+private fun ViewModel.observerDBAsFlow(
+    db: RoomDatabase,
+    vararg tables: String
+): Flow<Unit> = flow {
+    val observerChannel = Channel<Unit>(Channel.CONFLATED)
 
-
-fun  <T> ViewModel.invalidationFlow(db: AppDatabase, vararg tables: String, source: suspend ()->T) = callbackFlow {
-    viewModelScope.launch(Dispatchers.IO) {
-        trySend(source.invoke())
+    val observer = createInvalidationTacker(*tables) {
+        observerChannel.trySend(Unit)
     }
 
-    val tracker = createInvalidationTacker(tables = tables){
-        viewModelScope.launch(Dispatchers.IO) {
-            trySend(source.invoke())
-        }
+    db.invalidationTracker.addObserver(observer)
+
+    addCloseable {
+        Log.e("InvalidationTracker", "Close: observerDBAsFlow")
+
+        db.invalidationTracker.addObserver(observer)
+        observerChannel.cancel()
     }
 
-    db.invalidationTracker.addObserver(tracker)
-
-    awaitClose {
-        db.invalidationTracker.removeObserver(tracker)
+    for (signal in observerChannel) {
+        Log.e("InvalidationTracker", "Observer DB invalidation")
+        emit(Unit)
     }
-
 }
+

@@ -45,6 +45,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     compileOptions {
@@ -110,11 +111,14 @@ play {
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
 
-    implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
+    implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.7")
+
+
+    implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
 
-    val COMPOSE_VERSION = "1.6.0"
-    implementation("androidx.compose.compiler:compiler:1.5.8")
+    val COMPOSE_VERSION = "1.6.1"
+    implementation("androidx.compose.compiler:compiler:1.5.9")
     implementation("androidx.compose.animation:animation:$COMPOSE_VERSION")
     implementation("androidx.compose.foundation:foundation:$COMPOSE_VERSION")
     implementation("androidx.compose.material:material:$COMPOSE_VERSION")
@@ -124,11 +128,13 @@ dependencies {
     implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
 
     implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.glance:glance-appwidget:1.0.0")
+    implementation("androidx.glance:glance-appwidget:1.1.0-alpha01")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-    implementation("androidx.navigation:navigation-compose:2.7.6")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+
 
     implementation("androidx.paging:paging-runtime-ktx:3.2.1")
     implementation("androidx.paging:paging-compose:3.2.1")

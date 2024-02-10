@@ -1,6 +1,8 @@
 package com.imfibit.activitytracker.ui.widgets
 
 import android.content.Context
+import android.graphics.drawable.Icon
+import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -67,6 +69,8 @@ class WidgetOverview : GlanceAppWidget() {
     }
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+
+
         provideContent {
             val prefs = currentState<Preferences>()
 
@@ -116,6 +120,8 @@ class WidgetOverview : GlanceAppWidget() {
                                 "#59BF2D" -> com.imfibit.activitytracker.R.drawable.widget_backgoround_green
                                 else -> throw IllegalArgumentException()
                             }
+
+
 
                             Box(
                                 modifier = GlanceModifier

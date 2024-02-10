@@ -6,7 +6,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.core.AppViewModel
-import com.imfibit.activitytracker.core.invalidationFlow
 import com.imfibit.activitytracker.core.services.activity.ToggleActivityService
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
@@ -17,7 +16,6 @@ import com.imfibit.activitytracker.ui.components.dialogs.DialogScore
 import com.imfibit.activitytracker.ui.components.dialogs.DialogSession
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 @Composable

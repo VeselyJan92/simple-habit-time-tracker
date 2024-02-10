@@ -29,10 +29,10 @@ import androidx.compose.material.icons.automirrored.outlined.FactCheck
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,7 +46,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.extensions.toggle
 import com.imfibit.activitytracker.core.toColor
@@ -56,6 +56,7 @@ import com.imfibit.activitytracker.database.entities.FocusBoardItemTag
 import com.imfibit.activitytracker.ui.MainBody
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.dialogs.rememberDialog
+import kotlinx.collections.immutable.persistentListOf
 import org.burnoutcrew.reorderable.ItemPosition
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
@@ -98,36 +99,35 @@ val colors200 = listOf(
 @Preview
 @Composable
 private fun Preview() {
-    val context = LocalContext.current
-
     Body(
-        navControl = NavHostController(context),
-        items = remember { mutableStateListOf(
-            FocusBoardItemWithTags(DevSeeder.getFocusBoardItem(), listOf(DevSeeder.getFocusBoardItemTag()))
-        ) },
+        items = remember {
+            listOf(
+                FocusBoardItemWithTags(DevSeeder.getFocusBoardItem(), listOf(DevSeeder.getFocusBoardItemTag()))
+            )
+        },
         tags = remember {mutableStateListOf() },
         onFocusItemEdit = {},
         onFocusItemDelete = {},
         reorderFocusItems = {},
-        swapFocusItems = {_, _ -> },
+        swapFocusItems = { _, _ -> },
         reorderTags = { },
-        swapTags = {_, _ -> },
-        onTagEdit = {},
-        onTagDelete = {}
-    )
+        swapTags = { _, _ -> },
+        onTagEdit = {}
+    ) {}
 }
 
 
 
 @Composable
-fun ScreenFocusBoard(navControl: NavHostController) {
-
-    val viewModel = hiltViewModel<FocusBoardViewModel>()
+fun ScreenFocusBoard(
+    viewModel: FocusBoardViewModel = hiltViewModel<FocusBoardViewModel>()
+) {
+    val focusItems by viewModel.focusItems.collectAsStateWithLifecycle()
+    val tags by viewModel.tags.collectAsStateWithLifecycle()
 
     Body(
-        navControl = navControl,
-        items = viewModel.focusItems,
-        tags = viewModel.tags,
+        items = focusItems,
+        tags = tags,
         onFocusItemEdit = viewModel::onFocusItemEdit,
         onFocusItemDelete = viewModel::onFocusItemDelete,
         reorderFocusItems = viewModel::reorderFocusItems,
@@ -141,9 +141,8 @@ fun ScreenFocusBoard(navControl: NavHostController) {
 
 @Composable
 private fun Body(
-    navControl: NavHostController,
-    items: SnapshotStateList<FocusBoardItemWithTags>,
-    tags: SnapshotStateList<FocusBoardItemTag>,
+    items: List<FocusBoardItemWithTags>,
+    tags: List<FocusBoardItemTag>,
     onFocusItemEdit: (FocusBoardItemWithTags) -> Unit,
     onFocusItemDelete: (FocusBoardItemWithTags) -> Unit,
     reorderFocusItems: () -> Unit,
@@ -165,20 +164,16 @@ private fun Body(
                 mutableStateOf(set)
             }
 
-            val items = remember(toggle.value) {
+            val items = remember(toggle.value, items) {
                 derivedStateOf {
                     items.filter { it.tags.isEmpty() || it.tags.any { toggle.value.contains(it.id) } }
                 }
             }
 
             HeaderWithTags(
-                tagsState = tags,
-                reorderTags = reorderTags,
-                swapTags = swapTags,
-                onTagEdit = onTagEdit,
-                onTagDelete = onTagDelete,
-                selectedTags = toggle.value,
-                toggle = { toggle.value = toggle.value.toMutableSet().apply { toggle(it.id) } }
+                toggle = { toggle.value = toggle.value.toMutableSet().apply { toggle(it.id) } },
+                tags = tags,
+                selectedTags = toggle.value
             )
 
             FocusBoardItems(
@@ -195,7 +190,7 @@ private fun Body(
 
 @Composable
 private fun TopBar(
-    tagsState: SnapshotStateList<FocusBoardItemTag>,
+    tagsState: List<FocusBoardItemTag>,
     reorderTags: () -> Unit,
     swapTags: (ItemPosition, ItemPosition) -> Unit,
     onTagEdit: (FocusBoardItemTag) -> Unit,
@@ -246,7 +241,7 @@ private fun TopBar(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FocusBoardItems(
-    tags : SnapshotStateList<FocusBoardItemTag>,
+    tags : List<FocusBoardItemTag>,
     onFocusItemEdit: (FocusBoardItemWithTags)->Unit,
     onFocusItemDelete: (FocusBoardItemWithTags)->Unit,
     focusItems: List<FocusBoardItemWithTags>,
@@ -316,23 +311,16 @@ fun FocusBoardItems(
 
 @Composable
 fun HeaderWithTags(
-    toggle: (FocusBoardItemTag)-> Unit,
-    tagsState: SnapshotStateList<FocusBoardItemTag>,
+    toggle: (FocusBoardItemTag) -> Unit,
+    tags: List<FocusBoardItemTag>,
     selectedTags: Set<Long>,
-    reorderTags: () -> Unit,
-    swapTags: (ItemPosition, ItemPosition) -> Unit,
-    onTagEdit: (FocusBoardItemTag) -> Unit,
-    onTagDelete: (FocusBoardItemTag) -> Unit,
 ) {
-
-
-
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ){
 
-        items(tagsState, {item -> item.id }){ item ->
+        items(tags, { item -> item.id }){ item ->
 
             FocusItemTag(
                 onClick =  { toggle(item) },

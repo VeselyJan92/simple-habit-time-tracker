@@ -9,11 +9,12 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.paging.cachedIn
 import com.imfibit.activitytracker.core.AppViewModel
-import com.imfibit.activitytracker.core.activityInvalidationTracker
-import com.imfibit.activitytracker.core.services.activity.ToggleActivityService
+import com.imfibit.activitytracker.core.activityTables
+import com.imfibit.activitytracker.core.registerInvalidationTracker
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toPersistentList
 import java.time.YearMonth
 import javax.inject.Inject
 
@@ -22,7 +23,6 @@ import javax.inject.Inject
 class TrackedActivityHistoryVM @Inject constructor(
     private val db: AppDatabase,
     private val rep: RepositoryTrackedActivity,
-    private val toggleActivityService: ToggleActivityService,
     private val savedStateHandle: SavedStateHandle
 ) : AppViewModel() {
 
@@ -33,7 +33,7 @@ class TrackedActivityHistoryVM @Inject constructor(
     private lateinit var source: MonthsPagingSource
 
     init {
-        activityInvalidationTracker(db){
+        registerInvalidationTracker(db, *activityTables){
             source.invalidate()
         }
     }
@@ -60,7 +60,7 @@ class MonthsPagingSource(
 
         val months = List(PAGE_SIZE){
             rep.getMonthData(activityId, YearMonth.now().minusMonths((month * PAGE_SIZE +  it).toLong()))
-        }
+        }.toPersistentList()
 
         return LoadResult.Page(
             data = months,
@@ -70,7 +70,7 @@ class MonthsPagingSource(
     }
 
     override fun getRefreshKey(state: PagingState<Int, RepositoryTrackedActivity.Month>): Int? {
-    return 0
+        return 0
     }
 }
 

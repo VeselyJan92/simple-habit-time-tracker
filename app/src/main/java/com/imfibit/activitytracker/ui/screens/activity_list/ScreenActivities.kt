@@ -1,6 +1,7 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -46,6 +47,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.PreferencesKeys
@@ -69,13 +72,10 @@ import org.burnoutcrew.reorderable.reorderable
 @Composable
 fun ScreenActivities(
     navController: NavHostController,
+    vm:ActivitiesViewModel  = hiltViewModel()
 ) {
-    val vm = hiltViewModel<ActivitiesViewModel>()
-
-
     MainBody {
         TopBar(nav = navController)
-
         ScreenBody(navController, vm)
     }
 }
@@ -113,7 +113,9 @@ private fun ScreenBody(
     nav: NavHostController,
     vm: ActivitiesViewModel
 ) {
-    val data by vm.data.collectAsState(initial = ActivitiesViewModel.Data())
+    val data by vm.data.collectAsStateWithLifecycle()
+
+    Log.e("tracker", "recompose")
 
     Box {
         if (data.activities.isEmpty() && data.live.isEmpty()){

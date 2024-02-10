@@ -1,6 +1,5 @@
 package com.imfibit.activitytracker.ui.components.dialogs
 
-import android.os.Bundle
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,13 +20,11 @@ import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.NavOptions
-import androidx.navigation.Navigator
 import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.core.activityTables
 import com.imfibit.activitytracker.core.extensions.navigate
-import com.imfibit.activitytracker.core.invalidationFlow
+import com.imfibit.activitytracker.core.invalidationStateFlow
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.composed.RecordWithActivity
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
@@ -58,7 +55,7 @@ fun DialogRecords(nav: NavHostController, scaffoldState: ScaffoldState) {
 
                 DialogBaseHeader(title = stringResource( R.string.dialog_records_title))
 
-                val data by vm.data.collectAsState(initial = listOf())
+                val data by vm.data.collectAsState()
 
                 if (data.isEmpty()) {
                     Text(text = stringResource(id = R.string.no_records), fontWeight= FontWeight.W600, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
@@ -101,7 +98,7 @@ class DayRecordsVM @Inject constructor(
     val activityId: Long = savedStateHandle["activity_id"] ?: throw IllegalArgumentException()
     val date: LocalDate = LocalDate.parse(savedStateHandle["date"])?: throw IllegalArgumentException()
 
-    val data = invalidationFlow(db){
+    val data = invalidationStateFlow(db, listOf(), *activityTables){
         val activity = rep.activityDAO.flowById(activityId).first()
 
         val from = date.atStartOfDay()

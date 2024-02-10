@@ -14,6 +14,12 @@ abstract class DAOFocusBoardItemTags : BaseEditableDAO<FocusBoardItemTag> {
    """)
     abstract fun getAllFlow(): Flow<List<FocusBoardItemTag>>
 
+    @Query("""
+        SELECT * FROM focus_board_item_tags
+        order by position
+   """)
+    abstract fun getAll(): List<FocusBoardItemTag>
+
 
     @Query("""
         SELECT t.* FROM focus_board_item_tags t

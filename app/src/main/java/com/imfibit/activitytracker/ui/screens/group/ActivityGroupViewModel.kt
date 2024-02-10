@@ -4,8 +4,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.imfibit.activitytracker.core.AppViewModel
-import com.imfibit.activitytracker.core.createActivityInvalidationTracker
+import com.imfibit.activitytracker.core.activityTables
 import com.imfibit.activitytracker.core.extensions.swap
+import com.imfibit.activitytracker.core.invalidationStateFlow
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
@@ -32,38 +33,24 @@ class ActivityGroupViewModel @Inject constructor(
     val groupName = mutableStateOf<String?>(null)
 
 
-    val activities = MutableStateFlow<List<TrackedActivityRecentOverview>>(listOf())
-
-    val group = MutableStateFlow<TrackerActivityGroup?>(null)
-
-
-
-    val tracker = createActivityInvalidationTracker {
-        fetch()
+    val activities = invalidationStateFlow(db, listOf(), *activityTables){
+        rep.getActivitiesOverview(db.activityDAO().getActivitiesFromGroup(id))
     }
 
-    private fun fetch() = viewModelScope.launch(Dispatchers.IO) {
-        //there might be and update after delete group
-        val groupData = db.groupDAO().getByIdOrNull(id) ?: return@launch
+    val group = invalidationStateFlow(db, null, *activityTables){
+        val group = db.groupDAO().getByIdOrNull(id)
 
-
-
-        activities.value = rep.getActivitiesOverview(db.activityDAO().getActivitiesFromGroup(id))
-
-        withContext(Dispatchers.Main){
-            group.value = groupData
-            groupName.value = groupData.name
+        if (group != null){
+            viewModelScope.launch(Dispatchers.Main) {
+                groupName.value = group.name
+            }
         }
+
+        group
     }
 
-    init {
-        db.invalidationTracker.addObserver(tracker)
-        fetch()
-    }
 
     override fun onCleared()  = runBlocking(Dispatchers.IO) {
-        db.invalidationTracker.removeObserver(tracker)
-
         val group = db.groupDAO().getByIdOrNull(id)
 
         // If name is not filled or group was deleted

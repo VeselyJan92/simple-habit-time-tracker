@@ -19,15 +19,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -189,6 +189,8 @@ private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldStat
     val vm = hiltViewModel<ActivitiesViewModel>()
     val focusBoardViewModel = hiltViewModel<FocusBoardViewModel>()
 
+    val tags by focusBoardViewModel.tags.collectAsStateWithLifecycle()
+
 
     val pagerState = rememberPagerState(
         initialPage = 1,
@@ -200,7 +202,7 @@ private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldStat
         display = dialogEditFocusItem,
         isEdit = false,
         item = FocusBoardItemWithTags(FocusBoardItem(title = "", content = ""), listOf()),
-        tags = focusBoardViewModel.tags,
+        tags = tags,
         onFocusItemEdit = {
             focusBoardViewModel.createNewFocusItem(it)
         }
@@ -262,7 +264,7 @@ private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldStat
             ) { page ->
                 when(page){
                     SCREEN_ACTIVITIES_PAGER_ID -> ScreenActivities(navController = navControl )
-                    SCREEN_FOCUS_BOARD_PAGER_ID -> ScreenFocusBoard(navControl = navControl)
+                    SCREEN_FOCUS_BOARD_PAGER_ID -> ScreenFocusBoard()
                 }
             }
         },
