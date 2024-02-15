@@ -1,13 +1,9 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
-import android.content.Context
 import android.util.Log
-import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.viewModelScope
-import com.imfibit.activitytracker.core.AppViewModel
-import com.imfibit.activitytracker.core.PreferencesKeys
+import com.imfibit.activitytracker.core.BaseViewModel
 import com.imfibit.activitytracker.core.activityTables
-import com.imfibit.activitytracker.core.dataStore
 import com.imfibit.activitytracker.core.extensions.swap
 import com.imfibit.activitytracker.core.invalidationStateFlow
 import com.imfibit.activitytracker.core.services.TrackTimeService
@@ -30,7 +26,7 @@ class ActivitiesViewModel @Inject constructor(
     private val db: AppDatabase,
     private val timerService: TrackTimeService,
     private val  rep: RepositoryTrackedActivity,
-) : AppViewModel() {
+) : BaseViewModel() {
 
     data class Data(
         val activities: List<TrackedActivityRecentOverview> = listOf(),
@@ -90,18 +86,4 @@ class ActivitiesViewModel @Inject constructor(
         db.groupDAO().insert(group)
     }
 
-    fun clearOnboardingData(context: Context) = launchIO  {
-        db.clearAllTables()
-
-        context.dataStore.edit {
-            it[PreferencesKeys.ERASE_OBOARDING_SHOW] = false
-        }
-
-    }
-
-    fun hideClearCard(context: Context) = launchIO {
-        context.dataStore.edit {
-            it[PreferencesKeys.ERASE_OBOARDING_SHOW] = false
-        }
-    }
 }

@@ -35,7 +35,6 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun DialogRecords(nav: NavHostController, scaffoldState: ScaffoldState) {
     val vm = hiltViewModel<DayRecordsVM>()

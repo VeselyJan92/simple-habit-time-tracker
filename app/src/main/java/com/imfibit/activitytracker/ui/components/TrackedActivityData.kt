@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -17,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.core.TestTag
 import com.imfibit.activitytracker.core.value
 import com.imfibit.activitytracker.database.entities.*
 import com.imfibit.activitytracker.ui.components.dialogs.DialogScore
@@ -73,7 +75,7 @@ fun Record(
 
     Surface(
         elevation = 2.dp,
-        modifier = Modifier
+        modifier = Modifier.testTag(TestTag.ACTIVITY_RECORD)
             .clickable(onClick = {
                 onCLick(record)
             }),

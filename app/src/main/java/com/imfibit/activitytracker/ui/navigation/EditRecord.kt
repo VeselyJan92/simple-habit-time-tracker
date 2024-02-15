@@ -5,7 +5,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavHostController
-import com.imfibit.activitytracker.core.AppViewModel
+import com.imfibit.activitytracker.core.BaseViewModel
 import com.imfibit.activitytracker.core.services.activity.ToggleActivityService
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
@@ -49,7 +49,7 @@ public class DialogEditRecordVM @Inject constructor(
     private val db: AppDatabase,
     private val toggleActivityService: ToggleActivityService,
     private val savedStateHandle: SavedStateHandle
-): AppViewModel(){
+): BaseViewModel(){
 
     val record: TrackedActivityRecord =  savedStateHandle["record"] ?: throw IllegalArgumentException()
 

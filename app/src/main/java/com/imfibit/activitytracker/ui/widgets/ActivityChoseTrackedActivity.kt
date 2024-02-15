@@ -21,22 +21,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
 import androidx.glance.appwidget.GlanceAppWidgetManager
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
-import com.imfibit.activitytracker.core.AppViewModel
-import com.imfibit.activitytracker.core.services.OverviewWidgetService
+import com.imfibit.activitytracker.core.BaseViewModel
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import javax.inject.Inject
 
 
 abstract class WidgetPickerVM constructor(
     private val database: AppDatabase
-): AppViewModel(){
+): BaseViewModel(){
     val data: MutableStateFlow<List<TrackedActivity>> = MutableStateFlow(listOf())
 
     init {

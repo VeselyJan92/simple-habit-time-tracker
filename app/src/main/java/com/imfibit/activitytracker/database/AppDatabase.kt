@@ -12,8 +12,23 @@ import com.imfibit.activitytracker.database.converters.LocalTimeConverter
 import com.imfibit.activitytracker.database.dao.DAOFocusBoardItem
 import com.imfibit.activitytracker.database.dao.DAOFocusBoardItemTagRelation
 import com.imfibit.activitytracker.database.dao.DAOFocusBoardItemTags
-import com.imfibit.activitytracker.database.dao.tracked_activity.*
-import com.imfibit.activitytracker.database.entities.*
+import com.imfibit.activitytracker.database.dao.tracked_activity.DAOActivityGroup
+import com.imfibit.activitytracker.database.dao.tracked_activity.DAOPresetTimers
+import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivity
+import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivityChecked
+import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivityMetric
+import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivityScore
+import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivityTime
+import com.imfibit.activitytracker.database.entities.FocusBoardItem
+import com.imfibit.activitytracker.database.entities.FocusBoardItemTag
+import com.imfibit.activitytracker.database.entities.FocusBoardItemTagRelation
+import com.imfibit.activitytracker.database.entities.PresetTimer
+import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
+import com.imfibit.activitytracker.database.entities.TrackedActivityMetric
+import com.imfibit.activitytracker.database.entities.TrackedActivityScore
+import com.imfibit.activitytracker.database.entities.TrackedActivityTime
+import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.database.migrations.migrations
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import dagger.Module
@@ -21,8 +36,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import javax.inject.Singleton
 
 
@@ -102,7 +115,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(*migrations)
                     .build()
 
-                runBlocking(Dispatchers.IO) { DebugTestSeeder.seed(db) }
+               // runBlocking(Dispatchers.IO) { DebugTestSeeder.seed(db) }
 
                 db
             }

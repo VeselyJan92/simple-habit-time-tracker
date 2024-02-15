@@ -17,34 +17,31 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.datastore.preferences.core.edit
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.imfibit.activitytracker.R
-import com.imfibit.activitytracker.core.PreferencesKeys
-import com.imfibit.activitytracker.core.dataStore
-import com.imfibit.activitytracker.core.services.NotificationService
+import com.imfibit.activitytracker.core.AppViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 
 
 @Composable
 fun CheckNotificationPermission() {
-    val context = LocalContext.current
-
     val askForNotifications = remember {
         mutableStateOf(false)
     }
 
+    val appVM = hiltViewModel<AppViewModel>()
+
     DialogAskForNotifications(askForNotifications){
         runBlocking {
-            context.dataStore.edit { settings -> settings[PreferencesKeys.ASK_FOR_NOTIFICATION] = false }
+            appVM.settings.setShouldShowNotificationsPopup(false)
         }
 
         askForNotifications.value = false
     }
 
     LaunchedEffect(true ) {
-        if (NotificationService(context).shouldAskForNotification()){
-
+        if (appVM.settings.getShouldShowNotificationsPopup() == true){
             delay(2000)
             askForNotifications.value = true
         }

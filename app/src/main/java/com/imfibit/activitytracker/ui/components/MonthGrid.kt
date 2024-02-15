@@ -8,16 +8,32 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.ContextString
+import com.imfibit.activitytracker.core.TestTag
+import com.imfibit.activitytracker.database.DevSeeder
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import java.time.*
+import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.*
 
+
+@Preview
+@Composable
+private fun MonthPreview() = Month(
+    modifier = Modifier,
+    activity = DevSeeder.getTrackedActivityTime(),
+    month = DevSeeder.getMonthData(YearMonth.now()),
+    onDayLongClicked = {_, _ -> },
+    onDayClicked = {_, _ -> }
+)
 
 @Composable
 fun Month(
@@ -26,7 +42,7 @@ fun Month(
     month: RepositoryTrackedActivity.Month,
     onDayClicked: (TrackedActivity, LocalDate) -> Unit,
     onDayLongClicked: (TrackedActivity, LocalDate) -> Unit
-){
+)  = Column {
     MonthSplitter(month =  "${month.month.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault()).uppercase()} - ${month.month.year}")
 
     Column(modifier = modifier.padding(3.dp)) {
@@ -48,9 +64,11 @@ private fun Week(
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         week.days.forEach {
             val modifier = if (it.date == LocalDate.now())
-                Modifier.border(width = 2.dp, Color.Black, shape = RoundedCornerShape(50))
-            else
                 Modifier
+                    .border(width = 2.dp, Color.Black, shape = RoundedCornerShape(50))
+                    .testTag(TestTag.MONTH_GRID_TODAY)
+            else
+                Modifier.testTag(TestTag.MONTH_GRID_DATE + it.date.format(DateTimeFormatter.ISO_DATE))
 
 
 
@@ -84,7 +102,9 @@ private fun Week(
                 else -> activity.type.getLabel(week.total)
             }
 
-            MetricBlock(MetricWidgetData(metric, activity.goal.color(week.total), { resources.getString(R.string.week)}))
+            MetricBlock(
+                data = MetricWidgetData(value = metric, color = activity.goal.color(week.total), label = { resources.getString(R.string.week)})
+            )
         }else{
             MetricBlock(MetricWidgetData({"-"}, Color.LightGray, {""}))
         }

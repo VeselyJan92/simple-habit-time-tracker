@@ -24,6 +24,7 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun EditableDatetime(
+    modifier: Modifier = Modifier,
     datetime: LocalDateTime,
     onDatetimeEdit: (LocalDateTime)->Unit
 ){
@@ -31,7 +32,7 @@ fun EditableDatetime(
 
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .height(30.dp)
             .background(Colors.ChipGray, RoundedCornerShape(50))
             .padding(start = 8.dp, end = 8.dp),

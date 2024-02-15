@@ -5,15 +5,14 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.content.ContextCompat
-import com.imfibit.activitytracker.core.PreferencesKeys
-import com.imfibit.activitytracker.core.dataStore
+import com.imfibit.activitytracker.core.AppSettings
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 
 class NotificationService @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val appSettings: AppSettings
 ) {
 
     suspend fun shouldAskForNotification(): Boolean{
@@ -24,7 +23,7 @@ class NotificationService @Inject constructor(
                 Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED
 
-            val askForNotificationsToggle = context.dataStore.data.first()[PreferencesKeys.ASK_FOR_NOTIFICATION] ?: true
+            val askForNotificationsToggle = appSettings.getShouldShowNotificationsPopup() ?: true
 
             askForNotificationsToggle && !isGranted
         }else{

@@ -2,7 +2,6 @@ package com.imfibit.activitytracker.ui.screens.activity_list
 
 import android.annotation.SuppressLint
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -28,19 +26,16 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AssignmentTurnedIn
 import androidx.compose.material.icons.outlined.SwipeLeft
 import androidx.compose.material.icons.outlined.Topic
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -48,11 +43,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
-import com.imfibit.activitytracker.core.PreferencesKeys
-import com.imfibit.activitytracker.core.dataStore
+import com.imfibit.activitytracker.core.TestTag
 import com.imfibit.activitytracker.core.value
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.embedable.TimeRange
@@ -63,6 +56,7 @@ import com.imfibit.activitytracker.ui.SCREEN_SETTINGS
 import com.imfibit.activitytracker.ui.SCREEN_STATISTICS
 import com.imfibit.activitytracker.ui.components.BaseMetricBlock
 import com.imfibit.activitytracker.ui.components.Colors
+import com.imfibit.activitytracker.ui.components.util.TestableContent
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyGridState
@@ -73,7 +67,7 @@ import org.burnoutcrew.reorderable.reorderable
 fun ScreenActivities(
     navController: NavHostController,
     vm:ActivitiesViewModel  = hiltViewModel()
-) {
+) = TestableContent(testTag = TestTag.DASHBOARD_ACTIVITIES_CONTENT) {
     MainBody {
         TopBar(nav = navController)
         ScreenBody(navController, vm)
@@ -209,13 +203,6 @@ private fun Activities(
     ) {
 
         item("head", span = { GridItemSpan(2) }) {
-            val context = LocalContext.current
-            val pref by context.dataStore.data.collectAsState(initial = null)
-
-            if (pref?.get(PreferencesKeys.ERASE_OBOARDING_SHOW) == true) {
-                ClearAll(vm)
-            }
-
             Today(nav, data.today)
         }
 
@@ -258,58 +245,6 @@ private fun Activities(
             ) { isDragging ->
                 Category(nav, item, if (isDragging) Color.LightGray else Color.White )
             }
-        }
-    }
-}
-
-
-@Composable
-private fun ClearAll(vm: ActivitiesViewModel) {
-
-    val context = LocalContext.current
-
-    Surface(
-        elevation = 2.dp,
-        shape = RoundedCornerShape(5.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Icon(
-                modifier = Modifier.clickable {
-                    vm.hideClearCard(context)
-                },
-                imageVector = Icons.Default.Clear,
-                contentDescription = null
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Text(
-                modifier = Modifier.weight(1f),
-                text = "Clear all onboarding data",
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
-            )
-
-            Box(
-                modifier = Modifier
-                    .size(70.dp, 30.dp)
-                    .padding(end = 8.dp)
-                    .background(Colors.ChipGray, RoundedCornerShape(50))
-                    .clickable(onClick = {
-                        vm.clearOnboardingData(context)
-                    }),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = "Erase")
-            }
-
         }
     }
 }

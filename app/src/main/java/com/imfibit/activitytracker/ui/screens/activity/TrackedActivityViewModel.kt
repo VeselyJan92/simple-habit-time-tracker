@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
-import com.imfibit.activitytracker.core.AppViewModel
+import com.imfibit.activitytracker.core.BaseViewModel
 import com.imfibit.activitytracker.core.ContextString
 import com.imfibit.activitytracker.core.activityTables
 import com.imfibit.activitytracker.core.invalidationStateFlow
@@ -50,7 +50,7 @@ class TrackedActivityViewModel @Inject constructor(
     private val db: AppDatabase,
     private val rep: RepositoryTrackedActivity,
     private val savedStateHandle: SavedStateHandle
-) : AppViewModel() {
+) : BaseViewModel() {
 
     var deleted = false
 

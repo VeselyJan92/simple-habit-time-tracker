@@ -1,8 +1,7 @@
 package com.imfibit.activitytracker.ui.viewmodels
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.imfibit.activitytracker.core.AppViewModel
+import com.imfibit.activitytracker.core.BaseViewModel
 import com.imfibit.activitytracker.core.services.activity.TimeActivityService
 import com.imfibit.activitytracker.core.services.activity.ToggleActivityService
 import com.imfibit.activitytracker.core.services.TrackTimeService
@@ -27,7 +26,7 @@ class RecordViewModel @Inject constructor(
     private val toggleService: ToggleActivityService,
     private val sessionService: TimeActivityService,
     public val hapticsService: UserHapticsService
-): AppViewModel() {
+): BaseViewModel() {
 
     fun getActivity(activityId: Long) = rep.activityDAO.getById(activityId)
 

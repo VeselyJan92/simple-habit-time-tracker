@@ -1,7 +1,6 @@
 package com.imfibit.activitytracker.ui
 
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,12 +18,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,8 +37,8 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.imfibit.activitytracker.R
-import com.imfibit.activitytracker.core.PreferencesKeys
-import com.imfibit.activitytracker.core.dataStore
+import com.imfibit.activitytracker.core.AppViewModel
+import com.imfibit.activitytracker.core.TestTag
 import com.imfibit.activitytracker.core.notifications.NotificationLiveSession
 import com.imfibit.activitytracker.core.notifications.NotificationTimerOver
 import com.imfibit.activitytracker.database.AppDatabase
@@ -62,10 +63,11 @@ import com.imfibit.activitytracker.ui.screens.settings.ScreenSetting
 import com.imfibit.activitytracker.ui.screens.statistics.ScreenStatistics
 import com.imfibit.activitytracker.ui.screens.upcomming.ScreenUpcoming
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -77,8 +79,8 @@ const val SCREEN_STATISTICS = "SCREEN_STATISTICS"
 const val SCREEN_UPCOMING = "SCREEN_UPCOMING"
 const val SCREEN_TIMELINE = "SCREEN_TIMELINE"
 const val SCREEN_TIMER_OVER = "SCREEN_TIMER_OVER"
-const val SCREEN_ONBOARDING= "SCREEN_ONBOARDING"
-const val SCREEN_SETTINGS= "SCREEN_SETTINGS"
+const val SCREEN_ONBOARDING = "SCREEN_ONBOARDING"
+const val SCREEN_SETTINGS = "SCREEN_SETTINGS"
 
 
 const val SCREEN_FOCUS_BOARD_PAGER_ID = 0
@@ -107,70 +109,89 @@ class MainActivity : ComponentActivity() {
 
 }
 
-
+val LocalNavController = compositionLocalOf<NavHostController> {
+    error("No LocalNavController provided")
+}
 
 @Composable
-fun MainActivity.Router(){
+fun MainActivity.Router() {
+    val vm = hiltViewModel<AppViewModel>()
+
     val navControl = rememberNavController()
 
-    val context: Context = LocalContext.current
-
-    val onboarded =  runBlocking {
-       context.dataStore.data.first()[PreferencesKeys.ONBOARDING_COMPLETED] ?: false
-    }
+    val onboarded = runBlocking { vm.settings.getOnboarded() ?: false }
 
     val destination = if (onboarded) SCREEN_ACTIVITIES else SCREEN_ONBOARDING
 
     val scaffoldState = rememberScaffoldState()
 
-    NavHost(navController = navControl, startDestination = destination){
-        composable(SCREEN_STATISTICS){ ScreenStatistics(navControl, scaffoldState) }
-        composable(SCREEN_ACTIVITIES){ Dashboard(navControl, scaffoldState) }
-        composable(SCREEN_UPCOMING){ ScreenUpcoming(navControl, scaffoldState) }
-        composable(SCREEN_ONBOARDING){ ScreenOnboarding(navControl, scaffoldState) }
-        composable(SCREEN_SETTINGS){ ScreenSetting(navControl, scaffoldState) }
 
-        composable(
-            route ="screen_activity_group/{group_id}",
-            arguments = listOf(navArgument("group_id") { type = NavType.LongType })){
-            ScreenActivityGroup(navControl, scaffoldState)
-        }
+    CompositionLocalProvider(LocalNavController provides rememberNavController()) {
 
-        composable(
-                route ="screen_activity/{activity_id}",
+        NavHost(navController = navControl, startDestination = destination) {
+            composable(SCREEN_STATISTICS) { ScreenStatistics(navControl, scaffoldState) }
+            composable(SCREEN_ACTIVITIES) { Dashboard(navControl, scaffoldState) }
+            composable(SCREEN_UPCOMING) { ScreenUpcoming(navControl, scaffoldState) }
+            composable(SCREEN_SETTINGS) { ScreenSetting(navControl, scaffoldState) }
+
+            composable(
+                route = SCREEN_ONBOARDING
+            ) {
+                ScreenOnboarding(
+                    onOnboardingDone = {
+                        runBlocking {
+                            vm.settings.setOnboarded(true)
+                        }
+
+                        navControl.navigate(SCREEN_ACTIVITIES)
+                    }
+                )
+            }
+
+            composable(
+                route = "screen_activity_group/{group_id}",
+                arguments = listOf(navArgument("group_id") { type = NavType.LongType })
+            ) {
+                ScreenActivityGroup(navControl, scaffoldState)
+            }
+
+            composable(
+                route = "screen_activity/{activity_id}",
                 arguments = listOf(navArgument("activity_id") { type = NavType.LongType })
-        ){
-            ScreenTrackedActivity(navControl, scaffoldState)
-        }
+            ) {
+                ScreenTrackedActivity(navControl, scaffoldState)
+            }
 
-        composable(
-            route ="screen_activity_history/{activity_id}",
-            arguments = listOf(navArgument("activity_id") { type = NavType.LongType })
-        ){
-            ScreenActivityHistory(navControl, scaffoldState)
-        }
+            composable(
+                route = "screen_activity_history/{activity_id}",
+                arguments = listOf(navArgument("activity_id") { type = NavType.LongType })
+            ) {
+                ScreenActivityHistory(navControl, scaffoldState)
+            }
 
-        dialog(
+            dialog(
                 route = "screen_day_history/{activity_id}/{date}",
                 arguments = listOf(
-                        navArgument("activity_id") { type = NavType.LongType },
-                        navArgument("date") { type = NavType.StringType }
+                    navArgument("activity_id") { type = NavType.LongType },
+                    navArgument("date") { type = NavType.StringType }
                 )
-        ){
-            DialogRecords(navControl, scaffoldState)
-        }
+            ) {
+                DialogRecords(navControl, scaffoldState)
+            }
 
 
-        dialog(
-            route = "dialog_edit_record/{record}",
-            arguments = listOf(
-                navArgument("record") { type = NavType.ParcelableType(TrackedActivityRecord::class.java)},
-            )
-        ){
-            EditRecord(navControl)
+            dialog(
+                route = "dialog_edit_record/{record}",
+                arguments = listOf(
+                    navArgument("record") {
+                        type = NavType.ParcelableType(TrackedActivityRecord::class.java)
+                    },
+                )
+            ) {
+                EditRecord(navControl)
+            }
         }
     }
-
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -184,7 +205,8 @@ private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldStat
 
     val name = stringResource(id = R.string.new_activity_name)
 
-    val newGroup = TrackerActivityGroup(0, stringResource(id = R.string.screen_activities_new_group), 0)
+    val newGroup =
+        TrackerActivityGroup(0, stringResource(id = R.string.screen_activities_new_group), 0)
 
     val vm = hiltViewModel<ActivitiesViewModel>()
     val focusBoardViewModel = hiltViewModel<FocusBoardViewModel>()
@@ -195,7 +217,7 @@ private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldStat
     val pagerState = rememberPagerState(
         initialPage = 1,
         initialPageOffsetFraction = 0f,
-        pageCount = {2}
+        pageCount = { 2 }
     )
 
     DialogEditFocusItem(
@@ -213,7 +235,7 @@ private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldStat
             dialogNewActivity.value = false
 
             scope.launch {
-                if (pagerState.currentPage != SCREEN_ACTIVITIES_PAGER_ID){
+                if (pagerState.currentPage != SCREEN_ACTIVITIES_PAGER_ID) {
                     pagerState.animateScrollToPage(SCREEN_ACTIVITIES_PAGER_ID)
                     delay(100)
                 }
@@ -224,13 +246,16 @@ private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldStat
         onAddActivity = {
             dialogNewActivity.value = false
 
-            scope.launch {
-                if (pagerState.currentPage != SCREEN_ACTIVITIES_PAGER_ID){
+            scope.launch(Dispatchers.Main) {
+                if (pagerState.currentPage != SCREEN_ACTIVITIES_PAGER_ID) {
                     pagerState.animateScrollToPage(SCREEN_ACTIVITIES_PAGER_ID)
                     delay(100)
                 }
 
-                val activityId = vm.createNewActivity(name, it).await()
+                val activityId = withContext(Dispatchers.IO) {
+                    vm.createNewActivity(name, it).await()
+                }
+
 
                 navControl.navigate("screen_activity/$activityId")
             }
@@ -240,7 +265,7 @@ private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldStat
             dialogNewActivity.value = false
 
             scope.launch {
-                if (pagerState.currentPage != SCREEN_FOCUS_BOARD_PAGER_ID){
+                if (pagerState.currentPage != SCREEN_FOCUS_BOARD_PAGER_ID) {
                     pagerState.animateScrollToPage(SCREEN_FOCUS_BOARD_PAGER_ID)
                     delay(100)
                 }
@@ -253,7 +278,10 @@ private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldStat
     Scaffold(
         scaffoldState = scaffoldState,
         floatingActionButton = {
-            FloatingActionButton(onClick = { dialogNewActivity.value = true }) {
+            FloatingActionButton(
+                onClick = { dialogNewActivity.value = true },
+                modifier = Modifier.testTag(TestTag.DASHBOARD_ADD_ACTIVITY)
+            ) {
                 Icon(Icons.Filled.Add, null)
             }
         },
@@ -262,8 +290,8 @@ private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldStat
                 contentPadding = it,
                 state = pagerState,
             ) { page ->
-                when(page){
-                    SCREEN_ACTIVITIES_PAGER_ID -> ScreenActivities(navController = navControl )
+                when (page) {
+                    SCREEN_ACTIVITIES_PAGER_ID -> ScreenActivities(navController = navControl)
                     SCREEN_FOCUS_BOARD_PAGER_ID -> ScreenFocusBoard()
                 }
             }
@@ -275,7 +303,7 @@ private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldStat
 
 @Composable
 fun MainBody(content: @Composable (ColumnScope.() -> Unit)) {
-    Column (modifier = Modifier.fillMaxSize(), content = content)
+    Column(modifier = Modifier.fillMaxSize(), content = content)
 }
 
 

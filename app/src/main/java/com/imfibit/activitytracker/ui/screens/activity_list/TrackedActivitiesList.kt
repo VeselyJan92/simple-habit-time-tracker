@@ -213,6 +213,7 @@ fun TrackedActivity(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RowScope.ActionButton(
+    modifier: Modifier = Modifier,
     actionButton: ActionButton,
     activity: TrackedActivity,
     onClick: (()->Unit),
@@ -220,7 +221,7 @@ fun RowScope.ActionButton(
 ) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier
+        modifier = modifier
             .align(Alignment.CenterVertically)
             .size(55.dp)
             .padding(end = 8.dp, start = 8.dp)

@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.burnoutcrew.reorderable.ItemPosition
+import kotlin.random.Random
 
 fun <T> MutableList<T>.swap(from: Int, to: Int) {
     val t = this[from]
@@ -53,4 +54,10 @@ fun <T> MutableSet<T>.toggle(item: T){
     }else{
         add(item)
     }
+}
+
+private val alphanumeric = ('A'..'Z') + ('a'..'z') + ('0'..'9')
+
+fun Random.randomString(length: Int) = buildString {
+        repeat(length) { append(alphanumeric.random()) }
 }

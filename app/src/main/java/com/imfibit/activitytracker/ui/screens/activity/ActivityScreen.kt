@@ -16,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.core.TestTag
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
@@ -34,6 +36,7 @@ import com.imfibit.activitytracker.database.repository.tracked_activity.Reposito
 import com.imfibit.activitytracker.ui.components.*
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.dialogs.*
+import com.imfibit.activitytracker.ui.components.util.TestableContent
 import com.imfibit.activitytracker.ui.screens.activity_list.ActionButton
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.ActionButton.DEFAULT
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.ActionButton.IN_SESSION
@@ -82,7 +85,7 @@ fun ScreenTrackedActivity(
     onDeleteActivity: (TrackedActivity)->Unit,
     onActivityNameUpdate: (String)->Unit,
     onNavigateToHistory: (TrackedActivity) -> Unit
-) {
+) = TestableContent(testTag = TestTag.TRACKED_ACTIVITY_SCREEN) {
 
     val state by activityState.collectAsState(initial = null)
 
@@ -101,7 +104,7 @@ fun ScreenTrackedActivity(
                 TopBarBackButton(navHostController = nav)
 
                 BasicTextField(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).testTag(TestTag.TRACKED_ACTIVITY_EDIT_NAME),
                     value = activityName.value ?: "",
                     singleLine = true,
                     onValueChange = onActivityNameUpdate,
@@ -280,20 +283,26 @@ fun SessionActivityCustomStart(
 
             val action = if (activity.isInSession()) IN_SESSION else DEFAULT
 
-            ActionButton(actionButton = action, activity = activity, onClick = {
-                val validStart = start.value ?: LocalDateTime.now()
+            ActionButton(
+                modifier = Modifier.testTag(TestTag.TRACKED_ACTIVITY_ACTION_BUTTON),
+                actionButton = action,
+                activity = activity,
+                onClick = {
+                    val validStart = start.value ?: LocalDateTime.now()
 
-                if (validStart >= LocalDateTime.now())
-                    return@ActionButton
+                    if (validStart >= LocalDateTime.now())
+                        return@ActionButton
 
-                onActionClick(validStart)
-            })
+                    onActionClick(validStart)
+                }
+            )
 
             Spacer(modifier = Modifier.width(8.dp))
 
 
             if(activity.isInSession()){
                 EditableDatetime(
+                    modifier = Modifier.testTag(TestTag.TRACKED_ACTIVITY_TIME_CLOSE_SESSION),
                     datetime = start.value ?: LocalDateTime.now(),
                     onDatetimeEdit = {
                         if(activity.isInSession()){

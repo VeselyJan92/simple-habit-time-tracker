@@ -116,6 +116,8 @@ dependencies {
 
     implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation("androidx.test:runner:1.5.2")
+    implementation("androidx.test:rules:1.5.0")
 
     val COMPOSE_VERSION = "1.6.1"
     implementation("androidx.compose.compiler:compiler:1.5.9")
@@ -151,7 +153,19 @@ dependencies {
     ksp("androidx.hilt:hilt-compiler:1.1.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.48.1")
+
 
     debugImplementation( "androidx.compose.ui:ui-tooling:$COMPOSE_VERSION")
     implementation("androidx.compose.ui:ui-tooling-preview:$COMPOSE_VERSION")
+
+
+    // Test rules and transitive dependencies:
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:$COMPOSE_VERSION")
+
+    // Needed for createAndroidComposeRule, but not createComposeRule:
+    debugImplementation("androidx.compose.ui:ui-test-manifest:$COMPOSE_VERSION")
+
+    debugImplementation("androidx.test:core:1.5.0")
+
 }

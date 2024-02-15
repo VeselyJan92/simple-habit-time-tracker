@@ -1,17 +1,66 @@
 package com.imfibit.activitytracker.database
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import com.imfibit.activitytracker.core.iter
 import com.imfibit.activitytracker.database.composed.FocusBoardItemWithTags
+import com.imfibit.activitytracker.database.embedable.TimeRange
+import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
+import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import com.imfibit.activitytracker.database.entities.FocusBoardItem
 import com.imfibit.activitytracker.database.entities.FocusBoardItemTag
+import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
 import com.imfibit.activitytracker.database.entities.TrackedActivityScore
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
+import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.YearMonth
 import java.util.*
 import kotlin.random.Random.Default.nextInt
 
 object DevSeeder {
+
+    fun getMonthData(date: YearMonth): RepositoryTrackedActivity.Month {
+
+        val first = date.atDay(1)
+        val last = date.atEndOfMonth()
+
+        val from = first.minusDays(first.dayOfWeek.ordinal.toLong())
+        val to = last.plusDays(last.dayOfWeek.ordinal.toLong())
+
+        val weeks = (from iter to.plusDays(1)).asSequence().chunked(7).map {
+            RepositoryTrackedActivity.Week(
+                from = it.first(),
+                to = it.last(),
+                days = it.map { RepositoryTrackedActivity.Day(
+                    label = {it.dayOfMonth.toString()},
+                    metric = 60*60,
+                    color = Color.LightGray,
+                    date = it,
+                    type = TrackedActivity.Type.TIME
+                ) },
+                total = 1000
+            )
+        }.toList()
+
+        return RepositoryTrackedActivity.Month(weeks, date)
+    }
+
+    fun getTrackedActivityTime() = TrackedActivity(
+        id = -1,
+        groupId = -1,
+        name = "Test activity",
+        position = 0,
+        groupPosition = 0,
+        type = TrackedActivity.Type.TIME,
+        inSessionSince = null,
+        goal = TrackedActivityGoal(0, TimeRange.DAILY),
+        challenge = TrackedActivityChallenge(
+            name = "", target = -1, from = LocalDate.now(), to = LocalDate.now()
+        )
+    )
 
     public fun getTags() = listOf(
         FocusBoardItemTag(id = 1, name = "Habits", color = FocusBoardItemTag.colors[0].toArgb()),

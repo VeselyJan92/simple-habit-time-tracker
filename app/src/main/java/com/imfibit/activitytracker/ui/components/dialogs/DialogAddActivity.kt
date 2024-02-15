@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.core.TestTag
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.components.Colors
 
@@ -44,23 +46,23 @@ fun DialogAddActivity(
     DialogBaseHeader(title = stringResource(id = R.string.create_new_activity))
 
 
-    TrackedActivities(Icons.Default.Timer, stringResource(id = R.string.new_activity_time)){
+    TrackedActivities(modifier = Modifier.testTag(TestTag.DIALOG_ADD_ACTIVITY_TIME), Icons.Default.Timer, stringResource(id = R.string.new_activity_time)){
         onAddActivity.invoke(TrackedActivity.Type.TIME)
     }
 
-    TrackedActivities(Icons.Default.Score, stringResource(id = R.string.new_activity_score)){
+    TrackedActivities(modifier = Modifier.testTag(TestTag.DIALOG_ADD_ACTIVITY_SCORE), Icons.Default.Score, stringResource(id = R.string.new_activity_score)){
         onAddActivity.invoke(TrackedActivity.Type.SCORE)
     }
 
-    TrackedActivities(Icons.Default.AssignmentTurnedIn, stringResource(id = R.string.new_activity_checked)) {
+    TrackedActivities(modifier = Modifier.testTag(TestTag.DIALOG_ADD_ACTIVITY_COMPLETION), Icons.Default.AssignmentTurnedIn, stringResource(id = R.string.new_activity_checked)) {
         onAddActivity.invoke(TrackedActivity.Type.CHECKED)
     }
 
-    TrackedActivities(Icons.Default.Topic, stringResource(id = R.string.new_activity_folder)) {
+    TrackedActivities(modifier = Modifier.testTag(TestTag.DIALOG_ADD_ACTIVITY_GROUP), Icons.Default.Topic, stringResource(id = R.string.new_activity_folder)) {
         onAddFolder()
     }
 
-    TrackedActivities(Icons.Default.Assignment, stringResource(id = R.string.new_activity_focus_item)) {
+    TrackedActivities(modifier = Modifier.testTag(TestTag.DIALOG_ADD_ACTIVITY_FOCUS_ITEM), Icons.Default.Assignment, stringResource(id = R.string.new_activity_focus_item)) {
         onAddFocusItem()
     }
 
@@ -76,6 +78,7 @@ fun DialogAddActivity(
 
 @Composable
 private fun TrackedActivities(
+    modifier: Modifier,
     icon: ImageVector,
     name: String,
     clickable: () -> Unit
@@ -83,7 +86,7 @@ private fun TrackedActivities(
     val interaction = remember { MutableInteractionSource() }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .padding(8.dp)
             .fillMaxWidth()
             .zIndex(1f)

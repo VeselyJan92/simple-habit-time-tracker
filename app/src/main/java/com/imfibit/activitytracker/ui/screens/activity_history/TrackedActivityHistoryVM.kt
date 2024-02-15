@@ -8,7 +8,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.paging.cachedIn
-import com.imfibit.activitytracker.core.AppViewModel
+import com.imfibit.activitytracker.core.BaseViewModel
 import com.imfibit.activitytracker.core.activityTables
 import com.imfibit.activitytracker.core.registerInvalidationTracker
 import com.imfibit.activitytracker.database.AppDatabase
@@ -24,7 +24,7 @@ class TrackedActivityHistoryVM @Inject constructor(
     private val db: AppDatabase,
     private val rep: RepositoryTrackedActivity,
     private val savedStateHandle: SavedStateHandle
-) : AppViewModel() {
+) : BaseViewModel() {
 
     val id: Long = savedStateHandle["activity_id"] ?: throw IllegalArgumentException()
 

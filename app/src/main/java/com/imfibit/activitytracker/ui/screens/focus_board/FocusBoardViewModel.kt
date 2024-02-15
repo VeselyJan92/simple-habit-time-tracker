@@ -1,24 +1,14 @@
 package com.imfibit.activitytracker.ui.screens.focus_board
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.lifecycle.viewModelScope
-import com.imfibit.activitytracker.core.AppViewModel
+import com.imfibit.activitytracker.core.BaseViewModel
 import com.imfibit.activitytracker.core.extensions.swap
-import com.imfibit.activitytracker.core.extensions.swapByIndex
 import com.imfibit.activitytracker.core.focusBoardTables
 import com.imfibit.activitytracker.core.invalidationStateFlow
-import com.imfibit.activitytracker.core.registerInvalidationTracker
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.composed.FocusBoardItemWithTags
-import com.imfibit.activitytracker.database.entities.FocusBoardItem
 import com.imfibit.activitytracker.database.entities.FocusBoardItemTag
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryFocusBoard
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toPersistentList
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.burnoutcrew.reorderable.ItemPosition
 import javax.inject.Inject
 
@@ -27,7 +17,7 @@ import javax.inject.Inject
 class FocusBoardViewModel @Inject constructor(
     private val db: AppDatabase,
     private val  rep: RepositoryFocusBoard
-) : AppViewModel() {
+) : BaseViewModel() {
 
     val tags = invalidationStateFlow(db, listOf(),*focusBoardTables){
         db.focusBoardItemTagDAO().getAll()
