@@ -69,15 +69,15 @@ android {
         applicationId = "com.imfibit.activitytracker"
         minSdk = 26
         targetSdk = 34
-        versionCode = 37
-        versionName = "1.3.8"
+        versionCode = 38
+        versionName = "1.3.9"
         testInstrumentationRunner  ="com.imfibit.activitytracker.HiltRunner"
     }
 
     buildTypes {
         getByName("release") {
 
-            isMinifyEnabled = false
+            isMinifyEnabled = true
 
             manifestPlaceholders["crashlyticsCollectionEnabled"] = true
 
