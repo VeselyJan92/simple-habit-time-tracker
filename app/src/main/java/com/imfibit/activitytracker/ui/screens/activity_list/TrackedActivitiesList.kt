@@ -15,6 +15,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -268,18 +269,18 @@ fun RowScope.ActionButton(
 @Composable
 fun Goal(label: String) {
     Row(
-        Modifier
-            .size(70.dp, 20.dp)
-            .background(Colors.ChipGray, RoundedCornerShape(50))
+        modifier = Modifier.padding(start = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(Icons.Filled.Flag, contentDescription = null)
+        Icon(
+            modifier = Modifier.size(18.dp),
+            imageVector = Icons.Outlined.Flag,
+            contentDescription = null
+        )
 
         Text(
             label,
-            Modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically)
-                .padding(end = 8.dp),
+            Modifier.padding(start = 4.dp, end = 8.dp),
             textAlign = TextAlign.Center,
             style = TextStyle(
                 fontSize = 10.sp
