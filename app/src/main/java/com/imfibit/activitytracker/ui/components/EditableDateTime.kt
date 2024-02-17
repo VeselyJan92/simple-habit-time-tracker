@@ -2,7 +2,6 @@ package com.imfibit.activitytracker.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,8 +16,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.imfibit.activitytracker.ui.components.dialogs.system.DialogDatePicker
+import com.imfibit.activitytracker.ui.components.dialogs.rememberDialog
 import com.imfibit.activitytracker.ui.components.dialogs.system.DialogTimePicker
+import com.imfibit.activitytracker.ui.components.dialogs.system.MyDatePickerDialog
+import com.imfibit.activitytracker.ui.components.dialogs.system.MyTimePickerDialog
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -40,18 +42,19 @@ fun EditableDatetime(
     ) {
         val source1 = remember { MutableInteractionSource()}
 
+
+        var dateDialog by rememberDialog();
+
+        if (dateDialog){
+            MyDatePickerDialog(LocalDate.now(), onDateSelected = {}, onDismiss = { dateDialog = false})
+        }
+
         Text(
             textAlign = TextAlign.Center,
             text = datetime.format(DateTimeFormatter.ofPattern("dd. MM.")),     //TODO Local format
             modifier = Modifier.clickable(
                 onClick = {
-                    DialogDatePicker(
-                        date = datetime.toLocalDate(),
-                        onDateSet = {
-                            onDatetimeEdit.invoke(datetime.toLocalTime().atDate(it))
-                        },
-                        context = context
-                    )
+                    dateDialog = true
                 },
                 indication = rememberRipple(bounded = false),
                 interactionSource = source1
@@ -66,19 +69,23 @@ fun EditableDatetime(
 
         val source2 = remember { MutableInteractionSource()}
 
+        var timeDialog by rememberDialog();
+
+        if (timeDialog){
+            MyTimePickerDialog(
+                time = datetime.toLocalTime(),
+                onDateSelected = {timeDialog = false},
+                onDismiss = { timeDialog = false }
+            )
+        }
+
         Text(
             textAlign = TextAlign.Center,
             text = datetime.format(DateTimeFormatter.ofPattern("HH:mm")),     //TODO Local format
             style = TextStyle(fontWeight = FontWeight.Bold),
             modifier = Modifier.clickable(
                 onClick = {
-                    DialogTimePicker(
-                        time = datetime.toLocalTime(),
-                        onTimeSet = {
-                            onDatetimeEdit.invoke(datetime.toLocalDate().atTime(it))
-                        },
-                        context = context
-                    )
+                    timeDialog = true
                 },
                 indication = rememberRipple(bounded = false),
                 interactionSource = source2

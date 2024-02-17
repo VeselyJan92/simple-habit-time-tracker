@@ -126,6 +126,8 @@ dependencies {
     implementation("androidx.compose.material:material:$COMPOSE_VERSION")
     implementation("androidx.compose.material:material-icons-extended:$COMPOSE_VERSION")
     implementation("androidx.activity:activity-compose:1.8.2")
+    implementation("androidx.compose.material3:material3:1.2.0")
+
 
     implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
 

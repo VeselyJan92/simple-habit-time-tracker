@@ -36,6 +36,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import javax.inject.Singleton
 
 
@@ -115,7 +117,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(*migrations)
                     .build()
 
-               // runBlocking(Dispatchers.IO) { DebugTestSeeder.seed(db) }
+               runBlocking(Dispatchers.IO) { DebugTestSeeder.seed(db) }
 
                 db
             }
