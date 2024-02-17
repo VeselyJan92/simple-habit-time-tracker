@@ -41,7 +41,7 @@ fun CheckNotificationPermission() {
     }
 
     LaunchedEffect(true ) {
-        if (appVM.settings.getShouldShowNotificationsPopup() == true){
+        if (appVM.settings.getShouldShowNotificationsPopup() != false){
             delay(2000)
             askForNotifications.value = true
         }
