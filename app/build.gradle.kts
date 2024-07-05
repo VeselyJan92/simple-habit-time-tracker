@@ -10,8 +10,8 @@ plugins {
     id("com.google.firebase.crashlytics")
     id("com.google.devtools.ksp")
 
-
-    id("org.jetbrains.kotlin.plugin.parcelize") version "1.9.22"
+    id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.kotlin.plugin.parcelize")
 }
 
 repositories {
@@ -51,10 +51,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.8"
     }
 
     ksp {
@@ -114,58 +110,57 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.7")
 
 
-    implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
+    implementation(platform("com.google.firebase:firebase-bom:33.1.1"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
-    implementation("androidx.test:runner:1.5.2")
-    implementation("androidx.test:rules:1.5.0")
 
-    val COMPOSE_VERSION = "1.6.1"
-    implementation("androidx.compose.compiler:compiler:1.5.9")
+
+    val COMPOSE_VERSION = "1.6.8"
     implementation("androidx.compose.animation:animation:$COMPOSE_VERSION")
     implementation("androidx.compose.foundation:foundation:$COMPOSE_VERSION")
     implementation("androidx.compose.material:material:$COMPOSE_VERSION")
     implementation("androidx.compose.material:material-icons-extended:$COMPOSE_VERSION")
-    implementation("androidx.activity:activity-compose:1.8.2")
+    implementation("androidx.activity:activity-compose:1.9.0")
 
     implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
 
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.glance:glance-appwidget:1.1.0-alpha01")
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.glance:glance-appwidget:1.1.0")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 
-    implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+    implementation("androidx.navigation:navigation-compose:2.8.0-beta04")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.3")
 
 
     implementation("androidx.paging:paging-runtime-ktx:3.2.1")
     implementation("androidx.paging:paging-compose:3.2.1")
 
-    val ROOM_VERSION = "2.6.1"
+    val ROOM_VERSION = "2.7.0-alpha04"
     ksp("androidx.room:room-compiler:$ROOM_VERSION")
     implementation("androidx.room:room-runtime:$ROOM_VERSION")
     implementation("androidx.room:room-ktx:$ROOM_VERSION")
 
 
-    implementation("androidx.hilt:hilt-common:1.1.0")
-    implementation("com.google.dagger:hilt-android:2.48.1")
-    ksp("com.google.dagger:hilt-android-compiler:2.48.1")
-    ksp("androidx.hilt:hilt-compiler:1.1.0")
-    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
-
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.48.1")
+    implementation("androidx.hilt:hilt-common:1.2.0")
+    implementation("com.google.dagger:hilt-android:2.51.1")
+    ksp("com.google.dagger:hilt-android-compiler:2.51.1")
+    ksp("androidx.hilt:hilt-compiler:1.2.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
 
     debugImplementation( "androidx.compose.ui:ui-tooling:$COMPOSE_VERSION")
     implementation("androidx.compose.ui:ui-tooling-preview:$COMPOSE_VERSION")
 
 
-    // Test rules and transitive dependencies:
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:$COMPOSE_VERSION")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.48.1")
 
     // Needed for createAndroidComposeRule, but not createComposeRule:
     debugImplementation("androidx.compose.ui:ui-test-manifest:$COMPOSE_VERSION")
 
-    debugImplementation("androidx.test:core:1.5.0")
+    // Test rules and transitive dependencies:
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:$COMPOSE_VERSION")
+    testImplementation("androidx.test:core:1.6.1")
+    androidTestImplementation("androidx.test:runner:1.6.1")
+    androidTestImplementation("androidx.test:rules:1.6.1")
 
 }
