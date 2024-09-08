@@ -50,10 +50,8 @@ import com.imfibit.activitytracker.core.value
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
+import com.imfibit.activitytracker.ui.Destinations
 import com.imfibit.activitytracker.ui.MainBody
-import com.imfibit.activitytracker.ui.SCREEN_ACTIVITY
-import com.imfibit.activitytracker.ui.SCREEN_SETTINGS
-import com.imfibit.activitytracker.ui.SCREEN_STATISTICS
 import com.imfibit.activitytracker.ui.components.BaseMetricBlock
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.util.TestableContent
@@ -90,7 +88,7 @@ private fun TopBar(nav: NavHostController){
 
         Icon(
             modifier = Modifier.clickable {
-                nav.navigate(SCREEN_SETTINGS)
+                nav.navigate(Destinations.ScreenSettings)
             },
             imageVector = Icons.Default.Settings,
             tint = Color.Black,
@@ -213,7 +211,7 @@ private fun Activities(
                     nav = nav,
                     item = item,
                     modifier = Modifier,
-                    onNavigate = { nav.navigate(SCREEN_ACTIVITY(it.id.toString())) },
+                    onNavigate = { nav.navigate(Destinations.ScreenActivity(it.id)) },
                     isDragging = false
                 )
             }
@@ -230,7 +228,7 @@ private fun Activities(
                     nav = nav,
                     item = item,
                     modifier = Modifier,
-                    onNavigate = { nav.navigate(SCREEN_ACTIVITY(it.id.toString())) },
+                    onNavigate = { nav.navigate(Destinations.ScreenActivity(it.id)) },
                     isDragging = isDragging
                 )
             }
@@ -278,7 +276,7 @@ private fun Today(nav: NavHostController, today: List<ActivityWithMetric>) {
 
 
                 TextButton(
-                    onClick = { nav.navigate(SCREEN_STATISTICS) }
+                    onClick = { nav.navigate(Destinations.ScreenStatistics) }
                 ) {
                     Text(
                         text = stringResource(id = R.string.screen_title_statistics),
@@ -339,7 +337,7 @@ private fun Category(nav: NavHostController, item: TrackerActivityGroup, color: 
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
-            ) { nav.navigate("screen_activity_group/${item.id}") }
+            ) { nav.navigate(Destinations.ScreenActivityGroupRoute(item.id)) }
             .fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         color = color

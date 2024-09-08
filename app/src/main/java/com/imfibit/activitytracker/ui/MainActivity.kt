@@ -4,7 +4,6 @@ package com.imfibit.activitytracker.ui
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -46,6 +45,7 @@ import com.imfibit.activitytracker.database.composed.FocusBoardItemWithTags
 import com.imfibit.activitytracker.database.entities.FocusBoardItem
 import com.imfibit.activitytracker.database.entities.TrackedActivityRecord
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
+import com.imfibit.activitytracker.ui.Destinations.ScreenActivityGroupRoute
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.dialogs.DialogAddActivity
 import com.imfibit.activitytracker.ui.components.dialogs.DialogRecords
@@ -61,7 +61,6 @@ import com.imfibit.activitytracker.ui.screens.group.ScreenActivityGroup
 import com.imfibit.activitytracker.ui.screens.onboarding.ScreenOnboarding
 import com.imfibit.activitytracker.ui.screens.settings.ScreenSetting
 import com.imfibit.activitytracker.ui.screens.statistics.ScreenStatistics
-import com.imfibit.activitytracker.ui.screens.upcomming.ScreenUpcoming
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -69,18 +68,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-
-
-fun SCREEN_ACTIVITY(activity: String = "{activity_id}") = "screen_activity/$activity"
-
-
-const val SCREEN_ACTIVITIES = "screen_activities"
-const val SCREEN_STATISTICS = "SCREEN_STATISTICS"
-const val SCREEN_UPCOMING = "SCREEN_UPCOMING"
-const val SCREEN_TIMELINE = "SCREEN_TIMELINE"
-const val SCREEN_TIMER_OVER = "SCREEN_TIMER_OVER"
-const val SCREEN_ONBOARDING = "SCREEN_ONBOARDING"
-const val SCREEN_SETTINGS = "SCREEN_SETTINGS"
 
 
 const val SCREEN_FOCUS_BOARD_PAGER_ID = 0
@@ -121,54 +108,50 @@ fun MainActivity.Router() {
 
     val onboarded = runBlocking { vm.settings.getOnboarded() ?: false }
 
-    val destination = if (onboarded) SCREEN_ACTIVITIES else SCREEN_ONBOARDING
+    val destination: Any = if (onboarded) Destinations.ScreenActivities else Destinations.ScreenOnboarding
 
     val scaffoldState = rememberScaffoldState()
-
 
     CompositionLocalProvider(LocalNavController provides rememberNavController()) {
 
         NavHost(navController = navControl, startDestination = destination) {
-            composable(SCREEN_STATISTICS) { ScreenStatistics(navControl, scaffoldState) }
-            composable(SCREEN_ACTIVITIES) { Dashboard(navControl, scaffoldState) }
-            composable(SCREEN_UPCOMING) { ScreenUpcoming(navControl, scaffoldState) }
-            composable(SCREEN_SETTINGS) { ScreenSetting(navControl, scaffoldState) }
+            composable<Destinations.ScreenStatistics> {
+                ScreenStatistics(navControl, scaffoldState)
+            }
 
-            composable(
-                route = SCREEN_ONBOARDING
-            ) {
+            composable<Destinations.ScreenActivities> {
+                Dashboard(navControl, scaffoldState)
+            }
+
+            composable<Destinations.ScreenSettings> {
+                ScreenSetting(navControl, scaffoldState)
+            }
+
+            composable<Destinations.ScreenOnboarding>{
                 ScreenOnboarding(
                     onOnboardingDone = {
                         runBlocking {
                             vm.settings.setOnboarded(true)
                         }
 
-                        navControl.navigate(SCREEN_ACTIVITIES)
+                        navControl.navigate(Destinations.ScreenActivities)
                     }
                 )
             }
 
-            composable(
-                route = "screen_activity_group/{group_id}",
-                arguments = listOf(navArgument("group_id") { type = NavType.LongType })
-            ) {
+            composable<ScreenActivityGroupRoute> {
                 ScreenActivityGroup(navControl, scaffoldState)
             }
 
-            composable(
-                route = "screen_activity/{activity_id}",
-                arguments = listOf(navArgument("activity_id") { type = NavType.LongType })
-            ) {
+            composable<Destinations.ScreenActivity>{
                 ScreenTrackedActivity(navControl, scaffoldState)
             }
 
-            composable(
-                route = "screen_activity_history/{activity_id}",
-                arguments = listOf(navArgument("activity_id") { type = NavType.LongType })
-            ) {
+            composable<Destinations.ScreenActivityHistory> {
                 ScreenActivityHistory(navControl, scaffoldState)
             }
 
+            //TODO refactor later when custom serialzier are implemented in navigation 2.9
             dialog(
                 route = "screen_day_history/{activity_id}/{date}",
                 arguments = listOf(
@@ -194,7 +177,6 @@ fun MainActivity.Router() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldState) {
 
@@ -256,8 +238,7 @@ private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldStat
                     vm.createNewActivity(name, it).await()
                 }
 
-
-                navControl.navigate("screen_activity/$activityId")
+                navControl.navigate(Destinations.ScreenActivity(activityId))
             }
         },
 

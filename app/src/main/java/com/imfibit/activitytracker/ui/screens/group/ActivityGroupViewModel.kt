@@ -3,6 +3,7 @@ package com.imfibit.activitytracker.ui.screens.group
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.imfibit.activitytracker.core.BaseViewModel
 import com.imfibit.activitytracker.core.activityTables
 import com.imfibit.activitytracker.core.extensions.swap
@@ -10,6 +11,7 @@ import com.imfibit.activitytracker.core.invalidationStateFlow
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
+import com.imfibit.activitytracker.ui.Destinations
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,7 +25,7 @@ class ActivityGroupViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
 
-    val id: Long = savedStateHandle["group_id"] ?: throw IllegalArgumentException()
+    val id = savedStateHandle.toRoute<Destinations.ScreenActivityGroupRoute>().groupId
 
 
     //For better edittext performance save the name of the activity when user is done with the screen

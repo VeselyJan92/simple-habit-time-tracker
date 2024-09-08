@@ -99,15 +99,12 @@ fun DialogSessionContent(
         }
 
         LabeledColumn(text = "") {
-            val interaction = remember { MutableInteractionSource() }
-
             Box(
                 modifier = Modifier
                     .height(30.dp)
                     .width(60.dp)
                     .background(Colors.AppAccent, RoundedCornerShape(50))
                     .clickable(
-                        interactionSource = interaction,
                         onClick = {
                             DialogTimePicker(
                                 time = LocalTime.of(0, 0),
@@ -117,7 +114,6 @@ fun DialogSessionContent(
                                 context = context
                             )
                         },
-                        indication = rememberRipple(bounded = false)
                     )
                     .padding(horizontal = 8.dp),
                 contentAlignment = Alignment.Center,

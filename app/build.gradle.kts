@@ -12,6 +12,7 @@ plugins {
 
     id("org.jetbrains.kotlin.plugin.compose")
     id("org.jetbrains.kotlin.plugin.parcelize")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 repositories {
@@ -106,7 +107,7 @@ play {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
-
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.7.1") //For navigation
     implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.7")
 
 
@@ -114,7 +115,7 @@ dependencies {
     implementation("com.google.firebase:firebase-crashlytics-ktx")
 
 
-    val COMPOSE_VERSION = "1.6.8"
+    val COMPOSE_VERSION = "1.7.0"
     implementation("androidx.compose.animation:animation:$COMPOSE_VERSION")
     implementation("androidx.compose.foundation:foundation:$COMPOSE_VERSION")
     implementation("androidx.compose.material:material:$COMPOSE_VERSION")
@@ -127,13 +128,13 @@ dependencies {
     implementation("androidx.glance:glance-appwidget:1.1.0")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
-    implementation("androidx.navigation:navigation-compose:2.8.0-beta05")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.3")
+    implementation("androidx.navigation:navigation-compose:2.8.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
 
 
-    implementation("androidx.paging:paging-runtime-ktx:3.2.1")
-    implementation("androidx.paging:paging-compose:3.2.1")
+    implementation("androidx.paging:paging-runtime-ktx:3.3.1")
+    implementation("androidx.paging:paging-compose:3.3.1")
 
     val ROOM_VERSION = "2.7.0-alpha05"
     ksp("androidx.room:room-compiler:$ROOM_VERSION")
@@ -160,7 +161,7 @@ dependencies {
     // Test rules and transitive dependencies:
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:$COMPOSE_VERSION")
     testImplementation("androidx.test:core:1.6.1")
-    androidTestImplementation("androidx.test:runner:1.6.1")
+    androidTestImplementation("androidx.test:runner:1.6.2")
     androidTestImplementation("androidx.test:rules:1.6.1")
 
 }

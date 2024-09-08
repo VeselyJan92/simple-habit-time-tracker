@@ -6,6 +6,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import androidx.room.withTransaction
 import com.imfibit.activitytracker.core.BaseViewModel
 import com.imfibit.activitytracker.core.ContextString
@@ -19,6 +20,7 @@ import com.imfibit.activitytracker.database.entities.PresetTimer
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
+import com.imfibit.activitytracker.ui.Destinations
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.MetricWidgetData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -64,7 +66,7 @@ class TrackedActivityViewModel @Inject constructor(
             }
     }
 
-    val id: Long = savedStateHandle["activity_id"] ?: throw IllegalArgumentException()
+    val id = savedStateHandle.toRoute<Destinations.ScreenActivity>().activityId
 
     //For better edittext performance save the name of the activity when user is done with the screen
     val activityName = mutableStateOf<String?>(null)

@@ -83,7 +83,6 @@ private fun TrackedActivities(
     name: String,
     clickable: () -> Unit
 ){
-    val interaction = remember { MutableInteractionSource() }
 
     Column(
         modifier = modifier
@@ -92,7 +91,7 @@ private fun TrackedActivities(
             .zIndex(1f)
             .shadow(2.dp, shape = RoundedCornerShape(10.dp))
             .background(Colors.ChipGray, RoundedCornerShape(10.dp))
-            .clickable(interactionSource = interaction, onClick = clickable, indication = rememberRipple())
+            .clickable(onClick = clickable)
             .padding(8.dp)
 
     ){

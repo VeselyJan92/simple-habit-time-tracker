@@ -3,6 +3,7 @@ package com.imfibit.activitytracker.ui.screens.activity_history
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
@@ -13,6 +14,7 @@ import com.imfibit.activitytracker.core.activityTables
 import com.imfibit.activitytracker.core.registerInvalidationTracker
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
+import com.imfibit.activitytracker.ui.Destinations
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toPersistentList
 import java.time.YearMonth
@@ -26,7 +28,7 @@ class TrackedActivityHistoryVM @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
 
-    val id: Long = savedStateHandle["activity_id"] ?: throw IllegalArgumentException()
+    val id = savedStateHandle.toRoute<Destinations.ScreenActivityHistory>().activityId
 
     val activity = rep.db.activityDAO().flowById(id);
 

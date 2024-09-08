@@ -30,11 +30,7 @@ fun IconButton(text: String, icon: ImageVector, onClick: ()->Unit ){
         modifier = Modifier
             .height(30.dp)
             .background(Colors.ChipGray, RoundedCornerShape(50)).padding(start = 4.dp, end = 4.dp)
-            .clickable(
-                indication = rememberRipple(bounded = false),
-                interactionSource = interaction,
-                onClick = onClick
-            ),
+            .clickable(onClick = onClick),
         contentAlignment = Alignment.CenterStart
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -50,8 +46,6 @@ fun IconButton(text: String, icon: ImageVector, onClick: ()->Unit ){
                 )
             )
         }
-
-
     }
 
 }

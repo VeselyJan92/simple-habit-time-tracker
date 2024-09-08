@@ -36,11 +36,9 @@ fun DatetimeEditor(
 
     Row(Modifier.padding(start = 8.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
 
-        val isDate = remember { MutableInteractionSource() }
 
         Text(datetime.value.format(DateTimeFormatter.ofPattern("dd. MM.")),
             Modifier.clickable(
-                interactionSource = isDate,
                 onClick = {
                     DatePickerDialog(context,
                         0,
@@ -48,20 +46,16 @@ fun DatetimeEditor(
                         datetime.value.year, datetime.value.month.value, datetime.value.dayOfMonth
                     ).show()
                 },
-                indication = rememberRipple(bounded = false)
             ),
         )
 
         Box(Modifier.padding(start = 8.dp, end = 8.dp).size(5.dp).background(Color.Black, RoundedCornerShape(50)))
-
-        val isTime = remember { MutableInteractionSource() }
 
         Text(
             textAlign = TextAlign.Center,
             text = datetime.value.format(DateTimeFormatter.ofPattern("HH:mm")),
             style = TextStyle(fontWeight = FontWeight.Bold),
             modifier = Modifier.clickable(
-                interactionSource = isTime,
                 onClick = {
                     TimePickerDialog(context,
                         0,
@@ -69,7 +63,6 @@ fun DatetimeEditor(
                         datetime.value.hour, datetime.value.minute, true
                     ).show()
                 },
-                indication = rememberRipple(bounded = false)
             )
         )
     }

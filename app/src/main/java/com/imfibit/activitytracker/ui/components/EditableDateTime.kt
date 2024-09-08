@@ -38,7 +38,6 @@ fun EditableDatetime(
             .padding(start = 8.dp, end = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val source1 = remember { MutableInteractionSource()}
 
         Text(
             textAlign = TextAlign.Center,
@@ -53,8 +52,6 @@ fun EditableDatetime(
                         context = context
                     )
                 },
-                indication = rememberRipple(bounded = false),
-                interactionSource = source1
             )
         )
 
@@ -62,9 +59,8 @@ fun EditableDatetime(
             Modifier
                 .padding(start = 8.dp, end = 8.dp)
                 .size(5.dp)
-                .background(Color.Black, RoundedCornerShape(50)))
-
-        val source2 = remember { MutableInteractionSource()}
+                .background(Color.Black, RoundedCornerShape(50))
+        )
 
         Text(
             textAlign = TextAlign.Center,
@@ -80,8 +76,6 @@ fun EditableDatetime(
                         context = context
                     )
                 },
-                indication = rememberRipple(bounded = false),
-                interactionSource = source2
             )
 
         )

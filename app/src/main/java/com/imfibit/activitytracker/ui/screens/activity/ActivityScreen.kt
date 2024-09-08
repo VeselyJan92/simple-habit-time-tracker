@@ -33,6 +33,7 @@ import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
+import com.imfibit.activitytracker.ui.Destinations
 import com.imfibit.activitytracker.ui.components.*
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.dialogs.*
@@ -68,7 +69,7 @@ fun ScreenTrackedActivity(
         onDayLongClicked = { activity, date -> RecordNavigatorImpl.onDaylongClicked(nav, recordVM, activity, date)},
         onDeleteActivity = vm::deleteActivity,
         onActivityNameUpdate = vm::refreshName,
-        onNavigateToHistory = { nav.navigate("screen_activity_history/${it.id}") }
+        onNavigateToHistory = { nav.navigate(Destinations.ScreenActivityHistory(it.id)) }
     )
 }
 
