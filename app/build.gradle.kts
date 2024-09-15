@@ -66,8 +66,8 @@ android {
         applicationId = "com.imfibit.activitytracker"
         minSdk = 26
         targetSdk = 34
-        versionCode = 38
-        versionName = "1.3.9"
+        versionCode = 39
+        versionName = "1.4.0"
         testInstrumentationRunner  ="com.imfibit.activitytracker.HiltRunner"
     }
 
@@ -143,8 +143,8 @@ dependencies {
 
 
     implementation("androidx.hilt:hilt-common:1.2.0")
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    ksp("com.google.dagger:hilt-android-compiler:2.51.1")
+    implementation("com.google.dagger:hilt-android:2.52")
+    ksp("com.google.dagger:hilt-android-compiler:2.52")
     ksp("androidx.hilt:hilt-compiler:1.2.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
@@ -153,7 +153,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview:$COMPOSE_VERSION")
 
 
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.51.1")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.52")
 
     // Needed for createAndroidComposeRule, but not createComposeRule:
     debugImplementation("androidx.compose.ui:ui-test-manifest:$COMPOSE_VERSION")

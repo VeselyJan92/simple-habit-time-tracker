@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.room.InvalidationTracker
 import androidx.room.RoomDatabase
 import com.imfibit.activitytracker.database.AppDatabase
+import com.imfibit.activitytracker.database.entities.DailyChecklistItem
+import com.imfibit.activitytracker.database.entities.DailyChecklistTimelineItem
 import com.imfibit.activitytracker.database.entities.FocusBoardItem
 import com.imfibit.activitytracker.database.entities.FocusBoardItemTag
 import com.imfibit.activitytracker.database.entities.FocusBoardItemTagRelation
@@ -38,6 +40,11 @@ val focusBoardTables = arrayOf(
     FocusBoardItem.TABLE,
     FocusBoardItemTag.TABLE,
     FocusBoardItemTagRelation.TABLE
+)
+
+val dailyChecklistTables = arrayOf(
+    DailyChecklistItem.TABLE,
+    DailyChecklistTimelineItem.TABLE,
 )
 
 inline fun createInvalidationTacker(
@@ -91,7 +98,7 @@ fun  <T> ViewModel.invalidationStateFlow(
     return state;
 }
 
-private fun ViewModel.observerDBAsFlow(
+fun ViewModel.observerDBAsFlow(
     db: RoomDatabase,
     vararg tables: String
 ): Flow<Unit> = flow {

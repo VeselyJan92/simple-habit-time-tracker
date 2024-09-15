@@ -1,17 +1,25 @@
 package com.imfibit.activitytracker.database.repository.tracked_activity
 
-import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.room.withTransaction
 import com.imfibit.activitytracker.core.ContextString
-import com.imfibit.activitytracker.database.dao.tracked_activity.*
-import com.imfibit.activitytracker.database.embedable.TimeRange
-import com.imfibit.activitytracker.database.entities.*
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.composed.RecordWithActivity
-import com.imfibit.activitytracker.ui.components.*
+import com.imfibit.activitytracker.database.dao.tracked_activity.DAOPresetTimers
+import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivity
+import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivityChecked
+import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivityMetric
+import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivityScore
+import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivityTime
+import com.imfibit.activitytracker.database.embedable.TimeRange
+import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.database.entities.TrackedActivityRecord
+import com.imfibit.activitytracker.ui.components.Colors
+import com.imfibit.activitytracker.ui.components.MetricWidgetData
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview
-import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.ActionButton.*
+import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.ActionButton.CHECKED
+import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.ActionButton.DEFAULT
+import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.ActionButton.IN_SESSION
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -32,8 +40,7 @@ class RepositoryTrackedActivity @Inject constructor(
         val label: ContextString,
         val metric: Long,
         val color: Color,
-        val date: LocalDate,
-        val type: TrackedActivity.Type
+        val date: LocalDate
     )
 
     data class Week(
@@ -123,7 +130,6 @@ class RepositoryTrackedActivity @Inject constructor(
                     metric = it.metric,
                     color = Colors.getMetricColor(activity.goal, it.metric, TimeRange.DAILY, Colors.ChipGray),
                     date = it.from,
-                    type = activity.type
                 )
             }
 

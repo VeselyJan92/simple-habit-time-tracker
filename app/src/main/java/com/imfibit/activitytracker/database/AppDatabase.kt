@@ -9,6 +9,8 @@ import com.imfibit.activitytracker.BuildConfig
 import com.imfibit.activitytracker.database.converters.LocalDateConverter
 import com.imfibit.activitytracker.database.converters.LocalDateTimeConverter
 import com.imfibit.activitytracker.database.converters.LocalTimeConverter
+import com.imfibit.activitytracker.database.dao.DAODailyChecklistItem
+import com.imfibit.activitytracker.database.dao.DAODailyChecklistTimeline
 import com.imfibit.activitytracker.database.dao.DAOFocusBoardItem
 import com.imfibit.activitytracker.database.dao.DAOFocusBoardItemTagRelation
 import com.imfibit.activitytracker.database.dao.DAOFocusBoardItemTags
@@ -19,6 +21,8 @@ import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActiv
 import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivityMetric
 import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivityScore
 import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivityTime
+import com.imfibit.activitytracker.database.entities.DailyChecklistItem
+import com.imfibit.activitytracker.database.entities.DailyChecklistTimelineItem
 import com.imfibit.activitytracker.database.entities.FocusBoardItem
 import com.imfibit.activitytracker.database.entities.FocusBoardItemTag
 import com.imfibit.activitytracker.database.entities.FocusBoardItemTagRelation
@@ -36,6 +40,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import javax.inject.Singleton
 
 
@@ -67,12 +73,14 @@ object DatabaseModule {
         TrackerActivityGroup::class,
         FocusBoardItem::class,
         FocusBoardItemTag::class,
-        FocusBoardItemTagRelation::class
+        FocusBoardItemTagRelation::class,
+        DailyChecklistItem::class,
+        DailyChecklistTimelineItem::class,
     ],
     views = [
         TrackedActivityMetric::class
     ],
-    version = 9,
+    version = 10,
     exportSchema = false
 )
 @TypeConverters(
@@ -89,6 +97,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun metricDAO(): DAOTrackedActivityMetric
     abstract fun presetTimersDAO(): DAOPresetTimers
     abstract fun groupDAO(): DAOActivityGroup
+    abstract fun dailyCheckListTimelineDAO(): DAODailyChecklistTimeline
+    abstract fun dailyCheckListItemsDao(): DAODailyChecklistItem
 
     abstract fun focusBoardItemDAO(): DAOFocusBoardItem
     abstract fun focusBoardItemTagDAO(): DAOFocusBoardItemTags
@@ -106,16 +116,16 @@ abstract class AppDatabase : RoomDatabase() {
                 db
             }
             "debug" -> {
-                //context.deleteDatabase(DB_NAME)
+               // context.deleteDatabase(DB_NAME)
 
                 val db = Room
-                    .inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-                    //.databaseBuilder(context, AppDatabase::class.java, DB_NAME)
+                    //.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+                    .databaseBuilder(context, AppDatabase::class.java, DB_NAME)
                     //.createFromAsset("test.db")
                     .addMigrations(*migrations)
                     .build()
 
-               // runBlocking(Dispatchers.IO) { DebugTestSeeder.seed(db) }
+                //runBlocking(Dispatchers.IO) { DebugTestSeeder.seed(db) }
 
                 db
             }

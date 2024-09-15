@@ -7,6 +7,7 @@ import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import com.imfibit.activitytracker.database.entities.*
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryFocusBoard
+import com.imfibit.activitytracker.ui.components.Colors
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -28,11 +29,37 @@ object DebugTestSeeder {
 
         activity_workout(db)
 
-        activity_point(db)
-
         categories(db)
 
         createFocusBoard(db)
+
+
+        createDailyChecklist(db)
+
+    }
+
+    private suspend fun createDailyChecklist(db: AppDatabase) {
+        DevSeeder.getDailyChecklistTimelineCompletions().forEach {
+            db.dailyCheckListTimelineDAO().insert(it)
+        }
+
+        db.dailyCheckListItemsDao().insert(DailyChecklistItem(
+            title = "Random thing",
+            description = "The one thing I should do",
+            color = Colors.chooseableColors[8].toArgb()
+        ))
+
+        db.dailyCheckListItemsDao().insert(DailyChecklistItem(
+            title = "Workout",
+            description = "Make time for workout",
+            color = Colors.chooseableColors[17].toArgb()
+        ))
+
+        db.dailyCheckListItemsDao().insert(DailyChecklistItem(
+            title = "Plan your day",
+            description = "Planning is good",
+            color = Colors.chooseableColors[18].toArgb()
+        ))
 
     }
 
@@ -216,8 +243,6 @@ object DebugTestSeeder {
         val categoryId = db.groupDAO().insert(TrackerActivityGroup(0, "Work", 1))
 
         db.groupDAO().insert(TrackerActivityGroup(0, "Hobbies", 2))
-        
-        db.groupDAO().insert(TrackerActivityGroup(0, "Gym", 2))
 
         val activityId = db.activityDAO().insert(TrackedActivity(
             id = 0,
@@ -257,19 +282,19 @@ object DebugTestSeeder {
 
     suspend fun createFocusBoard(db: AppDatabase){
 
-        val habitTag = FocusBoardItemTag(0, "Habits", FocusBoardItemTag.colors[3].toArgb(), 1).let {
+        val habitTag = FocusBoardItemTag(0, "Habits", Colors.chooseableColors[3].toArgb(), 1).let {
             it.copy(id = db.focusBoardItemTagDAO().insert(it))
         }
 
-        val focusTag = FocusBoardItemTag(0, "Focus", FocusBoardItemTag.colors[7].toArgb(), 1).let {
+        val focusTag = FocusBoardItemTag(0, "Focus", Colors.chooseableColors[7].toArgb(), 1).let {
                 it.copy(id = db.focusBoardItemTagDAO().insert(it))
         }
 
-        val sideGoalsTag = FocusBoardItemTag(0, "Side goals", FocusBoardItemTag.colors[9].toArgb(), 1).let {
+        val sideGoalsTag = FocusBoardItemTag(0, "Side goals", Colors.chooseableColors[9].toArgb(), 1).let {
                 it.copy(id = db.focusBoardItemTagDAO().insert(it))
         }
 
-        val work = FocusBoardItemTag(0, "Work", FocusBoardItemTag.colors[13].toArgb(), 1).let {
+        val work = FocusBoardItemTag(0, "Work", Colors.chooseableColors[13].toArgb(), 1).let {
             it.copy(id = db.focusBoardItemTagDAO().insert(it))
         }
 

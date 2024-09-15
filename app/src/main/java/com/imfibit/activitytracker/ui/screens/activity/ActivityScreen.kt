@@ -622,7 +622,7 @@ fun RecentActivityGrid(
 
         for(month in months){
             val modifier = if (month.month.month == LocalDate.now().month) Modifier.background(Color(0xFFF5F5F5), RoundedCornerShape(5.dp)) else Modifier
-            Month(modifier, activity, month, onDayClicked, onDayLongClicked)
+            TrackedActivityMonth(modifier, activity, month, onDayClicked, onDayLongClicked)
         }
 
     }

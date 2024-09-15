@@ -27,15 +27,18 @@ fun rememberDialog(): MutableState<Boolean> {
 }
 
 @Composable
-inline fun BaseDialog(display: MutableState<Boolean>, noinline content: @Composable ColumnScope.() -> Unit){
+inline fun BaseDialog(
+    modifier: Modifier = Modifier,
+    display: MutableState<Boolean>,
+    noinline content: @Composable ColumnScope.() -> Unit
+){
     if (display.value) Dialog(
         onDismissRequest = {display.value = false},
         properties = DialogProperties(usePlatformDefaultWidth = false)
 
     ) {
-
         Surface(
-            modifier = Modifier.width(320.dp),
+            modifier = modifier.width(320.dp),
             shape = RoundedCornerShape(10.dp),
             elevation = 2.dp,
 

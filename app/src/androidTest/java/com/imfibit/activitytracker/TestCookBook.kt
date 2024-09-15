@@ -37,4 +37,9 @@ class TestCookBook(private val composeTestRule: ComposeRule) {
     }
 
 
+    fun createDailyChecklistItem(){
+        composeTestRule.onNodeWithTag(TestTag.DIALOG_ADD_CHECKLIST_ITEM).performClick()
+    }
+
+
 }

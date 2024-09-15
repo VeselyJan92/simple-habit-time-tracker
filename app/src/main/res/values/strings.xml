@@ -60,6 +60,7 @@
     <string name="new_activity_checked">Habit</string>
     <string name="new_activity_folder">Group</string>
     <string name="new_activity_focus_item">Focus item</string>
+    <string name="new_activity_daily_checklist_item">Daily checklist</string>
     <string name="cancel">CANCEL</string>
     <string name="dialog_goal_title">PICK GOAL</string>
     <string name="repetitions">Repetitions</string>
@@ -85,6 +86,7 @@
     <string name="dialog_timer_start_start_time">"Start: "</string>
     <string name="timer">Timer</string>
 
+    <string name="dashboard_explore">Explore</string>
 
 
     <string name="screen_activities_target">Target: </string>
@@ -186,6 +188,15 @@
     <string name="focus_board_edit_focus_item_title_placeholder">Title</string>
     <string name="focus_board_edit_focus_item_content_placeholder">Content</string>
     <string name="focus_board_edit_tag_name_placeholder">Tag name</string>
+
+
+    <string name="daily_checklist_edit_item_title_edit">Edit daily task</string>
+    <string name="daily_checklist_edit_item_title_create">Create daily task</string>
+    <string name="daily_checklist_empty_title">No items in your daily checklist</string>
+    <string name="daily_checklist_empty_message">Add items you want to do every day</string>
+    <string name="daily_checklist">Daily checklist</string>
+    <string name="daily_checklist_edit_item_title_placeholder">Title</string>
+    <string name="daily_checklist_edit_item_content_placeholder">Description</string>
 
 
     <string-array name="months">

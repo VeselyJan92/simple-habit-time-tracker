@@ -24,6 +24,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -42,6 +43,7 @@ import com.imfibit.activitytracker.core.notifications.NotificationLiveSession
 import com.imfibit.activitytracker.core.notifications.NotificationTimerOver
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.composed.FocusBoardItemWithTags
+import com.imfibit.activitytracker.database.entities.DailyChecklistItem
 import com.imfibit.activitytracker.database.entities.FocusBoardItem
 import com.imfibit.activitytracker.database.entities.TrackedActivityRecord
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
@@ -54,9 +56,12 @@ import com.imfibit.activitytracker.ui.screens.activity.ScreenTrackedActivity
 import com.imfibit.activitytracker.ui.screens.activity_history.ScreenActivityHistory
 import com.imfibit.activitytracker.ui.screens.activity_list.ActivitiesViewModel
 import com.imfibit.activitytracker.ui.screens.activity_list.ScreenActivities
+import com.imfibit.activitytracker.ui.screens.daily_checklist.DailyChecklistViewModel
+import com.imfibit.activitytracker.ui.screens.daily_checklist.DialogEditDailyChecklistItem
 import com.imfibit.activitytracker.ui.screens.focus_board.DialogEditFocusItem
 import com.imfibit.activitytracker.ui.screens.focus_board.FocusBoardViewModel
 import com.imfibit.activitytracker.ui.screens.focus_board.ScreenFocusBoard
+import com.imfibit.activitytracker.ui.screens.daily_checklist.ScreenMindBoot
 import com.imfibit.activitytracker.ui.screens.group.ScreenActivityGroup
 import com.imfibit.activitytracker.ui.screens.onboarding.ScreenOnboarding
 import com.imfibit.activitytracker.ui.screens.settings.ScreenSetting
@@ -72,6 +77,7 @@ import javax.inject.Inject
 
 const val SCREEN_FOCUS_BOARD_PAGER_ID = 0
 const val SCREEN_ACTIVITIES_PAGER_ID = 1
+const val SCREEN_MIND_BOOT_ID = 2
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -182,6 +188,7 @@ private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldStat
 
     val dialogNewActivity = remember { mutableStateOf(false) }
     val dialogEditFocusItem = remember { mutableStateOf(false) }
+    val dialogDailyChecklist = remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
 
@@ -191,16 +198,26 @@ private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldStat
         TrackerActivityGroup(0, stringResource(id = R.string.screen_activities_new_group), 0)
 
     val vm = hiltViewModel<ActivitiesViewModel>()
-    val focusBoardViewModel = hiltViewModel<FocusBoardViewModel>()
-
-    val tags by focusBoardViewModel.tags.collectAsStateWithLifecycle()
-
 
     val pagerState = rememberPagerState(
         initialPage = 1,
         initialPageOffsetFraction = 0f,
-        pageCount = { 2 }
+        pageCount = { 3 }
     )
+
+    val dailyChecklistItemViewModel = hiltViewModel<DailyChecklistViewModel>()
+
+    DialogEditDailyChecklistItem(
+        display = dialogDailyChecklist,
+        isEdit = false,
+        item = DailyChecklistItem(title = "", color = Colors.chooseableColors[0].toArgb(), description = ""),
+        onItemEdit = {
+            dailyChecklistItemViewModel.onAdd(item = it )
+        }
+    )
+
+    val focusBoardViewModel = hiltViewModel<FocusBoardViewModel>()
+    val tags by focusBoardViewModel.tags.collectAsStateWithLifecycle()
 
     DialogEditFocusItem(
         display = dialogEditFocusItem,
@@ -221,7 +238,6 @@ private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldStat
                     pagerState.animateScrollToPage(SCREEN_ACTIVITIES_PAGER_ID)
                     delay(100)
                 }
-
                 vm.addGroup(newGroup)
             }
         },
@@ -253,6 +269,19 @@ private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldStat
 
                 dialogEditFocusItem.value = true
             }
+        },
+
+        onAddDailyChecklist = {
+            dialogNewActivity.value = false
+
+            scope.launch {
+                if (pagerState.currentPage != SCREEN_MIND_BOOT_ID) {
+                    pagerState.animateScrollToPage(SCREEN_MIND_BOOT_ID)
+                    delay(100)
+                }
+
+                dialogDailyChecklist.value = true
+            }
         }
     )
 
@@ -274,6 +303,7 @@ private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldStat
                 when (page) {
                     SCREEN_ACTIVITIES_PAGER_ID -> ScreenActivities(navController = navControl)
                     SCREEN_FOCUS_BOARD_PAGER_ID -> ScreenFocusBoard()
+                    SCREEN_MIND_BOOT_ID -> ScreenMindBoot()
                 }
             }
         },

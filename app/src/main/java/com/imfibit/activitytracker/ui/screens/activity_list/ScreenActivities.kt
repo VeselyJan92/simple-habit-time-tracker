@@ -1,7 +1,6 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -28,7 +27,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AssignmentTurnedIn
-import androidx.compose.material.icons.outlined.SwipeLeft
+import androidx.compose.material.icons.outlined.Swipe
 import androidx.compose.material.icons.outlined.Topic
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -107,8 +106,6 @@ private fun ScreenBody(
 ) {
     val data by vm.data.collectAsStateWithLifecycle()
 
-    Log.e("tracker", "recompose")
-
     Box {
         if (data.activities.isEmpty() && data.live.isEmpty()){
             Column(
@@ -144,11 +141,11 @@ private fun ScreenBody(
                     modifier = Modifier
                         .size(50.dp)
                         .padding(bottom = 8.dp),
-                    imageVector = Icons.Outlined.SwipeLeft,
-                    contentDescription = "Focus item"
+                    imageVector = Icons.Outlined.Swipe,
+                    contentDescription = null
                 )
 
-                Text(text = "Go to Focus Board")
+                Text(text = stringResource(R.string.dashboard_explore))
 
             }
         }
