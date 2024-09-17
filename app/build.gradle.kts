@@ -65,7 +65,7 @@ android {
     defaultConfig {
         applicationId = "com.imfibit.activitytracker"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 39
         versionName = "1.4.0"
         testInstrumentationRunner  ="com.imfibit.activitytracker.HiltRunner"
@@ -111,16 +111,16 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.7")
 
 
-    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
 
 
-    val COMPOSE_VERSION = "1.7.0"
+    val COMPOSE_VERSION = "1.7.1"
     implementation("androidx.compose.animation:animation:$COMPOSE_VERSION")
     implementation("androidx.compose.foundation:foundation:$COMPOSE_VERSION")
     implementation("androidx.compose.material:material:$COMPOSE_VERSION")
     implementation("androidx.compose.material:material-icons-extended:$COMPOSE_VERSION")
-    implementation("androidx.activity:activity-compose:1.9.0")
+    implementation("androidx.activity:activity-compose:1.9.2")
 
     implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
 
@@ -129,14 +129,14 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
     implementation("androidx.navigation:navigation-compose:2.8.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.5")
 
 
-    implementation("androidx.paging:paging-runtime-ktx:3.3.1")
-    implementation("androidx.paging:paging-compose:3.3.1")
+    implementation("androidx.paging:paging-runtime-ktx:3.3.2")
+    implementation("androidx.paging:paging-compose:3.3.2")
 
-    val ROOM_VERSION = "2.7.0-alpha05"
+    val ROOM_VERSION = "2.7.0-alpha07"
     ksp("androidx.room:room-compiler:$ROOM_VERSION")
     implementation("androidx.room:room-runtime:$ROOM_VERSION")
     implementation("androidx.room:room-ktx:$ROOM_VERSION")
