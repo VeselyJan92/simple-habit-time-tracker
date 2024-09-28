@@ -53,6 +53,7 @@ import com.imfibit.activitytracker.ui.components.MetricWidgetData
 import com.imfibit.activitytracker.ui.components.MonthGridImpl
 import com.imfibit.activitytracker.ui.components.dialogs.rememberDialog
 import org.burnoutcrew.reorderable.ItemPosition
+import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
@@ -220,7 +221,14 @@ fun DailyChecklist(
     ) {
 
         items(items, key = { it.id }) { item ->
-            DailyChecklistItem(item, onCheckItem, onItemEdit, onItemDelete)
+            ReorderableItem(
+                state = state,
+                key = item.id,
+                modifier = Modifier,
+                defaultDraggingModifier = Modifier.animateItem()
+            ) {
+                DailyChecklistItem(item, onCheckItem, onItemEdit, onItemDelete)
+            }
         }
 
         item {
@@ -232,7 +240,7 @@ fun DailyChecklist(
         }
 
 
-        items(months) { item ->
+        items(months, key = { it.month}) { item ->
             Surface(
                 modifier = Modifier,
 
