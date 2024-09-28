@@ -94,6 +94,12 @@ android {
             isDebuggable = true
         }
 
+        create("stage") {
+            initWith(getByName("release"))
+            applicationIdSuffix = ".stage"
+            versionNameSuffix = " - Stage"
+        }
+
     }
 
     namespace = "com.imfibit.activitytracker"

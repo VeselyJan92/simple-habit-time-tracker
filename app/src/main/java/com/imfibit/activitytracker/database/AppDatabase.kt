@@ -115,7 +115,7 @@ abstract class AppDatabase : RoomDatabase() {
 
                 db
             }
-            "debug" -> {
+            "debug", "stage" -> {
                // context.deleteDatabase(DB_NAME)
 
                 val db = Room
