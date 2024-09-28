@@ -2,7 +2,9 @@ package com.imfibit.activitytracker.database
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import com.imfibit.activitytracker.core.getFullMonthBlockDays
 import com.imfibit.activitytracker.core.iter
+import com.imfibit.activitytracker.core.toSequence
 import com.imfibit.activitytracker.database.composed.FocusBoardItemWithTags
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
@@ -40,14 +42,7 @@ object DevSeeder {
     }
 
     fun getMonthData(date: YearMonth): RepositoryTrackedActivity.Month {
-
-        val first = date.atDay(1)
-        val last = date.atEndOfMonth()
-
-        val from = first.minusDays(first.dayOfWeek.ordinal.toLong())
-        val to = last.plusDays(last.dayOfWeek.ordinal.toLong())
-
-        val weeks = (from iter to.plusDays(1)).asSequence().chunked(7).map {
+        val weeks = getFullMonthBlockDays(date.year, date.monthValue).toSequence().chunked(7).map {
             RepositoryTrackedActivity.Week(
                 from = it.first(),
                 to = it.last(),

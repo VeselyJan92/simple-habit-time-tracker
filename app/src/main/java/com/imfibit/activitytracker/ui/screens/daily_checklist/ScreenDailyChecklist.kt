@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -43,17 +44,14 @@ import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.TestTag
 import com.imfibit.activitytracker.database.DevSeeder
 import com.imfibit.activitytracker.database.entities.DailyChecklistItem
-import com.imfibit.activitytracker.database.entities.FocusBoardItemTag
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.ui.MainBody
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.Colors.chooseableColors
 import com.imfibit.activitytracker.ui.components.MetricBlock
 import com.imfibit.activitytracker.ui.components.MetricWidgetData
-import com.imfibit.activitytracker.ui.components.MonthGridWeek
-import com.imfibit.activitytracker.ui.components.MonthSplitter
+import com.imfibit.activitytracker.ui.components.MonthGridImpl
 import com.imfibit.activitytracker.ui.components.dialogs.rememberDialog
-import com.imfibit.activitytracker.ui.screens.focus_board.FocusItemTag
 import org.burnoutcrew.reorderable.ItemPosition
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
@@ -236,66 +234,58 @@ fun DailyChecklist(
 
         items(months) { item ->
             Surface(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier,
 
                 shape = RoundedCornerShape(15.dp),
                 elevation = 1.dp,
                 color = Colors.SuperLight
 
             ) {
-                MindBootMonth(
-                    modifier = Modifier.padding(8.dp),
-                    month = item,
-                    onToggleDay = onToggleDay
-                )
+                DailyChecklistMonth(onToggleDay, item)
             }
         }
     }
 }
 
-
 @Composable
-fun MindBootMonth(
-    modifier: Modifier = Modifier,
-    month: RepositoryTrackedActivity.Month,
-    onToggleDay: (checked: Boolean, date: LocalDate) -> Unit
-) = Column {
-    MonthSplitter(month = month.month)
-
-    Column(modifier = modifier.padding(3.dp)) {
-        month.weeks.forEach {
-            MonthGridWeek(
-                week = it,
-                month = month.month.month,
-                weekSum = {
-                    MetricBlock(
-                        data = MetricWidgetData(
-                            value = { "${it.total}/7" },
-                            color = Colors.ChipGray,
-                            label = { resources.getString(R.string.week) }
-                        )
+private fun DailyChecklistMonth(
+    onToggleDay: (checked: Boolean, date: LocalDate) -> Unit,
+    month: RepositoryTrackedActivity.Month
+){
+    MonthGridImpl(
+        modifier = Modifier.padding(8.dp),
+        month = month,
+        weekSum = {
+           MetricBlock(
+                data = MetricWidgetData(
+                    value = { "${it.total}/7" },
+                    color = Colors.ChipGray,
+                    label = { resources.getString(R.string.week) }
+                )
+            )
+        },
+        noWeekSum = {
+            Spacer(Modifier.size(40.dp, 20.dp))
+        },
+        day = {
+           MetricBlock(
+                modifier = Modifier.testTag(
+                    TestTag.DAILY_CHECKLIST_MONTH_GRID_DAY + it.date.format(
+                        DateTimeFormatter.ISO_DATE
                     )
-                },
-
-                day = {
-                    MetricBlock(
-                        modifier = Modifier.testTag(
-                            TestTag.DAILY_CHECKLIST_MONTH_GRID_DAY + it.date.format(
-                                DateTimeFormatter.ISO_DATE
-                            )
-                        ),
-                        data = MetricWidgetData(
-                            value = it.label,
-                            color = it.color,
-                            label = { it.date.dayOfMonth.toString() }
-                        ),
-                        onLongClick = { onToggleDay(it.metric < 1, it.date) }
-                    )
-                }
+                ),
+                data = MetricWidgetData(
+                    value = it.label,
+                    color = it.color,
+                    label = { it.date.dayOfMonth.toString() }
+                ),
+                onLongClick = { onToggleDay(it.metric < 1, it.date) }
             )
         }
-    }
+    )
+
 }
+
 
 
 @Composable

@@ -63,7 +63,6 @@ fun BaseMetricBlock(
 
     val width = if (width == 0.dp)
         Modifier
-            .fillMaxWidth()
             .height(metricHeight)
     else
         Modifier.size(width, metricHeight)
