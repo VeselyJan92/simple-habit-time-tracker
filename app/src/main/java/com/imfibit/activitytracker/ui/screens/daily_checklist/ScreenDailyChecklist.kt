@@ -224,14 +224,13 @@ fun DailyChecklist(
             ReorderableItem(
                 state = state,
                 key = item.id,
-                modifier = Modifier,
-                defaultDraggingModifier = Modifier.animateItem()
+                modifier = Modifier.animateItem()
             ) {
                 DailyChecklistItem(item, onCheckItem, onItemEdit, onItemDelete)
             }
         }
 
-        item {
+        item(key = "Recent") {
             Text(
                 modifier = Modifier.padding(top = 8.dp),
                 text = "Recent activity",
@@ -240,7 +239,7 @@ fun DailyChecklist(
         }
 
 
-        items(months, key = { it.month}) { item ->
+        items(months, key = { it.month }) { item ->
             Surface(
                 modifier = Modifier,
 
