@@ -54,22 +54,29 @@ fun ScreenOnboarding(
 
     val onboardPages = listOf(
         Page(
-            stringResource(id = R.string.screen_onboarding_page_1_title),
-            stringResource(id = R.string.screen_onboarding_page_1_text),
+            stringResource(id = R.string.screen_onboarding_page_habits_title),
+            stringResource(id = R.string.screen_onboarding_page_habits_text),
             painterResource(id = R.drawable.onboarding_activities)
         ),
 
         Page(
-            stringResource(id = R.string.screen_onboarding_page_2_title),
-            stringResource(id = R.string.screen_onboarding_page_2_text),
+            stringResource(id = R.string.screen_onboarding_page_activity_overview_title),
+            stringResource(id = R.string.screen_onboarding_page_activity_overview_text),
+            painterResource(id = R.drawable.onboarding_time_activity)
+        ),
+
+        Page(
+            stringResource(id = R.string.screen_onboarding_page_focus_board_title),
+            stringResource(id = R.string.screen_onboarding_page_focus_board_text),
             painterResource(id = R.drawable.onboarding_focus_board)
         ),
 
         Page(
-            stringResource(id = R.string.screen_onboarding_page_3_title),
-            stringResource(id = R.string.screen_onboarding_page_3_text),
-            painterResource(id = R.drawable.onboarding_time_activity)
-        )
+            stringResource(id = R.string.screen_onboarding_page_daily_checklist_title),
+            stringResource(id = R.string.screen_onboarding_page_daily_checklist_text),
+            painterResource(id = R.drawable.onboarding_daily_checklist)
+        ),
+
     )
 
 

@@ -94,13 +94,15 @@
     <string name="screen_activities_new_group">New Group</string>
 
 
-    <string name="screen_onboarding_page_1_title">Track habits</string>
-    <string name="screen_onboarding_page_1_text">Track: completion, time, score\nAdd record easily by long pressing on any date.</string>
+    <string name="screen_onboarding_page_habits_title">Track habits</string>
+    <string name="screen_onboarding_page_habits_text">Track: completion, time, score.\nAdd record easily by long pressing on any date.</string>
+    <string name="screen_onboarding_page_focus_board_title">Focus board</string>
+    <string name="screen_onboarding_page_focus_board_text">Keep goals that don\'t require tracking.</string>
+    <string name="screen_onboarding_page_activity_overview_title">Activity overview</string>
+    <string name="screen_onboarding_page_activity_overview_text">See your progress, set up daily, weekly goal.</string>
+    <string name="screen_onboarding_page_daily_checklist_title">Daily checklist</string>
+    <string name="screen_onboarding_page_daily_checklist_text">Track daily micro habits.</string>
 
-    <string name="screen_onboarding_page_2_title">Focus board</string>
-    <string name="screen_onboarding_page_2_text">Keep goals that don\'t require tracking.</string>
-    <string name="screen_onboarding_page_3_title">Activity overview</string>
-    <string name="screen_onboarding_page_3_text">See you progress, set up daily, weekly goal.</string>
     <string name="screen_onboarding_skip">Skip</string>
     <string name="screen_onboarding_track">Go to activities</string>
 
@@ -193,7 +195,7 @@
     <string name="daily_checklist_edit_item_title_edit">Edit daily task</string>
     <string name="daily_checklist_edit_item_title_create">Create daily task</string>
     <string name="daily_checklist_empty_title">No items in your daily checklist</string>
-    <string name="daily_checklist_empty_message">Add items you want to do every day</string>
+    <string name="daily_checklist_empty_message">Add items you want to do every day.</string>
     <string name="daily_checklist">Daily checklist</string>
     <string name="daily_checklist_edit_item_title_placeholder">Title</string>
     <string name="daily_checklist_edit_item_content_placeholder">Description</string>

@@ -23,11 +23,13 @@ object DebugTestSeeder {
 
         focusBoardRepository = RepositoryFocusBoard(db)
 
-        activity_the_awesome_project(db)
-
-        activity_exploring(db)
-
         activity_workout(db)
+
+        activity_my_project(db)
+
+        activity_learning_spanish(db)
+
+
 
         categories(db)
 
@@ -44,33 +46,33 @@ object DebugTestSeeder {
         }
 
         db.dailyCheckListItemsDao().insert(DailyChecklistItem(
-            title = "Random thing",
-            description = "The one thing I should do",
+            title = "Morning protein",
+            description = "Take 40g of supplements.",
             color = Colors.chooseableColors[8].toArgb()
         ))
 
         db.dailyCheckListItemsDao().insert(DailyChecklistItem(
-            title = "Workout",
-            description = "Make time for workout",
-            color = Colors.chooseableColors[17].toArgb()
+            title = "Plan today",
+            description = "Decide what to do today.",
+            color = Colors.chooseableColors[12].toArgb()
         ))
 
         db.dailyCheckListItemsDao().insert(DailyChecklistItem(
-            title = "Plan your day",
-            description = "Planning is good",
-            color = Colors.chooseableColors[18].toArgb()
+            title = "No sugar",
+            description = "I didn't drink any sugary drinks.",
+            color = Colors.chooseableColors[5].toArgb()
         ))
 
     }
 
 
-    suspend fun activity_the_awesome_project(db: AppDatabase) {
+    suspend fun activity_my_project(db: AppDatabase) {
         var activityId: Long = 0
 
         activityId = db.activityDAO().insert(
             TrackedActivity(
-                id = 0, name = "The awesome project",
-                position = 1,
+                id = 0, name = "My project",
+                position = 2,
                 type = TrackedActivity.Type.TIME,
                 inSessionSince = null,
                 goal = TrackedActivityGoal(0, TimeRange.WEEKLY),
@@ -107,11 +109,9 @@ object DebugTestSeeder {
 
     }
 
-    suspend fun activity_exploring(db: AppDatabase) {
-        var activityId: Long = 0
-
-        activityId = db.activityDAO().insert(TrackedActivity(
-            id = 0, name = "Exploring new App",
+    suspend fun activity_learning_spanish(db: AppDatabase) {
+        val activityId = db.activityDAO().insert(TrackedActivity(
+            id = 0, name = "Learning Spanish",
             position = 1,
             type = TrackedActivity.Type.TIME,
             inSessionSince = LocalDateTime.now(),
@@ -154,15 +154,10 @@ object DebugTestSeeder {
             datetime_start = LocalDateTime.now().minusHours(4).minusDays(10),
             datetime_end = LocalDateTime.now().minusHours(3).minusDays(10)
         ))
-
-
-
     }
 
     suspend fun activity_workout(db: AppDatabase) {
-        var activityId: Long = 0
-
-        activityId = db.activityDAO().insert(TrackedActivity(
+        val activityId = db.activityDAO().insert(TrackedActivity(
             id = 0, name = "Workout routine",
             position = 1,
             type = TrackedActivity.Type.CHECKED,
