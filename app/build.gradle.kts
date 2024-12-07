@@ -149,8 +149,8 @@ dependencies {
 
 
     implementation("androidx.hilt:hilt-common:1.2.0")
-    implementation("com.google.dagger:hilt-android:2.52")
-    ksp("com.google.dagger:hilt-android-compiler:2.52")
+    implementation("com.google.dagger:hilt-android:2.53")
+    ksp("com.google.dagger:hilt-android-compiler:2.53")
     ksp("androidx.hilt:hilt-compiler:1.2.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
@@ -159,7 +159,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview:$COMPOSE_VERSION")
 
 
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.52")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.53")
 
     // Needed for createAndroidComposeRule, but not createComposeRule:
     debugImplementation("androidx.compose.ui:ui-test-manifest:$COMPOSE_VERSION")

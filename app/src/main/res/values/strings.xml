@@ -199,6 +199,8 @@
     <string name="daily_checklist">Daily checklist</string>
     <string name="daily_checklist_edit_item_title_placeholder">Title</string>
     <string name="daily_checklist_edit_item_content_placeholder">Description</string>
+    <string name="days">days</string>
+    <string name="strike">"Strike: "</string>
 
 
     <string-array name="months">

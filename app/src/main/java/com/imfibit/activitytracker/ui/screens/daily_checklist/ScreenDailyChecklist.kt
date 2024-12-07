@@ -1,6 +1,8 @@
 package com.imfibit.activitytracker.ui.screens.daily_checklist
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,17 +35,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.TestTag
-import com.imfibit.activitytracker.database.DevSeeder
 import com.imfibit.activitytracker.database.entities.DailyChecklistItem
+import com.imfibit.activitytracker.database.entities.DailyChecklistTimelineItemValue
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.ui.MainBody
 import com.imfibit.activitytracker.ui.components.Colors
@@ -51,6 +56,7 @@ import com.imfibit.activitytracker.ui.components.Colors.chooseableColors
 import com.imfibit.activitytracker.ui.components.MetricBlock
 import com.imfibit.activitytracker.ui.components.MetricWidgetData
 import com.imfibit.activitytracker.ui.components.MonthGridImpl
+import com.imfibit.activitytracker.ui.components.darker
 import com.imfibit.activitytracker.ui.components.dialogs.rememberDialog
 import org.burnoutcrew.reorderable.ItemPosition
 import org.burnoutcrew.reorderable.ReorderableItem
@@ -58,48 +64,55 @@ import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
 import java.time.LocalDate
-import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
 val items = buildList {
-    add(DailyChecklistItem(
-        title = "Random thing",
-        description = "Random thing",
-        color = chooseableColors.random().toArgb(),
-        id = 1
-    ))
-    add(DailyChecklistItem(
+    add(
+        DailyChecklistItem(
+            title = "Random thing",
+            description = "Random thing",
+            color = chooseableColors.random().toArgb(),
+            id = 1
+        )
+    )
+    add(
+        DailyChecklistItem(
             title = "Most important things first",
             description = "Most important things first",
             color = chooseableColors.random().toArgb(),
             id = 2
-    ))
-    add(DailyChecklistItem(
+        )
+    )
+    add(
+        DailyChecklistItem(
             title = "Make time for workout",
             description = "Make time for workout",
             color = chooseableColors.random().toArgb(),
             id = 3
-    ))
-    add(DailyChecklistItem(
-        title = "This random shit",
-        description = "This random shit",
-        id = 4,
-        color = chooseableColors.random().toArgb(),
-    ))
+        )
+    )
+    add(
+        DailyChecklistItem(
+            title = "This random shit",
+            description = "This random shit",
+            id = 4,
+            color = chooseableColors.random().toArgb(),
+        )
+    )
 }
 
-val months = buildList {
-    add(DevSeeder.getMonthData(YearMonth.now()))
-    add(DevSeeder.getMonthData(YearMonth.now()))
-    add(DevSeeder.getMonthData(YearMonth.now()))
-}
 
 @Preview
 @Composable
 private fun Preview() {
     Body(
         items = items,
-        months = months,
+        days = buildList {
+            repeat(7) {
+                add(DailyChecklistTimelineItemValue(LocalDate.now().minusDays(it.toLong()), true))
+            }
+        },
+        strike = 7,
         onCheckItem = { checked, item -> },
         onToggleDay = { checked, item -> },
         onItemEdit = {},
@@ -115,11 +128,13 @@ fun ScreenMindBoot() {
     val viewModel = hiltViewModel<DailyChecklistViewModel>()
 
     val items by viewModel.items.collectAsState()
-    val months by viewModel.months.collectAsState()
+    val days by viewModel.days.collectAsState()
+    val strike by viewModel.strike.collectAsState()
 
     Body(
         items = items,
-        months = months,
+        days = days,
+        strike = strike,
         onCheckItem = viewModel::onCheck,
         onToggleDay = viewModel::onToggleDay,
         onItemEdit = viewModel::onEdit,
@@ -132,13 +147,14 @@ fun ScreenMindBoot() {
 @Composable
 private fun Body(
     items: List<DailyChecklistItem>,
-    months: List<RepositoryTrackedActivity.Month>,
+    days: List<DailyChecklistTimelineItemValue>,
+    strike: Int,
     onCheckItem: (checked: Boolean, item: DailyChecklistItem) -> Unit,
     onToggleDay: (checked: Boolean, date: LocalDate) -> Unit,
     onItemEdit: (DailyChecklistItem) -> Unit,
     onItemDelete: (DailyChecklistItem) -> Unit,
     onSwap: (from: ItemPosition, to: ItemPosition) -> Unit,
-    onReordered: () -> Unit
+    onReordered: () -> Unit,
 ) {
     MainBody {
         TopBar()
@@ -178,7 +194,8 @@ private fun Body(
         } else {
             DailyChecklist(
                 items,
-                months,
+                days,
+                strike,
                 onCheckItem,
                 onToggleDay,
                 onItemEdit,
@@ -190,65 +207,107 @@ private fun Body(
     }
 }
 
+@Composable
+fun TopOverview(
+    days: List<DailyChecklistTimelineItemValue>,
+    strike: Int,
+    onToggleDay: (checked: Boolean, date: LocalDate) -> Unit,
+) {
+    Surface(
+        shape = RoundedCornerShape(15.dp),
+        elevation = 2.dp,
+        color = Colors.SuperLight
+    ) {
+        Column(Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .animateContentSize()
+
+            ) {
+                Column(Modifier.fillMaxWidth()) {
+
+                    Row(
+                        Modifier
+                            .padding(bottom = 8.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(buildAnnotatedString {
+                            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append(stringResource(R.string.strike))
+                            }
+                            append(" $strike " + stringResource(R.string.days))
+                        })
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        days.forEach {
+                            MetricBlock(
+                                modifier = Modifier.clickable {
+                                    onToggleDay(!it.completed, it.date_completed)
+                                },
+                                data = MetricWidgetData(
+                                    value = {
+
+                                        it.date_completed.dayOfMonth.toString().padStart(2,'0')
+                                    },
+
+                                    color = if (it.completed) Colors.ButtonGreen else Colors.ChipGray
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 @Composable
 fun DailyChecklist(
     items: List<DailyChecklistItem>,
-    months: List<RepositoryTrackedActivity.Month>,
+    days: List<DailyChecklistTimelineItemValue>,
+    strike: Int,
     onCheckItem: (checked: Boolean, item: DailyChecklistItem) -> Unit,
     onToggleDay: (checked: Boolean, date: LocalDate) -> Unit,
     onItemEdit: (DailyChecklistItem) -> Unit,
     onItemDelete: (DailyChecklistItem) -> Unit,
     onSwap: (from: ItemPosition, to: ItemPosition) -> Unit,
-    onReordered: () -> Unit
+    onReordered: () -> Unit,
 ) {
-
 
     val state = rememberReorderableLazyListState(
         onDragEnd = { from, to -> onReordered() },
         onMove = onSwap,
-        canDragOver = { draggedOver, dragging -> draggedOver.index < items.size }
+        canDragOver = { draggedOver, dragging -> draggedOver.key != "header" }
     )
 
     LazyColumn(
         state = state.listState,
         modifier = Modifier
             .testTag(TestTag.DAILY_CHECKLIST_LIST)
-            .reorderable(state = state)
-            .detectReorderAfterLongPress(state),
+            .reorderable(state = state),
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+
+        item(key = "header") {
+            TopOverview(days, strike, onToggleDay)
+        }
 
         items(items, key = { it.id }) { item ->
             ReorderableItem(
                 state = state,
                 key = item.id,
-                modifier = Modifier.animateItem()
+                modifier = Modifier.detectReorderAfterLongPress(state),
             ) {
-                DailyChecklistItem(item, onCheckItem, onItemEdit, onItemDelete)
-            }
-        }
-
-        item(key = "Recent") {
-            Text(
-                modifier = Modifier.padding(top = 8.dp),
-                text = "Recent activity",
-                fontWeight = FontWeight.Bold, fontSize = 18.sp
-            )
-        }
-
-
-        items(months, key = { it.month }) { item ->
-            Surface(
-                modifier = Modifier,
-
-                shape = RoundedCornerShape(15.dp),
-                elevation = 1.dp,
-                color = Colors.SuperLight
-
-            ) {
-                DailyChecklistMonth(onToggleDay, item)
+                DailyChecklistItem(item, it, onCheckItem, onItemEdit, onItemDelete)
             }
         }
     }
@@ -257,13 +316,13 @@ fun DailyChecklist(
 @Composable
 private fun DailyChecklistMonth(
     onToggleDay: (checked: Boolean, date: LocalDate) -> Unit,
-    month: RepositoryTrackedActivity.Month
-){
+    month: RepositoryTrackedActivity.Month,
+) {
     MonthGridImpl(
         modifier = Modifier.padding(8.dp),
         month = month,
         weekSum = {
-           MetricBlock(
+            MetricBlock(
                 data = MetricWidgetData(
                     value = { "${it.total}/7" },
                     color = Colors.ChipGray,
@@ -275,7 +334,7 @@ private fun DailyChecklistMonth(
             Spacer(Modifier.size(40.dp, 20.dp))
         },
         day = {
-           MetricBlock(
+            MetricBlock(
                 modifier = Modifier.testTag(
                     TestTag.DAILY_CHECKLIST_MONTH_GRID_DAY + it.date.format(
                         DateTimeFormatter.ISO_DATE
@@ -292,7 +351,6 @@ private fun DailyChecklistMonth(
     )
 
 }
-
 
 
 @Composable
@@ -316,9 +374,10 @@ private fun TopBar() {
 @Composable
 private fun DailyChecklistItem(
     item: DailyChecklistItem,
+    dragging: Boolean,
     onCheckItem: (checked: Boolean, item: DailyChecklistItem) -> Unit,
     onItemEdit: (DailyChecklistItem) -> Unit,
-    onItemDelete: (DailyChecklistItem) -> Unit
+    onItemDelete: (DailyChecklistItem) -> Unit,
 ) {
     val show = rememberDialog()
 
@@ -333,12 +392,12 @@ private fun DailyChecklistItem(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
+            .clickable(interactionSource = remember { MutableInteractionSource() } , indication = null) {
                 show.value = true
             }
             .testTag(TestTag.DAILY_CHECKLIST_LIST_ITEM),
         shape = RoundedCornerShape(15.dp),
-        color = Color(item.color),
+        color = Color(item.color).let { if (dragging) it.darker(0.25f) else it },
         elevation = 2.dp
     ) {
         Row(

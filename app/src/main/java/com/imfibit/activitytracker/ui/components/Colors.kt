@@ -61,6 +61,10 @@ object Colors{
 
       Color(0xFFCFD8DC),
    )
-
-
 }
+
+fun Color.darker(factor: Float) = copy(
+   red = red - factor,
+   green = green - factor,
+   blue = blue - factor
+)

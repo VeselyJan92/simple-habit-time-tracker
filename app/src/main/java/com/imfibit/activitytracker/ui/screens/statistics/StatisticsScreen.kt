@@ -489,7 +489,7 @@ private fun BlockCompleted(
 
                     val label =
                         if (it.activity.type == TrackedActivity.Type.CHECKED && range == TimeRange.DAILY)
-                            stringResource(id = R.string.yes).toUpperCase()
+                            stringResource(id = R.string.yes).uppercase()
                         else
                             "${it.metric} / ${range.getNumberOfDays(date)}"
 

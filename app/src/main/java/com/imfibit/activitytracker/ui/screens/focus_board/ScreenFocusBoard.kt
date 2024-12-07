@@ -292,12 +292,10 @@ fun FocusBoardItems(
                 contentPadding = PaddingValues(8.dp)
             ) {
 
-                items(focusItems, {it.item.id} ){ item ->
+                items(focusItems, { it.item.id } ){ item ->
                     ReorderableItem(
                         state = reorderState,
-                        key = item.item.id,
-                        modifier = Modifier,
-                        defaultDraggingModifier = if (reorderState.draggingItemKey == null) Modifier else Modifier.animateItemPlacement()
+                        key = item.item.id
                     ) {
                         FocusBoardItem(item, tags, onFocusItemEdit, onFocusItemDelete, if (it) Color.LightGray  else item.getMainTag()?.getUIColor() ?: Colors.SuperLight)
                     }

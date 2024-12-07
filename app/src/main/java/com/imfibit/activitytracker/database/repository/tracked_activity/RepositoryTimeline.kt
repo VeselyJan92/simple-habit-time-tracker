@@ -1,5 +1,6 @@
 package com.imfibit.activitytracker.database.repository.tracked_activity
 
+import androidx.core.util.rangeTo
 import androidx.room.withTransaction
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.getFullMonthBlockDays
@@ -7,6 +8,7 @@ import com.imfibit.activitytracker.core.toSequence
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.entities.DailyChecklistItem
 import com.imfibit.activitytracker.database.entities.DailyChecklistTimelineItem
+import com.imfibit.activitytracker.database.entities.DailyChecklistTimelineItemValue
 import com.imfibit.activitytracker.ui.components.Colors
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -67,6 +69,19 @@ class RepositoryTimeline @Inject constructor(
         } else {
             db.dailyCheckListTimelineDAO().delete(item)
         }
+    }
+
+    suspend fun getDataForPastDays(n: Int): List<DailyChecklistTimelineItemValue> {
+        val from = LocalDate.now().minusDays(n.toLong() -1 )
+        val to = LocalDate.now()
+
+        val completed =  db.dailyCheckListTimelineDAO().getFromTo(from, to).map { it.date_completed }.toSet()
+
+        return (from rangeTo to).toSequence().map { DailyChecklistTimelineItemValue(it, completed.contains(it))  }.toList()
+    }
+
+    suspend fun getStrike(): Int {
+        return db.dailyCheckListTimelineDAO().getStrike()
     }
 
     suspend fun getDataForPastMonths(n: Int) = buildList {

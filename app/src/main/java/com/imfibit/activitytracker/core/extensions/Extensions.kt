@@ -17,27 +17,16 @@ fun <T> MutableList<T>.swap(from: Int, to: Int) {
 
 
 fun <T>  MutableState<List<T>>.swap(from: ItemPosition, to: ItemPosition){
-    this.value = this.value.toMutableList().apply{
-        swap(from.index, to.index)
-    }
+    this.value = this.value.toMutableList().apply { swap(from.index, to.index) }
 }
 
 fun <T>  MutableStateFlow<List<T>>.swap(from: ItemPosition, to: ItemPosition){
-    this.value = this.value.toMutableList().apply{
-        swap(from.index, to.index)
-    }
+    this.value = this.value.toMutableList().apply { swap(from.index, to.index) }
 }
 
-
-fun <T>  SnapshotStateList<T>.swap(from: ItemPosition, to: ItemPosition){
-    this.swap(from.index, to.index)
+fun <T>  MutableStateFlow<List<T>>.swap(from: Int, to: Int){
+    this.value = this.value.toMutableList().apply { swap(from, to) }
 }
-
-fun <T>  SnapshotStateList<T>.swapByIndex(from: Int, to: Int){
-    this.swap(from, to)
-}
-
-
 
 @Composable
 fun <T> rememberReorderList(items: List<T>): MutableState<List<T>> {

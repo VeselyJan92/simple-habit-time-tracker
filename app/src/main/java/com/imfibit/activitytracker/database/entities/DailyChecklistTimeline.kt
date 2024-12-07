@@ -23,3 +23,8 @@ data class DailyChecklistTimelineItem(
         const val TABLE = "daily_checklist_timeline"
     }
 }
+
+data class DailyChecklistTimelineItemValue(
+    val  date_completed: LocalDate,
+    val  completed: Boolean,
+)

@@ -25,8 +25,12 @@ class DailyChecklistViewModel @Inject constructor(
         db.dailyCheckListItemsDao().getAll()
     }
 
-    val months = invalidationStateFlow(db, listOf(), *dailyChecklistTables) {
-        rep.getDataForPastMonths(6)
+    val days = invalidationStateFlow(db, listOf(), *dailyChecklistTables) {
+        rep.getDataForPastDays(7).reversed()
+    }
+
+    val strike = invalidationStateFlow(db, 0, *dailyChecklistTables) {
+        rep.getStrike()
     }
 
 
@@ -57,7 +61,7 @@ class DailyChecklistViewModel @Inject constructor(
     }
 
     fun onSwap(from: ItemPosition, to: ItemPosition) {
-        items.swap(from, to)
+        items.swap(from.index - 1, to.index - 1)
     }
 
 }

@@ -17,4 +17,22 @@ abstract class DAODailyChecklistTimeline : BaseEditableDAO<DailyChecklistTimelin
    """)
     abstract suspend fun getFromTo(from: LocalDate, to: LocalDate): List<DailyChecklistTimelineItem>
 
+    @Query("""
+        WITH RECURSIVE 
+            cte AS (
+                SELECT date_completed, 1 AS streak 
+                FROM daily_checklist_timeline 
+                WHERE date_completed = date('now')
+                
+                UNION ALL
+                
+                SELECT d.date_completed, c.streak + 1
+                FROM cte AS c
+                JOIN daily_checklist_timeline AS d ON d.date_completed = date(c.date_completed, '-1 day')
+            )
+        SELECT MAX(streak) 
+        FROM cte;
+    """)
+    abstract suspend fun getStrike(): Int
+
 }
