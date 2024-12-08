@@ -82,7 +82,7 @@ fun DialogEditTag(
             Spacer(modifier = Modifier.height(8.dp))
 
             ColorPickerComponent(
-                selected = item.getUIColor(),
+                selected = color,
                 onChoose = {
                     color = it
                 }
