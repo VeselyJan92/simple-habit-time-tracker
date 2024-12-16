@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Scaffold
@@ -63,6 +64,7 @@ fun ScreenActivityHistory(
     onDayLongClicked: (TrackedActivity, LocalDate) -> Unit
 ) {
     Scaffold(
+        modifier =  Modifier.safeDrawingPadding(),
         topBar = {
             SimpleTopBar(nav, stringResource(id = R.string.screen_title_record_history))
         },

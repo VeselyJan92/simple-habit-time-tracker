@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -42,6 +43,7 @@ import java.time.format.DateTimeFormatter
 fun ScreenSetting(navControl: NavHostController, scaffoldState: ScaffoldState) {
 
     Scaffold(
+        modifier =  Modifier.safeDrawingPadding(),
         scaffoldState = scaffoldState,
         topBar = {
             SimpleTopBar(navHostController = navControl, title =  stringResource(id = R.string.screen_settings_title))

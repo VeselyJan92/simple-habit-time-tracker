@@ -95,6 +95,7 @@ fun ScreenTrackedActivity(
     CheckNotificationPermission()
 
     Scaffold(
+        modifier =  Modifier.safeDrawingPadding(),
         topBar = {
             Row(
                 modifier = Modifier

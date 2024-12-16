@@ -4,9 +4,11 @@ package com.imfibit.activitytracker.ui
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.FloatingActionButton
@@ -58,10 +60,10 @@ import com.imfibit.activitytracker.ui.screens.activity_list.ActivitiesViewModel
 import com.imfibit.activitytracker.ui.screens.activity_list.ScreenActivities
 import com.imfibit.activitytracker.ui.screens.daily_checklist.DailyChecklistViewModel
 import com.imfibit.activitytracker.ui.screens.daily_checklist.DialogEditDailyChecklistItem
+import com.imfibit.activitytracker.ui.screens.daily_checklist.ScreenMindBoot
 import com.imfibit.activitytracker.ui.screens.focus_board.DialogEditFocusItem
 import com.imfibit.activitytracker.ui.screens.focus_board.FocusBoardViewModel
 import com.imfibit.activitytracker.ui.screens.focus_board.ScreenFocusBoard
-import com.imfibit.activitytracker.ui.screens.daily_checklist.ScreenMindBoot
 import com.imfibit.activitytracker.ui.screens.group.ScreenActivityGroup
 import com.imfibit.activitytracker.ui.screens.onboarding.ScreenOnboarding
 import com.imfibit.activitytracker.ui.screens.settings.ScreenSetting
@@ -92,6 +94,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        enableEdgeToEdge()
+
         NotificationTimerOver.createChannel(this)
         NotificationLiveSession.createChannel(this)
 
@@ -114,13 +118,17 @@ fun MainActivity.Router() {
 
     val onboarded = runBlocking { vm.settings.getOnboarded() ?: false }
 
-    val destination: Any = if (onboarded) Destinations.ScreenActivities else Destinations.ScreenOnboarding
+    val destination: Any =
+        if (onboarded) Destinations.ScreenActivities else Destinations.ScreenOnboarding
 
     val scaffoldState = rememberScaffoldState()
 
     CompositionLocalProvider(LocalNavController provides rememberNavController()) {
 
-        NavHost(navController = navControl, startDestination = destination) {
+        NavHost(
+            navController = navControl,
+            startDestination = destination
+        ) {
             composable<Destinations.ScreenStatistics> {
                 ScreenStatistics(navControl, scaffoldState)
             }
@@ -133,7 +141,7 @@ fun MainActivity.Router() {
                 ScreenSetting(navControl, scaffoldState)
             }
 
-            composable<Destinations.ScreenOnboarding>{
+            composable<Destinations.ScreenOnboarding> {
                 ScreenOnboarding(
                     onOnboardingDone = {
                         runBlocking {
@@ -149,7 +157,7 @@ fun MainActivity.Router() {
                 ScreenActivityGroup(navControl, scaffoldState)
             }
 
-            composable<Destinations.ScreenActivity>{
+            composable<Destinations.ScreenActivity> {
                 ScreenTrackedActivity(navControl, scaffoldState)
             }
 
@@ -210,9 +218,13 @@ private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldStat
     DialogEditDailyChecklistItem(
         display = dialogDailyChecklist,
         isEdit = false,
-        item = DailyChecklistItem(title = "", color = Colors.chooseableColors[0].toArgb(), description = ""),
+        item = DailyChecklistItem(
+            title = "",
+            color = Colors.chooseableColors[0].toArgb(),
+            description = ""
+        ),
         onItemEdit = {
-            dailyChecklistItemViewModel.onAdd(item = it )
+            dailyChecklistItemViewModel.onAdd(item = it)
         }
     )
 
@@ -286,6 +298,7 @@ private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldStat
     )
 
     Scaffold(
+        modifier = Modifier.safeDrawingPadding(),
         scaffoldState = scaffoldState,
         floatingActionButton = {
             FloatingActionButton(

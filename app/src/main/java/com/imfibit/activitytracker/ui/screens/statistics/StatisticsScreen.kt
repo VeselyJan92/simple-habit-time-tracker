@@ -43,6 +43,7 @@ import java.time.LocalDate
 @Composable
 fun ScreenStatistics(navController: NavHostController, scaffoldState: ScaffoldState) {
     Scaffold(
+        modifier =  Modifier.safeDrawingPadding(),
         scaffoldState = scaffoldState,
         topBar = {
             SimpleTopBar(
