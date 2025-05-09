@@ -42,7 +42,6 @@ android {
     }
 
     compileSdk = 35
-    buildToolsVersion = "34.0.0"
 
     buildFeatures {
         compose = true
