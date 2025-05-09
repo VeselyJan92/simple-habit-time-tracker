@@ -1,6 +1,6 @@
 package com.imfibit.activitytracker.ui.screens.daily_checklist
 
-import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -31,8 +31,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -65,6 +68,7 @@ import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlin.math.max
 
 val items = buildList {
     add(
@@ -108,7 +112,7 @@ private fun Preview() {
     Body(
         items = items,
         days = buildList {
-            repeat(7) {
+            repeat(30) {
                 add(DailyChecklistTimelineItemValue(LocalDate.now().minusDays(it.toLong()), true))
             }
         },
@@ -218,56 +222,88 @@ fun TopOverview(
         elevation = 2.dp,
         color = Colors.SuperLight
     ) {
-        Column(Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp) // Increased padding for more breathing room
+        ) {
             Row(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .animateContentSize()
-
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(Modifier.fillMaxWidth()) {
-
-                    Row(
-                        Modifier
-                            .padding(bottom = 8.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(buildAnnotatedString {
-                            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append(stringResource(R.string.strike))
-                            }
-                            append(" $strike " + stringResource(R.string.days))
-                        })
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        days.forEach {
-                            MetricBlock(
-                                modifier = Modifier.clickable {
-                                    onToggleDay(!it.completed, it.date_completed)
-                                },
-                                data = MetricWidgetData(
-                                    value = {
-
-                                        it.date_completed.dayOfMonth.toString().padStart(2,'0')
-                                    },
-
-                                    color = if (it.completed) Colors.ButtonGreen else Colors.ChipGray
-                                )
+                // Prominent strike count
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(
+                            SpanStyle(
+                                fontWeight = FontWeight.Black,
+                                fontSize = 20.sp
                             )
+                        ) { // Larger font for strike
+                            append("$strike")
                         }
-                    }
-                }
+                        append(" ")
+                        append(stringResource(R.string.days))
+                    },
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(end = 48.dp)
+                )
+
+                TruncatingBoxRow(days, onToggleDay)
             }
         }
     }
 }
 
+@Composable
+fun TruncatingBoxRow(
+    days: List<DailyChecklistTimelineItemValue>,
+    onToggleDay: (checked: Boolean, date: LocalDate) -> Unit,
+) {
+    Layout(
+        content = {
+            days.forEach {
+                Box(
+                    modifier = Modifier
+                        .size(16.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(if (it.completed) Colors.ButtonGreen else Colors.ChipGray)
+                        .clickable {
+                            onToggleDay(!it.completed, it.date_completed)
+                        }
+                )
+            }
+        }
+    ) { measurables, constraints ->
+        val boxSize = 16.dp.roundToPx()
+        val spacing = 4.dp.roundToPx()
+
+        val placeables = measurables.map { it.measure(constraints.copy(minWidth = 0)) }
+
+        var currentWidth = 0
+        val itemsToPlace = mutableListOf<Placeable>()
+
+        for (placeable in placeables) {
+            // Check if adding the current item exceeds the max width
+            if (currentWidth + placeable.width <= constraints.maxWidth) {
+                itemsToPlace.add(0, placeable) // Add to the beginning to maintain the order
+                currentWidth += placeable.width + spacing
+            } else {
+                break // Stop when adding the next item would exceed the width
+            }
+        }
+
+        layout(max(currentWidth - spacing, 0), boxSize) {
+            var xPosition = 0
+            itemsToPlace.forEach { placeable ->
+                placeable.placeRelative(xPosition, 0)
+                xPosition += placeable.width + spacing
+            }
+        }
+    }
+}
 
 @Composable
 fun DailyChecklist(
@@ -392,7 +428,10 @@ private fun DailyChecklistItem(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(interactionSource = remember { MutableInteractionSource() } , indication = null) {
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {
                 show.value = true
             }
             .testTag(TestTag.DAILY_CHECKLIST_LIST_ITEM),

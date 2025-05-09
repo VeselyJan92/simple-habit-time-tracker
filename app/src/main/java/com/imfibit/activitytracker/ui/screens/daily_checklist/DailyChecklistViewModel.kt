@@ -26,7 +26,7 @@ class DailyChecklistViewModel @Inject constructor(
     }
 
     val days = invalidationStateFlow(db, listOf(), *dailyChecklistTables) {
-        rep.getDataForPastDays(7).reversed()
+        rep.getDataForPastDays(30).reversed()
     }
 
     val strike = invalidationStateFlow(db, 0, *dailyChecklistTables) {

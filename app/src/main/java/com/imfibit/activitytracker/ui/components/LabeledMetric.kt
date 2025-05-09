@@ -72,7 +72,7 @@ fun BaseMetricBlock(
         modifier = Modifier
             .padding(top = if (labelOffset) labelHeight else 0.dp)
             .then(width)
-            .background(color, RoundedCornerShape(10.dp))
+            .background(color, RoundedCornerShape(8.dp))
             .then(modifier)
             .then(clickable),
         contentAlignment = Alignment.Center
