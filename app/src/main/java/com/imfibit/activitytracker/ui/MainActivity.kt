@@ -221,7 +221,7 @@ private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldStat
 
     if (editDailyChecklist){
         EditDailyChecklistItemBottomSheet(
-            onDismiss = {
+            onDismissRequest = {
                 editDailyChecklist = false
             },
             isEdit = false,

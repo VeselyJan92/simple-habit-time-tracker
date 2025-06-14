@@ -422,7 +422,7 @@ private fun DailyChecklistItem(
 
     if (dialogDailyChecklist){
         EditDailyChecklistItemBottomSheet(
-            onDismiss = {
+            onDismissRequest = {
                  dialogDailyChecklist = false
             },
             isEdit = true,
