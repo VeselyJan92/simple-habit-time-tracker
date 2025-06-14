@@ -18,6 +18,7 @@ import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
@@ -25,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.testTag
@@ -59,7 +61,7 @@ import com.imfibit.activitytracker.ui.screens.activity_history.ScreenActivityHis
 import com.imfibit.activitytracker.ui.screens.activity_list.ActivitiesViewModel
 import com.imfibit.activitytracker.ui.screens.activity_list.ScreenActivities
 import com.imfibit.activitytracker.ui.screens.daily_checklist.DailyChecklistViewModel
-import com.imfibit.activitytracker.ui.screens.daily_checklist.DialogEditDailyChecklistItem
+import com.imfibit.activitytracker.ui.screens.daily_checklist.EditDailyChecklistItemBottomSheet
 import com.imfibit.activitytracker.ui.screens.daily_checklist.ScreenMindBoot
 import com.imfibit.activitytracker.ui.screens.focus_board.DialogEditFocusItem
 import com.imfibit.activitytracker.ui.screens.focus_board.FocusBoardViewModel
@@ -191,12 +193,13 @@ fun MainActivity.Router() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldState) {
 
     val dialogNewActivity = remember { mutableStateOf(false) }
     val dialogEditFocusItem = remember { mutableStateOf(false) }
-    val dialogDailyChecklist = remember { mutableStateOf(false) }
+    var editDailyChecklist by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
 
@@ -215,18 +218,23 @@ private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldStat
 
     val dailyChecklistItemViewModel = hiltViewModel<DailyChecklistViewModel>()
 
-    DialogEditDailyChecklistItem(
-        display = dialogDailyChecklist,
-        isEdit = false,
-        item = DailyChecklistItem(
-            title = "",
-            color = Colors.chooseableColors[0].toArgb(),
-            description = ""
-        ),
-        onItemEdit = {
-            dailyChecklistItemViewModel.onAdd(item = it)
-        }
-    )
+
+    if (editDailyChecklist){
+        EditDailyChecklistItemBottomSheet(
+            onDismiss = {
+                editDailyChecklist = false
+            },
+            isEdit = false,
+            item = DailyChecklistItem(
+                title = "",
+                color = Colors.chooseableColors[0].toArgb(),
+                description = ""
+            ),
+            onItemEdit = {
+                dailyChecklistItemViewModel.onAdd(item = it)
+            }
+        )
+    }
 
     val focusBoardViewModel = hiltViewModel<FocusBoardViewModel>()
     val tags by focusBoardViewModel.tags.collectAsStateWithLifecycle()
@@ -292,7 +300,7 @@ private fun Dashboard(navControl: NavHostController, scaffoldState: ScaffoldStat
                     delay(100)
                 }
 
-                dialogDailyChecklist.value = true
+                editDailyChecklist  = true
             }
         }
     )

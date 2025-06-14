@@ -19,16 +19,19 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Checkbox
-import androidx.compose.material.Icon
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Checklist
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,7 +63,6 @@ import com.imfibit.activitytracker.ui.components.MetricBlock
 import com.imfibit.activitytracker.ui.components.MetricWidgetData
 import com.imfibit.activitytracker.ui.components.MonthGridImpl
 import com.imfibit.activitytracker.ui.components.darker
-import com.imfibit.activitytracker.ui.components.dialogs.rememberDialog
 import org.burnoutcrew.reorderable.ItemPosition
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
@@ -219,7 +221,7 @@ fun TopOverview(
 ) {
     Surface(
         shape = RoundedCornerShape(15.dp),
-        elevation = 2.dp,
+        shadowElevation = 2.dp,
         color = Colors.SuperLight
     ) {
         Column(
@@ -407,6 +409,7 @@ private fun TopBar() {
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DailyChecklistItem(
     item: DailyChecklistItem,
@@ -415,15 +418,19 @@ private fun DailyChecklistItem(
     onItemEdit: (DailyChecklistItem) -> Unit,
     onItemDelete: (DailyChecklistItem) -> Unit,
 ) {
-    val show = rememberDialog()
+    var dialogDailyChecklist by remember { mutableStateOf(false) }
 
-    DialogEditDailyChecklistItem(
-        display = show,
-        isEdit = true,
-        item = item,
-        onItemEdit = onItemEdit,
-        onItemDelete = onItemDelete
-    )
+    if (dialogDailyChecklist){
+        EditDailyChecklistItemBottomSheet(
+            onDismiss = {
+                 dialogDailyChecklist = false
+            },
+            isEdit = true,
+            item = item,
+            onItemEdit = onItemEdit,
+            onItemDelete = onItemDelete
+        )
+    }
 
     Surface(
         modifier = Modifier
@@ -432,12 +439,12 @@ private fun DailyChecklistItem(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
             ) {
-                show.value = true
+                dialogDailyChecklist = true
             }
             .testTag(TestTag.DAILY_CHECKLIST_LIST_ITEM),
         shape = RoundedCornerShape(15.dp),
         color = Color(item.color).let { if (dragging) it.darker(0.25f) else it },
-        elevation = 2.dp
+        shadowElevation = 2.dp
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

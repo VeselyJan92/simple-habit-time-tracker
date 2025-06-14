@@ -118,6 +118,7 @@ dependencies {
 
     implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation("androidx.compose.material3:material3-android:1.3.2")
 
 
     val COMPOSE_VERSION = "1.7.5"
