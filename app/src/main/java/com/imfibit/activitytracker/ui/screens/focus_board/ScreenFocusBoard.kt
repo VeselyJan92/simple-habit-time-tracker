@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -305,6 +306,10 @@ fun FocusBoardItems(
                         }
                     }
                 }
+
+                item {
+                    Spacer(modifier = Modifier.height(100.dp))
+                }
             }
         }
 
@@ -437,12 +442,17 @@ fun FocusBoardItem(
             if (item.item.title.isNotEmpty()) {
                 Text(
                     item.item.title,
-                    style = TextStyle.Default.copy(fontWeight = FontWeight.Bold, fontSize = 16.sp),
+                    style = TextStyle.Default.copy(fontWeight = FontWeight.Bold, fontSize = 17.sp),
                 )
             }
 
             if (item.item.content.isNotEmpty()) {
-                Text(item.item.content)
+                Text(
+                    text = item.item.content,
+                    style = TextStyle.Default.copy(
+                        fontSize = 16.sp
+                    ),
+                )
             }
 
             if (item.tags.size > 1) {

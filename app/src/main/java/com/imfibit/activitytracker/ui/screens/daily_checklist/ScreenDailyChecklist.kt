@@ -58,6 +58,7 @@ import com.imfibit.activitytracker.core.TestTag
 import com.imfibit.activitytracker.database.entities.DailyChecklistItem
 import com.imfibit.activitytracker.database.entities.DailyChecklistTimelineItemValue
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
+import com.imfibit.activitytracker.ui.AppTheme
 import com.imfibit.activitytracker.ui.MainBody
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.Colors.chooseableColors
@@ -83,7 +84,7 @@ val items = buildList {
     add(
         DailyChecklistItem(
             title = "Most important things first",
-            description = "Most important things first",
+            description = "Most important things first, Customize Toolbar…, Customize Toolbar…",
             color = chooseableColors.random().toArgb(),
             id = 2
         )
@@ -99,7 +100,7 @@ val items = buildList {
     add(
         DailyChecklistItem(
             title = "This random shit",
-            description = "This random shit",
+            description = "",
             id = 4,
             color = chooseableColors.random().toArgb(),
         )
@@ -109,7 +110,7 @@ val items = buildList {
 
 @Preview
 @Composable
-private fun Preview() {
+private fun Preview() = AppTheme {
     Body(
         items = items,
         days = buildList {
@@ -322,7 +323,8 @@ fun DailyChecklist(
     LazyColumn(
         state = lazyListState,
         modifier = Modifier
-            .testTag(TestTag.DAILY_CHECKLIST_LIST).fillMaxHeight(),
+            .testTag(TestTag.DAILY_CHECKLIST_LIST)
+            .fillMaxHeight(),
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -345,6 +347,10 @@ fun DailyChecklist(
                     onItemDelete = onItemDelete
                 )
             }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(100.dp))
         }
     }
 }
@@ -454,18 +460,27 @@ private fun DailyChecklistItem(
                     .padding(8.dp)
                     .weight(1f),
             ) {
-                Text(
-                    style = TextStyle.Default.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 17.sp
-                    ),
-                    text = item.title
-                )
 
-                Text(
-                    modifier = Modifier,
-                    text = item.description
-                )
+                if (item.title.isNotBlank()) {
+                    Text(
+                        style = TextStyle.Default.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 17.sp
+                        ),
+                        text = item.title
+                    )
+                }
+
+                if (item.description.isNotBlank()) {
+                    Text(
+                        style = TextStyle.Default.copy(
+                            fontSize = 16.sp
+                        ),
+                        modifier = Modifier,
+                        text = item.description
+                    )
+                }
+
             }
 
             val now = remember { LocalDate.now() }
