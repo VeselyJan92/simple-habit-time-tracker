@@ -1,5 +1,6 @@
 package com.imfibit.activitytracker.ui.screens.daily_checklist
 
+import androidx.compose.foundation.lazy.LazyListItemInfo
 import com.imfibit.activitytracker.core.BaseViewModel
 import com.imfibit.activitytracker.core.dailyChecklistTables
 import com.imfibit.activitytracker.core.extensions.swap
@@ -9,7 +10,6 @@ import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.entities.DailyChecklistItem
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTimeline
 import dagger.hilt.android.lifecycle.HiltViewModel
-import org.burnoutcrew.reorderable.ItemPosition
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -60,8 +60,12 @@ class DailyChecklistViewModel @Inject constructor(
         rep.reorderItems(items = items.value)
     }
 
-    fun onSwap(from: ItemPosition, to: ItemPosition) {
+    fun onSwap(from: LazyListItemInfo, to: LazyListItemInfo) {
         items.swap(from.index - 1, to.index - 1)
+
+        launchIO {
+            onReordered()
+        }
     }
 
 }

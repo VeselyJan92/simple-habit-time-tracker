@@ -1,5 +1,6 @@
 package com.imfibit.activitytracker.ui.screens.group
 
+import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -62,17 +63,16 @@ class ActivityGroupViewModel @Inject constructor(
         this.groupName.value = name
     }
 
+    fun onMoveActivity(from: LazyListItemInfo, to: LazyListItemInfo) {
+        this.activities.value = this.activities.value.toMutableList().apply { swap(from.index, to.index) }
 
-    fun moveActivity(from: Int, to: Int) {
-        this.activities.value = this.activities.value.toMutableList().apply { swap(from, to) }
-    }
+        launchIO {
+            val items = this@ActivityGroupViewModel.activities.value
+                .mapIndexed{index, item -> item.activity.copy(groupPosition = index)}
+                .toTypedArray()
 
-    fun onActivityDragEnd(from: Int, to: Int) = viewModelScope.launch(Dispatchers.IO){
-        val items = this@ActivityGroupViewModel.activities.value
-            .mapIndexed{index, item -> item.activity.copy(groupPosition = index)}
-            .toTypedArray()
-
-        db.activityDAO().updateAll(*items)
+            db.activityDAO().updateAll(*items)
+        }
     }
 
     fun delete(item: TrackerActivityGroup) = launchIO {

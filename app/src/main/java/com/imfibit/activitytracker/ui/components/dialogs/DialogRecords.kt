@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,7 +36,7 @@ import javax.inject.Inject
 
 
 @Composable
-fun DialogRecords(nav: NavHostController, scaffoldState: ScaffoldState) {
+fun DialogRecords(nav: NavHostController) {
     val vm = hiltViewModel<DayRecordsVM>()
 
     //https://issuetracker.google.com/issues/221643630#comment8
@@ -47,7 +47,7 @@ fun DialogRecords(nav: NavHostController, scaffoldState: ScaffoldState) {
 
         Surface(
             shape = RoundedCornerShape(10.dp),
-            elevation = 2.dp,
+            shadowElevation = 2.dp,
             modifier = Modifier.width(320.dp)
         ){
             Column() {

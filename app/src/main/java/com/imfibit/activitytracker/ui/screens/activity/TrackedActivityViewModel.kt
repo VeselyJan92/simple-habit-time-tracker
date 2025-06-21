@@ -2,6 +2,7 @@ package com.imfibit.activitytracker.ui.screens.activity
 
 
 import android.util.Log
+import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -11,6 +12,7 @@ import androidx.room.withTransaction
 import com.imfibit.activitytracker.core.BaseViewModel
 import com.imfibit.activitytracker.core.ContextString
 import com.imfibit.activitytracker.core.activityTables
+import com.imfibit.activitytracker.core.extensions.swap
 import com.imfibit.activitytracker.core.invalidationStateFlow
 import com.imfibit.activitytracker.core.services.TrackTimeService
 import com.imfibit.activitytracker.database.AppDatabase
@@ -38,7 +40,7 @@ import javax.inject.Inject
 @Immutable
 data class TrackedActivityState(
     val activity: TrackedActivity,
-    val timers: MutableList<PresetTimer>,
+    val timers: List<PresetTimer>,
     val recent: List<RepositoryTrackedActivity.Month>,
     val months: List<MetricWidgetData>,
     val groups: List<TrackerActivityGroup>,
@@ -51,7 +53,7 @@ class TrackedActivityViewModel @Inject constructor(
     private val timerService: TrackTimeService,
     private val db: AppDatabase,
     private val rep: RepositoryTrackedActivity,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
 
     var deleted = false
@@ -60,7 +62,7 @@ class TrackedActivityViewModel @Inject constructor(
         Log.e("TrackedActivityViewModel", "clear")
         super.onCleared()
 
-        if (!activityName.value.isNullOrBlank() && ! deleted)
+        if (!activityName.value.isNullOrBlank() && !deleted)
             runBlocking(Dispatchers.IO) {
                 updateName(activityName.value!!)
             }
@@ -71,8 +73,9 @@ class TrackedActivityViewModel @Inject constructor(
     //For better edittext performance save the name of the activity when user is done with the screen
     val activityName = mutableStateOf<String?>(null)
 
-    val data = invalidationStateFlow(db, null, *activityTables ){
-        val activity: TrackedActivity = rep.activityDAO.tryGetById(id) ?: return@invalidationStateFlow null
+    val data = invalidationStateFlow(db, null, *activityTables) {
+        val activity: TrackedActivity =
+            rep.activityDAO.tryGetById(id) ?: return@invalidationStateFlow null
 
         //Ignore subsequent changes
         viewModelScope.launch(Dispatchers.Main) {
@@ -115,20 +118,20 @@ class TrackedActivityViewModel @Inject constructor(
             rep.getMonthData(id, YearMonth.now()),
         )
 
-       // val graph = rep.getWeeks(id)
+        // val graph = rep.getWeeks(id)
         val graph = listOf<RepositoryTrackedActivity.Week>()
 
 
         val months = rep.metricDAO.getMetricByMonth(
             activity.id,
-            YearMonth.now(),6
+            YearMonth.now(), 6
         ).map {
             val color = if (activity.goal.range == TimeRange.MONTHLY)
                 if (activity.goal.value <= it.metric) Colors.Completed else Colors.NotCompleted
             else
                 Colors.AppAccent
 
-            val metric:ContextString = if (activity.type == TrackedActivity.Type.CHECKED) {
+            val metric: ContextString = if (activity.type == TrackedActivity.Type.CHECKED) {
                 { "${it.metric} / ${it.from.month.length(it.from.isLeapYear)}" }
             } else {
                 activity.type.getLabel(it.metric)
@@ -146,15 +149,16 @@ class TrackedActivityViewModel @Inject constructor(
 
         val timers = rep.timers.getAll(activity.id).toMutableList()
 
-        val challengeMetric = rep.getChallengeMetric(activity.id, activity.challenge.from, activity.challenge.to)
+        val challengeMetric =
+            rep.getChallengeMetric(activity.id, activity.challenge.from, activity.challenge.to)
 
         TrackedActivityState(
-            activity, timers, recent, months, groups,  graph, challengeMetric
+            activity, timers, recent, months, groups, graph, challengeMetric
         )
     }
 
 
-    private suspend fun updateName(name: String){
+    private suspend fun updateName(name: String) {
         val activity = rep.activityDAO.getById(id)
         rep.activityDAO.update(activity.copy(name = name))
     }
@@ -167,9 +171,18 @@ class TrackedActivityViewModel @Inject constructor(
         rep.timers.insert(timer)
     }
 
-    fun reorganizeTimers(items: List<PresetTimer>) = launchIO {
-        val timers = items.mapIndexed{index, item -> item.copy(position = index) }.toTypedArray()
-        rep.timers.updateAll(*timers)
+    fun swapTimer(from: LazyListItemInfo, to: LazyListItemInfo) {
+        val timers = (data.value?.timers ?: return)
+            .toMutableList()
+            .apply { swap(from.index, to.index) }
+            .mapIndexed { index, item -> item.copy(position = index) }
+            .toTypedArray()
+
+        data.value = data.value?.copy(timers = timers.toMutableList())
+
+        launchIO {
+            rep.timers.updateAll(*timers)
+        }
     }
 
 
@@ -178,7 +191,7 @@ class TrackedActivityViewModel @Inject constructor(
     }
 
 
-    fun updateGoal(goal: TrackedActivityGoal)  = launchIO {
+    fun updateGoal(goal: TrackedActivityGoal) = launchIO {
         val activity = rep.activityDAO.getById(id)
         rep.activityDAO.update(activity.copy(goal = goal))
     }

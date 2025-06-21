@@ -7,21 +7,22 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.AssignmentTurnedIn
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -46,40 +47,64 @@ import com.imfibit.activitytracker.ui.components.TopBarBackButton
 import com.imfibit.activitytracker.ui.components.dialogs.DialogAgree
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivity
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview
-import org.burnoutcrew.reorderable.ReorderableItem
-import org.burnoutcrew.reorderable.detectReorderAfterLongPress
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
-import org.burnoutcrew.reorderable.reorderable
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 fun ScreenActivityGroup(
     nav: NavHostController,
-    scaffoldState: ScaffoldState,
 ) {
-
     val vm = hiltViewModel<ActivityGroupViewModel>()
 
     val activities by vm.activities.collectAsState()
     val group by vm.group.collectAsState()
 
+    group?.let {
+        ScreenActivityGroup(
+            nav = nav,
+            activities = activities,
+            group = group,
+            name = vm.groupName.value ?: "",
+            onDelete = {
+                nav.popBackStack()
+                vm.delete(it)
+            },
+            onNameChanged = vm::refreshName,
+            onMove = vm::onMoveActivity
+        )
+    }
+}
+
+@Composable
+@OptIn(ExperimentalFoundationApi::class)
+fun ScreenActivityGroup(
+    nav: NavHostController,
+    activities: List<TrackedActivityRecentOverview>,
+    group: TrackerActivityGroup?,
+    name: String,
+    onDelete: (TrackerActivityGroup) -> Unit,
+    onNameChanged: (String) -> Unit,
+    onMove: (from: LazyListItemInfo, to: LazyListItemInfo) -> Unit
+) {
     Scaffold(
-        modifier =  Modifier.safeDrawingPadding(),
+        modifier = Modifier.safeDrawingPadding(),
         topBar = {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically) {
+                verticalAlignment = Alignment.CenterVertically
+            ) {
 
                 TopBarBackButton(navHostController = nav)
 
                 BasicTextField(
                     modifier = Modifier.weight(1f),
-                    value = vm.groupName.value ?: "",
+                    value = name,
                     singleLine = true,
-                    onValueChange = {vm.refreshName(it)},
+                    onValueChange = onNameChanged,
                     textStyle = TextStyle(fontWeight = FontWeight.Black, fontSize = 25.sp)
                 )
 
@@ -88,16 +113,15 @@ fun ScreenActivityGroup(
                 }
 
                 DialogAgree(
-                    display = dialogDelete ,
-                    title = stringResource(id = R.string.screen_group_delete_group).uppercase() ,
+                    display = dialogDelete,
+                    title = stringResource(id = R.string.screen_group_delete_group).uppercase(),
                     onAction = { delete ->
                         dialogDelete.value = false
 
                         val tobeDeleted = group
 
-                        if(delete && tobeDeleted != null){
-                            nav.popBackStack()
-                            vm.delete(tobeDeleted)
+                        if (delete && tobeDeleted != null) {
+                            onDelete(tobeDeleted)
                         }
                     }
                 )
@@ -108,62 +132,45 @@ fun ScreenActivityGroup(
                     tint = Color.Black,
                     modifier = Modifier
                         .padding(start = 16.dp)
-                        .clickable(onClick = {
-                            dialogDelete.value = true
-                        })
+                        .clickable(
+                            onClick = {
+                                dialogDelete.value = true
+                            }
+                        )
                 )
-
-
             }
 
         },
-        content = {
-            ScreenBody(nav, vm, group, activities)
+        content = { paddingValues ->
+            ScreenBody(
+                paddingValues = paddingValues,
+                nav = nav,
+                activities = activities,
+                onMove = onMove,
+            )
         },
-        backgroundColor = Colors.AppBackground,
-        scaffoldState = scaffoldState
+        containerColor = Colors.AppBackground,
     )
 }
 
 @Composable
 private fun ScreenBody(
-    nav: NavHostController,
-    vm: ActivityGroupViewModel,
-    group: TrackerActivityGroup?,
-    activities: List<TrackedActivityRecentOverview>,
-) {
-    Activities(
-        nav = nav,
-        activities = activities,
-        onMove = { from, to -> vm.moveActivity(from, to) },
-        onDragEnd = { from, to -> vm.onActivityDragEnd(from, to) }
-    )
-
-}
-
-@Composable
-private fun Activities(
+    paddingValues: PaddingValues,
     nav: NavHostController,
     activities: List<TrackedActivityRecentOverview>,
-    onDragEnd: (from: Int, to: Int) -> Unit,
-    onMove: (from: Int, to: Int) -> Unit,
+    onMove: (from: LazyListItemInfo, to: LazyListItemInfo) -> Unit,
 ) {
-
     val activities = rememberReorderList(items = activities)
 
-
-
-
-    if (activities.value.isEmpty()){
+    if (activities.value.isEmpty()) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
+                .padding(paddingValues)
+                .fillMaxSize()
                 .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-
             Icon(
                 modifier = Modifier
                     .size(80.dp)
@@ -179,39 +186,33 @@ private fun Activities(
             )
         }
     } else {
-        val state = rememberReorderableLazyListState(
-            onDragEnd = onDragEnd,
-            onMove = {from, to -> onMove(from.index, to.index)}
-        )
+        val lazyListState = rememberLazyListState()
+        val reorderableLazyListState =
+            rememberReorderableLazyListState(lazyListState) { from, to ->
+                onMove(from, to)
+            }
 
         LazyColumn(
-            state = state.listState,
-            modifier = Modifier
-                .reorderable(state = state)
-                .detectReorderAfterLongPress(state),
+            modifier = Modifier.padding(paddingValues).fillMaxSize(),
+            state = lazyListState,
             verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(8.dp)
         ) {
 
-            items(activities.value, key = {item -> item.activity.id },) { item ->
-                ReorderableItem(state, key = item.activity.id, defaultDraggingModifier = Modifier) { isDragging ->
+            items(activities.value, key = { item -> item.activity.id }) { item ->
+                ReorderableItem(
+                    state = reorderableLazyListState,
+                    key = item.activity.id
+                ) { isDragging ->
                     TrackedActivity(
                         nav = nav,
                         item = item,
-                        modifier = Modifier,
+                        modifier = Modifier.longPressDraggableHandle(),
                         onNavigate = { nav.navigate(Destinations.ScreenActivity(it.id)) },
                         isDragging = isDragging
                     )
                 }
-
             }
-
         }
     }
-
-
-
-
-
 }
-

@@ -1,18 +1,12 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
-import android.content.Context
-import android.os.Build
-import android.os.VibrationEffect
-import android.os.Vibrator
-import android.os.VibratorManager
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Flag
@@ -20,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -41,10 +34,7 @@ import com.imfibit.activitytracker.database.entities.TrackedActivityTime
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.MetricBlock
 import com.imfibit.activitytracker.ui.components.MetricWidgetData
-import com.imfibit.activitytracker.ui.components.Timer
-import com.imfibit.activitytracker.ui.components.dialogs.DialogScore
-import com.imfibit.activitytracker.ui.components.dialogs.DialogSession
-import com.imfibit.activitytracker.ui.components.dialogs.ShowDialog
+import com.imfibit.activitytracker.ui.components.TimerBlock
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.*
 import com.imfibit.activitytracker.ui.viewmodels.RecordViewModel
 import com.imfibit.activitytracker.ui.widgets.custom.GoalProgressBar
@@ -61,9 +51,9 @@ data class TrackedActivityRecentOverview(
     val challengeMetric: Long,
     val past: List<MetricWidgetData>,
     val actionButton: ActionButton = ActionButton.DEFAULT,
-    val today: MetricAggregation
-){
-    enum class ActionButton{
+    val today: MetricAggregation,
+) {
+    enum class ActionButton {
         DEFAULT, CHECKED, IN_SESSION
     }
 
@@ -76,18 +66,18 @@ data class TrackedActivityRecentOverview(
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun TrackedActivity(
+    modifier: Modifier = Modifier,
     nav: NavHostController,
     item: TrackedActivityRecentOverview,
-    modifier: Modifier = Modifier,
     onNavigate: (activity: TrackedActivity) -> Unit,
-    isDragging: Boolean = false
+    isDragging: Boolean = false,
 ) {
     val activity = item.activity
 
     val recordVM = hiltViewModel<RecordViewModel>()
 
 
-    val color = when{
+    val color = when {
         isDragging -> Color.LightGray
         activity.isInSession() -> Colors.SuperLight
         else -> Color.White
@@ -95,16 +85,18 @@ fun TrackedActivity(
 
 
     Surface(
-        modifier = modifier
-            .clickable(interactionSource = remember { MutableInteractionSource() } , indication = null) {
-                onNavigate(activity)
-            },
-
-        elevation = 2.dp,
+        modifier = modifier,
+        shadowElevation = 2.dp,
         color = color,
         shape = RoundedCornerShape(20.dp)
     ) {
-        Column(modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    onNavigate(activity)
+                }
+        ) {
             Row(
                 modifier = Modifier
                     .padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
@@ -121,9 +113,29 @@ fun TrackedActivity(
                     onLongClick = {
                         recordVM.hapticsService.activityFeedback()
 
-                        when(activity.type){
-                            Type.TIME ->  nav.navigate("dialog_edit_record/{record}", bundleOf("record" to TrackedActivityTime(activity_id = activity.id, datetime_start = LocalDateTime.now(), datetime_end = LocalDateTime.now())))
-                            Type.SCORE ->  nav.navigate("dialog_edit_record/{record}", bundleOf("record" to TrackedActivityScore(activity_id = activity.id, datetime_completed = LocalDateTime.now(), score = 1)))
+                        when (activity.type) {
+                            Type.TIME -> nav.navigate(
+                                "dialog_edit_record/{record}",
+                                bundleOf(
+                                    "record" to TrackedActivityTime(
+                                        activity_id = activity.id,
+                                        datetime_start = LocalDateTime.now(),
+                                        datetime_end = LocalDateTime.now()
+                                    )
+                                )
+                            )
+
+                            Type.SCORE -> nav.navigate(
+                                "dialog_edit_record/{record}",
+                                bundleOf(
+                                    "record" to TrackedActivityScore(
+                                        activity_id = activity.id,
+                                        datetime_completed = LocalDateTime.now(),
+                                        score = 1
+                                    )
+                                )
+                            )
+
                             Type.CHECKED -> {}
                         }
                     }
@@ -148,14 +160,19 @@ fun TrackedActivity(
 
                     }
 
-                    Row(modifier = Modifier.fillMaxWidth(),
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        MetricBlock(item.past[4], width = 80.dp, metricStyle = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
-                        MetricBlock(item.past[3] )
-                        MetricBlock(item.past[2] )
-                        MetricBlock(item.past[1] )
+                        MetricBlock(
+                            item.past[4],
+                            width = 80.dp,
+                            metricStyle = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                        )
+                        MetricBlock(item.past[3])
+                        MetricBlock(item.past[2])
+                        MetricBlock(item.past[1])
                         MetricBlock(item.past[0])
                     }
 
@@ -173,7 +190,7 @@ fun TrackedActivity(
                                 exit = slideOutVertically()
                             ),
                         ) {
-                            if(item.activity.isInSession()){
+                            if (item.activity.isInSession()) {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -183,14 +200,22 @@ fun TrackedActivity(
                                 ) {
 
                                     if (activity.timer != null) {
-                                        Text(text = stringResource(id = R.string.activity_in_timer) + " " + activity.type.getLabel(activity.timer?.toLong() ?: 0L).value())
-                                    }else{
-                                        Text(text = stringResource(id = R.string.activity_in_session) + " " + item.activity.inSessionSince!!.format(DateTimeFormatter.ofPattern("HH:mm")))
+                                        Text(
+                                            text = stringResource(id = R.string.activity_in_timer) + " " + activity.type.getLabel(
+                                                activity.timer?.toLong() ?: 0L
+                                            ).value()
+                                        )
+                                    } else {
+                                        Text(
+                                            text = stringResource(id = R.string.activity_in_session) + " " + item.activity.inSessionSince!!.format(
+                                                DateTimeFormatter.ofPattern("HH:mm")
+                                            )
+                                        )
                                     }
 
-                                    Timer(
+                                    TimerBlock(
                                         startTime = item.activity.inSessionSince,
-                                        onClick = {  }
+                                        onClick = { }
                                     )
                                 }
                             }
@@ -200,7 +225,7 @@ fun TrackedActivity(
                 }
             }
 
-            if (item.activity.challenge.isSet()){
+            if (item.activity.challenge.isSet()) {
                 GoalProgressBar(
                     item.activity.challenge,
                     item.challengeMetric,
@@ -217,8 +242,8 @@ fun RowScope.ActionButton(
     modifier: Modifier = Modifier,
     actionButton: ActionButton,
     activity: TrackedActivity,
-    onClick: (()->Unit),
-    onLongClick: (()->Unit) = {},
+    onClick: (() -> Unit),
+    onLongClick: (() -> Unit) = {},
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -244,8 +269,8 @@ fun RowScope.ActionButton(
             mutableStateOf(34.dp)
         }
 
-        if (actionButton == ActionButton.IN_SESSION) LaunchedEffect(activity.inSessionSince){
-            while (currentCoroutineContext().isActive){
+        if (actionButton == ActionButton.IN_SESSION) LaunchedEffect(activity.inSessionSince) {
+            while (currentCoroutineContext().isActive) {
                 glow.value = if (glow.value == 34.dp) 37.dp else 34.dp
                 delay(1000)
             }
@@ -254,7 +279,8 @@ fun RowScope.ActionButton(
         Box(
             Modifier
                 .size(glow.value)
-                .background(color, RoundedCornerShape(50)), contentAlignment = Alignment.Center  ){
+                .background(color, RoundedCornerShape(50)), contentAlignment = Alignment.Center
+        ) {
             Icon(
                 contentDescription = null,
                 imageVector = icon,

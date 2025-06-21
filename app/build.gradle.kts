@@ -20,6 +20,13 @@ repositories {
 }
 
 android {
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+        // Enable core library desugaring
+        isCoreLibraryDesugaringEnabled = true
+    }
+
     signingConfigs {
         create("release") {
             val properties = Properties().apply {
@@ -111,55 +118,55 @@ play {
 }
 
 dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.7.3") //For navigation
     implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.7")
 
 
-    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
-    implementation("androidx.compose.material3:material3-android:1.3.2")
 
 
-    val COMPOSE_VERSION = "1.7.5"
+    val COMPOSE_VERSION = "1.8.3"
     implementation("androidx.compose.animation:animation:$COMPOSE_VERSION")
     implementation("androidx.compose.foundation:foundation:$COMPOSE_VERSION")
-    implementation("androidx.compose.material:material:$COMPOSE_VERSION")
-    implementation("androidx.compose.material:material-icons-extended:$COMPOSE_VERSION")
-    implementation("androidx.activity:activity-compose:1.9.3")
+    implementation("androidx.activity:activity-compose:1.10.1")
+    implementation("androidx.compose.material3:material3-android:1.4.0-alpha16")
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
+    implementation("sh.calvin.reorderable:reorderable:2.5.1")
 
-    implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
 
     implementation("androidx.core:core-ktx:1.16.0")
     implementation("androidx.glance:glance-appwidget:1.1.1")
     implementation("androidx.datastore:datastore-preferences:1.2.0-alpha02")
 
     implementation("androidx.navigation:navigation-compose:2.9.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.1")
 
 
     implementation("androidx.paging:paging-runtime-ktx:3.3.6")
     implementation("androidx.paging:paging-compose:3.3.6")
 
-    val ROOM_VERSION = "2.7.1"
+    val ROOM_VERSION = "2.7.2"
     ksp("androidx.room:room-compiler:$ROOM_VERSION")
     implementation("androidx.room:room-runtime:$ROOM_VERSION")
     implementation("androidx.room:room-ktx:$ROOM_VERSION")
 
 
     implementation("androidx.hilt:hilt-common:1.2.0")
-    implementation("com.google.dagger:hilt-android:2.53")
-    ksp("com.google.dagger:hilt-android-compiler:2.53")
+    implementation("com.google.dagger:hilt-android:2.56.2")
+    ksp("com.google.dagger:hilt-android-compiler:2.56.2")
     ksp("androidx.hilt:hilt-compiler:1.2.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-
 
     debugImplementation("androidx.compose.ui:ui-tooling:$COMPOSE_VERSION")
     implementation("androidx.compose.ui:ui-tooling-preview:$COMPOSE_VERSION")
 
 
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.53")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.56.2")
 
     // Needed for createAndroidComposeRule, but not createComposeRule:
     debugImplementation("androidx.compose.ui:ui-test-manifest:$COMPOSE_VERSION")

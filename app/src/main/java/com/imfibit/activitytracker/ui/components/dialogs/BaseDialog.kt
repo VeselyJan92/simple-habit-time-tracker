@@ -1,10 +1,10 @@
 package com.imfibit.activitytracker.ui.components.dialogs
 
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Surface
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -40,7 +40,7 @@ inline fun BaseDialog(
         Surface(
             modifier = modifier.width(320.dp),
             shape = RoundedCornerShape(10.dp),
-            elevation = 2.dp,
+            shadowElevation = 2.dp,
 
         ){
             Column(content = content, )
@@ -61,7 +61,7 @@ inline fun BaseDialogV2(
         Surface(
             modifier = Modifier.width(320.dp),
             shape = RoundedCornerShape(10.dp),
-            elevation = 2.dp,
+            shadowElevation = 2.dp,
         ){
             Column(content = content)
         }
@@ -82,7 +82,6 @@ fun DialogBaseHeader(title: String){
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White)
             .padding(8.dp)
     ) {
         Text(

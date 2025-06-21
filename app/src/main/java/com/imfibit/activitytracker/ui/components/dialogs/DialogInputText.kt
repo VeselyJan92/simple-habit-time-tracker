@@ -2,7 +2,7 @@ package com.imfibit.activitytracker.ui.components.dialogs
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -12,7 +12,7 @@ import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.ui.components.EditText
 
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 inline fun DialogInputText(
     display: MutableState<Boolean>,

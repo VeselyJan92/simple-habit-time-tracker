@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
@@ -42,7 +41,7 @@ import com.imfibit.activitytracker.ui.components.BaseBottomSheet
 import com.imfibit.activitytracker.ui.components.rememberTestBottomSheetState
 import com.imfibit.activitytracker.ui.components.selectors.ColorPickerComponent
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 private fun PreviewBottomSheet() {
@@ -56,7 +55,7 @@ private fun PreviewBottomSheet() {
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditDailyChecklistItemBottomSheet(
     state: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),

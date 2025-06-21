@@ -8,9 +8,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowLeft
+import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowLeft
+import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.outlined.Analytics
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -41,18 +45,21 @@ import java.time.LocalDate
 
 
 @Composable
-fun ScreenStatistics(navController: NavHostController, scaffoldState: ScaffoldState) {
+fun ScreenStatistics(navController: NavHostController) {
     Scaffold(
-        modifier =  Modifier.safeDrawingPadding(),
-        scaffoldState = scaffoldState,
+        modifier = Modifier.safeDrawingPadding(),
         topBar = {
             SimpleTopBar(
                 navController,
                 stringResource(id = R.string.screen_title_statistics)
             )
         },
-        content = { ScreenBody() },
-        backgroundColor = Colors.AppBackground
+        content = { padding ->
+            Box(modifier = Modifier.padding(padding)) {
+                ScreenBody()
+            }
+        },
+        containerColor = Colors.AppBackground
     )
 }
 
@@ -69,7 +76,7 @@ private fun ScreenBody() = Column {
     val pagerState = rememberPagerState(
         initialPage = 51,
         initialPageOffsetFraction = 0f,
-        pageCount = {100}
+        pageCount = { 100 }
     )
 
     val scope = rememberCoroutineScope()
@@ -131,7 +138,7 @@ private fun ScreenBody() = Column {
                     modifier = Modifier
                         .padding(top = 8.dp)
                         .padding(horizontal = 8.dp),
-                    elevation = 2.dp,
+                    shadowElevation = 2.dp,
                     shape = RoundedCornerShape(20.dp)
                 ) {
                     Column() {
@@ -158,13 +165,13 @@ private fun ScreenBody() = Column {
 @Composable
 private fun EmptyData(
     range: TimeRange,
-    date: LocalDate
+    date: LocalDate,
 ) {
     Surface(
         modifier = Modifier
             .padding(8.dp)
             .height(300.dp),
-        elevation = 2.dp,
+        shadowElevation = 2.dp,
         shape = RoundedCornerShape(20.dp)
     ) {
         Column(
@@ -185,7 +192,7 @@ private fun EmptyData(
                     .fillMaxWidth()
                     .fillMaxHeight()
             ) {
-                Icon(Icons.Default.ArrowLeft, contentDescription = null)
+                Icon(Icons.AutoMirrored.Filled.ArrowLeft, contentDescription = null)
 
 
                 Column(
@@ -212,7 +219,7 @@ private fun EmptyData(
                 }
 
 
-                Icon(Icons.Default.ArrowRight, contentDescription = null)
+                Icon(Icons.AutoMirrored.Filled.ArrowRight, contentDescription = null)
             }
         }
     }
@@ -230,7 +237,7 @@ private fun Navigation(
         modifier = Modifier
             .padding(top = 8.dp)
             .padding(horizontal = 8.dp),
-        elevation = 2.dp,
+        shadowElevation = 2.dp,
         shape = RoundedCornerShape(20.dp)
     ) {
         Row(
@@ -292,14 +299,14 @@ private fun Navigation(
 @Composable
 private fun NavigationHeader(
     range: TimeRange,
-    rangeDate: LocalDate
+    rangeDate: LocalDate,
 ) {
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(8.dp)
     ) {
-        Icon(Icons.Default.ArrowLeft, contentDescription = null)
+        Icon(Icons.AutoMirrored.Filled.ArrowLeft, contentDescription = null)
 
         Spacer(Modifier.weight(1f))
 
@@ -307,14 +314,14 @@ private fun NavigationHeader(
 
         Spacer(Modifier.weight(1f))
 
-        Icon(Icons.Default.ArrowRight, contentDescription = null)
+        Icon(Icons.AutoMirrored.Filled.ArrowRight, contentDescription = null)
     }
 }
 
 @Composable
 private fun NavigationTitle(
     range: TimeRange,
-    rangeDate: LocalDate
+    rangeDate: LocalDate,
 ) {
     Text(
         text = range.getDateLabel(rangeDate).value(),
@@ -351,12 +358,12 @@ private fun Header(title: String, icon: ImageVector, last: @Composable (() -> Un
 @Composable
 private fun BlockTimeTracked(
     data: List<ActivityWithMetric>?,
-    range: TimeRange
+    range: TimeRange,
 ) {
     if (data == null) return
 
     Surface(
-        elevation = 2.dp,
+        shadowElevation = 2.dp,
         modifier = Modifier.padding(8.dp),
         shape = RoundedCornerShape(20.dp),
         color = Colors.SuperLight
@@ -405,7 +412,7 @@ private fun BlockTimeTracked(
 
                 }
 
-                Divider(Modifier.padding(top = 4.dp, bottom = 4.dp))
+                HorizontalDivider(Modifier.padding(top = 4.dp, bottom = 4.dp))
             }
         }
     }
@@ -416,12 +423,12 @@ private fun BlockTimeTracked(
 @Composable
 private fun BlockScores(
     data: List<ActivityWithMetric>?,
-    range: TimeRange
+    range: TimeRange,
 ) {
     if (data == null) return
 
     Surface(
-        elevation = 2.dp,
+        shadowElevation = 2.dp,
         modifier = Modifier.padding(8.dp),
         shape = RoundedCornerShape(20.dp),
         color = Colors.SuperLight
@@ -451,7 +458,7 @@ private fun BlockScores(
                     )
                 }
 
-                Divider(Modifier.padding(top = 4.dp, bottom = 4.dp))
+                HorizontalDivider(Modifier.padding(top = 4.dp, bottom = 4.dp))
             }
 
         }
@@ -463,12 +470,12 @@ private fun BlockScores(
 private fun BlockCompleted(
     data: List<ActivityWithMetric>?,
     range: TimeRange,
-    date: LocalDate
+    date: LocalDate,
 ) {
     if (data == null) return
 
     Surface(
-        elevation = 2.dp,
+        shadowElevation = 2.dp,
         modifier = Modifier.padding(8.dp),
         shape = RoundedCornerShape(20.dp),
         color = Colors.SuperLight
@@ -503,7 +510,7 @@ private fun BlockCompleted(
                     )
                 }
 
-                Divider(Modifier.padding(top = 4.dp, bottom = 4.dp))
+                HorizontalDivider(Modifier.padding(top = 4.dp, bottom = 4.dp))
             }
         }
     }

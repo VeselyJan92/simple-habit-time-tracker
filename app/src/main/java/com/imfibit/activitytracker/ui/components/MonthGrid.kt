@@ -11,8 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
-import androidx.compose.material.Text
+import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -193,13 +194,13 @@ fun MonthSplitter(month: YearMonth) {
             .fillMaxWidth()
             .padding(top = 8.dp)
     ) {
-        Divider(
+        HorizontalDivider(
             Modifier
                 .padding(8.dp)
                 .weight(1f)
         )
         Text(text = value, fontWeight = FontWeight.W600)
-        Divider(
+        HorizontalDivider(
             Modifier
                 .padding(8.dp)
                 .weight(1f)

@@ -63,10 +63,18 @@ class ActivitiesViewModel @Inject constructor(
 
     fun onMoveActivity(from: Int, to: Int){
         data.value = data.value.copy(activities = data.value.activities.toMutableList().apply { swap(from, to) })
+
+        launchIO {
+            onDragEnd()
+        }
     }
 
     fun onMoveGroup(from: Int, to: Int) {
         data.value = data.value.copy(groups = data.value.groups.toMutableList().apply { swap(from, to) })
+
+        launchIO {
+            onDragEnd()
+        }
     }
 
 

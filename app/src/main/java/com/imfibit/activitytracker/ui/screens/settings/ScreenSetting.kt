@@ -15,11 +15,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,11 +40,10 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun ScreenSetting(navControl: NavHostController, scaffoldState: ScaffoldState) {
+fun ScreenSetting(navControl: NavHostController) {
 
     Scaffold(
         modifier =  Modifier.safeDrawingPadding(),
-        scaffoldState = scaffoldState,
         topBar = {
             SimpleTopBar(navHostController = navControl, title =  stringResource(id = R.string.screen_settings_title))
         },
@@ -56,7 +55,7 @@ fun ScreenSetting(navControl: NavHostController, scaffoldState: ScaffoldState) {
             }
         },
 
-        backgroundColor = Colors.AppBackground
+        containerColor = Colors.AppBackground
     )
 }
 
@@ -123,7 +122,7 @@ fun BackupDatabase() {
             },
         )
 
-        Divider()
+        HorizontalDivider()
 
         SettingsMenuItem(
             icon = { Icon(imageVector = Icons.Default.FileUpload, null) },
@@ -148,7 +147,7 @@ private fun SettingsGroup(
             .padding(8.dp)
             .fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        elevation = 2.dp
+        shadowElevation = 2.dp
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
             Text(
@@ -192,7 +191,7 @@ fun SettingsMenuItem(
 }
 
 @Composable
-fun Divider(){
-    Divider(modifier = Modifier.padding(8.dp))
+fun HorizontalDivider(){
+    HorizontalDivider(modifier = Modifier.padding(8.dp))
 }
 

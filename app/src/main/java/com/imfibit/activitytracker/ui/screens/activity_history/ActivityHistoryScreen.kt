@@ -7,9 +7,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Surface
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,7 +35,6 @@ import java.time.LocalDate
 @Composable
 fun ScreenActivityHistory(
     nav: NavHostController,
-    scaffoldState: ScaffoldState,
 ) {
     val vm = hiltViewModel<TrackedActivityHistoryVM>()
     val recordViewModel = hiltViewModel<RecordViewModel>()
@@ -45,7 +43,6 @@ fun ScreenActivityHistory(
 
     ScreenActivityHistory(
         nav = nav,
-        scaffoldState = scaffoldState,
         activity = activity,
         months = months,
         onDayClicked = { activity, date -> RecordNavigatorImpl.onDayClicked(nav, activity, date) },
@@ -56,7 +53,6 @@ fun ScreenActivityHistory(
 
 @Composable
 fun ScreenActivityHistory(
-    scaffoldState: ScaffoldState,
     nav: NavHostController,
     activity: TrackedActivity?,
     months: Flow<PagingData<RepositoryTrackedActivity.Month>>,
@@ -79,8 +75,7 @@ fun ScreenActivityHistory(
           }
 
         },
-        backgroundColor = Colors.AppBackground,
-        scaffoldState = scaffoldState
+        containerColor = Colors.AppBackground,
     )
 }
 
@@ -119,7 +114,7 @@ private fun MonthImpl(
     onDayLongClicked: (TrackedActivity, LocalDate) -> Unit
 ){
     Surface(
-        elevation = 2.dp,
+        shadowElevation = 2.dp,
         modifier = Modifier.padding(8.dp),
         shape = RoundedCornerShape(20.dp)
     ) {

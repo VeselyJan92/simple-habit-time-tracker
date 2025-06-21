@@ -3,7 +3,7 @@ package com.imfibit.activitytracker.ui.components.dialogs
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,7 +15,7 @@ import com.imfibit.activitytracker.ui.components.selectors.MinuteAndHourSelector
 import com.imfibit.activitytracker.ui.components.selectors.NumberSelector
 
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 inline fun DialogGoal(
     display: MutableState<Boolean>,

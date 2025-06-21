@@ -5,16 +5,23 @@ import android.content.Context
 import android.os.Build
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Functions
+import androidx.compose.material.icons.filled.Topic
 import androidx.compose.material.icons.outlined.AddAlarm
 import androidx.compose.material.icons.outlined.Flag
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -35,7 +42,6 @@ import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.ui.Destinations
 import com.imfibit.activitytracker.ui.components.*
-import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.dialogs.*
 import com.imfibit.activitytracker.ui.components.util.TestableContent
 import com.imfibit.activitytracker.ui.screens.activity_list.ActionButton
@@ -47,45 +53,53 @@ import com.imfibit.activitytracker.ui.widgets.custom.GoalProgressBar
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import java.time.DayOfWeek
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Composable
 fun ScreenTrackedActivity(
     nav: NavHostController,
-    scaffoldState: ScaffoldState
-){
+) {
     val recordVM = hiltViewModel<RecordViewModel>()
     val vm = hiltViewModel<TrackedActivityViewModel>()
 
+    val name = vm.activityName.value
+
     ScreenTrackedActivity(
         nav = nav,
-        scaffoldState = scaffoldState,
         vm = vm,
-        activityName = vm.activityName,
+        activityName = name,
         activityState = vm.data,
         onDayClicked = { activity, date -> RecordNavigatorImpl.onDayClicked(nav, activity, date) },
-        onDayLongClicked = { activity, date -> RecordNavigatorImpl.onDaylongClicked(nav, recordVM, activity, date)},
+        onDayLongClicked = { activity, date ->
+            RecordNavigatorImpl.onDaylongClicked(
+                nav,
+                recordVM,
+                activity,
+                date
+            )
+        },
         onDeleteActivity = vm::deleteActivity,
         onActivityNameUpdate = vm::refreshName,
         onNavigateToHistory = { nav.navigate(Destinations.ScreenActivityHistory(it.id)) }
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ScreenTrackedActivity(
     nav: NavHostController,
     vm: TrackedActivityViewModel,
-    scaffoldState: ScaffoldState,
-    activityName: MutableState<String?>,
+    activityName: String?,
     activityState: Flow<TrackedActivityState?>,
     onDayClicked: (TrackedActivity, LocalDate) -> Unit,
     onDayLongClicked: (TrackedActivity, LocalDate) -> Unit,
-    onDeleteActivity: (TrackedActivity)->Unit,
-    onActivityNameUpdate: (String)->Unit,
-    onNavigateToHistory: (TrackedActivity) -> Unit
+    onDeleteActivity: (TrackedActivity) -> Unit,
+    onActivityNameUpdate: (String) -> Unit,
+    onNavigateToHistory: (TrackedActivity) -> Unit,
 ) = TestableContent(testTag = TestTag.TRACKED_ACTIVITY_SCREEN) {
 
     val state by activityState.collectAsState(initial = null)
@@ -95,19 +109,22 @@ fun ScreenTrackedActivity(
     CheckNotificationPermission()
 
     Scaffold(
-        modifier =  Modifier.safeDrawingPadding(),
+        modifier = Modifier.safeDrawingPadding(),
         topBar = {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically) {
+                verticalAlignment = Alignment.CenterVertically
+            ) {
 
                 TopBarBackButton(navHostController = nav)
 
                 BasicTextField(
-                    modifier = Modifier.weight(1f).testTag(TestTag.TRACKED_ACTIVITY_EDIT_NAME),
-                    value = activityName.value ?: "",
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag(TestTag.TRACKED_ACTIVITY_EDIT_NAME),
+                    value = activityName ?: "",
                     singleLine = true,
                     onValueChange = onActivityNameUpdate,
                     textStyle = TextStyle(fontWeight = FontWeight.Black, fontSize = 25.sp)
@@ -125,7 +142,7 @@ fun ScreenTrackedActivity(
 
                         val activity = state?.activity
 
-                        if(delete && activity != null){
+                        if (delete && activity != null) {
                             nav.popBackStack()
                             onDeleteActivity(activity)
                         }
@@ -147,121 +164,58 @@ fun ScreenTrackedActivity(
             }
         },
         content = {
-            Column(
-                Modifier
-                    .verticalScroll(rememberScrollState())
-                    .padding(it)) {
-                ScreenBody(state,vm, onNavigateToHistory, onDayClicked, onDayLongClicked)
+            LazyColumn(
+                modifier = Modifier
+                    .padding(it)
+                    .padding(8.dp)
+            ) {
+                item {
+                    ActivitySettings(state, vm)
+                }
 
-                //LineChartView(state)
+                item {
+                    state?.let { state ->
+                        Surface(
+                            modifier = Modifier
+                                .padding(top = 8.dp),
+                            shape = RoundedCornerShape(20.dp)
+                        ) {
+                            Column {
 
-                Spacer(modifier = Modifier.height(100.dp))
+                                RecentActivity(
+                                    state,
+                                    onNavigateToHistory,
+                                    onDayClicked,
+                                    onDayLongClicked
+                                )
+                            }
+
+
+                        }
+
+                    }
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(100.dp))
+                }
             }
 
         },
 
 
-        backgroundColor = Colors.AppBackground,
-        scaffoldState = scaffoldState
+        containerColor = Colors.AppBackground,
     )
 }
 
-
-@ExperimentalFoundationApi
-@Composable
-fun ScreenBody(
-    state: TrackedActivityState?,
-    vm: TrackedActivityViewModel,
-    onNavigateToHistory: (TrackedActivity) -> Unit,
-    onDayClicked: (TrackedActivity, LocalDate) -> Unit,
-    onDayLongClicked: (TrackedActivity, LocalDate) -> Unit,
-) {
-    if (state != null){
-        Column {
-            ActivitySettings(state, vm)
-
-
-            if (state.activity.type == TrackedActivity.Type.TIME){
-                SessionActivityCustomStart(
-                    state = state,
-                    vm = vm,
-                    onActionClick = {
-                        if (state.activity.isInSession()){
-                            vm.commitSession(state.activity)
-                        }else{
-                            vm.startSession(state.activity, it)
-                        }
-                    },
-                    onUpdate = {
-                        vm.updateSession(state.activity, it)
-                    },
-
-                    onClear = {
-                        vm.clearRunning(state.activity)
-                    }
-                )
-            }
-
-            RecentActivity(state, onNavigateToHistory, onDayClicked, onDayLongClicked)
-        }
-    }
-
-
-}
-
-@Composable
-fun TextRecords() {
-    Surface(elevation = 2.dp, modifier = Modifier
-        .padding(8.dp)
-        .fillMaxWidth(), shape = RoundedCornerShape(20.dp)) {
-        Column(
-            Modifier
-                .padding(8.dp)
-                .background(Color.White)
-        ) {
-
-
-            Text(
-                modifier = Modifier.padding(bottom = 8.dp),
-                text = "Recent logs",
-                style = TextStyle(
-                    fontWeight = FontWeight.W600,
-                    fontSize = 20.sp
-                ),
-            )
-
-            repeat(7){
-
-                Row() {
-
-                    BaseMetricBlock("17. 02", color = Colors.ChipGray, width = 60.dp)
-                    
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Text(text = "Random record from the undergroud")
-                }
-                
-
-
-                Divider(
-                    Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth())
-
-                
-
-            }
-        }
-    }
-}
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SessionActivityCustomStart(
     onActionClick: (LocalDateTime) -> Unit,
     onUpdate: (LocalDateTime) -> Unit,
     onClear: () -> Unit,
     state: TrackedActivityState,
-    vm: TrackedActivityViewModel
+    vm: TrackedActivityViewModel,
 ) {
 
     val activity = state.activity
@@ -270,136 +224,177 @@ fun SessionActivityCustomStart(
         mutableStateOf(activity.inSessionSince)
     }
 
-    Surface(
-        elevation = 2.dp,
-        modifier = Modifier
-            .padding(horizontal = 8.dp)
-            .padding(top = 8.dp),
-        shape = RoundedCornerShape(20.dp)
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+        val action = if (activity.isInSession()) IN_SESSION else DEFAULT
 
-            val action = if (activity.isInSession()) IN_SESSION else DEFAULT
+        ActionButton(
+            modifier = Modifier.testTag(TestTag.TRACKED_ACTIVITY_ACTION_BUTTON),
+            actionButton = action,
+            activity = activity,
+            onClick = {
+                val validStart = start.value ?: LocalDateTime.now()
 
-            ActionButton(
-                modifier = Modifier.testTag(TestTag.TRACKED_ACTIVITY_ACTION_BUTTON),
-                actionButton = action,
-                activity = activity,
-                onClick = {
-                    val validStart = start.value ?: LocalDateTime.now()
+                if (validStart >= LocalDateTime.now())
+                    return@ActionButton
 
-                    if (validStart >= LocalDateTime.now())
-                        return@ActionButton
-
-                    onActionClick(validStart)
-                }
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-
-            if(activity.isInSession()){
-                EditableDatetime(
-                    modifier = Modifier.testTag(TestTag.TRACKED_ACTIVITY_TIME_CLOSE_SESSION),
-                    datetime = start.value ?: LocalDateTime.now(),
-                    onDatetimeEdit = {
-                        if(activity.isInSession()){
-                            onUpdate(it)
-                        }else{
-                            start.value = it
-                        }
-                    }
-                )
-            }else{
-                val context : Context = androidx.compose.ui.platform.LocalContext.current
-
-                val askForExactAlarm = remember { mutableStateOf(false) }
-
-                DialogAskForExactAlarm(askForExactAlarm)
-
-                val display = remember { mutableStateOf(false) }
-
-                DialogTimers(
-                    activity = activity,
-                    timers = state.timers,
-                    display = display,
-                    onTimerAdd = { timer -> vm.addTimer(timer)},
-                    onTimersReorganized = { items -> vm.reorganizeTimers(items) },
-                    onTimerDelete = { timer -> vm.deleteTimer(timer) },
-                    runTimer = {
-                        display.value = false
-
-                        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
-                            askForExactAlarm.value = true
-                        }else{
-                            vm.scheduleTimer(it)
-                        }
-                    }
-                )
-
-                Row(
-                    modifier = Modifier
-                        .height(30.dp)
-                        .background(Colors.ChipGray, RoundedCornerShape(50))
-                        .clickable(onClick = { display.value = true }),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.AddAlarm,
-                        contentDescription = null,
-                        modifier = Modifier.padding(start = 5.dp)
-                    )
-
-                    Text(
-                        text = "Start timer",
-                        modifier = Modifier.padding(end = 8.dp, start = 4.dp),
-                        textAlign = TextAlign.Center,
-                        style = TextStyle(
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                }
-
-
+                onActionClick(validStart)
             }
+        )
 
+        Spacer(modifier = Modifier.width(8.dp))
+
+
+        if (!activity.isInSession()) {
 
             Spacer(modifier = Modifier.weight(1f))
 
+            Spacer(modifier = Modifier.width(8.dp))
 
-            Timer(
+            val context: Context = androidx.compose.ui.platform.LocalContext.current
+
+            val askForExactAlarm = remember { mutableStateOf(false) }
+
+            DialogAskForExactAlarm(askForExactAlarm)
+
+            val display = remember { mutableStateOf(false) }
+
+            DialogTimers(
+                activity = activity,
+                timers = state.timers,
+                display = display,
+                onTimerAdd = { timer -> vm.addTimer(timer) },
+                swapTimer = vm::swapTimer,
+                onTimerDelete = { timer -> vm.deleteTimer(timer) },
+                runTimer = {
+                    display.value = false
+
+                    val alarmManager =
+                        context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+                        askForExactAlarm.value = true
+                    } else {
+                        vm.scheduleTimer(it)
+                    }
+                }
+            )
+
+            Row(
                 modifier = Modifier
-                    .size(100.dp, 30.dp),
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Colors.ChipGray)
+                    .height(30.dp)
+                    .clickable(
+                        onClick = {
+                            display.value = true
+                        }
+                    )
+                    .padding(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.AddAlarm,
+                    contentDescription = null,
+                )
+
+                Text(
+                    text = "Start timer",
+                    modifier = Modifier.padding(start = 4.dp),
+                    textAlign = TextAlign.Center,
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+            }
+
+        } else {
+
+            Text(
+                text = stringResource(id = R.string.activity_in_session) + " " + activity.inSessionSince!!.format(
+                    DateTimeFormatter.ofPattern("HH:mm")
+                )
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            var showPicker by remember { mutableStateOf(false) }
+
+            if (showPicker) {
+                val duration = Duration.between(activity.inSessionSince!!, LocalDateTime.now())
+
+                val timePickerState = rememberTimePickerState(
+                    initialHour = duration.toHoursPart().coerceIn(0, 23),
+                    initialMinute = duration.toMinutesPart().coerceIn(0, 59),
+                    is24Hour = true,
+                )
+
+                TimePickerDialog(
+                    onDismissRequest = {
+                        showPicker = false
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                showPicker = false
+
+                                val newStart = activity.inSessionSince
+                                    ?.minusHours(timePickerState.hour.toLong())
+                                    ?.minusMinutes(timePickerState.minute.toLong())
+                                    ?.withSecond(LocalDateTime.now().second)
+                                    ?.withNano(LocalDateTime.now().nano)
+
+                                onUpdate(newStart ?: LocalDateTime.now())
+                            }
+                        ) {
+                            Text("Edit duration")
+                        }
+                    },
+                    title = {
+                        Text(
+                            modifier = Modifier.padding(bottom = 8.dp),
+                            text = "Edit session length",
+                            style = TextStyle(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp,
+                                color = Color.Black
+                            )
+                        )
+                    }
+                ) {
+                    TimePicker(
+                        state = timePickerState,
+                    )
+                }
+            }
+
+            TimerBlock(
+                modifier = Modifier
+                    .height(30.dp),
                 startTime = start.value,
-                enable = activity.inSessionSince != null
+                onClick = {
+                    showPicker = true
+                }
             )
 
             Spacer(modifier = Modifier.width(8.dp))
 
-
-            if (activity.isInSession()){
-                Box(
-                    modifier = Modifier
-                        .size(50.dp, 30.dp)
-                        .padding(end = 8.dp)
-                        .background(Colors.ChipGray, RoundedCornerShape(50))
-                        .clickable(onClick = onClear),
-                    contentAlignment = Alignment.Center
-                ){
-                    Icon(imageVector = Icons.Default.Clear, contentDescription = null )
-                }
+            Box(
+                modifier = Modifier
+                    .size(50.dp, 30.dp)
+                    .background(Colors.ChipGray, RoundedCornerShape(10.dp))
+                    .clickable(onClick = onClear),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(imageVector = Icons.Default.Clear, contentDescription = null)
             }
-
         }
 
+        Spacer(modifier = Modifier.width(8.dp))
     }
-
 }
 
 
@@ -408,9 +403,7 @@ fun SessionActivityCustomStart(
 private fun ActivitySettings(state: TrackedActivityState?, vm: TrackedActivityViewModel) {
 
     Surface(
-        elevation = 2.dp,
         modifier = Modifier
-            .padding(horizontal = 8.dp)
             .padding(top = 8.dp),
         shape = RoundedCornerShape(20.dp)
     ) {
@@ -431,14 +424,37 @@ private fun ActivitySettings(state: TrackedActivityState?, vm: TrackedActivityVi
                 Group(vm, state?.groups, state?.activity)
                 Spacer(modifier = Modifier.width(8.dp))
 
-                SetChallange(state, vm)
+                if (state != null) {
+                    SetChallange(state, vm)
+                }
+            }
+
+            state?.let {
+                if (state.activity.type == TrackedActivity.Type.TIME) {
+                    SessionActivityCustomStart(
+                        state = state,
+                        vm = vm,
+                        onActionClick = {
+                            if (state.activity.isInSession()) {
+                                vm.commitSession(state.activity)
+                            } else {
+                                vm.startSession(state.activity, it)
+                            }
+                        },
+                        onUpdate = {
+                            vm.updateSession(state.activity, it)
+                        },
+
+                        onClear = {
+                            vm.clearRunning(state.activity)
+                        }
+                    )
+                }
+
             }
         }
 
     }
-
-
-
 
 
 }
@@ -455,7 +471,7 @@ private fun RowScope.Goal(vm: TrackedActivityViewModel, activity: TrackedActivit
         if (activity == null)
             return@IconTextButton
 
-        if ( activity.goal.range != TimeRange.DAILY || activity.type != TrackedActivity.Type.CHECKED)
+        if (activity.goal.range != TimeRange.DAILY || activity.type != TrackedActivity.Type.CHECKED)
             display.value = true
     }
 
@@ -477,23 +493,27 @@ private fun RowScope.ViewRange(vm: TrackedActivityViewModel, activity: TrackedAc
         }
     }
 
-    IconTextButton(Icons.Filled.DateRange, activity?.goal?.range?.label?.let { stringResource(id = it) }, modifier = Modifier.weight(1f)) {
+    IconTextButton(
+        Icons.Filled.DateRange,
+        activity?.goal?.range?.label?.let { stringResource(id = it) },
+        modifier = Modifier.weight(1f)
+    ) {
         display.value = true
     }
 
 }
 
 @Composable
-private fun RowScope.SetChallange(state: TrackedActivityState?, vm: TrackedActivityViewModel) {
+private fun RowScope.SetChallange(state: TrackedActivityState, vm: TrackedActivityViewModel) {
 
     val display = remember { mutableStateOf(false) }
 
     DialogProgressGoal(
         display = display,
-        activity = state!!.activity,
+        activity = state.activity,
         getLiveMetric = { from, to -> vm.getChallengeMetric(from, to) },
-        onSet = { vm.updateActivity(state.activity.copy(challenge = it))},
-        onDelete = {vm.updateActivity(state.activity.copy(challenge = TrackedActivityChallenge.empty))}
+        onSet = { vm.updateActivity(state.activity.copy(challenge = it)) },
+        onDelete = { vm.updateActivity(state.activity.copy(challenge = TrackedActivityChallenge.empty)) }
     )
 
     IconTextButton(Icons.Filled.Flag, "Challenge", modifier = Modifier.weight(1f)) {
@@ -504,43 +524,58 @@ private fun RowScope.SetChallange(state: TrackedActivityState?, vm: TrackedActiv
 
 
 @Composable
-private fun RowScope.Group(vm: TrackedActivityViewModel, groups: List<TrackerActivityGroup>?, activity: TrackedActivity?) {
+private fun RowScope.Group(
+    vm: TrackedActivityViewModel,
+    groups: List<TrackerActivityGroup>?,
+    activity: TrackedActivity?,
+) {
     val display = remember { mutableStateOf(false) }
 
-    if (activity != null && groups != null) DialogActivityGroupPicker(display = display, activity, groups) {
+    if (activity != null && groups != null) DialogActivityGroupPicker(
+        display = display,
+        activity,
+        groups
+    ) {
         vm.setGroup(it)
         display.value = false
     }
 
-    IconTextButton(Icons.Default.Topic, stringResource(id = R.string.activity_screen_recent_group), modifier = Modifier.weight(1f)) {
+    IconTextButton(
+        Icons.Default.Topic,
+        stringResource(id = R.string.activity_screen_recent_group),
+        modifier = Modifier.weight(1f)
+    ) {
         display.value = true
     }
 
 }
 
 
-
-
 @Composable
 private fun RecentActivity(
     state: TrackedActivityState?,
-    onNavigateToHistory: (TrackedActivity)->Unit,
+    onNavigateToHistory: (TrackedActivity) -> Unit,
     onDayClicked: (TrackedActivity, LocalDate) -> Unit,
     onDayLongClicked: (TrackedActivity, LocalDate) -> Unit,
 ) {
-    Surface(elevation = 2.dp, modifier = Modifier.padding(8.dp), shape = RoundedCornerShape(20.dp)) {
-
+    Surface(
+        modifier = Modifier
+            .padding(top = 8.dp)
+            .fillMaxHeight(),
+        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+    ) {
         Column(
             Modifier
                 .padding(bottom = 8.dp, start = 8.dp, end = 8.dp)
-                .background(Color.White)) {
+                .fillMaxHeight()
+        ) {
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = stringResource(id = R.string.activity_screen_recent_activity),
                     style = TextStyle(
-                            fontWeight = FontWeight.W600,
-                            fontSize = 20.sp
+                        fontWeight = FontWeight.W600,
+                        fontSize = 20.sp
                     ),
                 )
 
@@ -548,7 +583,7 @@ private fun RecentActivity(
 
                 TextButton(
                     onClick = {
-                        if (state != null){
+                        if (state != null) {
                             onNavigateToHistory(state.activity)
                         }
                     }
@@ -557,18 +592,29 @@ private fun RecentActivity(
                 }
             }
 
-            if(state != null && state.activity.challenge.isSet()){
-                GoalProgressBar(challenge = state.activity.challenge, actual = state.challengeMetric, type = state.activity.type )
+            if (state != null && state.activity.challenge.isSet()) {
+                GoalProgressBar(
+                    challenge = state.activity.challenge,
+                    actual = state.challengeMetric,
+                    type = state.activity.type
+                )
 
-                if(state.activity.isGoalSet()){
+                if (state.activity.isGoalSet()) {
                     val aheadInDays = state.activity.getChallengeAheadDays(state.challengeMetric)
 
                     Text(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 8.dp),
-                        text = stringResource(R.string.ahead_of_challenge_deadline_note, aheadInDays),
-                        style = TextStyle(color = Color.DarkGray, textAlign = TextAlign.Center, fontSize = 12.sp)
+                        text = stringResource(
+                            R.string.ahead_of_challenge_deadline_note,
+                            aheadInDays
+                        ),
+                        style = TextStyle(
+                            color = Color.DarkGray,
+                            textAlign = TextAlign.Center,
+                            fontSize = 12.sp
+                        )
                     )
                 }
             }
@@ -578,11 +624,16 @@ private fun RecentActivity(
             if (state != null)
                 RecentActivityGrid(state.activity, state.recent, onDayClicked, onDayLongClicked)
 
-            Divider(Modifier.padding(8.dp))
+            HorizontalDivider(Modifier.padding(8.dp))
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 repeat(6) {
-                    MetricBlock(state?.months?.getOrNull(it) ?: MetricWidgetData({ "-" }, Colors.ChipGray, { "" }))
+                    MetricBlock(
+                        state?.months?.getOrNull(it) ?: MetricWidgetData(
+                            { "-" },
+                            Colors.ChipGray,
+                            { "" })
+                    )
                 }
             }
 
@@ -596,16 +647,19 @@ fun RecentActivityGrid(
     months: List<RepositoryTrackedActivity.Month>,
     onDayClicked: (TrackedActivity, LocalDate) -> Unit,
     onDayLongClicked: (TrackedActivity, LocalDate) -> Unit,
-){
+) {
 
     Column(Modifier.fillMaxWidth()) {
 
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
 
             DayOfWeek.values().forEach {
-                Box(Modifier.size(40.dp, 30.dp), contentAlignment = Alignment.Center){
+                Box(Modifier.size(40.dp, 30.dp), contentAlignment = Alignment.Center) {
                     Text(
-                        text = it.getDisplayName(java.time.format.TextStyle.SHORT, Locale.getDefault()).uppercase(),
+                        text = it.getDisplayName(
+                            java.time.format.TextStyle.SHORT,
+                            Locale.getDefault()
+                        ).uppercase(),
                         textAlign = TextAlign.Center,
                         style = TextStyle(
                             fontWeight = FontWeight.W600,
@@ -615,14 +669,17 @@ fun RecentActivityGrid(
                 }
             }
 
-            Box(Modifier.size(40.dp, 30.dp), contentAlignment = Alignment.Center){
+            Box(Modifier.size(40.dp, 30.dp), contentAlignment = Alignment.Center) {
                 Icon(imageVector = Icons.Filled.Functions, contentDescription = null)
             }
 
         }
 
-        for(month in months){
-            val modifier = if (month.month.month == LocalDate.now().month) Modifier.background(Color(0xFFF5F5F5), RoundedCornerShape(5.dp)) else Modifier
+        for (month in months) {
+            val modifier = if (month.month.month == LocalDate.now().month) Modifier.background(
+                Color(0xFFF5F5F5),
+                RoundedCornerShape(5.dp)
+            ) else Modifier
             TrackedActivityMonth(modifier, activity, month, onDayClicked, onDayLongClicked)
         }
 

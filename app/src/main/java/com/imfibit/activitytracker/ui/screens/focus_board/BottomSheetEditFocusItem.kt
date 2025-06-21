@@ -1,11 +1,9 @@
 package com.imfibit.activitytracker.ui.screens.focus_board
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
@@ -14,41 +12,44 @@ import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.DevSeeder
 import com.imfibit.activitytracker.database.composed.FocusBoardItemWithTags
 import com.imfibit.activitytracker.database.entities.FocusBoardItemTag
+import com.imfibit.activitytracker.ui.AppTheme
 import com.imfibit.activitytracker.ui.components.AppTextField
 import com.imfibit.activitytracker.ui.components.AppTextFieldStyle_Header
-import com.imfibit.activitytracker.ui.components.dialogs.BaseDialog
-import com.imfibit.activitytracker.ui.components.dialogs.DialogBaseHeader
+import com.imfibit.activitytracker.ui.components.BaseBottomSheet
 import com.imfibit.activitytracker.ui.components.dialogs.DialogButtons
+import com.imfibit.activitytracker.ui.components.rememberTestBottomSheetState
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview()
 @Composable
-private fun Preview() {
-
-   val edit = remember {
-        mutableStateOf(true)
-    }
-
-    DialogEditFocusItem(
-        edit, true, DevSeeder.getFocusItemWithTags(), DevSeeder.getTags(), {}, {}
+private fun DialogEditFocusItem_Preview() = AppTheme {
+    BottomSheetEditFocusItem(
+        onDismissRequest = {},
+        state = rememberTestBottomSheetState(),
+        isEdit = true,
+        item = DevSeeder.getFocusItemWithTags(),
+        tags = DevSeeder.getTags(),
+        onFocusItemEdit = {},
+        onFocusItemDelete = {}
     )
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun DialogEditFocusItem(
-    display: MutableState<Boolean>,
+fun BottomSheetEditFocusItem(
+    onDismissRequest: () -> Unit,
+    state: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     isEdit: Boolean,
     item: FocusBoardItemWithTags,
     tags: List<FocusBoardItemTag>,
-    onFocusItemEdit: (FocusBoardItemWithTags)->Unit,
-    onFocusItemDelete: (FocusBoardItemWithTags)->Unit = {},
-
-){
-    BaseDialog(display = display ) {
-        val dialogTitle = if (isEdit) R.string.dialog_edt_focus_item_title else R.string.dialog_create_focus_item_title
-
-        DialogBaseHeader(title = stringResource(id = dialogTitle))
+    onFocusItemEdit: (FocusBoardItemWithTags) -> Unit,
+    onFocusItemDelete: (FocusBoardItemWithTags) -> Unit = {},
+) {
+    BaseBottomSheet(
+        onDismissRequest = onDismissRequest,
+        state = state
+    ) { onDismissRequest ->
 
         val tagState = remember {
             mutableStateListOf(*item.tags.toTypedArray())
@@ -62,14 +63,16 @@ fun DialogEditFocusItem(
             mutableStateOf(TextFieldValue(item.item.content))
         }
 
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)){
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
+        ) {
 
             AppTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = title.value,
-                onValueChange = {title.value = it},
+                onValueChange = { title.value = it },
                 style = AppTextFieldStyle_Header,
                 placeholderText = stringResource(R.string.focus_board_edit_focus_item_title_placeholder)
             )
@@ -81,21 +84,24 @@ fun DialogEditFocusItem(
                     .fillMaxWidth()
                     .defaultMinSize(minHeight = 150.dp),
                 value = content.value,
-                onValueChange = {content.value = it},
+                onValueChange = { content.value = it },
                 placeholderText = stringResource(R.string.focus_board_edit_focus_item_content_placeholder),
                 singleLine = false
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            FlowRow(verticalArrangement = Arrangement.spacedBy(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FlowRow(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
 
                 tags.forEach {
                     FocusItemTag(
                         onClick = {
-                            if (tagState.contains(it)){
+                            if (tagState.contains(it)) {
                                 tagState.remove(it)
-                            }else{
+                            } else {
                                 tagState.add(it)
                             }
                         },
@@ -108,19 +114,19 @@ fun DialogEditFocusItem(
         }
 
         DialogButtons {
-
-            if(isEdit){
+            if (isEdit) {
                 TextButton(
                     onClick = {
-                        onFocusItemDelete(item)
-                        display.value = false
+                        onDismissRequest {
+                            onFocusItemDelete(item)
+                        }
                     }
                 ) {
                     Text(text = stringResource(id = R.string.dialog_action_delete))
                 }
             }
 
-            TextButton(onClick = { display.value = false} ) {
+            TextButton(onClick = { onDismissRequest(null) }) {
                 Text(text = stringResource(id = R.string.dialog_action_cancel))
             }
 
@@ -131,9 +137,9 @@ fun DialogEditFocusItem(
                         content = content.value.text,
                     )
 
-
-                    onFocusItemEdit(FocusBoardItemWithTags(editedItem, tagState.toList()))
-                    display.value = false
+                    onDismissRequest {
+                        onFocusItemEdit(FocusBoardItemWithTags(editedItem, tagState.toList()))
+                    }
                 },
                 enabled = content.value.text.isNotEmpty() || title.value.text.isNotEmpty()
             ) {

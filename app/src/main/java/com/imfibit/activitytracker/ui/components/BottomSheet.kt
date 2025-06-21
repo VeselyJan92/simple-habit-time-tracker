@@ -4,11 +4,12 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -21,16 +22,18 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun rememberTestBottomSheetState(): SheetState {
-    val density = LocalDensity.current
-
-    return remember {
-        SheetState(
-            skipPartiallyExpanded = true,
-            initialValue = SheetValue.Expanded,
-            density = density
-        )
-    }
+    return rememberStandardBottomSheetState(
+        skipHiddenState = true,
+        initialValue = SheetValue.Expanded
+    )
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun rememberAppBottomSheetState(): SheetState {
+    return rememberModalBottomSheetState(skipPartiallyExpanded = true)
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,8 +64,6 @@ fun BaseBottomSheet(
         modifier = modifier
             .imePadding()
             .displayCutoutPadding(),
-        containerColor = MaterialTheme.colors.surface,
-        contentColor = MaterialTheme.colors.surface,
         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
         content = {
             content(animateToDismiss)

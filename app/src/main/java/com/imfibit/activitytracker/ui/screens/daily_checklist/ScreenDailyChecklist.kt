@@ -17,7 +17,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Checklist
@@ -63,11 +65,8 @@ import com.imfibit.activitytracker.ui.components.MetricBlock
 import com.imfibit.activitytracker.ui.components.MetricWidgetData
 import com.imfibit.activitytracker.ui.components.MonthGridImpl
 import com.imfibit.activitytracker.ui.components.darker
-import org.burnoutcrew.reorderable.ItemPosition
-import org.burnoutcrew.reorderable.ReorderableItem
-import org.burnoutcrew.reorderable.detectReorderAfterLongPress
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
-import org.burnoutcrew.reorderable.reorderable
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.math.max
@@ -123,7 +122,6 @@ private fun Preview() {
         onToggleDay = { checked, item -> },
         onItemEdit = {},
         onItemDelete = {},
-        onReordered = {},
         onSwap = { x, y -> }
     )
 }
@@ -146,7 +144,6 @@ fun ScreenMindBoot() {
         onItemEdit = viewModel::onEdit,
         onItemDelete = viewModel::onDelete,
         onSwap = viewModel::onSwap,
-        onReordered = viewModel::onReordered
     )
 }
 
@@ -159,8 +156,7 @@ private fun Body(
     onToggleDay: (checked: Boolean, date: LocalDate) -> Unit,
     onItemEdit: (DailyChecklistItem) -> Unit,
     onItemDelete: (DailyChecklistItem) -> Unit,
-    onSwap: (from: ItemPosition, to: ItemPosition) -> Unit,
-    onReordered: () -> Unit,
+    onSwap: (from: LazyListItemInfo, to: LazyListItemInfo) -> Unit,
 ) {
     MainBody {
         TopBar()
@@ -207,7 +203,6 @@ private fun Body(
                 onItemEdit,
                 onItemDelete,
                 onSwap,
-                onReordered
             )
         }
     }
@@ -316,21 +311,18 @@ fun DailyChecklist(
     onToggleDay: (checked: Boolean, date: LocalDate) -> Unit,
     onItemEdit: (DailyChecklistItem) -> Unit,
     onItemDelete: (DailyChecklistItem) -> Unit,
-    onSwap: (from: ItemPosition, to: ItemPosition) -> Unit,
-    onReordered: () -> Unit,
+    onSwap: (from: LazyListItemInfo, to: LazyListItemInfo) -> Unit,
 ) {
 
-    val state = rememberReorderableLazyListState(
-        onDragEnd = { from, to -> onReordered() },
-        onMove = onSwap,
-        canDragOver = { draggedOver, dragging -> draggedOver.key != "header" }
-    )
+    val lazyListState = rememberLazyListState()
+    val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
+        onSwap(from, to)
+    }
 
     LazyColumn(
-        state = state.listState,
+        state = lazyListState,
         modifier = Modifier
-            .testTag(TestTag.DAILY_CHECKLIST_LIST)
-            .reorderable(state = state),
+            .testTag(TestTag.DAILY_CHECKLIST_LIST).fillMaxHeight(),
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -341,11 +333,17 @@ fun DailyChecklist(
 
         items(items, key = { it.id }) { item ->
             ReorderableItem(
-                state = state,
-                key = item.id,
-                modifier = Modifier.detectReorderAfterLongPress(state),
-            ) {
-                DailyChecklistItem(item, it, onCheckItem, onItemEdit, onItemDelete)
+                state = reorderableLazyListState,
+                key = item.id
+            ) { isDragging ->
+                DailyChecklistItem(
+                    modifier = Modifier.longPressDraggableHandle(),
+                    item = item,
+                    dragging = isDragging,
+                    onCheckItem = onCheckItem,
+                    onItemEdit = onItemEdit,
+                    onItemDelete = onItemDelete
+                )
             }
         }
     }
@@ -412,6 +410,7 @@ private fun TopBar() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DailyChecklistItem(
+    modifier: Modifier = Modifier,
     item: DailyChecklistItem,
     dragging: Boolean,
     onCheckItem: (checked: Boolean, item: DailyChecklistItem) -> Unit,
@@ -420,10 +419,10 @@ private fun DailyChecklistItem(
 ) {
     var dialogDailyChecklist by remember { mutableStateOf(false) }
 
-    if (dialogDailyChecklist){
+    if (dialogDailyChecklist) {
         EditDailyChecklistItemBottomSheet(
             onDismissRequest = {
-                 dialogDailyChecklist = false
+                dialogDailyChecklist = false
             },
             isEdit = true,
             item = item,
@@ -433,7 +432,7 @@ private fun DailyChecklistItem(
     }
 
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },

@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material3.*
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -27,7 +27,6 @@ import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.components.Colors
 
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DialogActivityGroupPicker(
     display: MutableState<Boolean> = mutableStateOf(true),
