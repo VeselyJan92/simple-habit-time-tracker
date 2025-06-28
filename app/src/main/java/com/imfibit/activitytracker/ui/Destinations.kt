@@ -1,11 +1,6 @@
 package com.imfibit.activitytracker.ui
 
-import com.imfibit.activitytracker.core.data.LocalDateSerializer
-import com.imfibit.activitytracker.database.entities.TrackedActivityRecord
-import kotlinx.parcelize.Parcelize
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
-import java.time.LocalDate
 
 
 object Destinations {

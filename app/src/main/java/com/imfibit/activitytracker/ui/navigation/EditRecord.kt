@@ -47,7 +47,6 @@ fun EditRecord(navControl: NavHostController) {
 @HiltViewModel
 public class DialogEditRecordVM @Inject constructor(
     private val db: AppDatabase,
-    private val toggleActivityService: ToggleActivityService,
     private val savedStateHandle: SavedStateHandle
 ): BaseViewModel(){
 

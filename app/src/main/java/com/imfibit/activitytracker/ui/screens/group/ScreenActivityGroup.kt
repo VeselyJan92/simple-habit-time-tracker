@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -36,10 +35,17 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.core.extensions.navigate
 import com.imfibit.activitytracker.core.extensions.rememberReorderList
+import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
+import com.imfibit.activitytracker.database.entities.TrackedActivityRecord
+import com.imfibit.activitytracker.database.entities.TrackedActivityScore
+import com.imfibit.activitytracker.database.entities.TrackedActivityTime
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.ui.Destinations
 import com.imfibit.activitytracker.ui.components.Colors
@@ -47,8 +53,10 @@ import com.imfibit.activitytracker.ui.components.TopBarBackButton
 import com.imfibit.activitytracker.ui.components.dialogs.DialogAgree
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivity
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview
+import com.imfibit.activitytracker.ui.viewmodels.RecordViewModel
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
+import java.time.LocalDateTime
 
 
 @Composable
@@ -57,13 +65,13 @@ fun ScreenActivityGroup(
     nav: NavHostController,
 ) {
     val vm = hiltViewModel<ActivityGroupViewModel>()
+    val recordVM = hiltViewModel<RecordViewModel>()
 
     val activities by vm.activities.collectAsState()
     val group by vm.group.collectAsState()
 
     group?.let {
         ScreenActivityGroup(
-            nav = nav,
             activities = activities,
             group = group,
             name = vm.groupName.value ?: "",
@@ -72,7 +80,44 @@ fun ScreenActivityGroup(
                 vm.delete(it)
             },
             onNameChanged = vm::refreshName,
-            onMove = vm::onMoveActivity
+            onMove = vm::onMoveActivity,
+            onActionButtonClick = {
+                recordVM.activityTriggered(it)
+            },
+            onAddRecord = {
+                when (it) {
+                    is TrackedActivityCompletion -> throw IllegalStateException("Completion not supported")
+                    is TrackedActivityScore -> nav.navigate(
+                        "dialog_edit_record/{record}",
+                        bundleOf(
+                            "record" to TrackedActivityScore(
+                                activity_id = it.activity_id,
+                                datetime_completed = LocalDateTime.now(),
+                                score = 1
+                            )
+                        )
+                    )
+
+                    is TrackedActivityTime -> nav.navigate(
+                        "dialog_edit_record/{record}",
+                        bundleOf(
+                            "record" to TrackedActivityTime(
+                                activity_id = it.activity_id,
+                                datetime_start = LocalDateTime.now(),
+                                datetime_end = LocalDateTime.now()
+                            )
+                        )
+                    )
+                }
+
+
+            },
+            onNavigateToActivity = {
+                nav.navigate(Destinations.ScreenActivity(it.id))
+            },
+            onNavigateBack = {
+                nav.popBackStack()
+            }
         )
     }
 }
@@ -80,13 +125,16 @@ fun ScreenActivityGroup(
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 fun ScreenActivityGroup(
-    nav: NavHostController,
     activities: List<TrackedActivityRecentOverview>,
     group: TrackerActivityGroup?,
     name: String,
     onDelete: (TrackerActivityGroup) -> Unit,
     onNameChanged: (String) -> Unit,
-    onMove: (from: LazyListItemInfo, to: LazyListItemInfo) -> Unit
+    onMove: (from: LazyListItemInfo, to: LazyListItemInfo) -> Unit,
+    onActionButtonClick: (TrackedActivity) -> Unit,
+    onAddRecord: (TrackedActivityRecord) -> Unit,
+    onNavigateToActivity: (TrackedActivity) -> Unit,
+    onNavigateBack: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.safeDrawingPadding(),
@@ -98,7 +146,7 @@ fun ScreenActivityGroup(
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
-                TopBarBackButton(navHostController = nav)
+                TopBarBackButton(onBack = onNavigateBack)
 
                 BasicTextField(
                     modifier = Modifier.weight(1f),
@@ -144,9 +192,11 @@ fun ScreenActivityGroup(
         content = { paddingValues ->
             ScreenBody(
                 paddingValues = paddingValues,
-                nav = nav,
                 activities = activities,
                 onMove = onMove,
+                onActionButtonClick = onActionButtonClick,
+                onAddRecord = onAddRecord,
+                onNavigateToActivity = onNavigateToActivity
             )
         },
         containerColor = Colors.AppBackground,
@@ -156,9 +206,11 @@ fun ScreenActivityGroup(
 @Composable
 private fun ScreenBody(
     paddingValues: PaddingValues,
-    nav: NavHostController,
     activities: List<TrackedActivityRecentOverview>,
     onMove: (from: LazyListItemInfo, to: LazyListItemInfo) -> Unit,
+    onActionButtonClick: (TrackedActivity) -> Unit,
+    onAddRecord: (TrackedActivityRecord) -> Unit,
+    onNavigateToActivity: (TrackedActivity) -> Unit,
 ) {
     val activities = rememberReorderList(items = activities)
 
@@ -193,7 +245,9 @@ private fun ScreenBody(
             }
 
         LazyColumn(
-            modifier = Modifier.padding(paddingValues).fillMaxSize(),
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize(),
             state = lazyListState,
             verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(8.dp)
@@ -205,11 +259,12 @@ private fun ScreenBody(
                     key = item.activity.id
                 ) { isDragging ->
                     TrackedActivity(
-                        nav = nav,
                         item = item,
                         modifier = Modifier.longPressDraggableHandle(),
-                        onNavigate = { nav.navigate(Destinations.ScreenActivity(it.id)) },
-                        isDragging = isDragging
+                        onNavigate = onNavigateToActivity,
+                        isDragging = isDragging,
+                        onActionButtonClick = onActionButtonClick,
+                        onAddRecord = onAddRecord
                     )
                 }
             }

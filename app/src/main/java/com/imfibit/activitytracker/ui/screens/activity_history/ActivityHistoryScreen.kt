@@ -1,6 +1,7 @@
 package com.imfibit.activitytracker.ui.screens.activity_history
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -42,37 +43,47 @@ fun ScreenActivityHistory(
     val months = vm.months
 
     ScreenActivityHistory(
-        nav = nav,
         activity = activity,
         months = months,
         onDayClicked = { activity, date -> RecordNavigatorImpl.onDayClicked(nav, activity, date) },
-        onDayLongClicked = { activity, date -> RecordNavigatorImpl.onDaylongClicked(nav, recordViewModel ,activity, date) }
+        onDayLongClicked = { activity, date ->
+            RecordNavigatorImpl.onDaylongClicked(
+                nav = nav,
+                recordViewModel = recordViewModel,
+                activity = activity,
+                date = date
+            )
+        },
+        onNavigateBack = { nav.popBackStack() }
     )
 }
 
-
 @Composable
 fun ScreenActivityHistory(
-    nav: NavHostController,
     activity: TrackedActivity?,
     months: Flow<PagingData<RepositoryTrackedActivity.Month>>,
     onDayClicked: (TrackedActivity, LocalDate) -> Unit,
-    onDayLongClicked: (TrackedActivity, LocalDate) -> Unit
+    onDayLongClicked: (TrackedActivity, LocalDate) -> Unit,
+    onNavigateBack: () -> Unit,
 ) {
     Scaffold(
-        modifier =  Modifier.safeDrawingPadding(),
+        modifier = Modifier.safeDrawingPadding(),
         topBar = {
-            SimpleTopBar(nav, stringResource(id = R.string.screen_title_record_history))
+            SimpleTopBar(
+                title = stringResource(id = R.string.screen_title_record_history),
+                onBack = onNavigateBack
+            )
         },
-        content = {
-          if (activity!= null){
-              HistoryList(
-                  activity = activity,
-                  months = months,
-                  onDayClicked = onDayClicked,
-                  onDayLongClicked = onDayLongClicked
-              )
-          }
+        content = { contentPadding ->
+            if (activity != null) {
+                HistoryList(
+                    paddingValues = contentPadding,
+                    activity = activity,
+                    months = months,
+                    onDayClicked = onDayClicked,
+                    onDayLongClicked = onDayLongClicked
+                )
+            }
 
         },
         containerColor = Colors.AppBackground,
@@ -81,15 +92,19 @@ fun ScreenActivityHistory(
 
 @Composable
 private fun HistoryList(
+    paddingValues: PaddingValues,
     activity: TrackedActivity,
     months: Flow<PagingData<RepositoryTrackedActivity.Month>>,
     onDayClicked: (TrackedActivity, LocalDate) -> Unit,
-    onDayLongClicked: (TrackedActivity, LocalDate) -> Unit
+    onDayLongClicked: (TrackedActivity, LocalDate) -> Unit,
 ) {
 
     val monthsData = months.collectAsLazyPagingItems()
 
-    LazyColumn(reverseLayout = true) {
+    LazyColumn(
+        modifier = Modifier.padding(paddingValues),
+        reverseLayout = true
+    ) {
         items(
             count = monthsData.itemCount,
             key = monthsData.itemKey { it.month },
@@ -112,7 +127,7 @@ private fun MonthImpl(
     month: RepositoryTrackedActivity.Month,
     onDayClicked: (TrackedActivity, LocalDate) -> Unit,
     onDayLongClicked: (TrackedActivity, LocalDate) -> Unit
-){
+) {
     Surface(
         shadowElevation = 2.dp,
         modifier = Modifier.padding(8.dp),

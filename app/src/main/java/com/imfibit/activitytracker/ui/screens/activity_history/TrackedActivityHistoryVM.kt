@@ -16,7 +16,6 @@ import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.ui.Destinations
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.collections.immutable.toPersistentList
 import java.time.YearMonth
 import javax.inject.Inject
 
@@ -62,7 +61,7 @@ class MonthsPagingSource(
 
         val months = List(PAGE_SIZE){
             rep.getMonthData(activityId, YearMonth.now().minusMonths((month * PAGE_SIZE +  it).toLong()))
-        }.toPersistentList()
+        }
 
         return LoadResult.Page(
             data = months,

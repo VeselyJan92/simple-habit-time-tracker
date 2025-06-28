@@ -1,42 +1,64 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
-import androidx.compose.animation.*
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
+import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Flag
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.os.bundleOf
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
-import com.imfibit.activitytracker.core.extensions.navigate
 import com.imfibit.activitytracker.core.value
 import com.imfibit.activitytracker.database.composed.MetricAggregation
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivity.Type
+import com.imfibit.activitytracker.database.entities.TrackedActivityRecord
 import com.imfibit.activitytracker.database.entities.TrackedActivityScore
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.MetricBlock
 import com.imfibit.activitytracker.ui.components.MetricWidgetData
 import com.imfibit.activitytracker.ui.components.TimerBlock
-import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.*
-import com.imfibit.activitytracker.ui.viewmodels.RecordViewModel
+import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.ActionButton
 import com.imfibit.activitytracker.ui.widgets.custom.GoalProgressBar
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -67,22 +89,19 @@ data class TrackedActivityRecentOverview(
 @Composable
 fun TrackedActivity(
     modifier: Modifier = Modifier,
-    nav: NavHostController,
     item: TrackedActivityRecentOverview,
     onNavigate: (activity: TrackedActivity) -> Unit,
     isDragging: Boolean = false,
+    onActionButtonClick: (TrackedActivity) -> Unit,
+    onAddRecord: (TrackedActivityRecord) -> Unit,
 ) {
     val activity = item.activity
-
-    val recordVM = hiltViewModel<RecordViewModel>()
-
 
     val color = when {
         isDragging -> Color.LightGray
         activity.isInSession() -> Colors.SuperLight
         else -> Color.White
     }
-
 
     Surface(
         modifier = modifier,
@@ -104,40 +123,35 @@ fun TrackedActivity(
 
             ) {
 
+                val haptic = LocalHapticFeedback.current
+
                 ActionButton(
                     actionButton = item.actionButton,
                     activity = item.activity,
                     onClick = {
-                        recordVM.activityTriggered(activity)
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onActionButtonClick(item.activity)
                     },
                     onLongClick = {
-                        recordVM.hapticsService.activityFeedback()
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
 
-                        when (activity.type) {
-                            Type.TIME -> nav.navigate(
-                                "dialog_edit_record/{record}",
-                                bundleOf(
-                                    "record" to TrackedActivityTime(
-                                        activity_id = activity.id,
-                                        datetime_start = LocalDateTime.now(),
-                                        datetime_end = LocalDateTime.now()
-                                    )
-                                )
+                        val record = when (activity.type) {
+                            Type.TIME -> TrackedActivityTime(
+                                activity_id = activity.id,
+                                datetime_start = LocalDateTime.now(),
+                                datetime_end = LocalDateTime.now()
                             )
 
-                            Type.SCORE -> nav.navigate(
-                                "dialog_edit_record/{record}",
-                                bundleOf(
-                                    "record" to TrackedActivityScore(
-                                        activity_id = activity.id,
-                                        datetime_completed = LocalDateTime.now(),
-                                        score = 1
-                                    )
-                                )
+                            Type.SCORE -> TrackedActivityScore(
+                                activity_id = activity.id,
+                                datetime_completed = LocalDateTime.now(),
+                                score = 1
                             )
 
-                            Type.CHECKED -> {}
+                            Type.CHECKED -> null
                         }
+
+                        record?.let { onAddRecord(it) }
                     }
                 )
 

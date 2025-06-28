@@ -465,7 +465,7 @@ private fun DailyChecklistItem(
                     Text(
                         style = TextStyle.Default.copy(
                             fontWeight = FontWeight.Bold,
-                            fontSize = 17.sp
+                            fontSize = 16.sp
                         ),
                         text = item.title
                     )
@@ -474,7 +474,7 @@ private fun DailyChecklistItem(
                 if (item.description.isNotBlank()) {
                     Text(
                         style = TextStyle.Default.copy(
-                            fontSize = 16.sp
+                            fontSize = 15.sp
                         ),
                         modifier = Modifier,
                         text = item.description

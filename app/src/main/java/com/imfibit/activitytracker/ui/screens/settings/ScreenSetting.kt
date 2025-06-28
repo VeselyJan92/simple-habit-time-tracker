@@ -45,7 +45,10 @@ fun ScreenSetting(navControl: NavHostController) {
     Scaffold(
         modifier =  Modifier.safeDrawingPadding(),
         topBar = {
-            SimpleTopBar(navHostController = navControl, title =  stringResource(id = R.string.screen_settings_title))
+            SimpleTopBar(
+                title =  stringResource(id = R.string.screen_settings_title),
+                onBack = { navControl.popBackStack() }
+            )
         },
 
         content = {

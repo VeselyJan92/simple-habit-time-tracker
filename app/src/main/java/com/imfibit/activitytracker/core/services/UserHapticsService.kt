@@ -11,13 +11,13 @@ import javax.inject.Inject
 
 class UserHapticsService @Inject constructor(
     @ApplicationContext private val context: Context,
-){
+) {
 
-    fun activityFeedback(){
+    fun activityFeedback() {
         Log.e("Vibrate", "Vibrate")
-        val vibrator  = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             (context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator
-        }else{
+        } else {
             @Suppress("DEPRECATION")
             context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         }

@@ -23,12 +23,11 @@ import com.imfibit.activitytracker.core.TestTag
 
 @Composable
 fun SimpleTopBar(
-    navHostController: NavHostController,
     title: String,
-    backButton:Boolean = true,
-    endIcon: @Composable ()->Unit = { }
-){
-
+    backButton: Boolean = true,
+    endIcon: @Composable () -> Unit = { },
+    onBack: () -> Unit,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -36,7 +35,7 @@ fun SimpleTopBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (backButton)
-            TopBarBackButton(navHostController = navHostController)
+            TopBarBackButton(onBack = onBack)
 
         TopBarTitle(title = title)
 
@@ -44,11 +43,10 @@ fun SimpleTopBar(
 
         endIcon()
     }
-
 }
 
 @Composable
-fun TopBarTitle(title: String){
+fun TopBarTitle(title: String) {
     Text(
         text = title,
         fontWeight = FontWeight.Black, fontSize = 25.sp
@@ -58,15 +56,15 @@ fun TopBarTitle(title: String){
 
 @Composable
 fun TopBarBackButton(
-    navHostController: NavHostController,
-    modifier: Modifier = Modifier.padding(end = 16.dp)
-){
+    modifier: Modifier = Modifier.padding(end = 16.dp),
+    onBack: () -> Unit,
+) {
     Icon(
         contentDescription = null,
         imageVector = Icons.Default.ArrowBackIosNew,
         tint = Color.Black,
-        modifier = modifier.clickable(onClick = {
-            navHostController.popBackStack()
-        }).testTag(TestTag.GENERAL_BACK_BUTTON)
+        modifier = modifier
+            .clickable(onClick = onBack)
+            .testTag(TestTag.GENERAL_BACK_BUTTON)
     )
 }

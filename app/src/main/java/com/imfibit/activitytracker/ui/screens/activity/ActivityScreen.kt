@@ -84,7 +84,8 @@ fun ScreenTrackedActivity(
         },
         onDeleteActivity = vm::deleteActivity,
         onActivityNameUpdate = vm::refreshName,
-        onNavigateToHistory = { nav.navigate(Destinations.ScreenActivityHistory(it.id)) }
+        onNavigateToHistory = { nav.navigate(Destinations.ScreenActivityHistory(it.id)) },
+        onNavigateBack = { nav.popBackStack() }
     )
 }
 
@@ -100,6 +101,7 @@ fun ScreenTrackedActivity(
     onDeleteActivity: (TrackedActivity) -> Unit,
     onActivityNameUpdate: (String) -> Unit,
     onNavigateToHistory: (TrackedActivity) -> Unit,
+    onNavigateBack: () -> Unit,
 ) = TestableContent(testTag = TestTag.TRACKED_ACTIVITY_SCREEN) {
 
     val state by activityState.collectAsState(initial = null)
@@ -118,7 +120,7 @@ fun ScreenTrackedActivity(
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
-                TopBarBackButton(navHostController = nav)
+                TopBarBackButton(onBack = onNavigateBack)
 
                 BasicTextField(
                     modifier = Modifier

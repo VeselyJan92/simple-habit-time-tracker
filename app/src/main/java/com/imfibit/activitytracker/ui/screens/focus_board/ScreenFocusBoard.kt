@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -36,7 +35,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -59,6 +57,7 @@ import com.imfibit.activitytracker.core.toColor
 import com.imfibit.activitytracker.database.DevSeeder
 import com.imfibit.activitytracker.database.composed.FocusBoardItemWithTags
 import com.imfibit.activitytracker.database.entities.FocusBoardItemTag
+import com.imfibit.activitytracker.ui.AppTheme
 import com.imfibit.activitytracker.ui.MainBody
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.dialogs.rememberDialog
@@ -100,23 +99,24 @@ val colors200 = listOf(
 
 @Preview
 @Composable
-private fun Preview() {
+private fun ScreenFocusBoard_Preview() = AppTheme {
+    val tags = listOf(DevSeeder.getFocusBoardItemTag())
+
     Body(
-        items = remember {
-            listOf(
-                FocusBoardItemWithTags(
-                    DevSeeder.getFocusBoardItem(),
-                    listOf(DevSeeder.getFocusBoardItemTag())
-                )
+        items = listOf(
+            FocusBoardItemWithTags(
+                DevSeeder.getFocusBoardItem(),
+                tags
             )
-        },
-        tags = remember { mutableStateListOf() },
+        ),
+        tags = tags,
         onFocusItemEdit = {},
         onFocusItemDelete = {},
         swapFocusItems = { _, _ -> },
         swapTags = { _, _ -> },
-        onTagEdit = {}
-    ) {}
+        onTagEdit = {},
+        onTagDelete = {}
+    )
 }
 
 
@@ -125,7 +125,7 @@ fun ScreenFocusBoard(
     viewModel: FocusBoardViewModel = hiltViewModel<FocusBoardViewModel>(),
 ) {
     val focusItems by viewModel.focusItems.collectAsStateWithLifecycle()
-    val tags by viewModel.tags.collectAsState()
+    val tags by viewModel.tags.collectAsStateWithLifecycle()
 
     Body(
         items = focusItems,
@@ -306,10 +306,6 @@ fun FocusBoardItems(
                         }
                     }
                 }
-
-                item {
-                    Spacer(modifier = Modifier.height(100.dp))
-                }
             }
         }
 
@@ -442,7 +438,7 @@ fun FocusBoardItem(
             if (item.item.title.isNotEmpty()) {
                 Text(
                     item.item.title,
-                    style = TextStyle.Default.copy(fontWeight = FontWeight.Bold, fontSize = 17.sp),
+                    style = TextStyle.Default.copy(fontWeight = FontWeight.Bold, fontSize = 16.sp),
                 )
             }
 
@@ -450,7 +446,7 @@ fun FocusBoardItem(
                 Text(
                     text = item.item.content,
                     style = TextStyle.Default.copy(
-                        fontSize = 16.sp
+                        fontSize = 15.sp
                     ),
                 )
             }

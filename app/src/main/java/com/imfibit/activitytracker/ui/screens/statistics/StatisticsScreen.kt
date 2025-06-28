@@ -50,8 +50,8 @@ fun ScreenStatistics(navController: NavHostController) {
         modifier = Modifier.safeDrawingPadding(),
         topBar = {
             SimpleTopBar(
-                navController,
-                stringResource(id = R.string.screen_title_statistics)
+                title = stringResource(id = R.string.screen_title_statistics),
+                onBack = { navController.popBackStack() }
             )
         },
         content = { padding ->
