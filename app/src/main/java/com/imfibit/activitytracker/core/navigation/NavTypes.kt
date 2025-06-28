@@ -8,7 +8,6 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.Json
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -118,17 +117,4 @@ object LocalDateTimeSerializer : KSerializer<LocalDateTime> {
     override fun deserialize(decoder: Decoder): LocalDateTime {
         return LocalDateTime.parse(decoder.decodeString(), formatter)
     }
-}
-
-class JsonNavType<T>(
-    private val serializer: KSerializer<T>,
-) : NavType<T>(isNullableAllowed = false) {
-    override fun get(bundle: Bundle, key: String): T? = parseValue(bundle.getString(key) ?: "")
-
-    override fun put(bundle: Bundle, key: String, value: T) =
-        bundle.putString(key, serializeAsValue(value))
-
-    override fun parseValue(value: String): T = Json.decodeFromString(serializer, value)
-
-    override fun serializeAsValue(value: T): String = Json.encodeToString(serializer, value)
 }

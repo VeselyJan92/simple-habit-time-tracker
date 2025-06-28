@@ -66,4 +66,8 @@ class FocusBoardViewModel @Inject constructor(
     fun onTagDelete(item: FocusBoardItemTag) = launchIO {
         db.focusBoardItemTagDAO().delete(item)
     }
+
+    fun onTagToggle(item: FocusBoardItemTag) = launchIO {
+        db.focusBoardItemTagDAO().upsert( item.copy(isChecked = !item.isChecked))
+    }
 }

@@ -1,5 +1,6 @@
 package com.imfibit.activitytracker.ui.screens.focus_board
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -32,8 +34,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,7 +52,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.imfibit.activitytracker.R
-import com.imfibit.activitytracker.core.extensions.toggle
 import com.imfibit.activitytracker.core.toColor
 import com.imfibit.activitytracker.database.DevSeeder
 import com.imfibit.activitytracker.database.composed.FocusBoardItemWithTags
@@ -115,7 +114,8 @@ private fun ScreenFocusBoard_Preview() = AppTheme {
         swapFocusItems = { _, _ -> },
         swapTags = { _, _ -> },
         onTagEdit = {},
-        onTagDelete = {}
+        onTagDelete = { },
+        onTagToggle = { }
     )
 }
 
@@ -135,7 +135,8 @@ fun ScreenFocusBoard(
         swapFocusItems = viewModel::swapFocusItems,
         swapTags = viewModel::swapTags,
         onTagEdit = viewModel::onTagEdit,
-        onTagDelete = viewModel::onTagDelete
+        onTagDelete = viewModel::onTagDelete,
+        onTagToggle = viewModel::onTagToggle
     )
 }
 
@@ -149,34 +150,21 @@ private fun Body(
     swapTags: (LazyListItemInfo, LazyListItemInfo) -> Unit,
     onTagEdit: (FocusBoardItemTag) -> Unit,
     onTagDelete: (FocusBoardItemTag) -> Unit,
+    onTagToggle: (FocusBoardItemTag) -> Unit,
 ) {
     MainBody {
         TopBar(tags, swapTags, onTagEdit, onTagDelete)
 
         Column(Modifier.padding(8.dp)) {
 
-
-            val set = buildSet { addAll(tags.map { it.id }) }
-
-            val toggle = remember(set) {
-                mutableStateOf(set)
-            }
-
-            val items = remember(toggle.value, items) {
-                derivedStateOf {
-                    items.filter { it.tags.isEmpty() || it.tags.any { toggle.value.contains(it.id) } }
-                }
-            }
-
             HeaderWithTags(
-                toggle = { toggle.value = toggle.value.toMutableSet().apply { toggle(it.id) } },
+                onToggle = onTagToggle,
                 tags = tags,
-                selectedTags = toggle.value
             )
 
             FocusBoardItems(
                 tags = tags,
-                focusItems = items.value,
+                focusItems = items,
                 swapFocusItems = swapFocusItems,
                 onFocusItemDelete = onFocusItemDelete,
                 onFocusItemEdit = onFocusItemEdit
@@ -249,10 +237,7 @@ fun FocusBoardItems(
 
     if (focusItems.isEmpty()) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .padding(8.dp),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -285,6 +270,7 @@ fun FocusBoardItems(
             shadowElevation = 2.dp
         ) {
             LazyColumn(
+                modifier = Modifier,
                 state = lazyListState,
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(8.dp)
@@ -315,9 +301,8 @@ fun FocusBoardItems(
 
 @Composable
 fun HeaderWithTags(
-    toggle: (FocusBoardItemTag) -> Unit,
+    onToggle: (FocusBoardItemTag) -> Unit,
     tags: List<FocusBoardItemTag>,
-    selectedTags: Set<Long>,
 ) {
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
@@ -325,8 +310,8 @@ fun HeaderWithTags(
     ) {
         items(tags, { item -> item.id }) { item ->
             FocusItemTag(
-                onClick = { toggle(item) },
-                isSelected = selectedTags.contains(item.id),
+                onClick = { onToggle(item) },
+                isSelected = item.isChecked,
                 name = item.name,
                 color = item.color.toColor(),
                 modifier = Modifier.padding(vertical = 2.dp),

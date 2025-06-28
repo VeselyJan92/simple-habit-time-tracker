@@ -1,6 +1,5 @@
 package com.imfibit.activitytracker.database.entities
 
-import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.room.*
@@ -22,10 +21,13 @@ data class FocusBoardItemTag(
     val name: String = "",
 
     @ColumnInfo(name = "color")
-    var color: Int = chooseableColors.first().toArgb(),
+    val color: Int = chooseableColors.first().toArgb(),
 
     @ColumnInfo(name = "position")
-    var position: Int = 0
+    val position: Int = 0,
+
+    @ColumnInfo(name = "is_checked")
+    val isChecked: Boolean = true
 ) {
     companion object{
         const val TABLE = "focus_board_item_tags"
