@@ -1,9 +1,7 @@
 package com.imfibit.activitytracker.ui.screens.activity_list
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,21 +13,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AssignmentTurnedIn
 import androidx.compose.material.icons.outlined.Swipe
 import androidx.compose.material.icons.outlined.Topic
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -37,7 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,23 +39,31 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.TestTag
+import com.imfibit.activitytracker.core.extensions.navigate
 import com.imfibit.activitytracker.core.value
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.embedable.TimeRange
+import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
+import com.imfibit.activitytracker.database.entities.TrackedActivityRecord
+import com.imfibit.activitytracker.database.entities.TrackedActivityScore
+import com.imfibit.activitytracker.database.entities.TrackedActivityTime
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.ui.Destinations
 import com.imfibit.activitytracker.ui.MainBody
 import com.imfibit.activitytracker.ui.components.BaseMetricBlock
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.util.TestableContent
+import com.imfibit.activitytracker.ui.viewmodels.RecordViewModel
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
-import sh.calvin.reorderable.rememberReorderableLazyListState
+import java.time.LocalDateTime
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -70,14 +71,60 @@ fun ScreenActivities(
     navController: NavHostController,
     vm: ActivitiesViewModel = hiltViewModel(),
 ) = TestableContent(testTag = TestTag.DASHBOARD_ACTIVITIES_CONTENT) {
+
+    val recordVM = hiltViewModel<RecordViewModel>()
+
     MainBody {
-        TopBar(nav = navController)
-        ScreenBody(navController, vm)
+        TopBar(
+            onGoToSettings = {
+                navController.navigate(Destinations.ScreenSettings)
+            }
+        )
+        ScreenBody(
+            vm,
+            onNavigateToStatistics = {
+                navController.navigate(Destinations.ScreenStatistics)
+            },
+            onGoToActivityGroup = {
+                navController.navigate(Destinations.ScreenActivityGroupRoute(it))
+            },
+            onGoToActivity = {
+                navController.navigate(Destinations.ScreenActivity(it.id))
+            },
+            onActionButtonClicked = {
+                recordVM.activityTriggered(it)
+            },
+            onAddRecord = {
+                when(it){
+                    is TrackedActivityCompletion -> throw IllegalStateException("Completion not supported")
+                    is TrackedActivityScore -> navController.navigate(
+                        "dialog_edit_record/{record}",
+                        bundleOf(
+                            "record" to TrackedActivityScore(
+                                activity_id = it.activity_id,
+                                datetime_completed = LocalDateTime.now(),
+                                score = 1
+                            )
+                        )
+                    )
+                    is TrackedActivityTime -> navController.navigate(
+                        "dialog_edit_record/{record}",
+                        bundleOf(
+                            "record" to TrackedActivityTime(
+                                activity_id = it.activity_id,
+                                datetime_start = LocalDateTime.now(),
+                                datetime_end = LocalDateTime.now()
+                            )
+                        )
+                    )
+                }
+            }
+        )
     }
 }
 
 @Composable
-private fun TopBar(nav: NavHostController) {
+private fun TopBar(onGoToSettings: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -91,9 +138,9 @@ private fun TopBar(nav: NavHostController) {
         )
 
         Icon(
-            modifier = Modifier.clickable {
-                nav.navigate(Destinations.ScreenSettings)
-            },
+            modifier = Modifier.clickable(
+                onClick = onGoToSettings
+            ),
             imageVector = Icons.Default.Settings,
             tint = Color.Black,
             contentDescription = null,
@@ -106,8 +153,12 @@ private fun Any?.type() = (this as String).split("_").first()
 
 @Composable
 private fun ScreenBody(
-    nav: NavHostController,
     vm: ActivitiesViewModel,
+    onNavigateToStatistics: () -> Unit,
+    onGoToActivityGroup: (Long) -> Unit,
+    onGoToActivity: (TrackedActivity) -> Unit,
+    onActionButtonClicked: (TrackedActivity) -> Unit,
+    onAddRecord: (TrackedActivityRecord) -> Unit,
 ) {
     val data by vm.data.collectAsStateWithLifecycle()
 
@@ -155,16 +206,28 @@ private fun ScreenBody(
             }
         }
 
-        Activities(nav, vm, data)
+        Activities(
+            vm = vm,
+            data = data,
+            onNavigateToStatistics = onNavigateToStatistics,
+            onGoToActivityGroup = onGoToActivityGroup,
+            onGoToActivity = onGoToActivity,
+            onActionButtonClick = onActionButtonClicked,
+            onAddRecord = onAddRecord
+        )
 
     }
 }
 
 @Composable
 private fun Activities(
-    nav: NavHostController,
     vm: ActivitiesViewModel,
     data: ActivitiesViewModel.Data,
+    onNavigateToStatistics: () -> Unit,
+    onGoToActivityGroup: (Long) -> Unit,
+    onGoToActivity: (TrackedActivity) -> Unit,
+    onActionButtonClick: (TrackedActivity) -> Unit,
+    onAddRecord: (TrackedActivityRecord) -> Unit,
 ) {
     val lazyListState = rememberLazyGridState()
     val reorderableLazyListState = rememberReorderableLazyGridState(lazyListState) { from, to ->
@@ -195,7 +258,10 @@ private fun Activities(
             key = "head",
             span = { GridItemSpan(2) }
         ) {
-            Today(nav, data.today)
+            Today(
+                today = data.today,
+                onNavigateToStatistics = onNavigateToStatistics
+            )
         }
 
         items(
@@ -209,10 +275,11 @@ private fun Activities(
             ) { isDragging ->
                 TrackedActivity(
                     modifier = Modifier.longPressDraggableHandle(),
-                    nav = nav,
                     item = item,
-                    onNavigate = { nav.navigate(Destinations.ScreenActivity(it.id)) },
-                    isDragging = isDragging
+                    onNavigate = onGoToActivity,
+                    isDragging = isDragging,
+                    onActionButtonClick = onActionButtonClick,
+                    onAddRecord = onAddRecord
                 )
             }
         }
@@ -227,11 +294,11 @@ private fun Activities(
                 state = reorderableLazyListState,
                 key = "group_${item.id}"
             ) { isDragging ->
-                Category(
+                ActivityGroup(
                     modifier = Modifier.longPressDraggableHandle(),
-                    nav = nav,
                     item = item,
-                    color = Color.White
+                    color = Color.White,
+                    onGoToActivityGroup = onGoToActivityGroup
                 )
             }
         }
@@ -239,7 +306,10 @@ private fun Activities(
 }
 
 @Composable
-private fun Today(nav: NavHostController, today: List<ActivityWithMetric>) {
+private fun Today(
+    today: List<ActivityWithMetric>,
+    onNavigateToStatistics: () -> Unit,
+) {
     Surface(
         shadowElevation = 2.dp,
         shape = RoundedCornerShape(20.dp),
@@ -267,7 +337,7 @@ private fun Today(nav: NavHostController, today: List<ActivityWithMetric>) {
 
 
                 TextButton(
-                    onClick = { nav.navigate(Destinations.ScreenStatistics) }
+                    onClick = onNavigateToStatistics
                 ) {
                     Text(
                         text = stringResource(id = R.string.screen_title_statistics),
@@ -314,7 +384,7 @@ private fun Today(nav: NavHostController, today: List<ActivityWithMetric>) {
                         )
                     }
 
-                    if (index != today.size - 1){
+                    if (index != today.size - 1) {
                         HorizontalDivider(Modifier.padding(top = 4.dp, bottom = 4.dp))
                     }
                 }
@@ -328,19 +398,20 @@ private fun Today(nav: NavHostController, today: List<ActivityWithMetric>) {
 }
 
 @Composable
-private fun Category(
+private fun ActivityGroup(
     modifier: Modifier,
-    nav: NavHostController,
     item: TrackerActivityGroup,
     color: Color = Color.White,
+    onGoToActivityGroup: (Long) -> Unit,
 ) {
     Surface(
         shadowElevation = 2.dp,
         modifier = modifier
             .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) { nav.navigate(Destinations.ScreenActivityGroupRoute(item.id)) }
+                onClick = {
+                    onGoToActivityGroup(item.id)
+                }
+            )
             .fillMaxWidth(),
         shape = RoundedCornerShape(10.dp),
         color = color
