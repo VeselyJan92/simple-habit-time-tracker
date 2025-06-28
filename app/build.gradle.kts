@@ -48,7 +48,7 @@ android {
 
     }
 
-    compileSdk = 35
+    compileSdk = 36
 
     buildFeatures {
         compose = true
@@ -71,7 +71,7 @@ android {
     defaultConfig {
         applicationId = "com.imfibit.activitytracker"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 48
         versionName = "1.4.2"
         testInstrumentationRunner  ="com.imfibit.activitytracker.HiltRunner"

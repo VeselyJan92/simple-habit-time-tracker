@@ -1,5 +1,7 @@
 package com.imfibit.activitytracker.ui
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -39,7 +41,13 @@ fun AppNavHost() {
 
         NavHost(
             navController = navControl,
-            startDestination = destination
+            startDestination = destination,
+            popExitTransition = {
+                ExitTransition.None
+            },
+            popEnterTransition = {
+                EnterTransition.None
+            }
         ) {
             composable<Destinations.ScreenStatistics> {
                 ScreenStatistics(navControl)
