@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.konan.properties.Properties
 
 plugins {
     id("com.android.application")
-    id("com.github.triplet.play") version "3.8.6"
+    id("com.github.triplet.play") version "3.12.1"
     id("kotlin-android")
     id("dagger.hilt.android.plugin")
 
@@ -72,8 +72,8 @@ android {
         applicationId = "com.imfibit.activitytracker"
         minSdk = 26
         targetSdk = 36
-        versionCode = 49
-        versionName = "1.4.2"
+        versionCode = 50
+        versionName = "1.4.3"
         testInstrumentationRunner  ="com.imfibit.activitytracker.HiltRunner"
     }
 
