@@ -22,10 +22,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -118,6 +120,7 @@ private fun Preview() = AppTheme {
                 add(DailyChecklistTimelineItemValue(LocalDate.now().minusDays(it.toLong()), true))
             }
         },
+        history = listOf(),
         strike = 7,
         onCheckItem = { checked, item -> },
         onToggleDay = { checked, item -> },
@@ -135,10 +138,12 @@ fun ScreenMindBoot() {
     val items by viewModel.items.collectAsState()
     val days by viewModel.days.collectAsState()
     val strike by viewModel.strike.collectAsState()
+    val history by viewModel.history.collectAsState()
 
     Body(
         items = items,
         days = days,
+        history = history,
         strike = strike,
         onCheckItem = viewModel::onCheck,
         onToggleDay = viewModel::onToggleDay,
@@ -148,10 +153,12 @@ fun ScreenMindBoot() {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Body(
     items: List<DailyChecklistItem>,
     days: List<DailyChecklistTimelineItemValue>,
+    history: List<DailyChecklistTimelineItemValue>,
     strike: Int,
     onCheckItem: (checked: Boolean, item: DailyChecklistItem) -> Unit,
     onToggleDay: (checked: Boolean, date: LocalDate) -> Unit,
@@ -159,9 +166,25 @@ private fun Body(
     onItemDelete: (DailyChecklistItem) -> Unit,
     onSwap: (from: LazyListItemInfo, to: LazyListItemInfo) -> Unit,
 ) {
-    MainBody {
-        TopBar()
+    var showHistoryBottomSheet by remember { mutableStateOf(false) }
 
+    if (showHistoryBottomSheet) {
+        DailyChecklistHistoryBottomSheet(
+            history = history,
+            onToggleDay = onToggleDay,
+            onDismissRequest = {
+                showHistoryBottomSheet = false
+            }
+        )
+    }
+
+
+    MainBody {
+        TopBar(
+            onCalendarClicked = {
+                showHistoryBottomSheet = true
+            }
+        )
 
         if (items.isEmpty()) {
             Column(
@@ -356,51 +379,11 @@ fun DailyChecklist(
 }
 
 @Composable
-private fun DailyChecklistMonth(
-    onToggleDay: (checked: Boolean, date: LocalDate) -> Unit,
-    month: RepositoryTrackedActivity.Month,
-) {
-    MonthGridImpl(
-        modifier = Modifier.padding(8.dp),
-        month = month,
-        weekSum = {
-            MetricBlock(
-                data = MetricWidgetData(
-                    value = { "${it.total}/7" },
-                    color = Colors.ChipGray,
-                    label = { resources.getString(R.string.week) }
-                )
-            )
-        },
-        noWeekSum = {
-            Spacer(Modifier.size(40.dp, 20.dp))
-        },
-        day = {
-            MetricBlock(
-                modifier = Modifier.testTag(
-                    TestTag.DAILY_CHECKLIST_MONTH_GRID_DAY + it.date.format(
-                        DateTimeFormatter.ISO_DATE
-                    )
-                ),
-                data = MetricWidgetData(
-                    value = it.label,
-                    color = it.color,
-                    label = { it.date.dayOfMonth.toString() }
-                ),
-                onLongClick = { onToggleDay(it.metric < 1, it.date) }
-            )
-        }
-    )
-
-}
-
-
-@Composable
-private fun TopBar() {
+private fun TopBar(onCalendarClicked: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 8.dp, start = 16.dp, bottom = 8.dp, end = 16.dp),
+            .padding(start = 16.dp, end = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -409,6 +392,13 @@ private fun TopBar() {
             fontWeight = FontWeight.Black, fontSize = 25.sp
         )
 
+        Spacer(modifier = Modifier.weight(1f))
+
+        IconButton(
+            onClick = onCalendarClicked
+        ) {
+            Icon(imageVector = Icons.Default.CalendarMonth, contentDescription = null )
+        }
     }
 
 }

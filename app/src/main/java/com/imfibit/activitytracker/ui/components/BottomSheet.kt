@@ -3,6 +3,8 @@ package com.imfibit.activitytracker.ui.components
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -63,7 +65,7 @@ fun BaseBottomSheet(
         onDismissRequest = onDismissRequest,
         modifier = modifier
             .imePadding()
-            .displayCutoutPadding(),
+            .displayCutoutPadding().statusBarsPadding().padding(top = 16.dp),
         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
         content = {
             content(animateToDismiss)

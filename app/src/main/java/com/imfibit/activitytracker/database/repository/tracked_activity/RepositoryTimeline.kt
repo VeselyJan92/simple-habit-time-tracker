@@ -80,57 +80,15 @@ class RepositoryTimeline @Inject constructor(
         return (from rangeTo to).toSequence().map { DailyChecklistTimelineItemValue(it, completed.contains(it))  }.toList()
     }
 
+    suspend fun getDataForPastDays(from:  LocalDate, to: LocalDate): List<DailyChecklistTimelineItemValue> {
+        val completed =  db.dailyCheckListTimelineDAO().getFromTo(from, to).map { it.date_completed }.toSet()
+
+        return (from rangeTo to).toSequence().map { DailyChecklistTimelineItemValue(it, completed.contains(it))  }.toList()
+    }
+
     suspend fun getStrike(): Int {
         return db.dailyCheckListTimelineDAO().getStrike()
     }
-
-    suspend fun getDataForPastMonths(n: Int) = buildList {
-        val data = db.dailyCheckListTimelineDAO()
-            .getFromTo(LocalDate.now().minusMonths(n + 1L), LocalDate.now())
-            .map { it.date_completed }.toSet()
-
-        repeat(n) {
-            add(mapMonthData(YearMonth.now().minusMonths(it.toLong()), data))
-        }
-    }
-
-    suspend fun getMonthData(month: YearMonth): RepositoryTrackedActivity.Month {
-        val days = getFullMonthBlockDays(month.year, month.monthValue)
-
-        val set = db.dailyCheckListTimelineDAO()
-            .getFromTo(days.lower, days.upper)
-            .map { it.date_completed }.toSet()
-
-        return mapMonthData(month, set)
-    }
-
-    suspend fun mapMonthData(
-        month: YearMonth,
-        data: Set<LocalDate>
-    ): RepositoryTrackedActivity.Month {
-        val days = getFullMonthBlockDays(month.year, month.monthValue)
-
-        val weeks = days.toSequence().chunked(7).map { week ->
-            RepositoryTrackedActivity.Week(
-                week.first(),
-                week.last(),
-                week.map {
-                    val completed = data.contains(it)
-
-                    RepositoryTrackedActivity.Day(
-                        { resources.getString(if (completed) R.string.yes else R.string.no) },
-                        if (completed) 1 else 0,
-                        if (completed) Colors.ButtonGreen else Colors.ChipGray,
-                        it
-                    )
-                },
-                week.count { data.contains(it) }.toLong()
-            )
-        }
-
-        return RepositoryTrackedActivity.Month(weeks.toList(), month)
-    }
-
 
 }
 

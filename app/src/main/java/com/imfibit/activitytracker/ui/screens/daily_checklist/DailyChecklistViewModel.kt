@@ -29,6 +29,10 @@ class DailyChecklistViewModel @Inject constructor(
         rep.getDataForPastDays(30).reversed()
     }
 
+    val history = invalidationStateFlow(db, listOf(), *dailyChecklistTables) {
+        rep.getDataForPastDays(LocalDate.now().minusMonths(6L), LocalDate.now()).reversed()
+    }
+
     val strike = invalidationStateFlow(db, 0, *dailyChecklistTables) {
         rep.getStrike()
     }
