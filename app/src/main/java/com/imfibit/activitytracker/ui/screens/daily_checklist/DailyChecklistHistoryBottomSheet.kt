@@ -95,10 +95,8 @@ private fun DailyChecklistHistoryContent(
     onToggleDay: (checked: Boolean, date: LocalDate) -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .padding(horizontal = 8.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Absolute.SpaceBetween
     ) {
         DayOfWeek.entries.forEach {
             Box(Modifier.size(40.dp, 30.dp), contentAlignment = Alignment.Center) {
@@ -121,7 +119,6 @@ private fun DailyChecklistHistoryContent(
 
     LazyColumn(
         reverseLayout = true,
-        contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(items = groupedByMonth, key = { it.first }) {

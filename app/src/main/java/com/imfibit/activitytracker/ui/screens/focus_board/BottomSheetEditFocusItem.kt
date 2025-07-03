@@ -17,9 +17,7 @@ import com.imfibit.activitytracker.database.DevSeeder
 import com.imfibit.activitytracker.database.composed.FocusBoardItemWithTags
 import com.imfibit.activitytracker.database.entities.FocusBoardItemTag
 import com.imfibit.activitytracker.ui.AppTheme
-import com.imfibit.activitytracker.ui.components.AppTextField
-import com.imfibit.activitytracker.ui.components.AppTextFieldStyle_Header
-import com.imfibit.activitytracker.ui.components.BaseBottomSheet
+import com.imfibit.activitytracker.ui.components.ScrollBottomSheet
 import com.imfibit.activitytracker.ui.components.dialogs.DialogButtons
 import com.imfibit.activitytracker.ui.components.rememberTestBottomSheetState
 
@@ -50,7 +48,7 @@ fun BottomSheetEditFocusItem(
     onFocusItemEdit: (FocusBoardItemWithTags) -> Unit,
     onFocusItemDelete: (FocusBoardItemWithTags) -> Unit = {},
 ) {
-    BaseBottomSheet(
+    ScrollBottomSheet(
         onDismissRequest = onDismissRequest,
         state = state
     ) { onDismissRequest ->

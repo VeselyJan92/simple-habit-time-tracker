@@ -1,17 +1,11 @@
 package com.imfibit.activitytracker.ui.screens.daily_checklist
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SheetState
@@ -40,7 +34,7 @@ import com.imfibit.activitytracker.core.TestTag.DAILY_CHECKLIST_EDIT_CONTINUE
 import com.imfibit.activitytracker.core.toColor
 import com.imfibit.activitytracker.database.DevSeeder
 import com.imfibit.activitytracker.database.entities.DailyChecklistItem
-import com.imfibit.activitytracker.ui.components.BaseBottomSheet
+import com.imfibit.activitytracker.ui.components.ScrollBottomSheet
 import com.imfibit.activitytracker.ui.components.rememberTestBottomSheetState
 import com.imfibit.activitytracker.ui.components.selectors.ColorPickerComponent
 
@@ -67,7 +61,7 @@ fun EditDailyChecklistItemBottomSheet(
     item: DailyChecklistItem,
     onItemEdit: (DailyChecklistItem) -> Unit,
     onItemDelete: (DailyChecklistItem) -> Unit = {},
-) = BaseBottomSheet(
+) = ScrollBottomSheet(
     state = state,
     onDismissRequest = onDismissRequest,
     content = { onDismissRequest ->

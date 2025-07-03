@@ -5,9 +5,7 @@ import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
@@ -31,7 +29,7 @@ import com.imfibit.activitytracker.database.DevSeeder
 import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.AppTheme
-import com.imfibit.activitytracker.ui.components.BaseBottomSheet
+import com.imfibit.activitytracker.ui.components.ScrollBottomSheet
 import com.imfibit.activitytracker.ui.components.rememberAppBottomSheetState
 import com.imfibit.activitytracker.ui.components.rememberTestBottomSheetState
 import com.imfibit.activitytracker.ui.widgets.custom.GoalProgressBar
@@ -67,7 +65,7 @@ fun BottomSheetProgressGoal(
     getLiveMetric: suspend (LocalDate?, LocalDate?) -> Long,
     onSet: (TrackedActivityChallenge) -> Unit,
     onDelete: () -> Unit,
-) = BaseBottomSheet(
+) = ScrollBottomSheet(
     state = state,
     onDismissRequest = onDismissRequest,
 ) { onDismissRequest ->
