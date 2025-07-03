@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -240,11 +241,15 @@ fun TrackedActivity(
             }
 
             if (item.activity.challenge.isSet()) {
-                GoalProgressBar(
-                    item.activity.challenge,
-                    item.challengeMetric,
-                    item.activity.type
-                )
+                Box(
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
+                ) {
+                    GoalProgressBar(
+                        item.activity.challenge,
+                        item.challengeMetric,
+                        item.activity.type
+                    )
+                }
             }
         }
     }

@@ -32,25 +32,29 @@ import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.components.Colors
 
 @Composable
-fun GoalProgressBar(challenge: TrackedActivityChallenge, actual: Long, type: TrackedActivity.Type) = GoalProgressBar(
-    name =  challenge.name,
-    target = challenge.target,
-    actual = actual,
-    type = type
-)
+fun GoalProgressBar(challenge: TrackedActivityChallenge, actual: Long, type: TrackedActivity.Type) =
+    GoalProgressBar(
+        name = challenge.name,
+        target = challenge.target,
+        actual = actual,
+        type = type
+    )
 
 @Composable
 fun GoalProgressBar(
     name: String,
     target: Long,
     actual: Long,
-    type: TrackedActivity.Type
-){
+    type: TrackedActivity.Type,
+) {
 
     val animationTargetState = remember { mutableStateOf(0f) }
 
-    LaunchedEffect(target, actual){
-        animationTargetState.value = if (actual == 0L || target == 0L) 0f else minOf((actual.toFloat() / target.toFloat()), 1f)
+    LaunchedEffect(target, actual) {
+        animationTargetState.value = if (actual == 0L || target == 0L) 0f else minOf(
+            (actual.toFloat() / target.toFloat()),
+            1f
+        )
     }
 
     val animated by animateFloatAsState(
@@ -61,11 +65,14 @@ fun GoalProgressBar(
     Box(
         Modifier
             .fillMaxWidth()
-            .height(50.dp), contentAlignment = Alignment.Center,) {
+            .height(32.dp),
+    ) {
 
-        Canvas(modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp)){
+        Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(32.dp)
+        ) {
             drawRoundRect(
                 size = Size(size.width, size.height),
                 color = Color.LightGray,
@@ -73,10 +80,11 @@ fun GoalProgressBar(
                 style = Stroke(5f)
             )
 
-            val clamped  = if (animated * size.width < size.height) size.height else animated * size.width
+            val clamped =
+                if (animated * size.width < size.height) size.height else animated * size.width
 
             drawRoundRect(
-                size = Size(clamped, size.height ),
+                size = Size(clamped, size.height),
                 color = if (actual >= target && target != 0L) Colors.Completed else Color(0xFFE0E0E0),
                 cornerRadius = CornerRadius(size.width, size.width)
             )
@@ -85,20 +93,23 @@ fun GoalProgressBar(
         Row(
             Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween){
+                .padding(horizontal = 24.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
 
-            Text(name, fontWeight = FontWeight.W600, fontSize = 15.sp )
+            Text(name, fontWeight = FontWeight.W600, fontSize = 15.sp)
 
-            val fractionLabel = if (actual > target && target != 0L){
+            val fractionLabel = if (actual > target && target != 0L) {
                 stringResource(R.string.dialog_challenge_estimated_completed)
-            }else{
-                when(type){
+            } else {
+                when (type) {
                     TrackedActivity.Type.TIME -> "${actual / 3600}h / ${target / 3600}h"
                     TrackedActivity.Type.SCORE, TrackedActivity.Type.CHECKED -> "$actual / ${target}"
                 }
             }
 
-            Text(fractionLabel, fontWeight = FontWeight.W600, fontSize = 17.sp )
+            Text(fractionLabel, fontWeight = FontWeight.W600, fontSize = 17.sp)
 
         }
     }

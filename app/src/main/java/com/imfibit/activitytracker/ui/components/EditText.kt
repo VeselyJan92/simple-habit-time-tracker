@@ -28,7 +28,7 @@ fun BasicEditTextDecorationBox(innerTextField: @Composable () -> Unit){
             .fillMaxSize()
             .background(
                 Colors.ChipGray,
-                RoundedCornerShape(50)
+                RoundedCornerShape(8.dp)
             )
             .padding(horizontal = 8.dp),
         contentAlignment = Alignment.Center

@@ -505,21 +505,26 @@ private fun RowScope.ViewRange(vm: TrackedActivityViewModel, activity: TrackedAc
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun RowScope.SetChallange(state: TrackedActivityState, vm: TrackedActivityViewModel) {
 
-    val display = remember { mutableStateOf(false) }
+    var display by remember { mutableStateOf(false) }
 
-    DialogProgressGoal(
-        display = display,
-        activity = state.activity,
-        getLiveMetric = { from, to -> vm.getChallengeMetric(from, to) },
-        onSet = { vm.updateActivity(state.activity.copy(challenge = it)) },
-        onDelete = { vm.updateActivity(state.activity.copy(challenge = TrackedActivityChallenge.empty)) }
-    )
+    if (display){
+        BottomSheetProgressGoal(
+            activity = state.activity,
+            getLiveMetric = { from, to -> vm.getChallengeMetric(from, to) },
+            onSet = { vm.updateActivity(state.activity.copy(challenge = it)) },
+            onDelete = { vm.updateActivity(state.activity.copy(challenge = TrackedActivityChallenge.empty)) },
+            onDismissRequest = {
+                display = false
+            }
+        )
+    }
 
     IconTextButton(Icons.Filled.Flag, "Challenge", modifier = Modifier.weight(1f)) {
-        display.value = true
+        display = true
     }
 
 }
@@ -600,6 +605,8 @@ private fun RecentActivity(
                     actual = state.challengeMetric,
                     type = state.activity.type
                 )
+
+                Spacer(modifier = Modifier.height(8.dp))
 
                 if (state.activity.isGoalSet()) {
                     val aheadInDays = state.activity.getChallengeAheadDays(state.challengeMetric)
