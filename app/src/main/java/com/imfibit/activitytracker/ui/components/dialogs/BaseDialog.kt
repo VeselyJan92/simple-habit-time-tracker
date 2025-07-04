@@ -26,24 +26,29 @@ fun rememberDialog(): MutableState<Boolean> {
     }
 }
 
+
 @Composable
+@Deprecated("")
 inline fun BaseDialog(
     modifier: Modifier = Modifier,
     display: MutableState<Boolean>,
-    noinline content: @Composable ColumnScope.() -> Unit
-){
+    noinline content: @Composable ColumnScope.() -> Unit,
+) {
     if (display.value) Dialog(
-        onDismissRequest = {display.value = false},
+        onDismissRequest = { display.value = false },
         properties = DialogProperties(usePlatformDefaultWidth = false)
 
     ) {
         Surface(
             modifier = modifier.width(320.dp),
-            shape = RoundedCornerShape(10.dp),
+            shape = RoundedCornerShape(20.dp),
             shadowElevation = 2.dp,
 
-        ){
-            Column(content = content, )
+            ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                content = content
+            )
         }
     }
 }
@@ -51,36 +56,28 @@ inline fun BaseDialog(
 @Composable
 inline fun BaseDialogV2(
     noinline onDismissRequest: () -> Unit,
-    noinline content: @Composable() (ColumnScope.() -> Unit)
-){
+    paddingValues: PaddingValues = PaddingValues(top = 16.dp,  start = 16.dp, end = 16.dp),
+    noinline content: @Composable() (ColumnScope.() -> Unit),
+) {
     Dialog(
         onDismissRequest = onDismissRequest,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
-
     ) {
         Surface(
-            modifier = Modifier.width(320.dp),
-            shape = RoundedCornerShape(10.dp),
+            shape = RoundedCornerShape(20.dp),
             shadowElevation = 2.dp,
-        ){
-            Column(content = content)
+        ) {
+            Column(
+                modifier = Modifier.padding(paddingValues),
+                content = content
+            )
         }
     }
 }
 
 @Composable
-fun ShowDialog(mutableState: MutableState<Boolean>, content: @Composable () -> Unit) {
-    if (mutableState.value){
-        content()
-    }
-}
-
-
-
-@Composable
-fun DialogBaseHeader(title: String){
+fun DialogBaseHeader(title: String, modifier: Modifier = Modifier) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
     ) {
@@ -96,11 +93,11 @@ fun DialogBaseHeader(title: String){
 }
 
 @Composable
-inline fun DialogButtons(content: @Composable RowScope.() -> Unit){
+inline fun DialogButtons(modifier: Modifier = Modifier, content: @Composable RowScope.() -> Unit) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(end = 16.dp, top = 8.dp, bottom = 8.dp),
+            .padding(top = 8.dp, bottom = 8.dp),
         content = content,
         horizontalArrangement = Arrangement.End
     )

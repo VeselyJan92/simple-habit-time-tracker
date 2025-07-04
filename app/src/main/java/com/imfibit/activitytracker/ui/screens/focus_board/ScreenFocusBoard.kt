@@ -3,7 +3,6 @@ package com.imfibit.activitytracker.ui.screens.focus_board
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -13,13 +12,10 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.LazyRow
@@ -28,7 +24,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.FactCheck
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -49,6 +45,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.glance.layout.padding
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.imfibit.activitytracker.R
@@ -59,7 +56,6 @@ import com.imfibit.activitytracker.database.entities.FocusBoardItemTag
 import com.imfibit.activitytracker.ui.AppTheme
 import com.imfibit.activitytracker.ui.MainBody
 import com.imfibit.activitytracker.ui.components.Colors
-import com.imfibit.activitytracker.ui.components.dialogs.rememberDialog
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -155,24 +151,23 @@ private fun Body(
     MainBody {
         TopBar(tags, swapTags, onTagEdit, onTagDelete)
 
-        Column(Modifier.padding(8.dp)) {
+        HeaderWithTags(
+            onToggle = onTagToggle,
+            tags = tags,
+        )
 
-            HeaderWithTags(
-                onToggle = onTagToggle,
-                tags = tags,
-            )
+        FocusBoardItems(
+            tags = tags,
+            focusItems = items,
+            swapFocusItems = swapFocusItems,
+            onFocusItemDelete = onFocusItemDelete,
+            onFocusItemEdit = onFocusItemEdit
+        )
 
-            FocusBoardItems(
-                tags = tags,
-                focusItems = items,
-                swapFocusItems = swapFocusItems,
-                onFocusItemDelete = onFocusItemDelete,
-                onFocusItemEdit = onFocusItemEdit
-            )
-        }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopBar(
     tagsState: List<FocusBoardItemTag>,
@@ -192,34 +187,47 @@ private fun TopBar(
             fontWeight = FontWeight.Black, fontSize = 25.sp
         )
 
-        val createEditTag = rememberDialog()
+        var editLabels by remember { mutableStateOf(false) }
 
+        if (editLabels) {
+            DialogFocusBoardSettings(
+                tags = tagsState,
+                swapTags = swapTags,
+                onTagEdit = onTagEdit,
+                onTagDelete = onTagDelete,
+                onDismissRequest = { editLabels = false }
+            )
+        }
 
-        DialogFocusBoardSettings(
-            display = createEditTag,
-            tags = tagsState,
-            swapTags = swapTags,
-            onTagEdit = onTagEdit,
-            onTagDelete = onTagDelete
-        )
-
-        Row(
-            modifier = Modifier
-                .background(Colors.SuperLight, RoundedCornerShape(5.dp))
-                .padding(4.dp)
-                .clickable { createEditTag.value = true },
-            verticalAlignment = Alignment.CenterVertically
+        Surface(
+            modifier = Modifier,
+            shape = RoundedCornerShape(8.dp),
+            shadowElevation = 1.dp,
+            color = Colors.SuperLight,
         ) {
-            Icon(imageVector = Icons.Default.Edit, contentDescription = null)
+            Row(
+                modifier = Modifier.clickable(onClick = { editLabels = true }),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    imageVector = Icons.Default.EditNote,
+                    contentDescription = ""
+                )
 
-            Spacer(modifier = Modifier.width(8.dp))
 
-            Text(text = "Tags", fontSize = 18.sp, fontWeight = FontWeight.Medium)
+                Text(
+                    modifier = Modifier.padding(8.dp),
+                    text = "Labels",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+            }
         }
     }
 
 }
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -264,10 +272,10 @@ fun FocusBoardItems(
         }
     } else {
         Surface(
-            modifier = Modifier.padding(top = 8.dp),
+            modifier = Modifier.padding(8.dp),
             shape = RoundedCornerShape(20.dp),
             color = Color.White,
-            shadowElevation = 2.dp
+            shadowElevation = 2.dp,
         ) {
             LazyColumn(
                 modifier = Modifier,
@@ -293,6 +301,8 @@ fun FocusBoardItems(
                     }
                 }
             }
+
+
         }
 
     }
@@ -306,7 +316,8 @@ fun HeaderWithTags(
 ) {
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(horizontal = 8.dp)
     ) {
         items(tags, { item -> item.id }) { item ->
             FocusItemTag(
@@ -314,7 +325,7 @@ fun HeaderWithTags(
                 isSelected = item.isChecked,
                 name = item.name,
                 color = item.color.toColor(),
-                modifier = Modifier.padding(vertical = 2.dp),
+                modifier = Modifier,
             )
         }
     }
@@ -340,7 +351,8 @@ fun FocusItemTag(
     ) {
         Row(
             modifier = Modifier.clickable(onClick = onClick),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
 
             if (iconStart != null) {

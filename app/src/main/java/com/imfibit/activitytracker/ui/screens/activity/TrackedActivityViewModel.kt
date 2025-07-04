@@ -8,12 +8,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingSource
+import androidx.paging.PagingSource.LoadParams
+import androidx.paging.PagingSource.LoadResult
+import androidx.paging.PagingState
+import androidx.paging.cachedIn
 import androidx.room.withTransaction
 import com.imfibit.activitytracker.core.BaseViewModel
 import com.imfibit.activitytracker.core.ContextString
 import com.imfibit.activitytracker.core.activityTables
 import com.imfibit.activitytracker.core.extensions.swap
 import com.imfibit.activitytracker.core.invalidationStateFlow
+import com.imfibit.activitytracker.core.registerInvalidationTracker
 import com.imfibit.activitytracker.core.services.TrackTimeService
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.embedable.TimeRange
@@ -69,6 +77,19 @@ class TrackedActivityViewModel @Inject constructor(
     }
 
     val id = savedStateHandle.toRoute<Destinations.ScreenActivity>().activityId
+
+    private lateinit var source: MonthsPagingSource
+
+    init {
+        registerInvalidationTracker(db, *activityTables){
+            source.invalidate()
+        }
+    }
+
+    val months = Pager(PagingConfig(MonthsPagingSource.PAGE_SIZE) ){
+        source = MonthsPagingSource(rep, id)
+        source
+    }.flow.cachedIn(viewModelScope)
 
     //For better edittext performance save the name of the activity when user is done with the screen
     val activityName = mutableStateOf<String?>(null)
@@ -246,5 +267,36 @@ class TrackedActivityViewModel @Inject constructor(
 
 
 }
+
+
+class MonthsPagingSource(
+    val rep: RepositoryTrackedActivity,
+    val activityId: Long
+) : PagingSource<Int, RepositoryTrackedActivity.Month>() {
+
+    companion object {
+        const val PAGE_SIZE = 6
+    }
+
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, RepositoryTrackedActivity.Month> {
+
+        val month = params.key ?: 0
+
+        val months = List(PAGE_SIZE){
+            rep.getMonthData(activityId, YearMonth.now().minusMonths((month * PAGE_SIZE +  it).toLong()))
+        }
+
+        return LoadResult.Page(
+            data = months,
+            prevKey =   null,
+            nextKey = month + 1
+        )
+    }
+
+    override fun getRefreshKey(state: PagingState<Int, RepositoryTrackedActivity.Month>): Int? {
+        return 0
+    }
+}
+
 
 

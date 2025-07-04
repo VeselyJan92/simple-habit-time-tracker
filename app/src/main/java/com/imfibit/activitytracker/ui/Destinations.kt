@@ -22,12 +22,6 @@ object Destinations {
         val activityId: Long
     )
 
-    @Serializable
-    data class ScreenActivityHistory(
-        val activityId: Long
-    )
-
-
     //TODO add in future
    /* @Serializable
     data class DialogActivityDayHistory(

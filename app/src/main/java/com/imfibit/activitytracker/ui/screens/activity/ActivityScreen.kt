@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.TestTag
@@ -40,10 +41,10 @@ import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.imfibit.activitytracker.ui.Destinations
 import com.imfibit.activitytracker.ui.components.*
 import com.imfibit.activitytracker.ui.components.dialogs.*
 import com.imfibit.activitytracker.ui.components.util.TestableContent
+import com.imfibit.activitytracker.ui.screens.activity_history.BottomSheetActivityHistory
 import com.imfibit.activitytracker.ui.screens.activity_list.ActionButton
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.ActionButton.DEFAULT
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.ActionButton.IN_SESSION
@@ -68,6 +69,19 @@ fun ScreenTrackedActivity(
 
     val name = vm.activityName.value
 
+    var showHistoryBottomSheet by remember { mutableStateOf(false) }
+
+    if (showHistoryBottomSheet) {
+        val data = vm.data.collectAsStateWithLifecycle()
+
+        BottomSheetActivityHistory(
+            onDismissRequest = { showHistoryBottomSheet = false },
+            activity = data.value?.activity,
+            months = vm.months,
+            nav = nav,
+        )
+    }
+
     ScreenTrackedActivity(
         nav = nav,
         vm = vm,
@@ -84,7 +98,9 @@ fun ScreenTrackedActivity(
         },
         onDeleteActivity = vm::deleteActivity,
         onActivityNameUpdate = vm::refreshName,
-        onNavigateToHistory = { nav.navigate(Destinations.ScreenActivityHistory(it.id)) },
+        onNavigateToHistory = {
+            showHistoryBottomSheet = true
+        },
         onNavigateBack = { nav.popBackStack() }
     )
 }
@@ -511,7 +527,7 @@ private fun RowScope.SetChallange(state: TrackedActivityState, vm: TrackedActivi
 
     var display by remember { mutableStateOf(false) }
 
-    if (display){
+    if (display) {
         BottomSheetProgressGoal(
             activity = state.activity,
             getLiveMetric = { from, to -> vm.getChallengeMetric(from, to) },
