@@ -14,34 +14,12 @@ fun <T> MutableList<T>.swap(from: Int, to: Int) {
     this[to] = t
 }
 
-
-fun <T>  MutableState<List<T>>.swap(from: LazyListItemInfo, to: LazyListItemInfo){
-    this.value = this.value.toMutableList().apply { swap(from.index, to.index) }
-}
-
 fun <T>  MutableStateFlow<List<T>>.swap(from: LazyListItemInfo, to: LazyListItemInfo){
     this.value = this.value.toMutableList().apply { swap(from.index, to.index) }
 }
 
 fun <T>  MutableStateFlow<List<T>>.swap(from: Int, to: Int){
     this.value = this.value.toMutableList().apply { swap(from, to) }
-}
-
-@Composable
-fun <T> rememberReorderList(items: List<T>): MutableState<List<T>> {
-    val state =  remember(items) {
-        mutableStateOf(items)
-    }
-    return state
-}
-
-
-fun <T> MutableSet<T>.toggle(item: T){
-    if (contains(item)){
-        remove(item)
-    }else{
-        add(item)
-    }
 }
 
 private val alphanumeric = ('A'..'Z') + ('a'..'z') + ('0'..'9')

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -45,7 +46,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.TestTag
-import com.imfibit.activitytracker.core.extensions.navigate
+import com.imfibit.activitytracker.core.navigation.navigate
 import com.imfibit.activitytracker.core.value
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.embedable.TimeRange
@@ -56,7 +57,7 @@ import com.imfibit.activitytracker.database.entities.TrackedActivityScore
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.ui.Destinations
-import com.imfibit.activitytracker.ui.MainBody
+import com.imfibit.activitytracker.ui.DashboardBody
 import com.imfibit.activitytracker.ui.components.BaseMetricBlock
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.util.TestableContent
@@ -74,7 +75,7 @@ fun ScreenActivities(
 
     val recordVM = hiltViewModel<RecordViewModel>()
 
-    MainBody {
+    DashboardBody {
         TopBar(
             onGoToSettings = {
                 navController.navigate(Destinations.ScreenSettings)
@@ -248,7 +249,7 @@ private fun Activities(
 
     LazyVerticalGrid(
         state = lazyListState,
-        modifier = Modifier,
+        modifier = Modifier.fillMaxSize(),
         columns = GridCells.Fixed(2),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),

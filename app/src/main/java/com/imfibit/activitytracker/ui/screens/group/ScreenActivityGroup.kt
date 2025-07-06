@@ -27,6 +27,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,8 +40,7 @@ import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
-import com.imfibit.activitytracker.core.extensions.navigate
-import com.imfibit.activitytracker.core.extensions.rememberReorderList
+import com.imfibit.activitytracker.core.navigation.navigate
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
 import com.imfibit.activitytracker.database.entities.TrackedActivityRecord
@@ -156,23 +156,24 @@ fun ScreenActivityGroup(
                     textStyle = TextStyle(fontWeight = FontWeight.Black, fontSize = 25.sp)
                 )
 
-                val dialogDelete = remember {
-                    mutableStateOf(false)
-                }
+                var dialogDelete by remember { mutableStateOf(false) }
 
-                DialogAgree(
-                    display = dialogDelete,
-                    title = stringResource(id = R.string.screen_group_delete_group).uppercase(),
-                    onAction = { delete ->
-                        dialogDelete.value = false
+                if (dialogDelete){
+                    DialogAgree(
+                        onDismissRequest = { dialogDelete = false },
+                        title = stringResource(id = R.string.screen_group_delete_group).uppercase(),
+                        onAction = { delete ->
+                            dialogDelete = false
 
-                        val tobeDeleted = group
+                            val tobeDeleted = group
 
-                        if (delete && tobeDeleted != null) {
-                            onDelete(tobeDeleted)
+                            if (delete && tobeDeleted != null) {
+                                onDelete(tobeDeleted)
+                            }
                         }
-                    }
-                )
+                    )
+
+                }
 
                 Icon(
                     contentDescription = null,
@@ -182,7 +183,7 @@ fun ScreenActivityGroup(
                         .padding(start = 16.dp)
                         .clickable(
                             onClick = {
-                                dialogDelete.value = true
+                                dialogDelete = true
                             }
                         )
                 )
@@ -212,9 +213,8 @@ private fun ScreenBody(
     onAddRecord: (TrackedActivityRecord) -> Unit,
     onNavigateToActivity: (TrackedActivity) -> Unit,
 ) {
-    val activities = rememberReorderList(items = activities)
 
-    if (activities.value.isEmpty()) {
+    if (activities.isEmpty()) {
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -253,7 +253,7 @@ private fun ScreenBody(
             contentPadding = PaddingValues(8.dp)
         ) {
 
-            items(activities.value, key = { item -> item.activity.id }) { item ->
+            items(activities, key = { item -> item.activity.id }) { item ->
                 ReorderableItem(
                     state = reorderableLazyListState,
                     key = item.activity.id

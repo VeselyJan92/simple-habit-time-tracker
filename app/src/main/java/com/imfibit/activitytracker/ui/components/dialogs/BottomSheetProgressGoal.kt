@@ -18,6 +18,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
@@ -30,9 +31,10 @@ import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.AppTheme
 import com.imfibit.activitytracker.ui.components.ScrollBottomSheet
+import com.imfibit.activitytracker.ui.components.dialogs.system.DatePickerDialog
 import com.imfibit.activitytracker.ui.components.rememberAppBottomSheetState
 import com.imfibit.activitytracker.ui.components.rememberTestBottomSheetState
-import com.imfibit.activitytracker.ui.widgets.custom.GoalProgressBar
+import com.imfibit.activitytracker.ui.components.GoalProgressBar
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import java.time.LocalDate
@@ -69,17 +71,13 @@ fun BottomSheetProgressGoal(
     state = state,
     onDismissRequest = onDismissRequest,
 ) { onDismissRequest ->
-
-
-    val defaultName = stringResource(R.string.dialog_challenge_name_default)
-
-    val challenge = remember(activity.challenge) {
+    var challenge by remember(activity.challenge) {
 
         val value = if (activity.challenge.isSet()) {
             activity.challenge
         } else {
             TrackedActivityChallenge(
-                defaultName,
+                "",
                 0,
                 LocalDate.now(),
                 LocalDate.now().plusMonths(1L)
@@ -88,7 +86,6 @@ fun BottomSheetProgressGoal(
 
         mutableStateOf(value)
     }
-
 
     Text(
         text = stringResource(R.string.dialog_challenge_title),
@@ -102,15 +99,16 @@ fun BottomSheetProgressGoal(
     Spacer(modifier = Modifier.height(16.dp))
 
     OutlinedTextField(
+        keyboardOptions = KeyboardOptions(KeyboardCapitalization.Sentences),
         label = { Text(text = stringResource(R.string.dialog_challenge_name)) },
         modifier = Modifier
             .fillMaxWidth(),
-        value = challenge.value.name,
+        value = challenge.name,
         singleLine = true,
         textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
         onValueChange = {
             if (it.length < 30) {
-                challenge.value = challenge.value.copy(name = it)
+                challenge = challenge.copy(name = it)
             }
         },
     )
@@ -119,9 +117,9 @@ fun BottomSheetProgressGoal(
 
     RangeItem(
         label = stringResource(R.string.dialog_challenge_from),
-        date = challenge.value.from,
+        date = challenge.from,
         onDateSet = {
-            challenge.value = challenge.value.copy(from = it)
+            challenge = challenge.copy(from = it)
         },
     )
 
@@ -130,9 +128,9 @@ fun BottomSheetProgressGoal(
 
     RangeItem(
         label = stringResource(R.string.dialog_challenge_to),
-        date = challenge.value.to,
+        date = challenge.to,
         onDateSet = {
-            challenge.value = challenge.value.copy(to = it)
+            challenge = challenge.copy(to = it)
         },
     )
 
@@ -147,7 +145,7 @@ fun BottomSheetProgressGoal(
 
 
     val toDisplay =
-        if (challenge.value.target == 0L) "" else challenge.value.format(activity.type)
+        if (challenge.target == 0L) "" else challenge.format(activity.type)
             .toString()
 
     OutlinedTextField(
@@ -164,26 +162,25 @@ fun BottomSheetProgressGoal(
                 0L
             }
 
-            challenge.value =
-                challenge.value.copy(target = if (activity.type == TrackedActivity.Type.TIME) value * 3600 else value)
+            val target = if (activity.type == TrackedActivity.Type.TIME) value * 3600 else value
+
+            challenge = challenge.copy(target = target)
         },
     )
 
-    val metric = remember {
-        mutableStateOf(0L)
-    }
+    var metric by remember { mutableStateOf(0L) }
 
-    LaunchedEffect(challenge.value.from, challenge.value.to) {
-        metric.value = getLiveMetric(challenge.value.from, challenge.value.to)
+    LaunchedEffect(challenge.from, challenge.to) {
+        metric = getLiveMetric(challenge.from, challenge.to)
     }
 
     Spacer(modifier = Modifier.height(24.dp))
 
-    GoalProgressBar(challenge.value, actual = metric.value, activity.type)
+    GoalProgressBar(challenge, actual = metric, activity.type)
 
     Spacer(modifier = Modifier.height(8.dp))
 
-    if (!activity.goal.isSet() || !challenge.value.isSet()) {
+    if (!activity.goal.isSet() || !challenge.isSet()) {
         Text(
             modifier = Modifier
                 .padding(horizontal = 8.dp)
@@ -191,7 +188,7 @@ fun BottomSheetProgressGoal(
             text = stringResource(R.string.dialog_challenge_not_set),
             style = TextStyle(textAlign = TextAlign.Center)
         )
-    } else if (challenge.value.target > metric.value) {
+    } else if (challenge.target > metric) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -200,7 +197,7 @@ fun BottomSheetProgressGoal(
         ) {
 
             val totalDays =
-                ((challenge.value.target - metric.value) / activity.goal.metricPerDay()).toInt()
+                ((challenge.target - metric) / activity.goal.metricPerDay()).toInt()
 
             val estimated = if (totalDays / 30 == 0) {
                 stringResource(id = R.string.dialog_challenge_estimated_days, totalDays)
@@ -233,9 +230,9 @@ fun BottomSheetProgressGoal(
 
             Spacer(modifier = Modifier.padding(vertical = 8.dp))
 
-            val aheadInDays = Period.between(estimatedEndDate, challenge.value.to).days
+            val aheadInDays = Period.between(estimatedEndDate, challenge.to).days
 
-            if (estimatedEndDate > challenge.value.to) {
+            if (estimatedEndDate > challenge.to) {
                 Text(
                     text = stringResource(R.string.dialog_challenge_impossible),
                     style = TextStyle(color = Color.Red, textAlign = TextAlign.Center)
@@ -254,19 +251,29 @@ fun BottomSheetProgressGoal(
     }
 
     DialogButtons {
-        TextButton(onClick = { onDismissRequest() }) {
+        TextButton(
+            onClick = {
+                onDismissRequest(null)
+            }
+        ) {
             Text(text = stringResource(id = R.string.dialog_action_cancel))
         }
 
-        TextButton(onClick = { onDismissRequest { onDelete() } }) {
+        TextButton(
+            onClick = {
+                onDismissRequest {
+                    onDelete()
+                }
+            }
+        ) {
             Text(text = stringResource(id = R.string.dialog_action_delete))
         }
 
         TextButton(
             onClick = {
-                if (challenge.value.target != 0L && challenge.value.name.isNotBlank()) {
+                if (challenge.target != 0L && challenge.name.isNotBlank()) {
                     onDismissRequest {
-                        onSet(challenge.value)
+                        onSet(challenge)
                     }
                 }
             }
@@ -275,7 +282,6 @@ fun BottomSheetProgressGoal(
         }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -286,29 +292,17 @@ private fun RangeItem(
     val formatter = remember { DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM) }
 
     var showPicker by remember { mutableStateOf(false) }
-
     if (showPicker) {
-        val dateState = rememberDatePickerState(initialSelectedDate = date)
-
         DatePickerDialog(
             onDismissRequest = {
                 showPicker = false
             },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        onDateSet(dateState.getSelectedDate() ?: LocalDate.now())
-                        showPicker = false
-                    }
-                ) {
-                    Text(text = stringResource(id = R.string.dialog_action_continue))
-                }
+            date = date,
+            onDatePicked = {
+                onDateSet(it ?: LocalDate.now())
+                showPicker = false
             }
-        ) {
-            DatePicker(
-                state = dateState,
-            )
-        }
+        )
     }
 
     val interactionSource = remember {
@@ -333,6 +327,7 @@ private fun RangeItem(
     }
 
     OutlinedTextField(
+        keyboardOptions = KeyboardOptions(KeyboardCapitalization.Sentences),
         label = { Text(text = label) },
         value = date.format(formatter),
         onValueChange = { /* This field is not directly editable */ },

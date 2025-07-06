@@ -9,9 +9,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,18 +26,6 @@ import java.time.LocalDateTime
 val labelHeight = 13.dp
 val metricHeight = 20.dp
 val metricTextStyle = TextStyle(fontSize = 10.sp, fontWeight = FontWeight.W600)
-
-data class Editable(
-    val type: TrackedActivity.Type,
-    val metric: Long,
-    val from: LocalDateTime,
-    val to: LocalDateTime,
-    val activityId: Long = 0,
-    val recordId: Long = 0,
-){
-    fun isRecord() = recordId != 0L
-}
-
 
 class MetricWidgetData(
     val value: ContextString,
@@ -55,36 +45,31 @@ fun BaseMetricBlock(
     metricStyle: TextStyle = metricTextStyle,
     onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
-){
-    val clickable = if(onClick != null)
-        Modifier.combinedClickable(onClick = onClick, onLongClick = onLongClick)
-    else
-        Modifier
-
-    val width = if (width == 0.dp)
-        Modifier
-            .height(metricHeight)
-    else
-        Modifier.size(width, metricHeight)
-
-
-    Box(
-        modifier = Modifier
-            .padding(top = if (labelOffset) labelHeight else 0.dp)
-            .then(width)
-            .background(color, RoundedCornerShape(8.dp))
-            .then(modifier)
-            .then(clickable),
-        contentAlignment = Alignment.Center
-    ){
-        Text(
-            text = metric,
-            modifier = Modifier.align(Alignment.Center),
-            style = metricStyle
+) {
+    val boxModifier = Modifier
+        .padding(top = if (labelOffset) labelHeight else 0.dp)
+        .then(
+            if (width == 0.dp) Modifier.height(metricHeight) else Modifier.size(width, metricHeight)
         )
-    }
-}
+        .clip(RoundedCornerShape(8.dp))
+        .background(color)
+        .then(modifier)
+        .then(
+            if (onClick != null) Modifier.combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            ) else Modifier
+        )
+        .wrapContentHeight(align = Alignment.CenterVertically)
 
+    Text(
+        textAlign = TextAlign.Center,
+        modifier = boxModifier,
+        text = metric,
+        style = metricStyle
+    )
+
+}
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -95,18 +80,18 @@ fun LabeledMetricBlock(
     color: Color, width: Dp = 40.dp,
     onLongClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
-    metricStyle: TextStyle =  metricTextStyle,
-    onClick: (() -> Unit)? = null
-){
+    metricStyle: TextStyle = metricTextStyle,
+    onClick: (() -> Unit)? = null,
+) {
 
-    val clickable = if(onLongClick != null)
-        Modifier.combinedClickable(onClick = {}, onLongClick = onLongClick, )
+    val clickable = if (onLongClick != null)
+        Modifier.combinedClickable(onClick = {}, onLongClick = onLongClick)
     else
         Modifier
 
-    val width = if (width == 0.dp){
+    val width = if (width == 0.dp) {
         Modifier.fillMaxWidth(1f)
-    }else{
+    } else {
         Modifier.width(width)
     }
 
@@ -116,8 +101,13 @@ fun LabeledMetricBlock(
             .height(metricHeight + labelHeight)
             .then(clickable),
 
-        horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = label, style = TextStyle(fontSize = 10.sp), modifier = Modifier.height(labelHeight))
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = label,
+            style = TextStyle(fontSize = 10.sp),
+            modifier = Modifier.height(labelHeight)
+        )
         BaseMetricBlock(
             metric = metric,
             color = color,
@@ -141,9 +131,9 @@ fun MetricBlock(
     metricStyle: TextStyle = metricTextStyle,
     onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
-){
+) {
 
-    if(data.label == null) {
+    if (data.label == null) {
         BaseMetricBlock(
             metric = data.value.value(),
             color = data.color,
@@ -153,7 +143,7 @@ fun MetricBlock(
             metricStyle = metricStyle,
             onClick = onClick,
         )
-    }else{
+    } else {
         LabeledMetricBlock(
             metric = data.value.value(),
             label = data.label.value(),

@@ -2,6 +2,8 @@ package com.imfibit.activitytracker.database
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.room.ColumnInfo
+import androidx.room.PrimaryKey
 import com.imfibit.activitytracker.core.getFullMonthBlockDays
 import com.imfibit.activitytracker.core.iter
 import com.imfibit.activitytracker.core.toSequence
@@ -13,10 +15,12 @@ import com.imfibit.activitytracker.database.entities.DailyChecklistItem
 import com.imfibit.activitytracker.database.entities.DailyChecklistTimelineItem
 import com.imfibit.activitytracker.database.entities.FocusBoardItem
 import com.imfibit.activitytracker.database.entities.FocusBoardItemTag
+import com.imfibit.activitytracker.database.entities.PresetTimer
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
 import com.imfibit.activitytracker.database.entities.TrackedActivityScore
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
+import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.Colors.chooseableColors
@@ -27,6 +31,13 @@ import java.util.*
 import kotlin.random.Random.Default.nextInt
 
 object DevSeeder {
+
+    fun getPresetTimer(
+        id: Long = 0,
+        activity_id: Long = 0,
+        seconds: Int = 60 * 30,
+        position: Int = 0
+    ) = PresetTimer( id, activity_id, seconds, position)
 
 
     fun getDailyChecklistItem() = DailyChecklistItem(title = "Workout", color = chooseableColors[4].toArgb(), description = "Plan your workout")
@@ -62,27 +73,71 @@ object DevSeeder {
         return RepositoryTrackedActivity.Month(weeks, date)
     }
 
-    fun getTrackedActivityTime() = TrackedActivity(
-        id = -1,
-        groupId = -1,
-        name = "Test activity",
-        position = 0,
-        groupPosition = 0,
-        type = TrackedActivity.Type.TIME,
-        inSessionSince = null,
-        goal = TrackedActivityGoal(0, TimeRange.DAILY),
-        challenge = TrackedActivityChallenge(
-            name = "", target = -1, from = LocalDate.now(), to = LocalDate.now()
-        )
+    fun getActivityGroup(
+        id: Long = 0,
+        name: String = "Name",
+        position: Int = 0
+    ) = TrackerActivityGroup(
+        id = id,
+        name = name,
+        position = position
     )
 
-    fun getTrackedActivityCompletion() = TrackedActivity(
+    fun getTrackedActivityTime(
+        id: Long = -1,
+        groupId: Long = -1,
+        name: String = "Test activity",
+        position: Int = 0,
+        groupPosition: Int = 0,
+        type: TrackedActivity.Type = TrackedActivity.Type.TIME,
+        inSessionSince: LocalDateTime? = null,
+        goal: TrackedActivityGoal = TrackedActivityGoal(60 * 60, TimeRange.DAILY),
+        challenge: TrackedActivityChallenge = TrackedActivityChallenge(
+            name = "Research", target = 60 * 60 * 10, from = LocalDate.now(), to = LocalDate.now().plusDays(10)
+        )
+    ) = TrackedActivity(
+        id = id,
+        groupId = groupId,
+        name = name,
+        position = position,
+        groupPosition = groupPosition,
+        type = type,
+        inSessionSince = inSessionSince,
+        goal = goal,
+        challenge = challenge
+    )
+
+    fun getTrackedActivityCompletion(
+        id: Long = -1,
+        groupId: Long = -1,
+        name: String = "Test activity",
+        position: Int = 0,
+        groupPosition: Int = 0,
+        type: TrackedActivity.Type = TrackedActivity.Type.CHECKED,
+        inSessionSince: LocalDateTime? = null,
+        goal: TrackedActivityGoal = TrackedActivityGoal(0, TimeRange.DAILY),
+        challenge: TrackedActivityChallenge = TrackedActivityChallenge(
+            name = "", target = -1, from = LocalDate.now(), to = LocalDate.now()
+        )
+    ) = TrackedActivity(
+        id = id,
+        groupId = groupId,
+        name = name,
+        position = position,
+        groupPosition = groupPosition,
+        type = type,
+        inSessionSince = inSessionSince,
+        goal = goal,
+        challenge = challenge
+    )
+
+    fun getTrackedActivityScore() = TrackedActivity(
         id = -1,
         groupId = -1,
         name = "Test activity",
         position = 0,
         groupPosition = 0,
-        type = TrackedActivity.Type.CHECKED,
+        type = TrackedActivity.Type.SCORE,
         inSessionSince = null,
         goal = TrackedActivityGoal(0, TimeRange.DAILY),
         challenge = TrackedActivityChallenge(

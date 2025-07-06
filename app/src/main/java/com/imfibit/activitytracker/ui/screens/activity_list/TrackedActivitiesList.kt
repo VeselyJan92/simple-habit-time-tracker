@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -60,7 +59,7 @@ import com.imfibit.activitytracker.ui.components.MetricBlock
 import com.imfibit.activitytracker.ui.components.MetricWidgetData
 import com.imfibit.activitytracker.ui.components.TimerBlock
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.ActionButton
-import com.imfibit.activitytracker.ui.widgets.custom.GoalProgressBar
+import com.imfibit.activitytracker.ui.components.GoalProgressBar
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive

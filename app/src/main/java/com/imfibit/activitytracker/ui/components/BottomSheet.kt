@@ -48,9 +48,7 @@ fun BaseBottomSheet(
     onDismissRequest: () -> Unit,
     state: SheetState,
     paddingValues: PaddingValues = PaddingValues(horizontal = 16.dp),
-    content: @Composable ColumnScope.(
-        onDismissRequest: (action: (() -> Unit)?) -> Unit,
-    ) -> Unit,
+    content: @Composable ColumnScope.(onDismissRequest: (action: (() -> Unit)?) -> Unit, ) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
 

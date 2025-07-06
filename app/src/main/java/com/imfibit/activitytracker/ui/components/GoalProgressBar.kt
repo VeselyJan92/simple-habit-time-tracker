@@ -1,4 +1,4 @@
-package com.imfibit.activitytracker.ui.widgets.custom
+package com.imfibit.activitytracker.ui.components
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.sp
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
 import com.imfibit.activitytracker.database.entities.TrackedActivity
-import com.imfibit.activitytracker.ui.components.Colors
 
 @Composable
 fun GoalProgressBar(challenge: TrackedActivityChallenge, actual: Long, type: TrackedActivity.Type) =

@@ -17,6 +17,7 @@ import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.core.notifications.NotificationLiveSession
 import com.imfibit.activitytracker.core.notifications.NotificationTimerOver
 import com.imfibit.activitytracker.database.AppDatabase
+import com.imfibit.activitytracker.ui.components.Colors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -55,6 +56,7 @@ class MainActivity : ComponentActivity() {
 fun AppTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = MaterialTheme.colorScheme.copy(
+            background = Colors.AppBackground,
             surface = Color.White,
             surfaceContainerLow = Color.White
         )
@@ -67,10 +69,8 @@ val LocalNavController = compositionLocalOf<NavHostController> {
     error("No LocalNavController provided")
 }
 
-
-
 @Composable
-fun MainBody(content: @Composable (ColumnScope.() -> Unit)) {
+fun DashboardBody(content: @Composable (ColumnScope.() -> Unit)) {
     Column(modifier = Modifier.fillMaxSize(), content = content)
 }
 

@@ -6,14 +6,17 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FileDownload
@@ -31,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationManagerCompat
+import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
@@ -43,18 +47,27 @@ import java.time.format.DateTimeFormatter
 fun ScreenSetting(navControl: NavHostController) {
 
     Scaffold(
-        modifier =  Modifier.safeDrawingPadding(),
+        modifier = Modifier.safeDrawingPadding(),
         topBar = {
             SimpleTopBar(
-                title =  stringResource(id = R.string.screen_settings_title),
+                title = stringResource(id = R.string.screen_settings_title),
                 onBack = { navControl.popBackStack() }
             )
         },
 
         content = {
-            Column(Modifier.padding(it)) {
-                AppSettings()
-                BackupDatabase()
+            LazyColumn(
+                modifier = Modifier.padding(it),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(8.dp)
+            ) {
+                item {
+                    AppSettings()
+                }
+
+                item {
+                    BackupDatabase()
+                }
             }
         },
 
@@ -71,18 +84,19 @@ fun AppSettings() {
             mutableStateOf(NotificationManagerCompat.from(context).areNotificationsEnabled())
         }
 
-        val startForResult = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()){
-            notificationState.value = it
-        }
+        val startForResult =
+            rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+                notificationState.value = it
+            }
 
         val notificationLabel = if (notificationState.value)
             stringResource(id = R.string.screen_settings_application_group_notifications_enabled)
         else
             stringResource(id = R.string.screen_settings_application_group_notifications_disabled)
 
-        SettingsGroup(stringResource(id = R.string.screen_settings_application_group)){
-            SettingsMenuItem(
-                icon = { Icon(imageVector = Icons.Default.Notifications, null) },
+        SettingsGroup(stringResource(id = R.string.screen_settings_application_group)) {
+            SettingsListItem(
+                icon = Icons.Default.Notifications,
                 title = stringResource(id = R.string.screen_settings_application_group_notifications),
                 subtitle = notificationLabel,
                 onClick = {
@@ -95,42 +109,47 @@ fun AppSettings() {
 
 @Composable
 fun BackupDatabase() {
-    SettingsGroup(stringResource(id = R.string.screen_settings_backup_section)){
+    SettingsGroup(stringResource(id = R.string.screen_settings_backup_section)) {
 
         val context = LocalContext.current
         val vm = hiltViewModel<ScreenSettingVM>()
 
         val unsupported = stringResource(id = R.string.screen_settings_backup_unsupported)
 
-        val export = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("*/*")) {
-            if(it == null)
-                Toast.makeText(context,unsupported , Toast.LENGTH_LONG).show()
-            else
-                vm.exportDB(context, it)
-        }
+        val export =
+            rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("*/*")) {
+                if (it == null)
+                    Toast.makeText(context, unsupported, Toast.LENGTH_LONG).show()
+                else
+                    vm.exportDB(context, it)
+            }
 
         val import = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) {
-            if(it == null)
-                Toast.makeText(context,unsupported , Toast.LENGTH_LONG).show()
+            if (it == null)
+                Toast.makeText(context, unsupported, Toast.LENGTH_LONG).show()
             else
                 vm.importDB(context, it)
         }
 
-        SettingsMenuItem(
-            icon = { Icon(imageVector = Icons.Default.FileDownload, null) },
+        SettingsListItem(
+            icon = Icons.Default.FileDownload,
             title = stringResource(id = R.string.screen_settings_backup_label),
-            subtitle = stringResource(id = R.string.screen_settings_backup_explain) ,
+            subtitle = stringResource(id = R.string.screen_settings_backup_explain),
             onClick = {
-                export.launch("activity_tracker_${LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)}.db")
+                export.launch(
+                    "activity_tracker_${
+                        LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+                    }.db"
+                )
             },
         )
 
         HorizontalDivider()
 
-        SettingsMenuItem(
-            icon = { Icon(imageVector = Icons.Default.FileUpload, null) },
+        SettingsListItem(
+            icon = Icons.Default.FileUpload,
             title = stringResource(id = R.string.screen_settings_restore_label),
-            subtitle =  stringResource(id = R.string.screen_settings_restore_explain),
+            subtitle = stringResource(id = R.string.screen_settings_restore_explain),
             onClick = {
                 import.launch(arrayOf("application/octet-stream"))
             },
@@ -143,11 +162,11 @@ fun BackupDatabase() {
 @Composable
 private fun SettingsGroup(
     title: String,
-    content: @Composable () -> Unit) {
+    content: @Composable () -> Unit,
+) {
 
     Surface(
         modifier = Modifier
-            .padding(8.dp)
             .fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         shadowElevation = 2.dp
@@ -155,7 +174,7 @@ private fun SettingsGroup(
         Column(modifier = Modifier.padding(8.dp)) {
             Text(
                 modifier = Modifier
-                    .padding(bottom = 16.dp),
+                    .padding(start = 8.dp),
                 text = title,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
@@ -168,33 +187,28 @@ private fun SettingsGroup(
 }
 
 
-
 @Composable
-fun SettingsMenuItem(
-    icon: @Composable () -> Unit,
+fun SettingsListItem(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
     title: String,
     subtitle: String,
-    onClick: () -> Unit
-){
-
-    Row( modifier = Modifier.clickable{ onClick()}) {
-        Box(modifier = Modifier.padding(8.dp), contentAlignment = Alignment.Center){
-            icon()
-        }
-
-        Column() {
-            Text(text = title, fontWeight = FontWeight.W600)
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(text = subtitle)
-        }
-
-    }
+    onClick: () -> Unit,
+) {
+    ListItem(
+        headlineContent = { Text(title) },
+        supportingContent = { Text(subtitle) },
+        leadingContent = {
+            Icon(
+                imageVector = icon,
+                contentDescription = null // Title can serve as content description here
+            )
+        },
+        modifier = Modifier.clickable(onClick = onClick)
+    )
 }
 
 @Composable
-fun HorizontalDivider(){
+fun HorizontalDivider() {
     HorizontalDivider(modifier = Modifier.padding(8.dp))
 }
 

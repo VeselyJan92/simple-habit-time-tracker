@@ -1,5 +1,6 @@
 package com.imfibit.activitytracker.ui.components.dialogs
 
+import androidx.compose.animation.core.copy
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +17,9 @@ import androidx.compose.material.icons.filled.Score
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Topic
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -70,10 +73,12 @@ fun AddActivityBottomSheet(
     ) {
         Column(
             modifier = Modifier
-                .padding(horizontal = 8.dp)
+
                 .padding(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+
+            SectionTitle(text = "Habit")
 
             TrackedActivities(
                 modifier = Modifier.testTag(TestTag.DIALOG_ADD_ACTIVITY_TIME),
@@ -91,8 +96,8 @@ fun AddActivityBottomSheet(
 
             TrackedActivities(
                 modifier = Modifier.testTag(TestTag.DIALOG_ADD_ACTIVITY_COMPLETION),
-                Icons.Default.AssignmentTurnedIn,
-                stringResource(id = R.string.new_activity_checked),
+                icon = Icons.Default.AssignmentTurnedIn, // Corrected icon parameter name
+                name = stringResource(id = R.string.new_activity_checked),
                 clickable = { onAddActivity(TrackedActivity.Type.CHECKED) }
             )
 
@@ -103,12 +108,22 @@ fun AddActivityBottomSheet(
                 clickable = onAddFolder
             )
 
+            // Added Divider and spacing for better visual separation
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            SectionTitle(text = "Focus board")
+
             TrackedActivities(
                 modifier = Modifier.testTag(TestTag.DIALOG_ADD_ACTIVITY_FOCUS_ITEM),
                 icon = Icons.AutoMirrored.Filled.Assignment,
                 name = stringResource(id = R.string.new_activity_focus_item),
                 clickable = onAddFocusItem
             )
+
+            // Added Divider and spacing for better visual separation
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            SectionTitle(text = "Daily Checklist")
 
             TrackedActivities(
                 modifier = Modifier.testTag(TestTag.DIALOG_ADD_CHECKLIST_ITEM),
@@ -120,34 +135,44 @@ fun AddActivityBottomSheet(
     }
 }
 
+@Composable
+private fun SectionTitle(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleMedium, // Using MaterialTheme typography
+        modifier = Modifier.padding(vertical = 8.dp) // Added padding to section titles
+    )
+}
+
 
 @Composable
 private fun TrackedActivities(
-    modifier: Modifier,
+    modifier: Modifier = Modifier, // Provide a default value for modifier
     icon: ImageVector,
     name: String,
     clickable: () -> Unit,
 ) {
     Surface(
         modifier = modifier
-            .clickable(onClick = clickable)
+            .fillMaxWidth()
+            .clickable(onClick = clickable),
+        shape = RoundedCornerShape(10.dp),
+        color = Colors.ChipGray
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(Colors.ChipGray, RoundedCornerShape(10.dp))
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Icon(
-                modifier = Modifier.padding(end = 16.dp),
                 imageVector = icon,
-                contentDescription = ""
+                contentDescription = name
             )
 
             Text(
                 text = name,
-                style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
             )
         }
     }

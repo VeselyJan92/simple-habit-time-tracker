@@ -1,4 +1,14 @@
 <resources>
+
+    <plurals name="hours">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+
     <string name="app_name">Activity Time Tracker</string>
 
     <string name="screen_title_activities">Activities</string>
@@ -60,7 +70,7 @@
     <string name="new_activity_checked">Habit</string>
     <string name="new_activity_folder">Group</string>
     <string name="new_activity_focus_item">Focus item</string>
-    <string name="new_activity_daily_checklist_item">Daily checklist</string>
+    <string name="new_activity_daily_checklist_item">Checklist Item</string>
     <string name="cancel">CANCEL</string>
     <string name="dialog_goal_title">PICK GOAL</string>
     <string name="repetitions">Repetitions</string>
@@ -121,7 +131,7 @@
     <string name="dialog_preset_timers_title">Timers</string>
     <string name="dialog_preset_timers_preset">Preset</string>
     <string name="dialog_preset_timers_add">Add</string>
-    <string name="dialog_preset_timers_single">Start a timer</string>
+    <string name="dialog_preset_timers_single">Start custom timer</string>
 
     <string name="dialog_group_picker_title">Select activity group</string>
     <string name="dialog_group_picker_default">Dashboard</string>

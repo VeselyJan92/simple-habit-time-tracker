@@ -1,27 +1,47 @@
 package com.imfibit.activitytracker.ui.screens.statistics
 
-import android.app.DatePickerDialog
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowLeft
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.filled.ArrowLeft
-import androidx.compose.material.icons.filled.ArrowRight
+import androidx.compose.material.icons.filled.AssignmentTurnedIn
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Score
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.outlined.Analytics
-import androidx.compose.runtime.*
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -29,7 +49,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.sumByLong
 import com.imfibit.activitytracker.core.value
@@ -39,6 +58,7 @@ import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.components.BaseMetricBlock
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.SimpleTopBar
+import com.imfibit.activitytracker.ui.components.dialogs.system.DatePickerDialog
 import com.imfibit.activitytracker.ui.screens.activity_list.Goal
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -268,7 +288,17 @@ private fun Navigation(
 
             Spacer(modifier = Modifier.width(50.dp))
 
-            val context = LocalContext.current
+            var showDatePicker by remember { mutableStateOf(false) }
+
+            if (showDatePicker) {
+                DatePickerDialog(
+                    onDismissRequest = { showDatePicker = false },
+                    date = date,
+                    onDatePicked = {
+                        goTo(it ?: LocalDate.now())
+                    }
+                )
+            }
 
             Box(
                 modifier = Modifier
@@ -276,18 +306,9 @@ private fun Navigation(
                     .padding(end = 8.dp)
                     .height(30.dp)
                     .background(Colors.ChipGray, RoundedCornerShape(50))
-                    .clickable(
-                        onClick = {
-                            DatePickerDialog(
-                                context,
-                                0,
-                                { _, i, i2, i3 -> goTo(LocalDate.of(i, i2 + 1, i3)) },
-                                date.year,
-                                date.month.value - 1,
-                                date.dayOfMonth
-                            ).show()
-                        }
-                    ),
+                    .clickable {
+                        showDatePicker = true
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(Icons.Default.CalendarToday, contentDescription = null)

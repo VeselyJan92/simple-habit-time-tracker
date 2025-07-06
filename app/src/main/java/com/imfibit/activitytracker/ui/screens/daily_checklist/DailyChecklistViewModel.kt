@@ -2,10 +2,9 @@ package com.imfibit.activitytracker.ui.screens.daily_checklist
 
 import androidx.compose.foundation.lazy.LazyListItemInfo
 import com.imfibit.activitytracker.core.BaseViewModel
-import com.imfibit.activitytracker.core.dailyChecklistTables
+import com.imfibit.activitytracker.database.dailyChecklistTables
 import com.imfibit.activitytracker.core.extensions.swap
-import com.imfibit.activitytracker.core.invalidationStateFlow
-import com.imfibit.activitytracker.core.services.UserHapticsService
+import com.imfibit.activitytracker.database.invalidationStateFlow
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.entities.DailyChecklistItem
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTimeline
@@ -18,7 +17,6 @@ import javax.inject.Inject
 class DailyChecklistViewModel @Inject constructor(
     private val db: AppDatabase,
     private val rep: RepositoryTimeline,
-    private val hapticsService: UserHapticsService
 ) : BaseViewModel() {
 
     val items = invalidationStateFlow(db, listOf(), *dailyChecklistTables) {
@@ -40,12 +38,11 @@ class DailyChecklistViewModel @Inject constructor(
 
     fun onCheck(checked: Boolean?, item: DailyChecklistItem) = launchIO {
         rep.checkItem(checked, item)
-        hapticsService.activityFeedback()
+
     }
 
     fun onToggleDay(checked: Boolean, date: LocalDate) = launchIO {
         rep.toggleDailyChecklistCompletion(checked, date)
-        hapticsService.activityFeedback()
     }
 
     fun onEdit(item: DailyChecklistItem) = launchIO {

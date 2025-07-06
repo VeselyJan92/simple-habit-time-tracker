@@ -1,6 +1,5 @@
 package com.imfibit.activitytracker.core
 
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 
@@ -11,8 +10,6 @@ inline fun <T> Iterable<T>.sumByLong(selector: (T) -> Long): Long {
     }
     return sum
 }
-
-
 
 fun Int.toColor() = Color(this)
 

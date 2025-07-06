@@ -137,7 +137,7 @@ fun Dashboard(navControl: NavHostController) {
                     }
 
                     val activityId = withContext(Dispatchers.IO) {
-                        vm.createNewActivity(name, it).await()
+                        vm.createNewActivity(name, it)
                     }
 
                     navControl.navigate(Destinations.ScreenActivity(activityId))

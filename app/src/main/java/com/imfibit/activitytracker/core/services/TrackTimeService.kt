@@ -21,15 +21,12 @@ import javax.inject.Inject
 
 class TrackTimeService @Inject constructor(
     private val repository: RepositoryTrackedActivity,
-    private val haptics: UserHapticsService,
     @ApplicationContext private val context: Context,
     private val sessionService: TimeActivityService
 ){
 
     suspend fun startSession(activity: TrackedActivity, start: LocalDateTime = LocalDateTime.now()) {
         repository.activityDAO.update(activity.apply { inSessionSince = start })
-
-        haptics.activityFeedback()
 
         NotificationLiveSession.show(context, activity)
     }

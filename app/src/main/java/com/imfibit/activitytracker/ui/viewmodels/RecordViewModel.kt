@@ -5,7 +5,6 @@ import com.imfibit.activitytracker.core.BaseViewModel
 import com.imfibit.activitytracker.core.services.activity.TimeActivityService
 import com.imfibit.activitytracker.core.services.activity.ToggleActivityService
 import com.imfibit.activitytracker.core.services.TrackTimeService
-import com.imfibit.activitytracker.core.services.UserHapticsService
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
 import com.imfibit.activitytracker.database.entities.TrackedActivityRecord
@@ -25,7 +24,6 @@ class RecordViewModel @Inject constructor(
     private val timerService: TrackTimeService,
     private val toggleService: ToggleActivityService,
     private val sessionService: TimeActivityService,
-    public val hapticsService: UserHapticsService
 ): BaseViewModel() {
 
     fun getActivity(activityId: Long) = rep.activityDAO.getById(activityId)

@@ -3,8 +3,8 @@ package com.imfibit.activitytracker.ui.screens.focus_board
 import androidx.compose.foundation.lazy.LazyListItemInfo
 import com.imfibit.activitytracker.core.BaseViewModel
 import com.imfibit.activitytracker.core.extensions.swap
-import com.imfibit.activitytracker.core.focusBoardTables
-import com.imfibit.activitytracker.core.invalidationStateFlow
+import com.imfibit.activitytracker.database.focusBoardTables
+import com.imfibit.activitytracker.database.invalidationStateFlow
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.composed.FocusBoardItemWithTags
 import com.imfibit.activitytracker.database.entities.FocusBoardItemTag

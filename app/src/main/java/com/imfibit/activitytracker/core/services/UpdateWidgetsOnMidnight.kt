@@ -6,7 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.imfibit.activitytracker.core.createInvalidationTacker
+import com.imfibit.activitytracker.database.createInvalidationTacker
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion

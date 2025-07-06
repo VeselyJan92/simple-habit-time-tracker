@@ -1,7 +1,6 @@
 package com.imfibit.activitytracker.ui.components.dialogs
 
 import androidx.compose.material3.Text
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
@@ -16,72 +15,38 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 
 
 @Composable
 fun rememberDialog(): MutableState<Boolean> {
-    return remember {
-        mutableStateOf(false)
-    }
+    return remember { mutableStateOf(false) }
 }
 
 @Composable
-inline fun BaseDialog(
-    modifier: Modifier = Modifier,
-    display: MutableState<Boolean>,
-    noinline content: @Composable ColumnScope.() -> Unit
-){
-    if (display.value) Dialog(
-        onDismissRequest = {display.value = false},
-        properties = DialogProperties(usePlatformDefaultWidth = false)
-
-    ) {
-        Surface(
-            modifier = modifier.width(320.dp),
-            shape = RoundedCornerShape(10.dp),
-            shadowElevation = 2.dp,
-
-        ){
-            Column(content = content, )
-        }
-    }
-}
-
-@Composable
-inline fun BaseDialogV2(
-    noinline onDismissRequest: () -> Unit,
-    noinline content: @Composable() (ColumnScope.() -> Unit)
-){
+fun BaseDialog(
+    onDismissRequest: () -> Unit,
+    paddingValues: PaddingValues = PaddingValues(top = 16.dp,  start = 16.dp, end = 16.dp),
+    content: @Composable() (ColumnScope.() -> Unit),
+) {
     Dialog(
         onDismissRequest = onDismissRequest,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
-
     ) {
         Surface(
-            modifier = Modifier.width(320.dp),
-            shape = RoundedCornerShape(10.dp),
+            shape = RoundedCornerShape(20.dp),
             shadowElevation = 2.dp,
-        ){
-            Column(content = content)
+        ) {
+            Column(
+                modifier = Modifier.padding(paddingValues),
+                content = content
+            )
         }
     }
 }
 
 @Composable
-fun ShowDialog(mutableState: MutableState<Boolean>, content: @Composable () -> Unit) {
-    if (mutableState.value){
-        content()
-    }
-}
-
-
-
-@Composable
-fun DialogBaseHeader(title: String){
+fun DialogBaseHeader(title: String, modifier: Modifier = Modifier) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .padding(8.dp)
     ) {
         Text(
@@ -96,11 +61,11 @@ fun DialogBaseHeader(title: String){
 }
 
 @Composable
-inline fun DialogButtons(content: @Composable RowScope.() -> Unit){
+inline fun DialogButtons(modifier: Modifier = Modifier, content: @Composable RowScope.() -> Unit) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(end = 16.dp, top = 8.dp, bottom = 8.dp),
+            .padding(top = 8.dp, bottom = 8.dp),
         content = content,
         horizontalArrangement = Arrangement.End
     )

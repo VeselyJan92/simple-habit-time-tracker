@@ -6,9 +6,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.imfibit.activitytracker.core.BaseViewModel
-import com.imfibit.activitytracker.core.activityTables
+import com.imfibit.activitytracker.database.activityTables
 import com.imfibit.activitytracker.core.extensions.swap
-import com.imfibit.activitytracker.core.invalidationStateFlow
+import com.imfibit.activitytracker.database.invalidationStateFlow
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity

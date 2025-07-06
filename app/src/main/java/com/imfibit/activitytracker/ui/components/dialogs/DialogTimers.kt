@@ -10,93 +10,90 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.AlarmAdd
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.TimeUtils
+import com.imfibit.activitytracker.database.DevSeeder
 import com.imfibit.activitytracker.database.entities.PresetTimer
 import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.ui.AppTheme
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.IconButton
 import com.imfibit.activitytracker.ui.components.dialogs.system.DialogTimePicker
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
-import java.time.LocalTime
+
+@Preview
+@Composable
+fun DialogTimers_Preview() = AppTheme() {
+    DialogTimers(
+        onDismissRequest = {},
+        activity = DevSeeder.getTrackedActivityTime(),
+        timers = listOf(
+            DevSeeder.getPresetTimer(id = 1),
+            DevSeeder.getPresetTimer(id = 2)
+        ),
+        onTimerDelete = {},
+        onTimerAdd = {},
+        swapTimer = { _, _ -> },
+        runTimer = {}
+    )
+}
 
 @Composable
-inline fun DialogTimers(
-    display: MutableState<Boolean> = mutableStateOf(true),
+fun DialogTimers(
+    onDismissRequest: () -> Unit,
     activity: TrackedActivity,
     timers: List<PresetTimer>,
-    noinline onTimerDelete: ((timer: PresetTimer) -> Unit),
-    noinline onTimerAdd: ((timer: PresetTimer) -> Unit),
-    noinline swapTimer: (LazyListItemInfo, LazyListItemInfo) -> Unit,
-    noinline runTimer: ((timer: PresetTimer) -> Unit),
-) = BaseDialog(display = display) {
-
-    DialogBaseHeader(title = stringResource(R.string.dialog_preset_timers_title))
+    onTimerDelete: ((timer: PresetTimer) -> Unit),
+    onTimerAdd: ((timer: PresetTimer) -> Unit),
+    swapTimer: (LazyListItemInfo, LazyListItemInfo) -> Unit,
+    runTimer: ((timer: PresetTimer) -> Unit),
+) = BaseDialog(onDismissRequest = onDismissRequest) {
 
     Row(
         modifier = Modifier
-            .padding(top = 16.dp, start = 12.dp, end = 8.dp)
             .fillMaxWidth(),
-        verticalAlignment = Alignment.Bottom,
+        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-
-        val context = LocalContext.current
-
-        IconButton(
-            text = stringResource(R.string.dialog_preset_timers_single), icon = Icons.Default.Alarm
-        ) {
-            DialogTimePicker(
-                time = LocalTime.MIDNIGHT, onTimeSet = {
-                    runTimer.invoke(
-                        PresetTimer(
-                            0, activity.id, it.hour * 3600 + it.minute * 60, 0
-                        )
-                    )
-                }, context = context
-            )
-        }
+        DialogBaseHeader(title = stringResource(R.string.dialog_preset_timers_title))
 
         Spacer(modifier = Modifier.padding(8.dp))
 
-        IconButton(
-            text = stringResource(R.string.dialog_preset_timers_add), icon = Icons.Filled.AlarmAdd
-        ) {
+        var add by remember { mutableStateOf(false) }
+
+        if (add) {
             DialogTimePicker(
-                time = LocalTime.MIDNIGHT, onTimeSet = {
-                    onTimerAdd.invoke(
-                        PresetTimer(
-                            0, activity.id, it.hour * 3600 + it.minute * 60, 0
-                        )
-                    )
-                    display.value = false
-                }, context = context
+                onDismissRequest = { add = false },
+                initialHour = 1,
+                initialMinute = 0,
+                onTimePicked = { hour, minute ->
+                    onTimerAdd(PresetTimer(0, activity.id, hour * 3600 + minute * 60, 0))
+                }
             )
         }
+
+
+        IconButton(
+            text = stringResource(R.string.dialog_preset_timers_add), icon = Icons.Filled.AlarmAdd,
+            onClick = { add = true }
+        )
     }
 
-    Text(
-        text = stringResource(R.string.dialog_preset_timers_preset),
-        fontWeight = FontWeight.W500,
-        fontSize = 20.sp,
-        modifier = Modifier.padding(8.dp)
-    )
 
     val lazyListState = rememberLazyListState()
     val reorderableLazyListState =
@@ -106,10 +103,40 @@ inline fun DialogTimers(
 
     LazyColumn(
         state = lazyListState,
-        modifier = Modifier
-            .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
-
+        modifier = Modifier.padding(bottom = 16.dp, top = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
+
+        item {
+            var show by remember { mutableStateOf(false) }
+
+            if (show) {
+                DialogTimePicker(
+                    onDismissRequest = { show = false },
+                    initialHour = 1,
+                    initialMinute = 0,
+                    onTimePicked = { hour, minute ->
+                        runTimer(PresetTimer(0, activity.id, hour * 3600 + minute * 60, 0))
+                    }
+                )
+            }
+
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Colors.SuperLight, RoundedCornerShape(30))
+                    .padding(16.dp)
+                    .clickable {
+                        show = true
+                    },
+                text = stringResource(R.string.dialog_preset_timers_single),
+                style = TextStyle(
+                    fontSize = 14.sp, fontWeight = FontWeight.Bold
+                )
+            )
+        }
+
+
         items(
             items = timers,
             key = { item -> item.id },
@@ -131,40 +158,29 @@ inline fun DialogTimers(
                         .draggableHandle(),
                     backgroundContent = { },
                     content = {
-                        Row(
+                        Text(
                             modifier = Modifier
-                                .padding(bottom = 8.dp)
                                 .fillMaxWidth()
-                                .background(
-                                    Color.LightGray, RoundedCornerShape(30)
-                                )
-                                .padding(4.dp), verticalAlignment = Alignment.CenterVertically
-                        ) {
-
-                            Box(
-                                modifier = Modifier
-                                    .width(100.dp)
-                                    .height(30.dp)
-                                    .background(Colors.ChipGray, RoundedCornerShape(50)),
-                                contentAlignment = Alignment.Center
-                            ) {
-
-                                Text(
-                                    text = TimeUtils.secondsToMetric(item.seconds.toLong())
-                                        .removeSuffix(":00"),
-                                    textAlign = TextAlign.Center,
-                                    style = TextStyle(
-                                        fontSize = 14.sp, fontWeight = FontWeight.Bold
-                                    )
-                                )
-                            }
-
-                        }
-
-
+                                .background(Colors.SuperLight, RoundedCornerShape(30))
+                                .padding(16.dp),
+                            text = TimeUtils.secondsToMetric(item.seconds.toLong())
+                                .removeSuffix(":00"),
+                            style = TextStyle(
+                                fontSize = 14.sp, fontWeight = FontWeight.Bold
+                            )
+                        )
                     }
                 )
             }
         }
     }
+
+    DialogButtons {
+        TextButton(
+            onClick = onDismissRequest
+        ) {
+            Text(text = "OK")
+        }
+    }
 }
+

@@ -1,11 +1,10 @@
-package com.imfibit.activitytracker.core
+package com.imfibit.activitytracker.database
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.room.InvalidationTracker
 import androidx.room.RoomDatabase
-import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.entities.DailyChecklistItem
 import com.imfibit.activitytracker.database.entities.DailyChecklistTimelineItem
 import com.imfibit.activitytracker.database.entities.FocusBoardItem
@@ -55,22 +54,6 @@ inline fun createInvalidationTacker(
         override fun onInvalidated(tables: Set<String>) =  onInvalidated(tables)
     }
 }
-
-fun  <T> ViewModel.registerInvalidationTracker(db: AppDatabase, vararg tables: String,  source: suspend ()->T){
-
-    val tracker = createInvalidationTacker(*tables) {
-        viewModelScope.launch(Dispatchers.IO) {
-            source.invoke()
-        }
-    }
-
-    db.invalidationTracker.addObserver(tracker)
-
-    this.addCloseable {
-        db.invalidationTracker.removeObserver(tracker)
-    }
-}
-
 
 fun  <T> ViewModel.invalidationStateFlow(
     db: AppDatabase,

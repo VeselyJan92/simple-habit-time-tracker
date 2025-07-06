@@ -3,9 +3,9 @@ package com.imfibit.activitytracker.ui.screens.activity_list
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.imfibit.activitytracker.core.BaseViewModel
-import com.imfibit.activitytracker.core.activityTables
+import com.imfibit.activitytracker.database.activityTables
 import com.imfibit.activitytracker.core.extensions.swap
-import com.imfibit.activitytracker.core.invalidationStateFlow
+import com.imfibit.activitytracker.database.invalidationStateFlow
 import com.imfibit.activitytracker.core.services.TrackTimeService
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
@@ -47,7 +47,7 @@ class ActivitiesViewModel @Inject constructor(
         )
     }
 
-    suspend fun createNewActivity(name: String, type: TrackedActivity.Type) =  asyncIO {
+    suspend fun createNewActivity(name: String, type: TrackedActivity.Type): Long {
         val activity = TrackedActivity(
             id = 0L,
             name = name,
@@ -58,7 +58,7 @@ class ActivitiesViewModel @Inject constructor(
             challenge = TrackedActivityChallenge.empty
         )
 
-        rep.activityDAO.insertSync(activity)
+        return rep.activityDAO.insertSync(activity)
     }
 
     fun onMoveActivity(from: Int, to: Int){

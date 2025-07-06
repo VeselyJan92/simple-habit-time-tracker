@@ -4,11 +4,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -23,101 +24,96 @@ import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.toColor
 import com.imfibit.activitytracker.database.DevSeeder
 import com.imfibit.activitytracker.database.entities.FocusBoardItemTag
-import com.imfibit.activitytracker.ui.components.AppTextField
-import com.imfibit.activitytracker.ui.components.AppTextFieldStyle_Header
+import com.imfibit.activitytracker.ui.AppTheme
 import com.imfibit.activitytracker.ui.components.dialogs.BaseDialog
 import com.imfibit.activitytracker.ui.components.dialogs.DialogBaseHeader
 import com.imfibit.activitytracker.ui.components.dialogs.DialogButtons
 import com.imfibit.activitytracker.ui.components.selectors.ColorPickerComponent
 
 
-@Preview()
+@Preview
 @Composable
-private fun Preview() {
-
-    val edit = remember {
-        mutableStateOf(true)
-    }
-
+private fun DialogEditTag_Preview() = AppTheme {
     DialogEditTag(
-        edit, true, DevSeeder.getFocusBoardItemTag(), {}, {}
+        onDismissRequest = {  },
+        isEdit = true,
+        item = DevSeeder.getFocusBoardItemTag(),
+        onTagEdit = {},
+        onTagDelete = {}
     )
 }
 
 @Composable
 fun DialogEditTag(
-    display: MutableState<Boolean>,
+    onDismissRequest: () -> Unit,
     isEdit: Boolean,
     item: FocusBoardItemTag = FocusBoardItemTag(),
     onTagEdit: (FocusBoardItemTag) -> Unit,
     onTagDelete: (FocusBoardItemTag) -> Unit = {},
-) {
-    BaseDialog(display = display) {
-        val dialogTitle = if (isEdit) R.string.dialog_edit_tag_title else R.string.dialog_create_tag_title
+) = BaseDialog(onDismissRequest = onDismissRequest) {
 
-        DialogBaseHeader(title = stringResource(id = dialogTitle))
+    DialogBaseHeader(title = "Focus item label")
 
-        var color by remember {
-            mutableStateOf(item.color.toColor())
-        }
+    var color by remember {
+        mutableStateOf(item.color.toColor())
+    }
 
-        var name by remember {
-            mutableStateOf(TextFieldValue(item.name))
-        }
+    var name by remember {
+        mutableStateOf(TextFieldValue(item.name))
+    }
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        ) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
 
-            AppTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = name,
-                onValueChange = { name = it },
-                style = AppTextFieldStyle_Header,
-                placeholderText = stringResource(R.string.focus_board_edit_tag_name_placeholder)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            ColorPickerComponent(
-                selected = color,
-                onChoose = {
-                    color = it
-                }
-            )
-
-        }
-
-        DialogButtons {
-
-            if (isEdit) {
-                TextButton(
-                    onClick = {
-                        onTagDelete(item)
-                        display.value = false
-                    }
-                ) {
-                    Text(text = stringResource(id = R.string.dialog_action_delete))
-                }
+        OutlinedTextField(
+            keyboardOptions = KeyboardOptions(KeyboardCapitalization.Sentences),
+            modifier = Modifier.fillMaxWidth(),
+            value = name,
+            onValueChange = { name = it },
+            label = {
+                Text(stringResource(R.string.focus_board_edit_tag_name_placeholder))
             }
+        )
 
-            TextButton(onClick = { display.value = false }) {
-                Text(text = stringResource(id = R.string.dialog_action_cancel))
+        Spacer(modifier = Modifier.height(8.dp))
+
+        ColorPickerComponent(
+            selected = color,
+            onChoose = {
+                color = it
             }
+        )
 
+    }
+
+    DialogButtons {
+
+        if (isEdit) {
             TextButton(
                 onClick = {
-                    val editedItem = item.copy(name = name.text, color = color.toArgb())
-
-                    onTagEdit(editedItem)
-                    display.value = false
-                },
-                enabled = name.text.isNotEmpty()
+                    onTagDelete(item)
+                    onDismissRequest()
+                }
             ) {
-                Text(text = stringResource(id = R.string.dialog_action_continue))
+                Text(text = stringResource(id = R.string.dialog_action_delete))
             }
+        }
+
+        TextButton(onClick = onDismissRequest) {
+            Text(text = stringResource(id = R.string.dialog_action_cancel))
+        }
+
+        TextButton(
+            onClick = {
+                val editedItem = item.copy(name = name.text, color = color.toArgb())
+
+                onTagEdit(editedItem)
+                onDismissRequest()
+            },
+            enabled = name.text.isNotEmpty()
+        ) {
+            Text(text = stringResource(id = R.string.dialog_action_continue))
         }
     }
 }

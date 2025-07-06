@@ -80,7 +80,7 @@ fun TrackedActivityMonth(
     day = { day ->
         val dayModifier = if (day.date == LocalDate.now())
             Modifier
-                .border(width = 2.dp, Color.Black, shape = RoundedCornerShape(50))
+                .border(width = 2.dp, Color.Black, shape = RoundedCornerShape(8.dp))
                 .testTag(TestTag.MONTH_GRID_TODAY)
         else
             Modifier.testTag(TestTag.MONTH_GRID_DATE + day.date.format(DateTimeFormatter.ISO_DATE))

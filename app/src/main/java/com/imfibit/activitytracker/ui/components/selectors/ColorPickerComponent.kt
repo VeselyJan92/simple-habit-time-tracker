@@ -10,9 +10,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.imfibit.activitytracker.ui.AppTheme
 import com.imfibit.activitytracker.ui.components.Colors
 import kotlin.math.ceil
+
+@Preview
+@Composable
+fun ColorPickerComponent_Preview() = AppTheme {
+    ColorPickerComponent(
+        selected = Colors.chooseableColors[0],
+        onChoose = {}
+    )
+}
 
 @Composable
 fun ColorPickerComponent(

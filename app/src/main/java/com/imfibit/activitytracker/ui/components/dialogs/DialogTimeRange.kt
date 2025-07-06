@@ -2,61 +2,85 @@ package com.imfibit.activitytracker.ui.components.dialogs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.embedable.TimeRange
+import com.imfibit.activitytracker.ui.AppTheme
 import com.imfibit.activitytracker.ui.components.Colors
 
+@Preview
+@Composable
+fun DialogTimeRange_Preview() = AppTheme {
+    DialogTimeRange(
+        onDismissRequest = {},
+        range = TimeRange.WEEKLY,
+        onRangeSelected = {}
+    )
+}
 
 @Composable
-inline fun DialogTimeRange(
-    display: MutableState<Boolean>,
+fun DialogTimeRange(
+    onDismissRequest: () -> Unit,
     range: TimeRange,
-    noinline onRangeSelected: (TimeRange)->Unit
-) = BaseDialog(display = display) {
-
+    onRangeSelected: (TimeRange) -> Unit,
+) = BaseDialog(
+    onDismissRequest = onDismissRequest
+) {
     DialogBaseHeader(stringResource(id = R.string.dialog_time_range_title))
 
-    Row(Modifier.padding(8.dp)) {
+    Spacer(modifier = Modifier.height(16.dp))
+
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
 
         val selected = remember { mutableStateOf(range) }
 
-        val values = TimeRange.values()
+        val values = TimeRange.entries
 
-        values.forEachIndexed{ index, timeRange ->
-            Box(
+        values.forEachIndexed { index, timeRange ->
+            Text(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(end = if (values.size - 1 == index) 0.dp else 8.dp)
-                    .height(30.dp)
                     .background(
                         if (selected.value == timeRange) Colors.ChipGraySelected else Colors.ChipGray,
-                        RoundedCornerShape(50)
+                        RoundedCornerShape(8.dp)
                     )
-                    .clickable(onClick = {
-                        display.value = false
-                        onRangeSelected.invoke(timeRange)
-                    }),
-
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = stringResource(id = timeRange.label))
-            }
-
+                    .padding(8.dp)
+                    .clickable(
+                        onClick = {
+                            onDismissRequest()
+                            onRangeSelected.invoke(timeRange)
+                        }
+                    ),
+                textAlign = TextAlign.Center,
+                text = stringResource(id = timeRange.label))
         }
 
+    }
+
+    DialogButtons {
+        TextButton(
+            onClick = onDismissRequest
+        ) {
+            Text(text = "OK")
+        }
     }
 }

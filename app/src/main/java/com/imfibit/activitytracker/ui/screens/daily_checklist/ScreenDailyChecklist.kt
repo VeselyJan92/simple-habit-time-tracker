@@ -41,8 +41,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -59,19 +61,14 @@ import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.TestTag
 import com.imfibit.activitytracker.database.entities.DailyChecklistItem
 import com.imfibit.activitytracker.database.entities.DailyChecklistTimelineItemValue
-import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.ui.AppTheme
-import com.imfibit.activitytracker.ui.MainBody
+import com.imfibit.activitytracker.ui.DashboardBody
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.Colors.chooseableColors
-import com.imfibit.activitytracker.ui.components.MetricBlock
-import com.imfibit.activitytracker.ui.components.MetricWidgetData
-import com.imfibit.activitytracker.ui.components.MonthGridImpl
 import com.imfibit.activitytracker.ui.components.darker
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import kotlin.math.max
 
 val items = buildList {
@@ -168,6 +165,8 @@ private fun Body(
 ) {
     var showHistoryBottomSheet by remember { mutableStateOf(false) }
 
+
+
     if (showHistoryBottomSheet) {
         DailyChecklistHistoryBottomSheet(
             history = history,
@@ -179,7 +178,7 @@ private fun Body(
     }
 
 
-    MainBody {
+    DashboardBody {
         TopBar(
             onCalendarClicked = {
                 showHistoryBottomSheet = true
@@ -283,6 +282,8 @@ fun TruncatingBoxRow(
     days: List<DailyChecklistTimelineItemValue>,
     onToggleDay: (checked: Boolean, date: LocalDate) -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
+
     Layout(
         content = {
             days.forEach {
@@ -292,6 +293,7 @@ fun TruncatingBoxRow(
                         .clip(RoundedCornerShape(4.dp))
                         .background(if (it.completed) Colors.ButtonGreen else Colors.ChipGray)
                         .clickable {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             onToggleDay(!it.completed, it.date_completed)
                         }
                 )
@@ -400,7 +402,6 @@ private fun TopBar(onCalendarClicked: () -> Unit) {
             Icon(imageVector = Icons.Default.CalendarMonth, contentDescription = null )
         }
     }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -475,6 +476,8 @@ private fun DailyChecklistItem(
 
             val now = remember { LocalDate.now() }
 
+            val haptic = LocalHapticFeedback.current
+
             Box(
                 modifier = Modifier
                     .width(50.dp)
@@ -484,7 +487,10 @@ private fun DailyChecklistItem(
                 Checkbox(
                     modifier = Modifier.testTag(TestTag.CHECKBOX),
                     checked = item.date_checked == now,
-                    onCheckedChange = { onCheckItem(it, item) }
+                    onCheckedChange = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onCheckItem(it, item)
+                    }
                 )
             }
 

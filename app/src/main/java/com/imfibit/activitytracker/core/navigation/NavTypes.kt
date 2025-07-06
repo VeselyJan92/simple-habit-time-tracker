@@ -15,8 +15,8 @@ import java.time.format.DateTimeFormatter
 
 val NavType.Companion.LocalDateType: NavType<LocalDate>
     get() = object : NavType<LocalDate>(false) {
-        override fun get(bundle: Bundle, key: String): LocalDate? {
-            return bundle.getString(key)?.let { LocalDate.parse(it) }
+        override fun get(bundle: Bundle, key: String): LocalDate {
+            return bundle.getString(key)?.let { LocalDate.parse(it) }!!
         }
 
         override fun parseValue(value: String): LocalDate {
@@ -24,11 +24,12 @@ val NavType.Companion.LocalDateType: NavType<LocalDate>
         }
 
         override fun put(bundle: Bundle, key: String, value: LocalDate) {
-            bundle.putString(key, value.format(DateTimeFormatter.ISO_LOCAL_DATE))
+            bundle.putString(key, serializeAsValue(value))
         }
 
-        override val name: String
-            get() = "java.time.LocalDate"
+        override fun serializeAsValue(value: LocalDate): String {
+            return value.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        }
     }
 
 val NavType.Companion.LocalTimeType: NavType<LocalTime?>

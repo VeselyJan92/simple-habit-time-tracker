@@ -17,7 +17,6 @@ import com.imfibit.activitytracker.ui.Destinations.ScreenActivityGroupRoute
 import com.imfibit.activitytracker.ui.components.dialogs.DialogRecords
 import com.imfibit.activitytracker.ui.navigation.EditRecord
 import com.imfibit.activitytracker.ui.screens.activity.ScreenTrackedActivity
-import com.imfibit.activitytracker.ui.screens.activity_history.ScreenActivityHistory
 import com.imfibit.activitytracker.ui.screens.dashboard.Dashboard
 import com.imfibit.activitytracker.ui.screens.group.ScreenActivityGroup
 import com.imfibit.activitytracker.ui.screens.onboarding.ScreenOnboarding
@@ -81,18 +80,7 @@ fun AppNavHost() {
                 ScreenTrackedActivity(navControl)
             }
 
-            composable<Destinations.ScreenActivityHistory> {
-                ScreenActivityHistory(navControl)
-            }
-
-            //TODO refactor later when custom serialzier are implemented in navigation 2.9
-            dialog(
-                route = "screen_day_history/{activity_id}/{date}",
-                arguments = listOf(
-                    navArgument("activity_id") { type = NavType.LongType },
-                    navArgument("date") { type = NavType.StringType }
-                )
-            ) {
+            dialog<Destinations.DialogActivityDayHistory> {
                 DialogRecords(navControl)
             }
 

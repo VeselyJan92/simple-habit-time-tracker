@@ -1,4 +1,4 @@
-package com.imfibit.activitytracker.core.extensions
+package com.imfibit.activitytracker.core.navigation
 
 import android.os.Bundle
 import androidx.navigation.NavController
