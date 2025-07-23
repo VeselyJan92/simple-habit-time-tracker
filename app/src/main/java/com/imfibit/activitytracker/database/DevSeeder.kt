@@ -146,8 +146,8 @@ object DevSeeder {
     )
 
     public fun getTags() = listOf(
-        FocusBoardItemTag(id = 1, name = "Habits", color = chooseableColors[0].toArgb()),
-        FocusBoardItemTag(id = 2, name = "Tasks", color = chooseableColors[1].toArgb()),
+        FocusBoardItemTag(id = 1, name = "Habits", color = chooseableColors[3].toArgb()),
+        FocusBoardItemTag(id = 2, name = "Tasks", color = chooseableColors[6].toArgb()),
         FocusBoardItemTag(
             id = 3,
             name = "Side Quests",

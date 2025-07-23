@@ -98,10 +98,7 @@ private fun ScreenFocusBoard_Preview() = AppTheme {
 
     Body(
         items = listOf(
-            FocusBoardItemWithTags(
-                DevSeeder.getFocusBoardItem(),
-                tags
-            )
+            DevSeeder.getFocusItemWithTags()
         ),
         tags = tags,
         onFocusItemEdit = {},
@@ -203,7 +200,6 @@ private fun TopBar(
                         imageVector = Icons.Default.EditNote,
                         contentDescription = ""
                     )
-
 
                     Text(
                         modifier = Modifier.padding(8.dp),
@@ -449,9 +445,10 @@ fun FocusBoardItem(
                             color = it.getUIColor(),
                         ) {
                             Text(
-                                modifier = Modifier.padding(4.dp),
+                                modifier = Modifier.padding(6.dp),
                                 text = it.name,
-                                fontSize = 12.sp,
+                                fontSize = 14.sp,
+                                lineHeight = 14.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = Color.Black
                             )

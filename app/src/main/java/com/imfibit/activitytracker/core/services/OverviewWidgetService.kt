@@ -17,9 +17,9 @@ import javax.inject.Inject
 class OverviewWidgetService @Inject constructor(
     @ApplicationContext private val context: Context,
     private val database: AppDatabase,
-    private val rep: RepositoryTrackedActivity
+    private val rep: RepositoryTrackedActivity,
 ) {
-    suspend fun setupWidget(glanceId: GlanceId, activityId: Long){
+    suspend fun setupWidget(glanceId: GlanceId, activityId: Long) {
         updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { pref ->
 
             pref.toMutablePreferences().apply {
@@ -31,13 +31,13 @@ class OverviewWidgetService @Inject constructor(
         WidgetOverview().update(context, glanceId)
     }
 
-    suspend fun updateWidgets(){
+    suspend fun updateWidgets() {
         GlanceAppWidgetManager(context).getGlanceIds(WidgetOverview::class.java).forEach {
             updateWidget(it)
         }
     }
 
-    suspend fun updateWidget(id: GlanceId){
+    suspend fun updateWidget(id: GlanceId) {
         updateAppWidgetState(context, PreferencesGlanceStateDefinition, id) { pref ->
             pref.toMutablePreferences().apply {
 
@@ -51,19 +51,24 @@ class OverviewWidgetService @Inject constructor(
         WidgetOverview().update(context, id)
     }
 
-    private suspend fun updateContent(pref: MutablePreferences, activityId: Long){
-        val activity = database.activityDAO().getById(activityId)
+    private suspend fun updateContent(pref: MutablePreferences, activityId: Long) {
+        val activity = database.activityDAO().getByIdOrNull(activityId)
 
-        val overview = rep.getActivityOverview(activity)
+        if (activity != null) {
+            val overview = rep.getActivityOverview(activity)
 
-        pref[WidgetOverview.ACTIVITY_NAME] = activity.name
-        pref[WidgetOverview.METRIC_TODAY] = activity.type.getLabel(overview.today.metric).value(context)
+            pref[WidgetOverview.ACTIVITY_NAME] = activity.name
+            pref[WidgetOverview.METRIC_TODAY] =
+                activity.type.getLabel(overview.today.metric).value(context)
 
-        for ((index, past) in overview.past.reversed().withIndex()){
-            pref[WidgetOverview.keyValue(index)] = past.value.value(context)
-            pref[WidgetOverview.keyLabel(index)] = past.label?.value(context) ?: ""
-            pref[WidgetOverview.keyColor(index)] = String.format("#%06X", 0xFFFFFF and past.color.toArgb()).uppercase()
+            for ((index, past) in overview.past.reversed().withIndex()) {
+                pref[WidgetOverview.keyValue(index)] = past.value.value(context)
+                pref[WidgetOverview.keyLabel(index)] = past.label?.value(context) ?: ""
+                pref[WidgetOverview.keyColor(index)] =
+                    String.format("#%06X", 0xFFFFFF and past.color.toArgb()).uppercase()
+            }
+        } else {
+            pref[WidgetOverview.DELETED] = true
         }
     }
-
 }

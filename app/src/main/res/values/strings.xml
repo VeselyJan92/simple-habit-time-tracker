@@ -217,6 +217,9 @@
 
     <string name="days">days</string>
     <string name="strike">"Strike: "</string>
+    <string name="widget_error_activity_deleted">Activity deleted</string>
+    <string name="no_activities_to_display">No activities</string>
+    <string name="widget_picker_title">Choose activity</string>
 
 
     <string-array name="months">

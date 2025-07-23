@@ -28,6 +28,13 @@ abstract class DAOTrackedActivity : BaseEditableDAO<TrackedActivity> {
         SELECT * FROM tracked_activity 
         WHERE tracked_activity_id =:id
     """)
+    abstract fun getByIdOrNull(id: Long): TrackedActivity?
+
+
+    @Query("""
+        SELECT * FROM tracked_activity 
+        WHERE tracked_activity_id =:id
+    """)
     abstract fun tryGetById(id: Long): TrackedActivity?
 
     @Query("""

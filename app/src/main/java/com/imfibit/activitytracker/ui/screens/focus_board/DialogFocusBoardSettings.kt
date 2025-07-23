@@ -131,7 +131,7 @@ fun DialogFocusBoardSettings(
                     DialogEditTag(
                         onDismissRequest = { editDialog = false },
                         item = item,
-                        isEdit = false,
+                        isEdit = true,
                         onTagDelete = onTagDelete,
                         onTagEdit = onTagEdit
                     )
@@ -146,7 +146,7 @@ fun DialogFocusBoardSettings(
                     },
                     iconAfter = Icons.Default.Reorder,
                     name = item.name,
-                    color = if (false) Color.LightGray else item.getUIColor()
+                    color = item.getUIColor()
                 )
             }
         }
