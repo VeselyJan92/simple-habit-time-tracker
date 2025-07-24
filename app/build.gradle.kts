@@ -124,15 +124,15 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.9.0") //For navigation
 
 
-    implementation(platform("com.google.firebase:firebase-bom:33.16.0"))
-    implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
+    implementation("com.google.firebase:firebase-crashlytics")
 
 
     val COMPOSE_VERSION = "1.8.3"
     implementation("androidx.compose.animation:animation:$COMPOSE_VERSION")
     implementation("androidx.compose.foundation:foundation:$COMPOSE_VERSION")
     implementation("androidx.activity:activity-compose:1.10.1")
-    implementation("androidx.compose.material3:material3-android:1.4.0-alpha16")
+    implementation("androidx.compose.material3:material3-android:1.4.0-alpha18")
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation("sh.calvin.reorderable:reorderable:2.5.1")
 
@@ -141,9 +141,9 @@ dependencies {
     implementation("androidx.glance:glance-appwidget:1.1.1")
     implementation("androidx.datastore:datastore-preferences:1.2.0-alpha02")
 
-    implementation("androidx.navigation:navigation-compose:2.9.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.1")
+    implementation("androidx.navigation:navigation-compose:2.9.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.2")
 
 
     implementation("androidx.paging:paging-runtime-ktx:3.3.6")
@@ -155,17 +155,17 @@ dependencies {
     implementation("androidx.room:room-ktx:$ROOM_VERSION")
 
 
-    implementation("androidx.hilt:hilt-common:1.2.0")
-    implementation("com.google.dagger:hilt-android:2.56.2")
-    ksp("com.google.dagger:hilt-android-compiler:2.56.2")
-    ksp("androidx.hilt:hilt-compiler:1.2.0")
+    implementation("androidx.hilt:hilt-common:1.3.0-alpha02")
+    implementation("com.google.dagger:hilt-android:2.57")
+    ksp("com.google.dagger:hilt-android-compiler:2.57")
+    ksp("androidx.hilt:hilt-compiler:1.3.0-alpha02")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     debugImplementation("androidx.compose.ui:ui-tooling:$COMPOSE_VERSION")
     implementation("androidx.compose.ui:ui-tooling-preview:$COMPOSE_VERSION")
 
 
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.56.2")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.57")
 
     // Needed for createAndroidComposeRule, but not createComposeRule:
     debugImplementation("androidx.compose.ui:ui-test-manifest:$COMPOSE_VERSION")

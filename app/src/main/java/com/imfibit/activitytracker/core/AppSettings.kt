@@ -46,7 +46,9 @@ class PreferencesModule {
 }
 
 
-class PreferenceStore @Inject constructor(@ApplicationContext val context: Context): AppSettings {
+class PreferenceStore @Inject constructor(
+    @param:ApplicationContext val context: Context
+): AppSettings {
 
     private suspend fun <T> set(key: Preferences.Key<T>, value: T){
         context.dataStore.edit { settings -> settings[key] = value }
