@@ -66,12 +66,12 @@ class RepositoryTrackedActivity @Inject constructor(
     suspend fun getActivityOverview(activity: TrackedActivity): TrackedActivityRecentOverview {
         val pastRanges = 10
 
-        val today = metricDAO.getMetricByDay(activity.id, LocalDate.now().minusDays(pastRanges.toLong()), LocalDate.now())
+        val today = metricDAO.getMetricByDay(activity.id, LocalDate.now().minusDays(pastRanges.toLong() - 1), LocalDate.now())
 
         val data = when(activity.goal.range){
             TimeRange.DAILY -> today
-            TimeRange.WEEKLY -> metricDAO.getMetricByWeek(activity.id, LocalDate.now().with(ChronoField.DAY_OF_WEEK, 7), pastRanges+1)
-            TimeRange.MONTHLY -> metricDAO.getMetricByMonth(activity.id, YearMonth.now(), pastRanges+1)
+            TimeRange.WEEKLY -> metricDAO.getMetricByWeek(activity.id, LocalDate.now().with(ChronoField.DAY_OF_WEEK, 7), pastRanges)
+            TimeRange.MONTHLY -> metricDAO.getMetricByMonth(activity.id, YearMonth.now(), pastRanges)
         }
 
         val actionButton = when {
@@ -80,7 +80,7 @@ class RepositoryTrackedActivity @Inject constructor(
             else -> DEFAULT
         }
 
-        val groupedMetric = data.map {
+        val groupedMetric = data.reversed().map {
             val color = Colors.getMetricColor(
                 activity.goal,
                 it.metric,
@@ -133,7 +133,7 @@ class RepositoryTrackedActivity @Inject constructor(
                 )
             }
 
-            val metricSum =  it.map { it.metric }.sum()
+            val metricSum = it.sumOf { it.metric }
 
             Week(
                 from = it.first().from,

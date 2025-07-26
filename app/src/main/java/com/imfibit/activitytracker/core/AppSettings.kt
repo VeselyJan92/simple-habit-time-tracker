@@ -1,7 +1,6 @@
 package com.imfibit.activitytracker.core
 
 import android.content.Context
-import android.util.Log
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
@@ -12,6 +11,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.single
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -20,8 +20,8 @@ interface AppSettings {
     suspend fun getOnboarded(): Boolean? = false
     suspend fun setOnboarded(value: Boolean) { }
 
-    suspend fun getShouldShowNotificationsPopup(): Boolean? = false
-    suspend fun setShouldShowNotificationsPopup(value: Boolean) { }
+    suspend fun alreadyAksedForNotification(): Boolean? = false
+    suspend fun setAlreadyAksedForNotification(value: Boolean) { }
 }
 
 private const val USER_PREFERENCES_NAME = "app_settings"
@@ -40,7 +40,7 @@ class PreferencesModule {
 
     @Provides
     @Singleton
-    fun provideAppSettings(@ApplicationContext context: Context): AppSettings{
+    fun provideAppSettings(@ApplicationContext context: Context): PreferenceStore{
         return PreferenceStore(context)
     }
 }
@@ -50,8 +50,10 @@ class PreferenceStore @Inject constructor(
     @param:ApplicationContext val context: Context
 ): AppSettings {
 
+    val dataStore = context.dataStore
+
     private suspend fun <T> set(key: Preferences.Key<T>, value: T){
-        context.dataStore.edit { settings -> settings[key] = value }
+        dataStore.edit { settings -> settings[key] = value }
     }
 
     private suspend fun <T> get(key: Preferences.Key<T>): T? {
@@ -61,7 +63,7 @@ class PreferenceStore @Inject constructor(
     override suspend fun getOnboarded() = get(ONBOARDING_COMPLETED)
     override suspend fun setOnboarded(value: Boolean) = set(ONBOARDING_COMPLETED, value)
 
-    override suspend fun getShouldShowNotificationsPopup() = get(ASK_FOR_NOTIFICATION)
-    override suspend fun setShouldShowNotificationsPopup(value: Boolean) = set(ASK_FOR_NOTIFICATION, value)
+    override suspend fun alreadyAksedForNotification() = get(ASK_FOR_NOTIFICATION)
+    override suspend fun setAlreadyAksedForNotification(value: Boolean) = set(ASK_FOR_NOTIFICATION, value)
 
 }

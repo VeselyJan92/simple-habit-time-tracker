@@ -71,6 +71,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.core.ASK_FOR_NOTIFICATION
 import com.imfibit.activitytracker.core.TestTag
 import com.imfibit.activitytracker.database.DevSeeder
 import com.imfibit.activitytracker.database.embedable.TimeRange
@@ -168,7 +169,17 @@ fun ScreenTrackedActivity(
         )
     }
 
-    CheckNotificationPermission()
+    val settings by vm.settings.collectAsStateWithLifecycle(null)
+
+    settings?.let {
+        CheckNotificationPermission(
+            shouldAsk = it[ASK_FOR_NOTIFICATION] != false,
+            onDoNotAsk = {
+                vm.setAskForNotification()
+            }
+        )
+    }
+
 
     val haptics = LocalHapticFeedback.current
 

@@ -189,6 +189,9 @@
         <item>• Notifying when timer is over.</item>
     </string-array>
 
+    <string name="dialog_ask_for_notifications_allow">PERMIT</string>
+    <string name="dialog_ask_for_notifications_disallow">NO NOTIFICATIONS</string>
+
 
     <string name="dialog_create_focus_item_title">Create focus item</string>
     <string name="dialog_edt_focus_item_title">Edit focus item</string>

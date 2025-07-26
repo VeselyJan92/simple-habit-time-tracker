@@ -61,7 +61,7 @@ class OverviewWidgetService @Inject constructor(
             pref[WidgetOverview.METRIC_TODAY] =
                 activity.type.getLabel(overview.today.metric).value(context)
 
-            for ((index, past) in overview.past.reversed().withIndex()) {
+            for ((index, past) in overview.past.withIndex()) {
                 pref[WidgetOverview.keyValue(index)] = past.value.value(context)
                 pref[WidgetOverview.keyLabel(index)] = past.label?.value(context) ?: ""
                 pref[WidgetOverview.keyColor(index)] =

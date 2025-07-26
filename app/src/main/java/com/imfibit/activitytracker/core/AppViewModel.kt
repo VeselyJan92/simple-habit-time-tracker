@@ -6,8 +6,5 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AppViewModel @Inject constructor(
-    val settings: AppSettings
-) : ViewModel() {
-
-
-}
+    val settings: PreferenceStore
+) : ViewModel()

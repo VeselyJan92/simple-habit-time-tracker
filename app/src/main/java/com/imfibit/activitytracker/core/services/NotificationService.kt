@@ -23,7 +23,7 @@ class NotificationService @Inject constructor(
                 Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED
 
-            val askForNotificationsToggle = appSettings.getShouldShowNotificationsPopup() ?: true
+            val askForNotificationsToggle = appSettings.alreadyAksedForNotification() ?: true
 
             askForNotificationsToggle && !isGranted
         }else{

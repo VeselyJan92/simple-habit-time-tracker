@@ -3,6 +3,7 @@ package com.imfibit.activitytracker.ui.screens.activity
 
 import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.runtime.Immutable
+import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
@@ -13,8 +14,10 @@ import androidx.paging.PagingState
 import androidx.paging.cachedIn
 import androidx.room.InvalidationTracker
 import androidx.room.withTransaction
+import com.imfibit.activitytracker.core.ASK_FOR_NOTIFICATION
 import com.imfibit.activitytracker.core.BaseViewModel
 import com.imfibit.activitytracker.core.ContextString
+import com.imfibit.activitytracker.core.PreferenceStore
 import com.imfibit.activitytracker.core.extensions.swap
 import com.imfibit.activitytracker.core.services.TrackTimeService
 import com.imfibit.activitytracker.database.AppDatabase
@@ -30,6 +33,7 @@ import com.imfibit.activitytracker.ui.Destinations
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.MetricWidgetData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
@@ -54,7 +58,10 @@ class TrackedActivityViewModel @Inject constructor(
     private val db: AppDatabase,
     private val rep: RepositoryTrackedActivity,
     private val savedStateHandle: SavedStateHandle,
+    private val appSettings: PreferenceStore,
 ) : BaseViewModel() {
+
+    val settings = appSettings.dataStore.data
 
     val id = savedStateHandle.toRoute<Destinations.ScreenActivity>().activityId
 
@@ -217,6 +224,12 @@ class TrackedActivityViewModel @Inject constructor(
 
     fun updateActivity(activity: TrackedActivity) = launchIO {
         rep.activityDAO.update(activity)
+    }
+
+    fun setAskForNotification() = viewModelScope.launch{
+        appSettings.dataStore.edit {
+            it[ASK_FOR_NOTIFICATION] = false
+        }
     }
 }
 
