@@ -115,7 +115,6 @@ import java.util.Locale
 @Composable
 fun ScreenTrackedActivity_Preview() = AppTheme {
     ScreenTrackedActivity(
-        activityName = "name",
         state = TrackedActivityState(
             activity = DevSeeder.getTrackedActivityTime(
             ),
@@ -131,7 +130,7 @@ fun ScreenTrackedActivity_Preview() = AppTheme {
         onDayClicked = { _, _ -> },
         onDayLongClicked = { _, _ -> },
         onDeleteActivity = {},
-        onActivityNameUpdate = {},
+        onNameChanged = {},
         onNavigateToHistory = {},
         onNavigateBack = {},
         scheduleTimer = {},
@@ -156,8 +155,6 @@ fun ScreenTrackedActivity(
     val recordVM = hiltViewModel<RecordViewModel>()
     val vm = hiltViewModel<TrackedActivityViewModel>()
 
-    val name = vm.activityName.value
-
     var showHistoryBottomSheet by remember { mutableStateOf(false) }
 
     val data by vm.data.collectAsStateWithLifecycle()
@@ -177,7 +174,6 @@ fun ScreenTrackedActivity(
 
     data?.let {
         ScreenTrackedActivity(
-            activityName = name,
             state = it,
             onDayClicked = { activity, date ->
                 RecordNavigatorImpl.onDayClicked(
@@ -196,7 +192,7 @@ fun ScreenTrackedActivity(
                 )
             },
             onDeleteActivity = vm::deleteActivity,
-            onActivityNameUpdate = vm::refreshName,
+            onNameChanged = vm::updateName,
             onNavigateToHistory = {
                 showHistoryBottomSheet = true
             },
@@ -221,12 +217,11 @@ fun ScreenTrackedActivity(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ScreenTrackedActivity(
-    activityName: String?,
     state: TrackedActivityState,
     onDayClicked: (TrackedActivity, LocalDate) -> Unit,
     onDayLongClicked: (TrackedActivity, LocalDate) -> Unit,
     onDeleteActivity: (TrackedActivity) -> Unit,
-    onActivityNameUpdate: (String) -> Unit,
+    onNameChanged: (String) -> Unit,
     onNavigateToHistory: (TrackedActivity) -> Unit,
     onNavigateBack: () -> Unit,
     scheduleTimer: (PresetTimer) -> Unit,
@@ -258,13 +253,20 @@ fun ScreenTrackedActivity(
 
                 TopBarBackButton(onBack = onNavigateBack)
 
+                var name by remember(state.activity.name) {
+                    mutableStateOf(state.activity.name)
+                }
+
                 BasicTextField(
                     modifier = Modifier
                         .weight(1f)
                         .testTag(TestTag.TRACKED_ACTIVITY_EDIT_NAME),
-                    value = activityName ?: "",
+                    value = name,
                     singleLine = true,
-                    onValueChange = onActivityNameUpdate,
+                    onValueChange = {
+                        name = it
+                        onNameChanged(it)
+                    },
                     textStyle = TextStyle(fontWeight = FontWeight.Black, fontSize = 25.sp)
                 )
 
@@ -299,7 +301,7 @@ fun ScreenTrackedActivity(
             LazyColumn(
                 modifier = Modifier
                     .padding(it)
-                    .padding(8.dp)
+                    .padding(horizontal = 8.dp)
             ) {
                 item {
                     ActivitySettings(
@@ -334,9 +336,7 @@ fun ScreenTrackedActivity(
                             )
                         }
                     }
-
                 }
-
 
                 item {
                     Spacer(modifier = Modifier.height(100.dp))
@@ -567,8 +567,7 @@ private fun ActivitySettings(
     clearRunning: (TrackedActivity) -> Unit,
 ) {
     Surface(
-        modifier = Modifier
-            .padding(top = 8.dp),
+        modifier = Modifier,
         shape = RoundedCornerShape(20.dp)
     ) {
         Column {

@@ -1,10 +1,8 @@
 package com.imfibit.activitytracker.ui.screens.activity
 
 
-import android.util.Log
 import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
@@ -17,24 +15,21 @@ import androidx.room.InvalidationTracker
 import androidx.room.withTransaction
 import com.imfibit.activitytracker.core.BaseViewModel
 import com.imfibit.activitytracker.core.ContextString
-import com.imfibit.activitytracker.database.activityTables
 import com.imfibit.activitytracker.core.extensions.swap
-import com.imfibit.activitytracker.database.invalidationStateFlow
 import com.imfibit.activitytracker.core.services.TrackTimeService
 import com.imfibit.activitytracker.database.AppDatabase
+import com.imfibit.activitytracker.database.activityTables
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import com.imfibit.activitytracker.database.entities.PresetTimer
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
+import com.imfibit.activitytracker.database.invalidationStateFlow
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.ui.Destinations
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.MetricWidgetData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
@@ -61,36 +56,17 @@ class TrackedActivityViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
 
-    var deleted = false
-
-    override fun onCleared() {
-        Log.e("TrackedActivityViewModel", "clear")
-        super.onCleared()
-
-        if (!activityName.value.isNullOrBlank() && !deleted)
-            runBlocking(Dispatchers.IO) {
-                updateName(activityName.value!!)
-            }
-    }
-
     val id = savedStateHandle.toRoute<Destinations.ScreenActivity>().activityId
 
     val months = Pager(PagingConfig(MonthsPagingSource.PAGE_SIZE)) {
         MonthsPagingSource(rep, id, db.invalidationTracker)
     }.flow.cachedIn(viewModelScope)
 
-    //For better edittext performance save the name of the activity when user is done with the screen
-    val activityName = mutableStateOf<String?>(null)
+
 
     val data = invalidationStateFlow(db, null, *activityTables) {
         val activity: TrackedActivity =
             rep.activityDAO.tryGetById(id) ?: return@invalidationStateFlow null
-
-        //Ignore subsequent changes
-        viewModelScope.launch(Dispatchers.Main) {
-            activityName.value = activity.name
-        }
-
 
         /*
         val now = LocalDate.now()
@@ -164,13 +140,9 @@ class TrackedActivityViewModel @Inject constructor(
     }
 
 
-    private suspend fun updateName(name: String) {
+    fun updateName(name: String) = launchIO {
         val activity = rep.activityDAO.getById(id)
         rep.activityDAO.update(activity.copy(name = name))
-    }
-
-    fun refreshName(name: String) = launchIO {
-        activityName.value = name
     }
 
     fun addTimer(timer: PresetTimer) = launchIO {
@@ -212,7 +184,6 @@ class TrackedActivityViewModel @Inject constructor(
             if (activity.type == TrackedActivity.Type.TIME)
                 timerService.cancelSession(activity)
 
-            deleted = true
             rep.activityDAO.deleteById(activity.id)
         }
 
