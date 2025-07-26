@@ -3,7 +3,7 @@ package com.imfibit.activitytracker.ui.widgets
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
@@ -13,9 +13,10 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.ImageProvider
+import androidx.glance.LocalSize
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
-import androidx.glance.appwidget.LocalAppWidgetOptions
+import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.currentState
@@ -39,6 +40,7 @@ import androidx.lifecycle.viewModelScope
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.services.OverviewWidgetService
 import com.imfibit.activitytracker.database.AppDatabase
+import com.imfibit.activitytracker.ui.widgets.WidgetOverview.Companion.METRIC_TODAY
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -81,6 +83,14 @@ class WidgetOverview : GlanceAppWidget() {
         fun keyColor(index: Int) = stringPreferencesKey("METRIC_${index}_COLOR")
     }
 
+    override val sizeMode = SizeMode.Responsive(
+        buildSet {
+            repeat(10) {
+                add(DpSize(width = 60.dp + (it * 30).dp, height = 50.dp))
+            }
+        }
+    )
+
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val deletedText = context.getString(R.string.widget_error_activity_deleted)
 
@@ -98,36 +108,67 @@ class WidgetOverview : GlanceAppWidget() {
 
 @Composable
 private fun WidgetContent(prefs: Preferences) {
+    val size = LocalSize.current
+
     Column(
         modifier = GlanceModifier
-            .padding(5.dp)
+            .padding(8.dp)
             .fillMaxSize()
             .background(color = Color.White),
         verticalAlignment = Alignment.Vertical.CenterVertically
     ) {
-        Text(
-            text = prefs[WidgetOverview.Companion.ACTIVITY_NAME] ?: "",
-            style = TextStyle(
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                textAlign = TextAlign.Start,
-                color = ColorProvider(Color.Black)
-            )
-        )
-
-        Spacer(modifier = GlanceModifier.height(5.dp))
-
         Row(modifier = GlanceModifier.fillMaxWidth()) {
+            Text(
+                modifier = GlanceModifier.width(if (size.width > 210.dp) size.width - 80.dp else size.width),
+                text = prefs[WidgetOverview.Companion.ACTIVITY_NAME] ?: "",
+                maxLines = 1,
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Start,
+                    color = ColorProvider(Color.Black)
+                )
+            )
 
-            repeat(5) {
+            if (size.width > 210.dp) {
+                Spacer(modifier = GlanceModifier.defaultWeight())
 
-                if (it != 0)
-                    Spacer(modifier = GlanceModifier.defaultWeight())
+                Text(
+                    text = "Today:",
+                    style = TextStyle(
+                        fontSize = 15.sp,
+                        textAlign = TextAlign.Start,
+                        color = ColorProvider(Color.Black)
+                    )
+                )
 
+                Spacer(GlanceModifier.width(4.dp))
+
+                Text(
+                    text = prefs[METRIC_TODAY] ?: "",
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp,
+                        textAlign = TextAlign.Start,
+                        color = ColorProvider(Color.Black)
+                    )
+                )
+            }
+        }
+
+        Spacer(modifier = GlanceModifier.height(8.dp))
+
+        Row(
+            modifier = GlanceModifier.fillMaxWidth()
+        ) {
+
+            val items = ((size.width - 20.dp) / 35.dp).toInt()
+
+            repeat(items) {
                 Column(
+                    modifier = GlanceModifier.defaultWeight(),
                     horizontalAlignment = Alignment.Horizontal.CenterHorizontally
                 ) {
-
                     Text(
                         text = prefs[WidgetOverview.Companion.keyLabel(it)] ?: "",
                         style = TextStyle(
@@ -144,8 +185,6 @@ private fun WidgetContent(prefs: Preferences) {
                         "#59BF2D" -> R.drawable.widget_backgoround_green
                         else -> R.drawable.widget_backgoround_gray
                     }
-
-
 
                     Box(
                         modifier = GlanceModifier
@@ -167,35 +206,8 @@ private fun WidgetContent(prefs: Preferences) {
                 }
             }
         }
-
-        Spacer(modifier = GlanceModifier.height(5.dp))
-
-
-        /*Row {
-                    Text(
-                        text = "Today:",
-                        style = TextStyle(
-                            fontSize = 15.sp,
-                            textAlign = androidx.glance.text.TextAlign.Start,
-                            color = ColorProvider(Color.Black)
-                        )
-                    )
-
-                    Spacer(GlanceModifier.width(5.dp))
-
-                    Text(
-                        text = prefs[METRIC_TODAY] ?: "",
-                        style = TextStyle(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp,
-                            textAlign = androidx.glance.text.TextAlign.Start,
-                            color = ColorProvider(Color.Black)
-                        )
-                    )
-                }*/
     }
 }
-
 
 @Composable
 fun ActivityDeleted(deletedText: String) {

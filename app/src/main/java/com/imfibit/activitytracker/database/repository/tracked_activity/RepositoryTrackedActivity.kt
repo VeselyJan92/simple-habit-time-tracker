@@ -64,7 +64,7 @@ class RepositoryTrackedActivity @Inject constructor(
 
 
     suspend fun getActivityOverview(activity: TrackedActivity): TrackedActivityRecentOverview {
-        val pastRanges = 4
+        val pastRanges = 10
 
         val today = metricDAO.getMetricByDay(activity.id, LocalDate.now().minusDays(pastRanges.toLong()), LocalDate.now())
 
