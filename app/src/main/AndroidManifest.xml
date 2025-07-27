@@ -70,6 +70,7 @@
         <receiver
             android:name=".ui.widgets.WidgetOverviewReceiver"
             android:enabled="@bool/glance_appwidget_available"
+            android:label="@string/widget_checked_habit_label"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

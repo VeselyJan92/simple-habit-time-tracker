@@ -154,11 +154,10 @@
 
 
 
-    <string name="widget_time_activity">Study</string>
-    <string name="widget_time_description">Time tracked indicator</string>
-
-    <string name="widget_checked_habit_activity">Study</string>
-    <string name="widget_checked_habit_description">Habit  indicator</string>
+    <string name="widget_error_activity_deleted">Activity deleted</string>
+    <string name="widget_example_name">Workout</string>
+    <string name="widget_checked_habit_label">Progress timeline</string>
+    <string name="widget_checked_habit_description">View your recent activity progress</string>
 
 
     <string name="activity_in_session">In session: </string>
@@ -220,7 +219,7 @@
 
     <string name="days">days</string>
     <string name="strike">"Strike: "</string>
-    <string name="widget_error_activity_deleted">Activity deleted</string>
+
     <string name="no_activities_to_display">No activities</string>
     <string name="widget_picker_title">Choose activity</string>
 

@@ -1,5 +1,6 @@
 package com.imfibit.activitytracker.ui.widgets
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -13,6 +14,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.ImageProvider
+import androidx.glance.LocalContext
 import androidx.glance.LocalSize
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
@@ -30,6 +32,7 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
+import androidx.glance.preview.ExperimentalGlancePreviewApi
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
@@ -40,12 +43,18 @@ import androidx.lifecycle.viewModelScope
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.services.OverviewWidgetService
 import com.imfibit.activitytracker.database.AppDatabase
-import com.imfibit.activitytracker.ui.widgets.WidgetOverview.Companion.METRIC_TODAY
+import com.imfibit.activitytracker.ui.widgets.WidgetOverview.Companion.MAX_HISTORY
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(ExperimentalGlancePreviewApi::class)
+@androidx.glance.preview.Preview(320, 90)
+@Composable
+private fun WidgetContentPreview() {
+    WidgetPreview()
+}
 
 @HiltViewModel
 class ConfActivityWidgetOverviewVM @Inject constructor(
@@ -72,6 +81,8 @@ class WidgetOverviewReceiver : GlanceAppWidgetReceiver() {
 class WidgetOverview : GlanceAppWidget() {
 
     companion object {
+        const val MAX_HISTORY = 10
+
         val ACTIVITY_NAME = stringPreferencesKey("ACTIVITY_NAME")
         val ACTIVITY_ID = longPreferencesKey("ACTIVITY_ID")
         val METRIC_TODAY = stringPreferencesKey("METRIC_TODAY")
@@ -83,13 +94,21 @@ class WidgetOverview : GlanceAppWidget() {
         fun keyColor(index: Int) = stringPreferencesKey("METRIC_${index}_COLOR")
     }
 
-    override val sizeMode = SizeMode.Responsive(
-        buildSet {
-            repeat(10) {
-                add(DpSize(width = 60.dp + (it * 30).dp, height = 50.dp))
-            }
+    val sizes = buildSet {
+        repeat(MAX_HISTORY) {
+            add(DpSize(width = 60.dp + (it * 30).dp, height = 50.dp))
         }
-    )
+    }
+
+    override val sizeMode = SizeMode.Responsive(sizes)
+
+    override val previewSizeMode = SizeMode.Responsive(sizes)
+
+    override suspend fun providePreview(context: Context, widgetCategory: Int) {
+        provideContent {
+            WidgetPreview()
+        }
+    }
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val deletedText = context.getString(R.string.widget_error_activity_deleted)
@@ -100,27 +119,74 @@ class WidgetOverview : GlanceAppWidget() {
             if (prefs[DELETED] == true) {
                 ActivityDeleted(deletedText)
             } else {
-                WidgetContent(prefs)
+                val history = List(10) { index ->
+                    WidgetData(
+                        color = prefs[keyColor(index)] ?: "",
+                        label = prefs[keyLabel(index)] ?: "",
+                        value = prefs[keyValue(index)] ?: ""
+                    )
+                }
+
+                val today = prefs[METRIC_TODAY] ?: ""
+                val name = prefs[ACTIVITY_NAME] ?: ""
+
+                WidgetContent(name, history, today)
             }
         }
     }
 }
 
+private data class WidgetData(
+    val color: String,
+    val label: String,
+    val value: String,
+)
+
 @Composable
-private fun WidgetContent(prefs: Preferences) {
+private fun WidgetPreview() {
+    val context = LocalContext.current
+
+    val name = context.getString(R.string.widget_example_name)
+    val week = context.getString(R.string.week)
+    val today = context.getString(R.string.yes)
+
+    val history = List(10) { index ->
+        val metric = (0..7).random()
+
+        WidgetData(
+            color = if (metric > 2) "#59BF2D" else "#FF9800",
+            label = week,
+            value = "$metric/7"
+        )
+    }
+
+    WidgetContent(
+        name = name,
+        history = history,
+        today = today
+    )
+}
+
+@SuppressLint("RestrictedApi")
+@Composable
+private fun WidgetContent(
+    name: String,
+    history: List<WidgetData>,
+    today: String,
+) {
     val size = LocalSize.current
 
     Column(
         modifier = GlanceModifier
             .padding(8.dp)
             .fillMaxSize()
-            .background(color = Color.White),
+            .background(color = Color.White.copy(alpha = 0.9f)),
         verticalAlignment = Alignment.Vertical.CenterVertically
     ) {
         Row(modifier = GlanceModifier.fillMaxWidth()) {
             Text(
-                modifier = GlanceModifier.width(if (size.width > 210.dp) size.width - 80.dp else size.width),
-                text = prefs[WidgetOverview.Companion.ACTIVITY_NAME] ?: "",
+                modifier = GlanceModifier.width(if (size.width > 210.dp) size.width - 90.dp else size.width),
+                text = name,
                 maxLines = 1,
                 style = TextStyle(
                     fontWeight = FontWeight.Bold,
@@ -145,7 +211,7 @@ private fun WidgetContent(prefs: Preferences) {
                 Spacer(GlanceModifier.width(4.dp))
 
                 Text(
-                    text = prefs[METRIC_TODAY] ?: "",
+                    text = today.uppercase(),
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp,
@@ -164,13 +230,13 @@ private fun WidgetContent(prefs: Preferences) {
 
             val items = ((size.width - 20.dp) / 35.dp).toInt()
 
-            repeat(items) {
+            repeat(minOf(items, MAX_HISTORY)) {
                 Column(
                     modifier = GlanceModifier.defaultWeight(),
                     horizontalAlignment = Alignment.Horizontal.CenterHorizontally
                 ) {
                     Text(
-                        text = prefs[WidgetOverview.Companion.keyLabel(it)] ?: "",
+                        text = history[it].label,
                         style = TextStyle(
                             color = ColorProvider(Color.Black),
                             fontWeight = if (it == 0) FontWeight.Bold else FontWeight.Medium,
@@ -179,7 +245,7 @@ private fun WidgetContent(prefs: Preferences) {
                     )
 
                     //So far there is no cross compatible way to have round corners and color
-                    val resource = when (prefs[WidgetOverview.Companion.keyColor(it)]) {
+                    val resource = when (history[it].color) {
                         "#FF9800" -> R.drawable.widget_backgoround_orange
                         "#E0E0E0" -> R.drawable.widget_backgoround_gray
                         "#59BF2D" -> R.drawable.widget_backgoround_green
@@ -200,7 +266,7 @@ private fun WidgetContent(prefs: Preferences) {
                                 fontWeight = if (it == 0) FontWeight.Bold else FontWeight.Medium,
                                 fontSize = 10.sp
                             ),
-                            text = prefs[WidgetOverview.Companion.keyValue(it)] ?: ""
+                            text = history[it].value
                         )
                     }
                 }
@@ -209,6 +275,7 @@ private fun WidgetContent(prefs: Preferences) {
     }
 }
 
+@SuppressLint("RestrictedApi")
 @Composable
 fun ActivityDeleted(deletedText: String) {
     Box(

@@ -138,7 +138,11 @@ dependencies {
 
 
     implementation("androidx.core:core-ktx:1.16.0")
-    implementation("androidx.glance:glance-appwidget:1.1.1")
+    implementation("androidx.glance:glance:1.2.0-alpha01")
+    implementation("androidx.glance:glance-appwidget:1.2.0-alpha01")
+    implementation("androidx.glance:glance-preview:1.2.0-alpha01")
+    implementation("androidx.glance:glance-appwidget-preview:1.2.0-alpha01")
+
     implementation("androidx.datastore:datastore-preferences:1.2.0-alpha02")
 
     implementation("androidx.navigation:navigation-compose:2.9.2")
