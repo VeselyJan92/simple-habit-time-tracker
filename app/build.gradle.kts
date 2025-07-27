@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.konan.properties.Properties
 
 plugins {
@@ -15,16 +16,35 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 
-repositories {
-    maven { setUrl("https://jitpack.io") }
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+    }
 }
 
 android {
+    namespace = "com.imfibit.activitytracker"
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-        // Enable core library desugaring
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
         isCoreLibraryDesugaringEnabled = true
+    }
+
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
+
+    compileSdk = 36
+
+    defaultConfig {
+        applicationId = "com.imfibit.activitytracker"
+        minSdk = 26
+        targetSdk = 36
+        versionCode = 57
+        versionName = "1.4.3"
+        testInstrumentationRunner = "com.imfibit.activitytracker.HiltRunner"
     }
 
     signingConfigs {
@@ -48,38 +68,8 @@ android {
 
     }
 
-    compileSdk = 36
-
-    buildFeatures {
-        compose = true
-        buildConfig = true
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    ksp {
-        arg("room.generateKotlin", "true")
-    }
-
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-
-    defaultConfig {
-        applicationId = "com.imfibit.activitytracker"
-        minSdk = 26
-        targetSdk = 36
-        versionCode = 57
-        versionName = "1.4.3"
-        testInstrumentationRunner  ="com.imfibit.activitytracker.HiltRunner"
-    }
-
     buildTypes {
         getByName("release") {
-
             isMinifyEnabled = true
 
             manifestPlaceholders["crashlyticsCollectionEnabled"] = true
@@ -107,9 +97,6 @@ android {
         }
 
     }
-
-    namespace = "com.imfibit.activitytracker"
-
 }
 
 play {
@@ -179,5 +166,4 @@ dependencies {
     testImplementation("androidx.test:core:1.6.1")
     androidTestImplementation("androidx.test:runner:1.6.2")
     androidTestImplementation("androidx.test:rules:1.6.1")
-
 }
