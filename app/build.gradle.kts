@@ -13,7 +13,7 @@ plugins {
 
     id("org.jetbrains.kotlin.plugin.compose")
     id("org.jetbrains.kotlin.plugin.parcelize")
-    id("org.jetbrains.kotlin.plugin.serialization")
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
 }
 
 kotlin {
@@ -48,36 +48,36 @@ android {
     }
 
     signingConfigs {
-        create("release") {
-            val properties = Properties().apply {
-                load(File("../imfibit-tracker-keystore/signing.properties").reader())
-            }
+        /*     create("release") {
+                 val properties = Properties().apply {
+                     load(File("../imfibit-tracker-keystore/signing.properties").reader())
+                 }
 
-            storeFile = File(properties.getProperty("key_store"))
-            storePassword = properties.getProperty("key_store_password")
-            keyPassword = properties.getProperty("key_password")
-            keyAlias = properties.getProperty("key_alias")
-        }
-
+                 storeFile = File(properties.getProperty("key_store"))
+                 storePassword = properties.getProperty("key_store_password")
+                 keyPassword = properties.getProperty("key_password")
+                 keyAlias = properties.getProperty("key_alias")
+             }
+     */
         getByName("debug") {
-            storeFile = rootProject.file("debug.keystore")
-            storePassword = "android"
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
+            // storeFile = rootProject.file("debug.keystore")
+            // storePassword = "android"
+            // keyAlias = "androiddebugkey"
+            //  keyPassword = "android"
         }
 
     }
 
     buildTypes {
-        getByName("release") {
-            isMinifyEnabled = true
+        /*    getByName("release") {
+                isMinifyEnabled = true
 
-            manifestPlaceholders["crashlyticsCollectionEnabled"] = true
+                manifestPlaceholders["crashlyticsCollectionEnabled"] = true
 
-            signingConfig = signingConfigs.getByName("release")
-            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-        }
-
+                signingConfig = signingConfigs.getByName("release")
+                proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            }
+    */
         getByName("debug") {
             manifestPlaceholders["crashlyticsCollectionEnabled"] = false
             isMinifyEnabled = false
@@ -90,12 +90,12 @@ android {
             isDebuggable = true
         }
 
-        create("stage") {
-            initWith(getByName("release"))
-            applicationIdSuffix = ".stage"
-            versionNameSuffix = " - Stage"
-        }
-
+        /*   create("stage") {
+               initWith(getByName("release"))
+               applicationIdSuffix = ".stage"
+               versionNameSuffix = " - Stage"
+           }
+   */
     }
 }
 
@@ -108,7 +108,8 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.9.0") //For navigation
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
 
 
     implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
@@ -132,10 +133,13 @@ dependencies {
 
     implementation("androidx.datastore:datastore-preferences:1.2.0-alpha02")
 
-    implementation("androidx.navigation:navigation-compose:2.9.2")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.2")
+    // Navigation 3
+    implementation("androidx.navigation3:navigation3-runtime:1.0.0")
+    implementation("androidx.navigation3:navigation3-ui:1.0.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-navigation3:2.10.0")
+    implementation("androidx.compose.material3.adaptive:adaptive-navigation3:1.3.0-alpha05")
 
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0-rc01")
 
     implementation("androidx.paging:paging-runtime-ktx:3.3.6")
     implementation("androidx.paging:paging-compose:3.3.6")
@@ -146,17 +150,18 @@ dependencies {
     implementation("androidx.room:room-ktx:$ROOM_VERSION")
 
 
-    implementation("androidx.hilt:hilt-common:1.3.0-alpha02")
-    implementation("com.google.dagger:hilt-android:2.57")
-    ksp("com.google.dagger:hilt-android-compiler:2.57")
-    ksp("androidx.hilt:hilt-compiler:1.3.0-alpha02")
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation("androidx.hilt:hilt-common:1.3.0")
+    implementation("com.google.dagger:hilt-android:2.57.2")
+    ksp("com.google.dagger:hilt-android-compiler:2.57.2")
+    ksp("androidx.hilt:hilt-compiler:1.3.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
+
 
     debugImplementation("androidx.compose.ui:ui-tooling:$COMPOSE_VERSION")
     implementation("androidx.compose.ui:ui-tooling-preview:$COMPOSE_VERSION")
 
 
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.57")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.57.2")
 
     // Needed for createAndroidComposeRule, but not createComposeRule:
     debugImplementation("androidx.compose.ui:ui-test-manifest:$COMPOSE_VERSION")

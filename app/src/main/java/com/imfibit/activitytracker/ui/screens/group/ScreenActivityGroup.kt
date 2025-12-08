@@ -36,17 +36,15 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
-import com.imfibit.activitytracker.core.navigation.navigate
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
 import com.imfibit.activitytracker.database.entities.TrackedActivityRecord
 import com.imfibit.activitytracker.database.entities.TrackedActivityScore
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
+import com.imfibit.activitytracker.ui.AppDestination
 import com.imfibit.activitytracker.ui.Destinations
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.TopBarBackButton
@@ -62,9 +60,14 @@ import java.time.LocalDateTime
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 fun ScreenActivityGroup(
-    nav: NavHostController,
+    navigate: (AppDestination) -> Unit,
+    popBack: () -> Unit,
+    groupId: Long
 ) {
-    val vm = hiltViewModel<ActivityGroupViewModel>()
+    val vm = hiltViewModel<ActivityGroupViewModel, ActivityGroupViewModel.Factory> { factory ->
+        factory.create(groupId)
+    }
+
     val recordVM = hiltViewModel<RecordViewModel>()
 
     val activities by vm.activities.collectAsState()
@@ -76,7 +79,7 @@ fun ScreenActivityGroup(
             group = group,
             name = vm.groupName.value ?: "",
             onDelete = {
-                nav.popBackStack()
+                popBack()
                 vm.delete(it)
             },
             onNameChanged = vm::refreshName,
@@ -87,10 +90,9 @@ fun ScreenActivityGroup(
             onAddRecord = {
                 when (it) {
                     is TrackedActivityCompletion -> throw IllegalStateException("Completion not supported")
-                    is TrackedActivityScore -> nav.navigate(
-                        "dialog_edit_record/{record}",
-                        bundleOf(
-                            "record" to TrackedActivityScore(
+                    is TrackedActivityScore -> navigate(
+                        Destinations.DialogEditRecord(
+                             TrackedActivityScore(
                                 activity_id = it.activity_id,
                                 datetime_completed = LocalDateTime.now(),
                                 score = 1
@@ -98,10 +100,9 @@ fun ScreenActivityGroup(
                         )
                     )
 
-                    is TrackedActivityTime -> nav.navigate(
-                        "dialog_edit_record/{record}",
-                        bundleOf(
-                            "record" to TrackedActivityTime(
+                    is TrackedActivityTime -> navigate(
+                        Destinations.DialogEditRecord(
+                            TrackedActivityTime(
                                 activity_id = it.activity_id,
                                 datetime_start = LocalDateTime.now(),
                                 datetime_end = LocalDateTime.now()
@@ -113,10 +114,10 @@ fun ScreenActivityGroup(
 
             },
             onNavigateToActivity = {
-                nav.navigate(Destinations.ScreenActivity(it.id))
+                navigate(Destinations.ScreenActivity(it.id))
             },
             onNavigateBack = {
-                nav.popBackStack()
+                popBack()
             }
         )
     }

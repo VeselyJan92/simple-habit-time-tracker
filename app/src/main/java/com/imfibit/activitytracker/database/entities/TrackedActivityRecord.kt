@@ -8,11 +8,13 @@ import androidx.room.ForeignKey.Companion.CASCADE
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
+@Serializable
 sealed class TrackedActivityRecord : Parcelable {
     abstract var id: Long
     abstract var activity_id: Long

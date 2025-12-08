@@ -69,7 +69,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.ASK_FOR_NOTIFICATION
 import com.imfibit.activitytracker.core.TestTag
@@ -81,8 +80,11 @@ import com.imfibit.activitytracker.database.entities.PresetTimer
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
+import com.imfibit.activitytracker.ui.AppDestination
 import com.imfibit.activitytracker.ui.AppTheme
+import com.imfibit.activitytracker.ui.Destinations
 import com.imfibit.activitytracker.ui.components.Colors
+import com.imfibit.activitytracker.ui.components.GoalProgressBar
 import com.imfibit.activitytracker.ui.components.MetricBlock
 import com.imfibit.activitytracker.ui.components.MetricWidgetData
 import com.imfibit.activitytracker.ui.components.TimerBlock
@@ -103,7 +105,6 @@ import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecen
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.ActionButton.IN_SESSION
 import com.imfibit.activitytracker.ui.viewmodels.RecordNavigatorImpl
 import com.imfibit.activitytracker.ui.viewmodels.RecordViewModel
-import com.imfibit.activitytracker.ui.components.GoalProgressBar
 import java.time.DayOfWeek
 import java.time.Duration
 import java.time.LocalDate
@@ -151,10 +152,14 @@ fun ScreenTrackedActivity_Preview() = AppTheme {
 
 @Composable
 fun ScreenTrackedActivity(
-    nav: NavHostController,
+    navigate: (AppDestination) -> Unit,
+    popBack: () -> Unit,
+    activityId: Long
 ) {
     val recordVM = hiltViewModel<RecordViewModel>()
-    val vm = hiltViewModel<TrackedActivityViewModel>()
+    val vm = hiltViewModel<TrackedActivityViewModel, TrackedActivityViewModel.Factory> { factory ->
+        factory.create(activityId)
+    }
 
     var showHistoryBottomSheet by remember { mutableStateOf(false) }
 
@@ -165,7 +170,7 @@ fun ScreenTrackedActivity(
             onDismissRequest = { showHistoryBottomSheet = false },
             activity = data?.activity,
             months = vm.months,
-            nav = nav,
+            navigate = navigate,
         )
     }
 
@@ -188,14 +193,14 @@ fun ScreenTrackedActivity(
             state = it,
             onDayClicked = { activity, date ->
                 RecordNavigatorImpl.onDayClicked(
-                    nav,
+                    navigate,
                     activity,
                     date
                 )
             },
             onDayLongClicked = { activity, date ->
                 RecordNavigatorImpl.onDaylongClicked(
-                    nav = nav,
+                    navigate = navigate,
                     recordViewModel = recordVM,
                     activity = activity,
                     date = date,
@@ -207,7 +212,7 @@ fun ScreenTrackedActivity(
             onNavigateToHistory = {
                 showHistoryBottomSheet = true
             },
-            onNavigateBack = { nav.popBackStack() },
+            onNavigateBack = { popBack() },
             scheduleTimer = vm::scheduleTimer,
             deleteTimer = vm::deleteTimer,
             addTimer = vm::addTimer,
@@ -935,4 +940,3 @@ private fun HeaderButton(
         }
     }
 }
-

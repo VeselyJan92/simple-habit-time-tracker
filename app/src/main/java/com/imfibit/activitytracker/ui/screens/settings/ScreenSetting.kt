@@ -34,24 +34,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationManagerCompat
-import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.ui.AppDestination
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.SimpleTopBar
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun ScreenSetting(navControl: NavHostController) {
+fun ScreenSetting(
+    navigate: (AppDestination) -> Unit,
+    popBack: () -> Unit
+) {
 
     Scaffold(
         modifier = Modifier.safeDrawingPadding(),
         topBar = {
             SimpleTopBar(
                 title = stringResource(id = R.string.screen_settings_title),
-                onBack = { navControl.popBackStack() }
+                onBack = { popBack() }
             )
         },
 
@@ -211,4 +213,3 @@ fun SettingsListItem(
 fun HorizontalDivider() {
     HorizontalDivider(modifier = Modifier.padding(8.dp))
 }
-

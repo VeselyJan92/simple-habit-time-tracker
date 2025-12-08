@@ -48,13 +48,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.sumByLong
 import com.imfibit.activitytracker.core.value
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.ui.AppDestination
 import com.imfibit.activitytracker.ui.components.BaseMetricBlock
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.SimpleTopBar
@@ -65,13 +65,16 @@ import java.time.LocalDate
 
 
 @Composable
-fun ScreenStatistics(navController: NavHostController) {
+fun ScreenStatistics(
+    navigate: (AppDestination) -> Unit,
+    popBack: () -> Unit
+) {
     Scaffold(
         modifier = Modifier.safeDrawingPadding(),
         topBar = {
             SimpleTopBar(
                 title = stringResource(id = R.string.screen_title_statistics),
-                onBack = { navController.popBackStack() }
+                onBack = { popBack() }
             )
         },
         content = { padding ->

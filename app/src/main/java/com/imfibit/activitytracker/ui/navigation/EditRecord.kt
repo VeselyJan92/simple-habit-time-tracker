@@ -3,79 +3,88 @@ package com.imfibit.activitytracker.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.SavedStateHandle
-import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.core.BaseViewModel
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
 import com.imfibit.activitytracker.database.entities.TrackedActivityRecord
 import com.imfibit.activitytracker.database.entities.TrackedActivityScore
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
+import com.imfibit.activitytracker.ui.AppDestination
 import com.imfibit.activitytracker.ui.components.dialogs.DialogScore
 import com.imfibit.activitytracker.ui.components.dialogs.DialogSession
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import javax.inject.Inject
 
 @Composable
-fun EditRecord(navControl: NavHostController) {
-    val vm = hiltViewModel<DialogEditRecordVM>()
+fun EditRecord(
+    navigate: (AppDestination) -> Unit,
+    popBack: () -> Unit,
+    record: TrackedActivityRecord
+) {
+    val vm = hiltViewModel<DialogEditRecordVM, DialogEditRecordVM.Factory> { factory ->
+        factory.create(record)
+    }
+
     val data = vm.data.collectAsState(initial = null)
+    val currentRecord = data.value
 
-    val record = data.value
-
-    if (record != null) {
-        when (record) {
+    if (currentRecord != null) {
+        when (currentRecord) {
             is TrackedActivityCompletion -> {}
             is TrackedActivityScore -> DialogScore(
-                record = record,
+                record = currentRecord,
                 onUpdate = { time, score ->
                     vm.onUpdate(
-                        record.copy(
+                        currentRecord.copy(
                             datetime_completed = time,
                             score = score
                         )
                     );
                 },
-                onDelete = { vm.onDelete(record) },
-                onDismissRequest = { navControl.popBackStack() }
+                onDelete = { vm.onDelete(currentRecord) },
+                onDismissRequest = { popBack() }
             )
 
             is TrackedActivityTime -> DialogSession(
-                record = record,
+                record = currentRecord,
                 onUpdate = { from, to ->
                     vm.onUpdate(
-                        record.copy(
+                        currentRecord.copy(
                             datetime_start = from,
                             datetime_end = to
                         )
                     )
                 },
-                onDelete = { vm.onDelete(record) },
-                onDismissRequest = { navControl.popBackStack() }
+                onDelete = { vm.onDelete(currentRecord) },
+                onDismissRequest = { popBack() }
             )
         }
     }
 }
 
-@HiltViewModel
-public class DialogEditRecordVM @Inject constructor(
+@HiltViewModel(assistedFactory = DialogEditRecordVM.Factory::class)
+class DialogEditRecordVM @AssistedInject constructor(
     private val db: AppDatabase,
-    private val savedStateHandle: SavedStateHandle,
+    @Assisted private val record: TrackedActivityRecord
 ) : BaseViewModel() {
 
-    val record: TrackedActivityRecord =
-        savedStateHandle["record"] ?: throw IllegalArgumentException()
+    @AssistedFactory
+    interface Factory {
+        fun create(record: TrackedActivityRecord): DialogEditRecordVM
+    }
 
     init {
         if (record is TrackedActivityCompletion) {
-            throw Exception("Invalid argument")
+            throw IllegalArgumentException("Invalid argument: TrackedActivityCompletion is not supported")
         }
     }
 
     val data = MutableStateFlow(record)
 
-    public fun onUpdate(record: TrackedActivityRecord) = launchIO {
+    fun onUpdate(record: TrackedActivityRecord) = launchIO {
         when (record) {
             is TrackedActivityCompletion -> {}
             is TrackedActivityScore -> db.scoreDAO().upsert(record)
@@ -83,7 +92,7 @@ public class DialogEditRecordVM @Inject constructor(
         }
     }
 
-    public fun onDelete(record: TrackedActivityRecord) = launchIO {
+    fun onDelete(record: TrackedActivityRecord) = launchIO {
         when (record) {
             is TrackedActivityCompletion -> {}
             is TrackedActivityScore -> db.scoreDAO().delete(record)

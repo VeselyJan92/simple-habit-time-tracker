@@ -35,12 +35,10 @@ import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.navigation.NavHostController
 import androidx.navigation.toRoute
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.TestTag
 import com.imfibit.activitytracker.database.activityTables
-import com.imfibit.activitytracker.core.navigation.navigate
 import com.imfibit.activitytracker.database.invalidationStateFlow
 import com.imfibit.activitytracker.core.value
 import com.imfibit.activitytracker.database.AppDatabase
@@ -52,11 +50,13 @@ import com.imfibit.activitytracker.database.entities.TrackedActivityRecord
 import com.imfibit.activitytracker.database.entities.TrackedActivityScore
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
+import com.imfibit.activitytracker.ui.AppDestination
 import com.imfibit.activitytracker.ui.AppTheme
 import com.imfibit.activitytracker.ui.Destinations
 import com.imfibit.activitytracker.ui.components.Colors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import javax.inject.Inject
@@ -88,18 +88,24 @@ fun DialogRecords_PreviewNoItems() = AppTheme {
 
 
 @Composable
-fun DialogRecords(nav: NavHostController) {
-    val vm = hiltViewModel<DayRecordsVM>()
+fun DialogRecords(
+    navigate: (AppDestination) -> Unit,
+    popBack: () -> Unit,
+    activityId: Long,
+    date: LocalDate
+) {
+    val vm = hiltViewModel<DayRecordsVM, DayRecordsVM.Factory> { factory ->
+        factory.create(activityId, date.format(DateTimeFormatter.ISO_LOCAL_DATE))
+    }
 
     val data by vm.data.collectAsState()
 
     DialogRecords(
-        onDismissRequest = { nav.popBackStack() },
+        onDismissRequest = { popBack() },
         data = data,
         onNavigate = {
-            nav.navigate(
-                "dialog_edit_record/{record}",
-                bundleOf("record" to it)
+            navigate(
+                Destinations.DialogEditRecord(it)
             )
         }
     )
@@ -241,19 +247,26 @@ fun Record(
     }
 }
 
-@HiltViewModel
-class DayRecordsVM @Inject constructor(
+@HiltViewModel(assistedFactory = DayRecordsVM.Factory::class)
+class DayRecordsVM @dagger.assisted.AssistedInject constructor(
     private val db: AppDatabase,
     private val rep: RepositoryTrackedActivity,
-    private val savedStateHandle: SavedStateHandle,
+    @dagger.assisted.Assisted("activityId") private val activityId: Long,
+    @dagger.assisted.Assisted("date") private val date: String,
 ) : ViewModel() {
 
-    val destination = savedStateHandle.toRoute<Destinations.DialogActivityDayHistory>()
+    @dagger.assisted.AssistedFactory
+    interface Factory {
+        fun create(
+            @dagger.assisted.Assisted("activityId") activityId: Long,
+            @dagger.assisted.Assisted("date") date: String
+        ): DayRecordsVM
+    }
 
     val data = invalidationStateFlow(db, listOf(), *activityTables) {
-        val activity = rep.activityDAO.flowById(destination.activityId).first()
+        val activity = rep.activityDAO.flowById(activityId).first()
 
-        val from = destination.getDate().atStartOfDay()
+        val from = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE).atStartOfDay()
         val to = from.plusDays(1L)
 
 

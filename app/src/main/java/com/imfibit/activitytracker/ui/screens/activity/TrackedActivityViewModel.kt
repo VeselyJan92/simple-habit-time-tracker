@@ -4,9 +4,7 @@ package com.imfibit.activitytracker.ui.screens.activity
 import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.runtime.Immutable
 import androidx.datastore.preferences.core.edit
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
@@ -29,7 +27,6 @@ import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.database.invalidationStateFlow
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.imfibit.activitytracker.ui.Destinations
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.MetricWidgetData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -52,28 +49,31 @@ data class TrackedActivityState(
     val challengeMetric: Long,
 )
 
-@HiltViewModel
-class TrackedActivityViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = TrackedActivityViewModel.Factory::class)
+class TrackedActivityViewModel @dagger.assisted.AssistedInject constructor(
     private val timerService: TrackTimeService,
     private val db: AppDatabase,
     private val rep: RepositoryTrackedActivity,
-    private val savedStateHandle: SavedStateHandle,
+    @dagger.assisted.Assisted private val activityId: Long,
     private val appSettings: PreferenceStore,
 ) : BaseViewModel() {
 
+    @dagger.assisted.AssistedFactory
+    interface Factory {
+        fun create(activityId: Long): TrackedActivityViewModel
+    }
+
     val settings = appSettings.dataStore.data
 
-    val id = savedStateHandle.toRoute<Destinations.ScreenActivity>().activityId
-
     val months = Pager(PagingConfig(MonthsPagingSource.PAGE_SIZE)) {
-        MonthsPagingSource(rep, id, db.invalidationTracker)
+        MonthsPagingSource(rep, activityId, db.invalidationTracker)
     }.flow.cachedIn(viewModelScope)
 
 
 
     val data = invalidationStateFlow(db, null, *activityTables) {
         val activity: TrackedActivity =
-            rep.activityDAO.tryGetById(id) ?: return@invalidationStateFlow null
+            rep.activityDAO.tryGetById(activityId) ?: return@invalidationStateFlow null
 
         /*
         val now = LocalDate.now()
@@ -106,8 +106,8 @@ class TrackedActivityViewModel @Inject constructor(
 
         val recent = listOf(
             //rep.getRecentActivityM(id, YearMonth.now().minusMonths(2)),
-            rep.getMonthData(id, YearMonth.now().minusMonths(1)),
-            rep.getMonthData(id, YearMonth.now()),
+            rep.getMonthData(activityId, YearMonth.now().minusMonths(1)),
+            rep.getMonthData(activityId, YearMonth.now()),
         )
 
 
@@ -148,7 +148,7 @@ class TrackedActivityViewModel @Inject constructor(
 
 
     fun updateName(name: String) = launchIO {
-        val activity = rep.activityDAO.getById(id)
+        val activity = rep.activityDAO.getById(activityId)
         rep.activityDAO.update(activity.copy(name = name))
     }
 
@@ -177,13 +177,13 @@ class TrackedActivityViewModel @Inject constructor(
 
 
     fun updateGoal(goal: TrackedActivityGoal) = launchIO {
-        val activity = rep.activityDAO.getById(id)
+        val activity = rep.activityDAO.getById(activityId)
         rep.activityDAO.update(activity.copy(goal = goal))
     }
 
 
     fun scheduleTimer(timer: PresetTimer) = launchIO {
-        timerService.startWithTimer(rep.activityDAO.getById(id), timer)
+        timerService.startWithTimer(rep.activityDAO.getById(activityId), timer)
     }
 
     fun deleteActivity(activity: TrackedActivity) = launchIO {
@@ -198,7 +198,7 @@ class TrackedActivityViewModel @Inject constructor(
 
     fun setGroup(group: TrackerActivityGroup?) = launchIO {
         rep.activityDAO.update(
-            rep.activityDAO.getById(id).copy(groupId = group?.id)
+            rep.activityDAO.getById(activityId).copy(groupId = group?.id)
         )
     }
 
@@ -219,7 +219,7 @@ class TrackedActivityViewModel @Inject constructor(
     }
 
     suspend fun getChallengeMetric(from: LocalDate?, to: LocalDate?): Long {
-        return rep.getChallengeMetric(id, from, to)
+        return rep.getChallengeMetric(activityId, from, to)
     }
 
     fun updateActivity(activity: TrackedActivity) = launchIO {
@@ -278,5 +278,3 @@ class MonthsPagingSource(
         return null
     }
 }
-
-

@@ -20,7 +20,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
@@ -28,6 +27,7 @@ import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.DevSeeder
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
+import com.imfibit.activitytracker.ui.AppDestination
 import com.imfibit.activitytracker.ui.AppTheme
 import com.imfibit.activitytracker.ui.components.BaseBottomSheet
 import com.imfibit.activitytracker.ui.components.TrackedActivityMonth
@@ -64,7 +64,7 @@ fun BottomSheetActivityHistory_Preview() = AppTheme {
 fun BottomSheetActivityHistory(
     onDismissRequest: () -> Unit,
     months: Flow<PagingData<RepositoryTrackedActivity.Month>>,
-    nav: NavHostController,
+    navigate: (AppDestination) -> Unit,
     activity: TrackedActivity?,
 ) {
     val recordViewModel = hiltViewModel<RecordViewModel>()
@@ -74,10 +74,10 @@ fun BottomSheetActivityHistory(
     BottomSheetActivityHistory(
         activity = activity,
         months = months,
-        onDayClicked = { activity, date -> RecordNavigatorImpl.onDayClicked(nav, activity, date) },
+        onDayClicked = { activity, date -> RecordNavigatorImpl.onDayClicked(navigate, activity, date) },
         onDayLongClicked = { activity, date ->
             RecordNavigatorImpl.onDaylongClicked(
-                nav = nav,
+                navigate = navigate,
                 recordViewModel = recordViewModel,
                 activity = activity,
                 date = date,

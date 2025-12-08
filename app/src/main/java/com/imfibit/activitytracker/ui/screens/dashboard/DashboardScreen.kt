@@ -21,7 +21,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.ui.screens.activity_list.ActivitiesViewModel
 import com.imfibit.activitytracker.R
@@ -29,6 +28,7 @@ import com.imfibit.activitytracker.core.TestTag
 import com.imfibit.activitytracker.database.composed.FocusBoardItemWithTags
 import com.imfibit.activitytracker.database.entities.DailyChecklistItem
 import com.imfibit.activitytracker.database.entities.FocusBoardItem
+import com.imfibit.activitytracker.ui.AppDestination
 import com.imfibit.activitytracker.ui.Destinations
 import com.imfibit.activitytracker.ui.SCREEN_ACTIVITIES_PAGER_ID
 import com.imfibit.activitytracker.ui.SCREEN_FOCUS_BOARD_PAGER_ID
@@ -51,7 +51,7 @@ import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Dashboard(navControl: NavHostController) {
+fun Dashboard(navigate: (AppDestination) -> Unit) {
 
     var dialogNewActivity by remember { mutableStateOf(false) }
     var editDailyChecklist by remember { mutableStateOf(false) }
@@ -140,7 +140,7 @@ fun Dashboard(navControl: NavHostController) {
                         vm.createNewActivity(name, it)
                     }
 
-                    navControl.navigate(Destinations.ScreenActivity(activityId))
+                    navigate(Destinations.ScreenActivity(activityId))
                 }
             },
 
@@ -188,7 +188,7 @@ fun Dashboard(navControl: NavHostController) {
                 state = pagerState,
             ) { page ->
                 when (page) {
-                    SCREEN_ACTIVITIES_PAGER_ID -> ScreenActivities(navController = navControl)
+                    SCREEN_ACTIVITIES_PAGER_ID -> ScreenActivities(navigate = navigate)
                     SCREEN_FOCUS_BOARD_PAGER_ID -> ScreenFocusBoard()
                     SCREEN_MIND_BOOT_ID -> ScreenMindBoot()
                 }

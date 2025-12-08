@@ -40,13 +40,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.TestTag
-import com.imfibit.activitytracker.core.navigation.navigate
 import com.imfibit.activitytracker.core.value
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.embedable.TimeRange
@@ -56,8 +53,9 @@ import com.imfibit.activitytracker.database.entities.TrackedActivityRecord
 import com.imfibit.activitytracker.database.entities.TrackedActivityScore
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
-import com.imfibit.activitytracker.ui.Destinations
+import com.imfibit.activitytracker.ui.AppDestination
 import com.imfibit.activitytracker.ui.DashboardBody
+import com.imfibit.activitytracker.ui.Destinations
 import com.imfibit.activitytracker.ui.components.BaseMetricBlock
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.util.TestableContent
@@ -69,7 +67,7 @@ import java.time.LocalDateTime
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ScreenActivities(
-    navController: NavHostController,
+    navigate: (AppDestination) -> Unit,
     vm: ActivitiesViewModel = hiltViewModel(),
 ) = TestableContent(testTag = TestTag.DASHBOARD_ACTIVITIES_CONTENT) {
 
@@ -78,19 +76,19 @@ fun ScreenActivities(
     DashboardBody {
         TopBar(
             onGoToSettings = {
-                navController.navigate(Destinations.ScreenSettings)
+                navigate(Destinations.ScreenSettings)
             }
         )
         ScreenBody(
             vm,
             onNavigateToStatistics = {
-                navController.navigate(Destinations.ScreenStatistics)
+                navigate(Destinations.ScreenStatistics)
             },
             onGoToActivityGroup = {
-                navController.navigate(Destinations.ScreenActivityGroupRoute(it))
+                navigate(Destinations.ScreenActivityGroupRoute(it))
             },
             onGoToActivity = {
-                navController.navigate(Destinations.ScreenActivity(it.id))
+                navigate(Destinations.ScreenActivity(it.id))
             },
             onActionButtonClicked = {
                 recordVM.activityTriggered(it)
@@ -98,20 +96,18 @@ fun ScreenActivities(
             onAddRecord = {
                 when(it){
                     is TrackedActivityCompletion -> throw IllegalStateException("Completion not supported")
-                    is TrackedActivityScore -> navController.navigate(
-                        "dialog_edit_record/{record}",
-                        bundleOf(
-                            "record" to TrackedActivityScore(
+                    is TrackedActivityScore -> navigate(
+                        Destinations.DialogEditRecord(
+                            TrackedActivityScore(
                                 activity_id = it.activity_id,
                                 datetime_completed = LocalDateTime.now(),
                                 score = 1
                             )
                         )
                     )
-                    is TrackedActivityTime -> navController.navigate(
-                        "dialog_edit_record/{record}",
-                        bundleOf(
-                            "record" to TrackedActivityTime(
+                    is TrackedActivityTime -> navigate(
+                        Destinations.DialogEditRecord(
+                            TrackedActivityTime(
                                 activity_id = it.activity_id,
                                 datetime_start = LocalDateTime.now(),
                                 datetime_end = LocalDateTime.now()

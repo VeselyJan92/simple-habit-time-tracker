@@ -1,39 +1,49 @@
 package com.imfibit.activitytracker.ui
 
+import android.os.Parcelable
+import com.imfibit.activitytracker.database.entities.TrackedActivityRecord
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+sealed interface AppDestination : Parcelable
 
 object Destinations {
 
     @Serializable
-    object ScreenStatistics
+    @kotlinx.parcelize.Parcelize
+    object ScreenStatistics : AppDestination
 
     @Serializable
-    object ScreenActivities
+    @kotlinx.parcelize.Parcelize
+    object ScreenActivities : AppDestination
 
     @Serializable
-    object ScreenSettings
+    @kotlinx.parcelize.Parcelize
+    object ScreenSettings : AppDestination
 
     @Serializable
-    object ScreenOnboarding
+    @kotlinx.parcelize.Parcelize
+    object ScreenOnboarding : AppDestination
 
     @Serializable
+    @kotlinx.parcelize.Parcelize
     data class ScreenActivity(
         val activityId: Long,
-    )
+    ) : AppDestination
 
     @Serializable
+    @kotlinx.parcelize.Parcelize
     data class ScreenActivityGroupRoute(
         val groupId: Long,
-    )
+    ) : AppDestination
 
     @Serializable
+    @kotlinx.parcelize.Parcelize
     data class DialogActivityDayHistory(
         val activityId: Long,
         val date: String,
-    ) {
+    ) : AppDestination {
 
         // bit of hack here
         constructor(activityId: Long, date: LocalDate) : this(
@@ -46,10 +56,11 @@ object Destinations {
         }
     }
 
-//    @Serializable
-//    data class DialogEditRecord(
-//        val item: TrackedActivityRecord,
-//    )
+    @Serializable
+    @kotlinx.parcelize.Parcelize
+    data class DialogEditRecord(
+        val item: TrackedActivityRecord,
+    ) : AppDestination
 
 
 }
