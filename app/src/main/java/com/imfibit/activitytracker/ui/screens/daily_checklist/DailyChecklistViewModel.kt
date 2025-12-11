@@ -9,8 +9,13 @@ import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.entities.DailyChecklistItem
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTimeline
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.LocalDate
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
+import kotlin.time.Clock
 
 
 @HiltViewModel
@@ -28,7 +33,8 @@ class DailyChecklistViewModel @Inject constructor(
     }
 
     val history = invalidationStateFlow(db, listOf(), *dailyChecklistTables) {
-        rep.getDataForPastDays(LocalDate.now().minusMonths(6L), LocalDate.now()).reversed()
+        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        rep.getDataForPastDays(now.minus(6, DateTimeUnit.MONTH), now).reversed()
     }
 
     val strike = invalidationStateFlow(db, 0, *dailyChecklistTables) {

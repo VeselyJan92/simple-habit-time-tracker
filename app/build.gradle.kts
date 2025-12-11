@@ -20,6 +20,12 @@ kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_17)
     }
+
+    sourceSets {
+        all {
+            languageSettings.optIn("kotlin.time.ExperimentalTime")
+        }
+    }
 }
 
 android {
@@ -110,6 +116,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
 
 
     implementation(platform("com.google.firebase:firebase-bom:34.0.0"))

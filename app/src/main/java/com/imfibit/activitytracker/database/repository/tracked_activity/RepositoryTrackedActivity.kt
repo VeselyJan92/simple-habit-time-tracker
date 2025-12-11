@@ -24,10 +24,15 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.first
-import java.time.LocalDate
-import java.time.LocalDateTime
+import kotlin.time.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
 import java.time.YearMonth
-import java.time.temporal.ChronoField
 import javax.inject.Inject
 
 @Module
@@ -52,7 +57,8 @@ class RepositoryTrackedActivity @Inject constructor(
 
     data class Month(
         val weeks:List<Week>,
-        val month: YearMonth,
+        val year: Int,
+        val month: Int,
     )
 
     val completionDAO: DAOTrackedActivityChecked = db.completionDAO()
@@ -65,13 +71,23 @@ class RepositoryTrackedActivity @Inject constructor(
 
     suspend fun getActivityOverview(activity: TrackedActivity): TrackedActivityRecentOverview {
         val pastRanges = 10
+        val todayDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
 
-        val today = metricDAO.getMetricByDay(activity.id, LocalDate.now().minusDays(pastRanges.toLong() - 1), LocalDate.now())
+        val today = metricDAO.getMetricByDay(activity.id, todayDate.minus(pastRanges - 1, DateTimeUnit.DAY), todayDate)
 
         val data = when(activity.goal.range){
             TimeRange.DAILY -> today
-            TimeRange.WEEKLY -> metricDAO.getMetricByWeek(activity.id, LocalDate.now().with(ChronoField.DAY_OF_WEEK, 7), pastRanges)
-            TimeRange.MONTHLY -> metricDAO.getMetricByMonth(activity.id, YearMonth.now(), pastRanges)
+            TimeRange.WEEKLY -> {
+                var endOfWeek = todayDate
+                // 1 = Monday, 7 = Sunday. DayOfWeek.value in JDK is 1-7
+                // kotlinx.datetime.DayOfWeek is enum. ordinal 0-6.
+                // We use ordinal + 1 to get 1-7 (Mon-Sun).
+                while ((endOfWeek.dayOfWeek.ordinal + 1) != 7) {
+                    endOfWeek = endOfWeek.plus(1, DateTimeUnit.DAY)
+                }
+                metricDAO.getMetricByWeek(activity.id, endOfWeek, pastRanges)
+            }
+            TimeRange.MONTHLY -> metricDAO.getMetricByMonth(activity.id, todayDate.year, todayDate.monthNumber, pastRanges)
         }
 
         val actionButton = when {
@@ -107,7 +123,7 @@ class RepositoryTrackedActivity @Inject constructor(
 
     }
 
-    suspend fun getChallengeMetric(activityId: Long, from: LocalDate?, to: LocalDate?) = metricDAO.getMetric(activityId, from ?: LocalDate.of(2000, 1, 1), to ?: LocalDate.of(2100, 1, 1))
+    suspend fun getChallengeMetric(activityId: Long, from: LocalDate?, to: LocalDate?) = metricDAO.getMetric(activityId, from ?: LocalDate(2000, 1, 1), to ?: LocalDate(2100, 1, 1))
 
     suspend fun getActivitiesOverview(activities: List<TrackedActivity>) =  db.withTransaction {
         return@withTransaction activities.map { activity -> getActivityOverview(activity) }
@@ -116,13 +132,31 @@ class RepositoryTrackedActivity @Inject constructor(
     suspend fun getMonthData(
         activityId: Long,
         yearMonth: YearMonth
+    ): Month = getMonthData(activityId, yearMonth.year, yearMonth.monthValue)
+
+    suspend fun getMonthData(
+        activityId: Long,
+        year: Int,
+        month: Int
     ) = db.withTransaction {
-        val to  = yearMonth.atDay(1).plusMonths(1).with(ChronoField.DAY_OF_WEEK, 7)
-        val from = to.minusMonths(1).withDayOfMonth(1).with(ChronoField.DAY_OF_WEEK, 7).minusDays(6)
+        val firstOfMonth = LocalDate(year, month, 1)
+
+        var start = firstOfMonth
+        // 1 = Monday. ordinal 0
+        while((start.dayOfWeek.ordinal + 1) != 1) { 
+            start = start.minus(1, DateTimeUnit.DAY)
+        }
+
+        val endOfMonth = firstOfMonth.plus(1, DateTimeUnit.MONTH).minus(1, DateTimeUnit.DAY)
+        var end = endOfMonth
+        // 7 = Sunday. ordinal 6
+        while((end.dayOfWeek.ordinal + 1) != 7) { 
+            end = end.plus(1, DateTimeUnit.DAY)
+        }
 
         val activity = activityDAO.getById(activityId)
 
-        val weeks =  metricDAO.getMetricByDay(activityId, from, to).chunked(7).map {
+        val weeks =  metricDAO.getMetricByDay(activityId, start, end).chunked(7).map {
 
             val days = it.map {
                 Day(
@@ -137,14 +171,14 @@ class RepositoryTrackedActivity @Inject constructor(
 
             Week(
                 from = it.first().from,
-                to =  it.last().to.minusDays(1),
+                to =  it.last().to.minus(1, DateTimeUnit.DAY),
                 days = days,
                 total = metricSum,
             )
         }
 
         return@withTransaction Month(
-            weeks = weeks, month = yearMonth
+            weeks = weeks, year = year, month = month
         )
     }
 
@@ -186,7 +220,7 @@ class RepositoryTrackedActivity @Inject constructor(
     ): List<TrackedActivityRecord> = listOf(
         sessionDAO.getAll(from, to),
         scoreDAO.getAll(from, to),
-        completionDAO.getAll(from.toLocalDate(), to.toLocalDate())
+        completionDAO.getAll(from.date, to.date)
     ).flatten().sortedBy {it.order }
 
 
@@ -209,4 +243,3 @@ class RepositoryTrackedActivity @Inject constructor(
 
 
 }
-

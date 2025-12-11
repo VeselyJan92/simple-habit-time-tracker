@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,22 +28,26 @@ import com.imfibit.activitytracker.core.TestTag
 import com.imfibit.activitytracker.database.DevSeeder
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import java.time.LocalDate
-import java.time.YearMonth
-import java.time.format.DateTimeFormatter
-import java.time.format.TextStyle
+import kotlin.time.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.Month
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import java.util.Locale
 
 
 @Preview
 @Composable
-private fun MonthPreview() = TrackedActivityMonth(
-    modifier = Modifier,
-    activity = DevSeeder.getTrackedActivityTime(),
-    month = DevSeeder.getMonthData(YearMonth.now()),
-    onDayLongClicked = { _, _ -> },
-    onDayClicked = { _, _ -> }
-)
+private fun MonthPreview() {
+    val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    TrackedActivityMonth(
+        modifier = Modifier,
+        activity = DevSeeder.getTrackedActivityTime(),
+        month = DevSeeder.getMonthData(now.year, now.monthNumber),
+        onDayLongClicked = { _, _ -> },
+        onDayClicked = { _, _ -> }
+    )
+}
 
 @Composable
 fun TrackedActivityMonth(
@@ -78,12 +81,12 @@ fun TrackedActivityMonth(
     },
 
     day = { day ->
-        val dayModifier = if (day.date == LocalDate.now())
+        val dayModifier = if (day.date == Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
             Modifier
                 .border(width = 2.dp, Color.Black, shape = RoundedCornerShape(8.dp))
                 .testTag(TestTag.MONTH_GRID_TODAY)
         else
-            Modifier.testTag(TestTag.MONTH_GRID_DATE + day.date.format(DateTimeFormatter.ISO_DATE))
+            Modifier.testTag(TestTag.MONTH_GRID_DATE + day.date.toString())
 
         MetricBlock(
             data = MetricWidgetData(activity.type.getLabel(day.metric), day.color, day.label),
@@ -107,14 +110,14 @@ fun MonthGridImpl(
 ) = Layout(
     modifier = modifier.padding(3.dp),
     content = {
-        val now = remember { LocalDate.now() }
+        val now = remember { Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date }
 
-        MonthSplitter(month = month.month)
+        MonthSplitter(year = month.year, month = month.month)
 
         month.weeks.forEach { week ->
             // Day content
             week.days.forEach { day ->
-                if (day.date.month == month.month.month) {
+                if (day.date.monthNumber == month.month) {
                     day(day)
                 } else {
                     Spacer(modifier = Modifier
@@ -130,9 +133,9 @@ fun MonthGridImpl(
 
             // Week sum content
             val showMetricForCurrentWeek =
-                week.from.month == now.month && week.to.month != now.month
+                week.from.monthNumber == now.monthNumber && week.to.monthNumber != now.monthNumber
 
-            if (week.to.month == month.month.month || showMetricForCurrentWeek) {
+            if (week.to.monthNumber == month.month || showMetricForCurrentWeek) {
                 weekSum(week)
             } else {
                 noWeekSum()
@@ -181,12 +184,11 @@ fun MonthGridImpl(
 }
 
 @Composable
-fun MonthSplitter(month: YearMonth) {
-    val value = remember(month) {
-        val name =
-            month.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault()).uppercase()
+fun MonthSplitter(year: Int, month: Int) {
+    val value = remember(year, month) {
+        val name = Month(month).name.uppercase(Locale.getDefault())
 
-        "$name - ${month.year}"
+        "$name - $year"
     }
 
     Row(

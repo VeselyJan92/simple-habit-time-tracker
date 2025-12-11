@@ -2,7 +2,7 @@ package com.imfibit.activitytracker.database.dao
 
 import androidx.room.*
 import com.imfibit.activitytracker.database.entities.DailyChecklistTimelineItem
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 @Dao
 abstract class DAODailyChecklistTimeline : BaseEditableDAO<DailyChecklistTimelineItem> {

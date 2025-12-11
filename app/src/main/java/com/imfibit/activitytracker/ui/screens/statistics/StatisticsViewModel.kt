@@ -6,7 +6,7 @@ import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel

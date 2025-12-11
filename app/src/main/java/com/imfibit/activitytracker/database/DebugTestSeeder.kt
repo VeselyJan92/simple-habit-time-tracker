@@ -8,9 +8,15 @@ import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
 import com.imfibit.activitytracker.database.entities.*
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryFocusBoard
 import com.imfibit.activitytracker.ui.components.Colors
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
+import kotlin.time.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
 import kotlin.random.Random
 
 object DebugTestSeeder {
@@ -69,6 +75,9 @@ object DebugTestSeeder {
     suspend fun activity_my_project(db: AppDatabase) {
         var activityId: Long = 0
 
+        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        val today = now.date
+
         activityId = db.activityDAO().insert(
             TrackedActivity(
                 id = 0, name = "My project",
@@ -76,7 +85,7 @@ object DebugTestSeeder {
                 type = TrackedActivity.Type.TIME,
                 inSessionSince = null,
                 goal = TrackedActivityGoal(0, TimeRange.WEEKLY),
-                challenge = TrackedActivityChallenge("Research", 40 * 3600, LocalDate.now().minusMonths(1), LocalDate.now().plusMonths(1))
+                challenge = TrackedActivityChallenge("Research", 40 * 3600, today.minus(1, DateTimeUnit.MONTH), today.plus(1, DateTimeUnit.MONTH))
             )
         )
 
@@ -86,22 +95,34 @@ object DebugTestSeeder {
         db.presetTimersDAO().insert(PresetTimer(0,activityId, 60*30, 0))
 
 
+        val nowTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+
         db.sessionDAO().insert(
             TrackedActivityTime(
                 activity_id = activityId,
                 id = 0,
-                datetime_start = LocalDateTime.now().minusHours(2),
-                datetime_end = LocalDateTime.now().minusHours(1)
+                datetime_start = nowTime.let { LocalDateTime(it.date, LocalTime(it.hour - 2, it.minute)) },
+                datetime_end = nowTime.let { LocalDateTime(it.date, LocalTime(it.hour - 1, it.minute)) }
             )
         )
 
         repeat(20){
             if (Random.nextBoolean()){
+                // This logic needs adjustment because kotlinx.datetime arithmetic is a bit different.
+                // Assuming simple subtraction of hours/days for mock data.
+                // We'll construct new date times by shifting.
+                
+                // Original: LocalDateTime.now().minusHours(2).minusDays(it.toLong() + 1)
+                // kotlinx:
+                
+                val start = Clock.System.now().minus(2, DateTimeUnit.HOUR).minus(it + 1, DateTimeUnit.DAY, TimeZone.currentSystemDefault()).toLocalDateTime(TimeZone.currentSystemDefault())
+                val end = Clock.System.now().minus(1, DateTimeUnit.HOUR).minus(it + 1, DateTimeUnit.DAY, TimeZone.currentSystemDefault()).toLocalDateTime(TimeZone.currentSystemDefault())
+
                 db.sessionDAO().insert(TrackedActivityTime(
                         activity_id = activityId,
                         id = 0,
-                        datetime_start = LocalDateTime.now().minusHours(2).minusDays(it.toLong() + 1),
-                        datetime_end = LocalDateTime.now().minusHours(1).minusDays(it.toLong() + 1)
+                        datetime_start = start,
+                        datetime_end = end
                 ))
             }
 
@@ -110,49 +131,54 @@ object DebugTestSeeder {
     }
 
     suspend fun activity_learning_spanish(db: AppDatabase) {
+        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        
         val activityId = db.activityDAO().insert(TrackedActivity(
             id = 0, name = "Learning Spanish",
             position = 1,
             type = TrackedActivity.Type.TIME,
-            inSessionSince = LocalDateTime.now(),
+            inSessionSince = now,
             goal = TrackedActivityGoal(0, TimeRange.DAILY),
             challenge = TrackedActivityChallenge.empty
         ))
+        
+        val nowInstant = Clock.System.now()
+        val tz = TimeZone.currentSystemDefault()
 
         db.sessionDAO().insert(TrackedActivityTime(
             activity_id = activityId,
             id = 0,
-            datetime_start = LocalDateTime.now().minusHours(2),
-            datetime_end = LocalDateTime.now().minusHours(1)
+            datetime_start = nowInstant.minus(2, DateTimeUnit.HOUR, tz).toLocalDateTime(tz),
+            datetime_end = nowInstant.minus(1, DateTimeUnit.HOUR, tz).toLocalDateTime(tz)
         ))
 
         db.sessionDAO().insert(TrackedActivityTime(
             activity_id = activityId,
             id = 0,
-            datetime_start = LocalDateTime.now().minusHours(4),
-            datetime_end = LocalDateTime.now().minusHours(3)
+            datetime_start = nowInstant.minus(4, DateTimeUnit.HOUR, tz).toLocalDateTime(tz),
+            datetime_end = nowInstant.minus(3, DateTimeUnit.HOUR, tz).toLocalDateTime(tz)
         ))
 
 
         db.sessionDAO().insert(TrackedActivityTime(
             activity_id = activityId,
             id = 0,
-            datetime_start = LocalDateTime.now().minusHours(4).minusDays(1),
-            datetime_end = LocalDateTime.now().minusHours(3).minusDays(1)
+            datetime_start = nowInstant.minus(1, DateTimeUnit.DAY, tz).minus(4, DateTimeUnit.HOUR, tz).toLocalDateTime(tz),
+            datetime_end = nowInstant.minus(1, DateTimeUnit.DAY, tz).minus(3, DateTimeUnit.HOUR, tz).toLocalDateTime(tz)
         ))
 
         db.sessionDAO().insert(TrackedActivityTime(
             activity_id = activityId,
             id = 0,
-            datetime_start = LocalDateTime.now().minusHours(4).minusDays(3),
-            datetime_end = LocalDateTime.now().minusHours(3).minusDays(3)
+            datetime_start = nowInstant.minus(3, DateTimeUnit.DAY, tz).minus(4, DateTimeUnit.HOUR, tz).toLocalDateTime(tz),
+            datetime_end = nowInstant.minus(3, DateTimeUnit.DAY, tz).minus(3, DateTimeUnit.HOUR, tz).toLocalDateTime(tz)
         ))
 
         db.sessionDAO().insert(TrackedActivityTime(
             activity_id = activityId,
             id = 0,
-            datetime_start = LocalDateTime.now().minusHours(4).minusDays(10),
-            datetime_end = LocalDateTime.now().minusHours(3).minusDays(10)
+            datetime_start = nowInstant.minus(10, DateTimeUnit.DAY, tz).minus(4, DateTimeUnit.HOUR, tz).toLocalDateTime(tz),
+            datetime_end = nowInstant.minus(10, DateTimeUnit.DAY, tz).minus(3, DateTimeUnit.HOUR, tz).toLocalDateTime(tz)
         ))
     }
 
@@ -166,41 +192,21 @@ object DebugTestSeeder {
             challenge = TrackedActivityChallenge.empty
         ))
 
+        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        
         db.completionDAO().insert(TrackedActivityCompletion(
             id = 0,
             activity_id = activityId,
-            date_completed = LocalDate.of(2022, 1, 31),
-            time_completed = LocalTime.now(),
+            date_completed = LocalDate(2022, 1, 31),
+            time_completed = now.time,
         ))
 
         db.completionDAO().insert(TrackedActivityCompletion(
             id = 0,
             activity_id = activityId,
-            date_completed = LocalDate.of(2022, 2, 1),
-            time_completed = LocalTime.now(),
+            date_completed = LocalDate(2022, 2, 1),
+            time_completed = now.time,
         ))
-
-
-
-
-       /* db.completionDAO().insert(TrackedActivityCompletion(
-            id = 0,
-            activity_id = activityId,
-            date_completed = LocalDate.now(),
-            time_completed = LocalTime.now(),
-        ))
-
-        repeat(20){
-            if (Random.nextBoolean()){
-                db.completionDAO().insert(TrackedActivityCompletion(
-                    id = 0,
-                    activity_id = activityId,
-                    date_completed = LocalDate.now().minusDays(it + 1L),
-                    time_completed = LocalTime.now(),
-                ))
-            }
-        }*/
-
     }
 
     suspend fun activity_point(db: AppDatabase) {
@@ -214,20 +220,23 @@ object DebugTestSeeder {
             goal = TrackedActivityGoal(3, TimeRange.WEEKLY),
             challenge = TrackedActivityChallenge.empty
         ))
+        
+        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
         db.scoreDAO().insert(TrackedActivityScore(
             id = 0,
             activity_id = activityId,
-            datetime_completed = LocalDateTime.now(),
+            datetime_completed = now,
             score = 42
         ))
 
         repeat(20){
             if (Random.nextBoolean()){
+                val date = Clock.System.now().minus(it + 1, DateTimeUnit.DAY, TimeZone.currentSystemDefault()).toLocalDateTime(TimeZone.currentSystemDefault())
                 db.scoreDAO().insert(TrackedActivityScore(
                     id = 0,
                     activity_id = activityId,
-                    datetime_completed = LocalDateTime.now().minusDays(it + 1L ),
+                    datetime_completed = date,
                     score = Random.nextLong(10, 20)
                 ))
             }
@@ -258,19 +267,22 @@ object DebugTestSeeder {
             goal = TrackedActivityGoal(0, TimeRange.DAILY),
             challenge = TrackedActivityChallenge.empty
         ))
+        
+        val nowInstant = Clock.System.now()
+        val tz = TimeZone.currentSystemDefault()
 
         db.sessionDAO().insert(TrackedActivityTime(
             activity_id = activityId,
             id = 0,
-            datetime_start = LocalDateTime.now().minusHours(2).minusDays(2),
-            datetime_end = LocalDateTime.now().minusHours(1).minusDays(2)
+            datetime_start = nowInstant.minus(2, DateTimeUnit.DAY, tz).minus(2, DateTimeUnit.HOUR, tz).toLocalDateTime(tz),
+            datetime_end = nowInstant.minus(2, DateTimeUnit.DAY, tz).minus(1, DateTimeUnit.HOUR, tz).toLocalDateTime(tz)
         ))
 
         db.sessionDAO().insert(TrackedActivityTime(
             activity_id = activityId,
             id = 0,
-            datetime_start = LocalDateTime.now().minusHours(4).minusDays(2),
-            datetime_end = LocalDateTime.now().minusHours(3).minusDays(2)
+            datetime_start = nowInstant.minus(2, DateTimeUnit.DAY, tz).minus(4, DateTimeUnit.HOUR, tz).toLocalDateTime(tz),
+            datetime_end = nowInstant.minus(2, DateTimeUnit.DAY, tz).minus(3, DateTimeUnit.HOUR, tz).toLocalDateTime(tz)
         ))
     }
 

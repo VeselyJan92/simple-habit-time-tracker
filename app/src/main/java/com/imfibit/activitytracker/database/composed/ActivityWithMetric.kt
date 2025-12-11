@@ -3,7 +3,7 @@ package com.imfibit.activitytracker.database.composed
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import com.imfibit.activitytracker.database.entities.TrackedActivity
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 data class ActivityWithMetric(
     @Embedded
@@ -12,5 +12,3 @@ data class ActivityWithMetric(
     @ColumnInfo(name = "metric")
     val metric: Long
 )
-
-

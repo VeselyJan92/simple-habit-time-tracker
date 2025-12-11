@@ -2,9 +2,8 @@ package com.imfibit.activitytracker.ui
 
 import android.os.Parcelable
 import com.imfibit.activitytracker.database.entities.TrackedActivityRecord
+import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 sealed interface AppDestination : Parcelable
 
@@ -48,11 +47,11 @@ object Destinations {
         // bit of hack here
         constructor(activityId: Long, date: LocalDate) : this(
             activityId,
-            date.format(DateTimeFormatter.ISO_LOCAL_DATE)
+            date.toString()
         )
 
         fun getDate(): LocalDate {
-            return LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE)
+            return LocalDate.parse(date)
         }
     }
 

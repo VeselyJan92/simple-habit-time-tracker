@@ -2,8 +2,6 @@ package com.imfibit.activitytracker.database
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.room.ColumnInfo
-import androidx.room.PrimaryKey
 import com.imfibit.activitytracker.core.getFullMonthBlockDays
 import com.imfibit.activitytracker.core.iter
 import com.imfibit.activitytracker.core.toSequence
@@ -24,9 +22,15 @@ import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.Colors.chooseableColors
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.YearMonth
+import kotlin.time.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atTime
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
 import java.util.*
 import kotlin.random.Random.Default.nextInt
 
@@ -43,7 +47,8 @@ object DevSeeder {
     fun getDailyChecklistItem() = DailyChecklistItem(title = "Workout", color = chooseableColors[4].toArgb(), description = "Plan your workout")
 
     fun getDailyChecklistTimelineCompletions(): List<DailyChecklistTimelineItem> {
-        return (LocalDate.now().minusDays(180) iter LocalDate.now()).asSequence().mapNotNull {
+        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        return (today.minus(180, DateTimeUnit.DAY) iter today).asSequence().mapNotNull {
             if (kotlin.random.Random.nextBoolean()){
                 DailyChecklistTimelineItem(it)
             }else {
@@ -52,8 +57,8 @@ object DevSeeder {
         }.toList()
     }
 
-    fun getMonthData(date: YearMonth): RepositoryTrackedActivity.Month {
-        val weeks = getFullMonthBlockDays(date.year, date.monthValue).toSequence().chunked(7).map {
+    fun getMonthData(year: Int, month: Int): RepositoryTrackedActivity.Month {
+        val weeks = getFullMonthBlockDays(year, month).toSequence().chunked(7).map {
             RepositoryTrackedActivity.Week(
                 from = it.first(),
                 to = it.last(),
@@ -70,7 +75,12 @@ object DevSeeder {
             )
         }.toList()
 
-        return RepositoryTrackedActivity.Month(weeks, date)
+        return RepositoryTrackedActivity.Month(weeks, year, month)
+    }
+
+    // Overload for LocalDate to match call site usage
+    fun getMonthData(date: LocalDate): RepositoryTrackedActivity.Month {
+        return getMonthData(date.year, date.monthNumber)
     }
 
     fun getActivityGroup(
@@ -93,7 +103,7 @@ object DevSeeder {
         inSessionSince: LocalDateTime? = null,
         goal: TrackedActivityGoal = TrackedActivityGoal(60 * 60, TimeRange.DAILY),
         challenge: TrackedActivityChallenge = TrackedActivityChallenge(
-            name = "Research", target = 60 * 60 * 10, from = LocalDate.now(), to = LocalDate.now().plusDays(10)
+            name = "Research", target = 60 * 60 * 10, from = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date, to = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.plus(10, DateTimeUnit.DAY)
         )
     ) = TrackedActivity(
         id = id,
@@ -117,7 +127,7 @@ object DevSeeder {
         inSessionSince: LocalDateTime? = null,
         goal: TrackedActivityGoal = TrackedActivityGoal(0, TimeRange.DAILY),
         challenge: TrackedActivityChallenge = TrackedActivityChallenge(
-            name = "", target = -1, from = LocalDate.now(), to = LocalDate.now()
+            name = "", target = -1, from = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date, to = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
         )
     ) = TrackedActivity(
         id = id,
@@ -141,7 +151,7 @@ object DevSeeder {
         inSessionSince = null,
         goal = TrackedActivityGoal(0, TimeRange.DAILY),
         challenge = TrackedActivityChallenge(
-            name = "", target = -1, from = LocalDate.now(), to = LocalDate.now()
+            name = "", target = -1, from = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date, to = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
         )
     )
 
@@ -194,41 +204,19 @@ object DevSeeder {
         return words[Random().nextInt(words.size)]
     }
 
-    /*    private fun randomColor(): String{
-            val colors = context.resources.getStringArray(R.array.tracked_task_colors)
-            return colors[Random().nextInt(colors.size)]
-        }*/
-
-    /* private fun randomIcon(): String {
-         val icons = context.resources.getStringArray(R.array.tracked_task_icons)
-         return icons[Random().nextInt(icons.size)]
-     }*/
-
     private inline fun <reified T : Enum<T>> randomEnum() = enumValues<T>().random()
 
     fun shiftDateTime(addHours: Int = 0, addDays: Int = 0): LocalDateTime {
-        var datetime = LocalDateTime.now()
-        datetime = datetime.plusHours(addHours.toLong())
-        datetime = datetime.plusDays(addDays.toLong())
+        var datetime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        datetime = datetime.date.plus(addDays, DateTimeUnit.DAY).atTime(datetime.hour + addHours, datetime.minute)
         return datetime
     }
-
-    /*    fun getTrackedActivity(
-            id: Long = 0,
-            name: String = randomWord(),
-            position: Int = nextInt(100, 200),
-            type: TrackedActivity.Type = TrackedActivity.Type.CHECKED,
-            inSession: LocalDateTime? = null,
-            range: TimeRange = TimeRange.DAILY,
-            goal: Long = 0
-        ) = TrackedActivity(id, null, name, position, type, inSession, TrackedActivityGoal(goal, range))*/
-
 
     fun getTrackedTaskCompletion(
         id: Long = 0,
         activityId: Long = 0,
         date: LocalDateTime = shiftDateTime(nextInt(0, 2))
-    ) = TrackedActivityCompletion(id, activityId, date.toLocalDate(), date.toLocalTime())
+    ) = TrackedActivityCompletion(id, activityId, date.date, date.time)
 
     fun getTrackedTaskScore(
         id: Long = 0,
@@ -242,37 +230,7 @@ object DevSeeder {
         id: Long = 0,
         activityId: Long = 0,
         start: LocalDateTime = shiftDateTime(nextInt(0, 2), nextInt(-1, 1)),
-        end: LocalDateTime = start.plusHours(1)
+        end: LocalDateTime = start.date.atTime(start.hour + 1, start.minute)
     ) = TrackedActivityTime(id, activityId, start, end)
-
-
-    /*fun getTrackedActivityWithMetric(
-        activity: TrackedActivity = getTrackedActivity()
-    ): TrackedActivityWithMetric {
-
-        val data =  activity.metric_range.getPastRanges()
-
-        when(activity.type){
-            TrackedActivity.Type.SESSION -> data.apply {
-                this[1].metric = 60 * 124
-                this[2].metric = 60 * 124
-                this[4].metric = 60 * 124
-            }
-
-            TrackedActivity.Type.SCORE -> data.apply {
-                this[1].metric = 2
-                this[2].metric = 3
-                this[4].metric = 2
-            }
-
-            TrackedActivity.Type.COMPLETED -> data.apply {
-                this[1].metric = 0
-                this[2].metric = 1
-                this[4].metric = 1
-            }
-        }
-
-        return TrackedActivityWithMetric(activity, data)
-    }*/
 
 }

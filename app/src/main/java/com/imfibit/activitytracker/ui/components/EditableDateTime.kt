@@ -26,14 +26,19 @@ import androidx.compose.ui.unit.dp
 import com.imfibit.activitytracker.ui.AppTheme
 import com.imfibit.activitytracker.ui.components.dialogs.system.DatePickerDialog
 import com.imfibit.activitytracker.ui.components.dialogs.system.DialogTimePicker
-import java.time.LocalDateTime
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atTime
+import kotlinx.datetime.toJavaLocalDateTime
+import kotlinx.datetime.toLocalDateTime
 import java.time.format.DateTimeFormatter
+import kotlin.time.Clock
 
 @Preview
 @Composable
 private fun EditableDatetime_Preview() = AppTheme {
     EditableDatetime(
-        datetime = LocalDateTime.now(),
+        datetime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
         onDatetimeEdit = { }
     )
 }
@@ -52,7 +57,7 @@ fun EditableDatetime(
             initialHour = datetime.hour,
             initialMinute = datetime.minute,
             onTimePicked = { hour, minute ->
-                val date = datetime.withHour(hour).withMinute(minute) ?: LocalDateTime.now()
+                val date = datetime.date.atTime(hour, minute)
                 onDatetimeEdit(date)
             }
         )
@@ -62,9 +67,9 @@ fun EditableDatetime(
     if (showDatePicker) {
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
-            date = datetime.toLocalDate(),
+            date = datetime.date,
             onDatePicked = {
-                val date = it?.atTime(datetime.hour, datetime.minute) ?: LocalDateTime.now()
+                val date = it?.atTime(datetime.hour, datetime.minute) ?: Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                 onDatetimeEdit(date)
             }
         )
@@ -80,7 +85,7 @@ fun EditableDatetime(
 
         Text(
             textAlign = TextAlign.Center,
-            text = datetime.format(DateTimeFormatter.ofPattern("dd. MM.")),     //TODO Local format
+            text = datetime.toJavaLocalDateTime().format(DateTimeFormatter.ofPattern("dd. MM.")),     //TODO Local format
             modifier = Modifier.clickable(
                 onClick = {
                     showDatePicker = true
@@ -97,7 +102,7 @@ fun EditableDatetime(
 
         Text(
             textAlign = TextAlign.Center,
-            text = datetime.format(DateTimeFormatter.ofPattern("HH:mm")),     //TODO Local format
+            text = datetime.toJavaLocalDateTime().format(DateTimeFormatter.ofPattern("HH:mm")),     //TODO Local format
             fontWeight = FontWeight.Bold,
             modifier = Modifier.clickable(
                 onClick = {

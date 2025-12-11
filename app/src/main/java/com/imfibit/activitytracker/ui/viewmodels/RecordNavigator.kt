@@ -7,7 +7,8 @@ import com.imfibit.activitytracker.database.entities.TrackedActivityScore
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
 import com.imfibit.activitytracker.ui.AppDestination
 import com.imfibit.activitytracker.ui.Destinations
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.atTime
 
 
 object RecordNavigatorImpl {

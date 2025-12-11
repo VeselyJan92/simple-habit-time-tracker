@@ -5,17 +5,16 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.ContextString
-import java.time.Duration
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.Period
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.daysUntil
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlinx.datetime.toJavaLocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-import java.time.temporal.ChronoField
-import java.time.temporal.TemporalAdjusters
-import java.time.temporal.WeekFields
-import java.util.*
-
+import java.util.Locale
 
 enum class TimeRange(val label: Int) {
     DAILY(R.string.frequency_daily),
@@ -26,7 +25,7 @@ enum class TimeRange(val label: Int) {
         when(this@TimeRange){
             DAILY -> date.dayOfMonth.toString()
             WEEKLY -> resources.getString(R.string.week)
-            MONTHLY -> resources.getStringArray(R.array.months)[date.monthValue-1]
+            MONTHLY -> resources.getStringArray(R.array.months)[date.monthNumber-1]
         }
     }
 
@@ -34,70 +33,48 @@ enum class TimeRange(val label: Int) {
         val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
 
         when(this@TimeRange){
-            DAILY -> date.format(formatter)
+            DAILY -> date.toJavaLocalDate().format(formatter)
             WEEKLY -> this@TimeRange.getBoundaries(date).run {
-                first.format(formatter) + " - " + second.format(formatter)
+                first.toJavaLocalDate().format(formatter) + " - " + second.toJavaLocalDate().format(formatter)
             }
-            MONTHLY -> resources.getStringArray(R.array.months)[date.monthValue-1]
+            MONTHLY -> resources.getStringArray(R.array.months)[date.monthNumber-1]
         }
     }
 
 
-    fun getBoundaries(date: LocalDate) = when(this){
+    fun getBoundaries(date: LocalDate): Pair<LocalDate, LocalDate> = when(this){
         DAILY -> Pair(date, date)
         WEEKLY -> {
-            val start = date.with(
-                TemporalAdjusters
-                    .previousOrSame(WeekFields.of(Locale.getDefault()).firstDayOfWeek)
-            )
+            // NOTE: java.time.temporal.WeekFields is used to determine the first day of the week based on Locale.
+            // kotlinx-datetime does not yet support locale-based first day of week natively.
+            // For now, we will rely on java.time for this specific logic or default to Monday if acceptable, 
+            // but to be safe and correct we can keep using WeekFields or write a wrapper.
+            // However, since we are refactoring, we should try to minimize java.time usage.
+            // But getting first day of week from Locale is a JDK feature.
+            
+            // value is 1 (Mon) to 7 (Sun)
+            val firstDayOfWeek = java.time.temporal.WeekFields.of(Locale.getDefault()).firstDayOfWeek.value
+            
+            var start = date
+            // ordinal is 0 (Mon) to 6 (Sun)
+            // value is 1 (Mon) to 7 (Sun)
+            while ((start.dayOfWeek.ordinal + 1) != firstDayOfWeek) {
+                start = start.minus(1, DateTimeUnit.DAY)
+            }
 
-            val end = start.plusDays(6L)
+            val end = start.plus(6, DateTimeUnit.DAY)
 
             Pair(start, end)
         }
-        MONTHLY -> Pair(date.withDayOfMonth(1), date.withDayOfMonth(date.lengthOfMonth()))
+        MONTHLY -> {
+             val start = LocalDate(date.year, date.monthNumber, 1)
+             val end = start.plus(1, DateTimeUnit.MONTH).minus(1, DateTimeUnit.DAY)
+             Pair(start, end)
+        }
     }
 
     fun getNumberOfDays(date:LocalDate) = getBoundaries(date).run {
-        Period.between(first, second).days + 1
+        first.daysUntil(second) + 1
     }
-
-
-  /*  fun getPastRanges(periods: Int = 5) = when(this){
-        DAILY -> getDays(periods)
-        WEEKLY -> getWeeks(periods)
-        MONTHLY -> getMonths(periods)
-    }
-
-    fun getDays(periods: Int):List<Range>{
-        val firstDay = LocalDateTime.now()
-            .toLocalDate().atStartOfDay()
-
-        return (0 until periods).map {
-            Range(firstDay.minusDays(it - 0L), firstDay.minusDays(it - 1L))
-        }
-    }
-
-    fun getWeeks(periods: Int):List<Range>{
-        val firstDay = LocalDateTime.now()
-            .with(ChronoField.DAY_OF_WEEK, 1)
-            .toLocalDate().atStartOfDay()
-
-        return (0 until periods).map {
-            Range(firstDay.minusDays(it*7L), firstDay.minusDays((it-1)*7L))
-        }
-    }
-
-    fun getMonths(periods: Int):List<Range>{
-        val firstDay = LocalDateTime.now()
-            .withDayOfMonth(1)
-            .toLocalDate().atStartOfDay()
-
-        return (0 until periods).map {
-            Range(firstDay.minusMonths(it+0L), firstDay.minusMonths(it-1L))
-        }
-    }*/
 
 }
-
-

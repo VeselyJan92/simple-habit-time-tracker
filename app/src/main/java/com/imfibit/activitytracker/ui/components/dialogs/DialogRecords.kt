@@ -31,24 +31,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.navigation.toRoute
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.TestTag
-import com.imfibit.activitytracker.database.activityTables
-import com.imfibit.activitytracker.database.invalidationStateFlow
 import com.imfibit.activitytracker.core.value
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.DevSeeder
+import com.imfibit.activitytracker.database.activityTables
 import com.imfibit.activitytracker.database.composed.RecordWithActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
 import com.imfibit.activitytracker.database.entities.TrackedActivityRecord
 import com.imfibit.activitytracker.database.entities.TrackedActivityScore
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
+import com.imfibit.activitytracker.database.invalidationStateFlow
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import com.imfibit.activitytracker.ui.AppDestination
 import com.imfibit.activitytracker.ui.AppTheme
@@ -56,10 +53,13 @@ import com.imfibit.activitytracker.ui.Destinations
 import com.imfibit.activitytracker.ui.components.Colors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
-import java.time.LocalDate
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.atTime
+import kotlinx.datetime.plus
+import kotlinx.datetime.toJavaLocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-import javax.inject.Inject
 
 @Preview
 @Composable
@@ -95,7 +95,7 @@ fun DialogRecords(
     date: LocalDate
 ) {
     val vm = hiltViewModel<DayRecordsVM, DayRecordsVM.Factory> { factory ->
-        factory.create(activityId, date.format(DateTimeFormatter.ISO_LOCAL_DATE))
+        factory.create(activityId, date.toString())
     }
 
     val data by vm.data.collectAsState()
@@ -178,7 +178,7 @@ fun Record(
             when (record) {
                 is TrackedActivityCompletion -> {
                     append(
-                        record.datetime_completed.format(
+                        record.datetime_completed.toJavaLocalDateTime().format(
                             DateTimeFormatter.ofLocalizedTime(
                                 FormatStyle.SHORT
                             )
@@ -188,7 +188,7 @@ fun Record(
 
                 is TrackedActivityScore -> {
                     append(
-                        record.datetime_completed.format(
+                        record.datetime_completed.toJavaLocalDateTime().format(
                             DateTimeFormatter.ofLocalizedTime(
                                 FormatStyle.SHORT
                             )
@@ -198,14 +198,14 @@ fun Record(
 
                 is TrackedActivityTime -> {
                     append(
-                        record.datetime_start.format(
+                        record.datetime_start.toJavaLocalDateTime().format(
                             DateTimeFormatter.ofLocalizedTime(
                                 FormatStyle.SHORT
                             )
                         )
                     )
                     append(" - ")
-                    append(record.datetime_end.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)))
+                    append(record.datetime_end.toJavaLocalDateTime().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)))
                 }
             }
 
@@ -266,8 +266,8 @@ class DayRecordsVM @dagger.assisted.AssistedInject constructor(
     val data = invalidationStateFlow(db, listOf(), *activityTables) {
         val activity = rep.activityDAO.flowById(activityId).first()
 
-        val from = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE).atStartOfDay()
-        val to = from.plusDays(1L)
+        val from = LocalDate.parse(date).atTime(0, 0)
+        val to = from.date.plus(1, DateTimeUnit.DAY).atTime(0, 0)
 
 
         rep.getRecords(activity.id, activity.type, from, to).map {

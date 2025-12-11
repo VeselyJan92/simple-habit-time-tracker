@@ -19,7 +19,7 @@ import com.imfibit.activitytracker.database.entities.TrackedActivityScore
 import com.imfibit.activitytracker.ui.AppTheme
 import com.imfibit.activitytracker.ui.components.EditableDatetime
 import com.imfibit.activitytracker.ui.components.selectors.NumberSelector
-import java.time.LocalDateTime
+import kotlinx.datetime.LocalDateTime
 
 
 @Preview

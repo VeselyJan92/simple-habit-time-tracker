@@ -66,9 +66,14 @@ import com.imfibit.activitytracker.ui.DashboardBody
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.Colors.chooseableColors
 import com.imfibit.activitytracker.ui.components.darker
+import kotlin.time.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.toLocalDateTime
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
-import java.time.LocalDate
 import kotlin.math.max
 
 val items = buildList {
@@ -114,7 +119,7 @@ private fun Preview() = AppTheme {
         items = items,
         days = buildList {
             repeat(30) {
-                add(DailyChecklistTimelineItemValue(LocalDate.now().minusDays(it.toLong()), true))
+                add(DailyChecklistTimelineItemValue(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.minus(it.toLong(), DateTimeUnit.DAY), true))
             }
         },
         history = listOf(),
@@ -474,7 +479,7 @@ private fun DailyChecklistItem(
 
             }
 
-            val now = remember { LocalDate.now() }
+            val now = remember { Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date }
 
             val haptic = LocalHapticFeedback.current
 

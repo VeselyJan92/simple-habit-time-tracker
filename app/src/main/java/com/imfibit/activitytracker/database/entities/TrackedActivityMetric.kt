@@ -2,7 +2,7 @@ package com.imfibit.activitytracker.database.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.DatabaseView
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 
 @DatabaseView(

@@ -37,8 +37,14 @@ import com.imfibit.activitytracker.ui.components.rememberTestBottomSheetState
 import com.imfibit.activitytracker.ui.components.GoalProgressBar
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import java.time.LocalDate
-import java.time.Period
+import kotlin.time.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.daysUntil
+import kotlinx.datetime.plus
+import kotlinx.datetime.toJavaLocalDate
+import kotlinx.datetime.toLocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
@@ -79,8 +85,8 @@ fun BottomSheetProgressGoal(
             TrackedActivityChallenge(
                 "",
                 0,
-                LocalDate.now(),
-                LocalDate.now().plusMonths(1L)
+                Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
+                Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.plus(1, DateTimeUnit.MONTH)
             )
         }
 
@@ -209,7 +215,7 @@ fun BottomSheetProgressGoal(
                 )
             }
 
-            val estimatedEndDate = LocalDate.now().plusDays(totalDays.toLong());
+            val estimatedEndDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.plus(totalDays, DateTimeUnit.DAY);
 
             val estimatedString = buildAnnotatedString {
                 withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
@@ -217,7 +223,7 @@ fun BottomSheetProgressGoal(
                 }
 
                 append(
-                    " - " + estimatedEndDate.format(
+                    " - " + estimatedEndDate.toJavaLocalDate().format(
                         DateTimeFormatter.ofLocalizedDate(
                             FormatStyle.LONG
                         )
@@ -230,7 +236,7 @@ fun BottomSheetProgressGoal(
 
             Spacer(modifier = Modifier.padding(vertical = 8.dp))
 
-            val aheadInDays = Period.between(estimatedEndDate, challenge.to).days
+            val aheadInDays = estimatedEndDate.daysUntil(challenge.to)
 
             if (estimatedEndDate > challenge.to) {
                 Text(
@@ -299,7 +305,7 @@ private fun RangeItem(
             },
             date = date,
             onDatePicked = {
-                onDateSet(it ?: LocalDate.now())
+                onDateSet(it ?: Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
                 showPicker = false
             }
         )
@@ -329,7 +335,7 @@ private fun RangeItem(
     OutlinedTextField(
         keyboardOptions = KeyboardOptions(KeyboardCapitalization.Sentences),
         label = { Text(text = label) },
-        value = date.format(formatter),
+        value = date.toJavaLocalDate().format(formatter),
         onValueChange = { /* This field is not directly editable */ },
         modifier = Modifier
             .clickable { showPicker = true }

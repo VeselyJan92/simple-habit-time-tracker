@@ -5,14 +5,22 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.ForeignKey.Companion.CASCADE
+import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atDate
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
-import java.time.Duration
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
+import kotlinx.serialization.Transient
+import kotlin.math.abs
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 @Serializable
 sealed class TrackedActivityRecord : Parcelable {
@@ -20,6 +28,7 @@ sealed class TrackedActivityRecord : Parcelable {
     abstract var activity_id: Long
     abstract val metric: Long
 
+    @Transient
     abstract val order: LocalDateTime
 }
 
@@ -59,7 +68,8 @@ data class TrackedActivityCompletion(
     val datetime_completed get() = time_completed.atDate(date_completed)
 
     @Transient
-    override val order = datetime_completed
+    override val order: LocalDateTime
+        get() = datetime_completed
 
     companion object {
         const val TABLE = "tracked_activity_completion"
@@ -104,15 +114,17 @@ data class TrackedActivityScore(
     companion object{
         const val TABLE = "tracked_activity_score"
 
+        @OptIn(ExperimentalTime::class)
         fun getEmpty(activityId: Long) = TrackedActivityScore(
             activity_id = activityId,
-            datetime_completed = LocalDateTime.now(),
+            datetime_completed = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
             score = 1
         )
     }
 
     @Transient
-    override val order = datetime_completed
+    override val order: LocalDateTime
+        get() = datetime_completed
 
     override val metric: Long
         get() = score
@@ -153,18 +165,20 @@ data class TrackedActivityTime(
     companion object{
         const val TABLE = "tracked_activity_session"
 
+        @OptIn(ExperimentalTime::class)
         fun getEmpty(activityId: Long) = TrackedActivityTime(
             activity_id = activityId,
-            datetime_start = LocalDateTime.now(),
-            datetime_end = LocalDateTime.now()
+            datetime_start = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+            datetime_end = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         )
     }
 
+
+    @OptIn(ExperimentalTime::class)
     override val metric: Long
-        get() = Duration.between(datetime_start, datetime_end).seconds
+        get() = abs((datetime_start.toInstant(TimeZone.UTC) - datetime_end.toInstant(TimeZone.UTC)).inWholeSeconds)
 
     @Transient
-    override val order = datetime_start
+    override val order: LocalDateTime
+        get() = datetime_start
 }
-
-

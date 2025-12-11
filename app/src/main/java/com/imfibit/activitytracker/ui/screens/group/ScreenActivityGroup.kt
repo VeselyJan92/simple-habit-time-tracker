@@ -52,9 +52,11 @@ import com.imfibit.activitytracker.ui.components.dialogs.DialogAgree
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivity
 import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview
 import com.imfibit.activitytracker.ui.viewmodels.RecordViewModel
+import kotlin.time.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
-import java.time.LocalDateTime
 
 
 @Composable
@@ -94,7 +96,7 @@ fun ScreenActivityGroup(
                         Destinations.DialogEditRecord(
                              TrackedActivityScore(
                                 activity_id = it.activity_id,
-                                datetime_completed = LocalDateTime.now(),
+                                datetime_completed = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
                                 score = 1
                             )
                         )
@@ -104,8 +106,8 @@ fun ScreenActivityGroup(
                         Destinations.DialogEditRecord(
                             TrackedActivityTime(
                                 activity_id = it.activity_id,
-                                datetime_start = LocalDateTime.now(),
-                                datetime_end = LocalDateTime.now()
+                                datetime_start = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+                                datetime_end = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                             )
                         )
                     )

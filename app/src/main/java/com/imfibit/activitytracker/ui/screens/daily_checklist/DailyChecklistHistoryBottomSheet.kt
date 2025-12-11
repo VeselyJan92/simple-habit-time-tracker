@@ -41,9 +41,14 @@ import com.imfibit.activitytracker.ui.components.MonthSplitter
 import com.imfibit.activitytracker.ui.components.metricTextStyle
 import com.imfibit.activitytracker.ui.components.rememberAppBottomSheetState
 import com.imfibit.activitytracker.ui.components.rememberTestBottomSheetState
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.YearMonth
+import kotlin.time.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.toLocalDateTime
+import java.time.format.TextStyle
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,15 +56,15 @@ import java.util.Locale
 @Composable
 fun PreviewDailyChecklistHistoryBottomSheet() {
     val sampleHistory = buildList {
-        val today = LocalDate.now()
+        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
         add(DailyChecklistTimelineItemValue(today, true))
-        add(DailyChecklistTimelineItemValue(today.minusMonths(1).withDayOfMonth(15), true))
-        add(DailyChecklistTimelineItemValue(today.minusMonths(2).withDayOfMonth(10), false))
-        add(DailyChecklistTimelineItemValue(today.minusMonths(3).withDayOfMonth(6), true))
-        add(DailyChecklistTimelineItemValue(today.minusMonths(4).withDayOfMonth(7), true))
-        add(DailyChecklistTimelineItemValue(today.minusMonths(5).withDayOfMonth(8), true))
-        add(DailyChecklistTimelineItemValue(today.minusMonths(6).withDayOfMonth(9), true))
-        add(DailyChecklistTimelineItemValue(today.minusMonths(7).withDayOfMonth(10), true))
+        add(DailyChecklistTimelineItemValue(LocalDate(today.minus(1, DateTimeUnit.MONTH).year, today.minus(1, DateTimeUnit.MONTH).monthNumber, 15), true))
+        add(DailyChecklistTimelineItemValue(LocalDate(today.minus(2, DateTimeUnit.MONTH).year, today.minus(2, DateTimeUnit.MONTH).monthNumber, 10), false))
+        add(DailyChecklistTimelineItemValue(LocalDate(today.minus(3, DateTimeUnit.MONTH).year, today.minus(3, DateTimeUnit.MONTH).monthNumber, 6), true))
+        add(DailyChecklistTimelineItemValue(LocalDate(today.minus(4, DateTimeUnit.MONTH).year, today.minus(4, DateTimeUnit.MONTH).monthNumber, 7), true))
+        add(DailyChecklistTimelineItemValue(LocalDate(today.minus(5, DateTimeUnit.MONTH).year, today.minus(5, DateTimeUnit.MONTH).monthNumber, 8), true))
+        add(DailyChecklistTimelineItemValue(LocalDate(today.minus(6, DateTimeUnit.MONTH).year, today.minus(6, DateTimeUnit.MONTH).monthNumber, 9), true))
+        add(DailyChecklistTimelineItemValue(LocalDate(today.minus(7, DateTimeUnit.MONTH).year, today.minus(7, DateTimeUnit.MONTH).monthNumber, 10), true))
     }
     AppTheme {
         DailyChecklistHistoryBottomSheet(
@@ -101,10 +106,7 @@ private fun DailyChecklistHistoryContent(
         DayOfWeek.entries.forEach {
             Box(Modifier.size(40.dp, 30.dp), contentAlignment = Alignment.Center) {
                 Text(
-                    text = it.getDisplayName(
-                        java.time.format.TextStyle.SHORT,
-                        Locale.getDefault()
-                    ).uppercase(),
+                    text = "NAME",
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.W600,
                     fontSize = 10.sp
@@ -114,7 +116,7 @@ private fun DailyChecklistHistoryContent(
     }
 
     val groupedByMonth = remember(history) {
-        history.groupBy { item -> item.date_completed.withDayOfMonth(1) }.toList()
+        history.groupBy { item -> LocalDate(item.date_completed.year, item.date_completed.monthNumber, 1) }.toList()
     }
 
     LazyColumn(
@@ -123,9 +125,9 @@ private fun DailyChecklistHistoryContent(
     ) {
         items(items = groupedByMonth, key = { it.first }) {
             Column {
-                val month = YearMonth.of(it.first.year, it.first.monthValue)
+                val month = it.first
 
-                MonthSplitter(month)
+                MonthSplitter(month.year, month.monthNumber)
 
                 Month(
                     month = month,
@@ -144,21 +146,21 @@ private fun DailyChecklistHistoryContent(
 
 @Composable
 private fun Month(
-    month: YearMonth,
+    month: LocalDate,
     onDayClicked: (checked: Boolean, date: LocalDate) -> Unit,
     items: Map<LocalDate, DailyChecklistTimelineItemValue>,
 ) = Layout(
     content = {
         val weeks = remember(month, items) {
-            DateUtils.getWeeksInMonth(month)
+            DateUtils.getWeeksInMonth(month.year, month.monthNumber)
         }
 
         weeks.forEach { week ->
             // Day content
             week.forEach { day ->
                 Box(modifier = Modifier.padding(vertical = 4.dp)) {
-                    if (day.month == month.month) {
-                        val dayModifier = if (day == LocalDate.now())
+                    if (day.monthNumber == month.monthNumber) {
+                        val dayModifier = if (day == Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
                             Modifier
                                 .border(width = 2.dp, Color.Black, shape = RoundedCornerShape(8.dp))
                         else

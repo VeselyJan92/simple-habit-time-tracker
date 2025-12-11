@@ -27,16 +27,22 @@ import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
 import com.imfibit.activitytracker.ui.AppTheme
 import com.imfibit.activitytracker.ui.components.EditableDatetime
-import java.time.Duration
-import java.time.LocalDateTime
+import kotlin.time.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
+import kotlin.math.abs
 
 @Preview
 @Composable
 fun DialogSession_Preview() = AppTheme {
     DialogSession(
         allowDelete = true,
-        from = LocalDateTime.now(),
-        to = LocalDateTime.now().plusMinutes(60),
+        from = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+        to = Clock.System.now().plus(60, DateTimeUnit.MINUTE).toLocalDateTime(TimeZone.currentSystemDefault()),
         onUpdate = { _, _ -> },
         onDismissRequest = { },
         onDelete = { }
@@ -112,7 +118,7 @@ fun DialogSessionContent(
         }
     }
 
-    val minutes = Duration.between(from, to).seconds / 60
+    val minutes = abs((from.toInstant(TimeZone.UTC) - to.toInstant(TimeZone.UTC)).inWholeMinutes)
 
     DurationText(minutes)
 
@@ -191,4 +197,3 @@ private fun LabeledColumn(
 
     body.invoke(this)
 }
-

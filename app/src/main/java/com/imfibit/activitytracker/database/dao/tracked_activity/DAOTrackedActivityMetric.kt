@@ -8,8 +8,13 @@ import com.imfibit.activitytracker.core.iter
 import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.composed.MetricAggregation
 import com.imfibit.activitytracker.database.composed.toHashMap
-import java.time.LocalDate
-import java.time.YearMonth
+import kotlin.time.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
 
 @Dao
 interface DAOTrackedActivityMetric {
@@ -72,7 +77,7 @@ interface DAOTrackedActivityMetric {
         val map = getRawMetricDaily(activityId, from, to).toHashMap()
 
         (from iter to).forEach {
-            list.add(map[it] ?: MetricAggregation(it, it.plusDays(1L), 0L))
+            list.add(map[it] ?: MetricAggregation(it, it.plus(1, DateTimeUnit.DAY), 0L))
         }
 
         return list
@@ -104,10 +109,19 @@ interface DAOTrackedActivityMetric {
         firstDayInWeek: LocalDate, //Inclusive
         weeks: Int,
     ): MutableList<MetricAggregation> {
-        val from = firstDayInWeek.minusWeeks(weeks.toLong()).plusDays(1L)
+        val from = firstDayInWeek.minus(weeks, DateTimeUnit.WEEK).plus(1, DateTimeUnit.DAY)
         val list = mutableListOf<MetricAggregation>()
 
-        val sqlFirstWeekDay =(firstDayInWeek.dayOfWeek.value +2 )%7 -1
+        // 1 = Monday, 7 = Sunday
+        // (1 + 2) % 7 - 1 = 3 % 7 - 1 = 2
+        // (7 + 2) % 7 - 1 = 9 % 7 - 1 = 2 - 1 = 1
+        // SQLite: Sunday=0, Monday=1, ..., Saturday=6
+        // We need to verify if this logic still holds or if ordinal is needed.
+        // firstDayInWeek.dayOfWeek.value in java.time was 1 (Mon) to 7 (Sun)
+        // kotlinx.datetime.DayOfWeek.value is 1 (Mon) to 7 (Sun) if available (it is).
+        // If not available, use ordinal + 1.
+        val dayValue = firstDayInWeek.dayOfWeek.ordinal + 1
+        val sqlFirstWeekDay = (dayValue + 2 ) % 7 - 1
 
         val map = getRawMetricWeekly(
             activityId = activityId,
@@ -120,7 +134,7 @@ interface DAOTrackedActivityMetric {
             val data = map[it]
 
             list.add(
-                data ?: MetricAggregation(it, it.plusWeeks(1).minusDays(1L), 0L)
+                data ?: MetricAggregation(it, it.plus(1, DateTimeUnit.WEEK).minus(1, DateTimeUnit.DAY), 0L)
             )
         }
 
@@ -144,24 +158,27 @@ interface DAOTrackedActivityMetric {
     @Transaction
     fun getMetricByMonth(
         activityId: Long,
-        first: YearMonth,
+        year: Int,
+        month: Int,
         months: Int
     ): MutableList<MetricAggregation> {
+        val first = LocalDate(year, month, 1)
 
-        val from = first.minusMonths(months.toLong()).atDay(1)
+        val from = first.minus(months, DateTimeUnit.MONTH)
 
         val list = mutableListOf<MetricAggregation>()
 
-        val map = getRawMetricByMonth(activityId, from, first.atEndOfMonth()).toHashMap()
+        val map = getRawMetricByMonth(activityId, from, first.plus(1, DateTimeUnit.MONTH).minus(1, DateTimeUnit.DAY)).toHashMap()
 
 
         repeat(months){
-            val data = map[first.minusMonths(it.toLong()).atDay(1)]
+            val currentFirst = first.minus(it, DateTimeUnit.MONTH)
+            val data = map[currentFirst]
 
             list.add(
                 data ?: MetricAggregation(
-                    first.minusMonths(it.toLong()).atDay(1),
-                    first.minusMonths(it.toLong()).atEndOfMonth(),
+                    currentFirst,
+                    currentFirst.plus(1, DateTimeUnit.MONTH).minus(1, DateTimeUnit.DAY),
                     0L
                 )
             )
@@ -170,6 +187,9 @@ interface DAOTrackedActivityMetric {
     }
 
 
-    suspend fun getMetricToday(activityId: Long): Long = getMetric(activityId, LocalDate.now(), LocalDate.now())
+    suspend fun getMetricToday(activityId: Long): Long {
+        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        return getMetric(activityId, today, today)
+    }
 
 }

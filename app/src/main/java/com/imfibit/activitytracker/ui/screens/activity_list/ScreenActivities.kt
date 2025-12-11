@@ -60,9 +60,11 @@ import com.imfibit.activitytracker.ui.components.BaseMetricBlock
 import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.util.TestableContent
 import com.imfibit.activitytracker.ui.viewmodels.RecordViewModel
+import kotlin.time.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
-import java.time.LocalDateTime
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -100,7 +102,7 @@ fun ScreenActivities(
                         Destinations.DialogEditRecord(
                             TrackedActivityScore(
                                 activity_id = it.activity_id,
-                                datetime_completed = LocalDateTime.now(),
+                                datetime_completed = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
                                 score = 1
                             )
                         )
@@ -109,8 +111,8 @@ fun ScreenActivities(
                         Destinations.DialogEditRecord(
                             TrackedActivityTime(
                                 activity_id = it.activity_id,
-                                datetime_start = LocalDateTime.now(),
-                                datetime_end = LocalDateTime.now()
+                                datetime_start = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+                                datetime_end = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                             )
                         )
                     )

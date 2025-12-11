@@ -31,12 +31,18 @@ import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.MetricWidgetData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.YearMonth
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.daysUntil
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
 import java.time.format.TextStyle
 import java.util.Locale
 import javax.inject.Inject
+import kotlin.time.Clock
 
 
 @Immutable
@@ -70,50 +76,26 @@ class TrackedActivityViewModel @dagger.assisted.AssistedInject constructor(
     }.flow.cachedIn(viewModelScope)
 
 
-
     val data = invalidationStateFlow(db, null, *activityTables) {
         val activity: TrackedActivity =
             rep.activityDAO.tryGetById(activityId) ?: return@invalidationStateFlow null
 
-        /*
-        val now = LocalDate.now()
-        val today = LocalDate.now()
-        val endOfWeek = now.with(ChronoField.DAY_OF_WEEK, 7)
-        val month = today.withDayOfMonth(1)
-        val days30 = today.minusDays(30L)
+        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
 
-
-        val metricToday = activity.type.getComposeString(
-            rep.metricDAO.getMetric(activity.id, today, today)
-        )
-
-        val isChecked = activity.type == TrackedActivity.Type.CHECKED
-
-        val metricWeek = activity.type.getComposeString(
-            rep.metricDAO.getMetric(activity.id, endOfWeek.minusDays(6), endOfWeek),
-            fraction = if (isChecked) 7L else null
-        )
-
-        val metricMonth = activity.type.getComposeString(
-            rep.metricDAO.getMetric(activity.id, month, today),
-            fraction = if (isChecked) today.lengthOfMonth().toLong() else null
-        )
-
-        val metric30Days = activity.type.getComposeString(
-            rep.metricDAO.getMetric(activity.id, days30, today),
-            fraction = if (isChecked) 30L else null
-        )*/
+        val currentMonthStart = LocalDate(today.year, today.monthNumber, 1)
+        val prevMonthStart = currentMonthStart.minus(1, DateTimeUnit.MONTH)
 
         val recent = listOf(
-            //rep.getRecentActivityM(id, YearMonth.now().minusMonths(2)),
-            rep.getMonthData(activityId, YearMonth.now().minusMonths(1)),
-            rep.getMonthData(activityId, YearMonth.now()),
+            rep.getMonthData(activityId, prevMonthStart.year, prevMonthStart.monthNumber),
+            rep.getMonthData(activityId, currentMonthStart.year, currentMonthStart.monthNumber),
         )
 
 
         val months = rep.metricDAO.getMetricByMonth(
             activity.id,
-            YearMonth.now(), 6
+            today.year,
+            today.monthNumber,
+            6
         ).map {
             val color = if (activity.goal.range == TimeRange.MONTHLY)
                 if (activity.goal.value <= it.metric) Colors.Completed else Colors.NotCompleted
@@ -121,13 +103,17 @@ class TrackedActivityViewModel @dagger.assisted.AssistedInject constructor(
                 Colors.AppAccent
 
             val metric: ContextString = if (activity.type == TrackedActivity.Type.CHECKED) {
-                { "${it.metric} / ${it.from.month.length(it.from.isLeapYear)}" }
+                {
+                    val nextMonth = it.from.plus(1, DateTimeUnit.MONTH)
+                    val lengthOfMonth = it.from.daysUntil(nextMonth)
+                    "${it.metric} / $lengthOfMonth"
+                }
             } else {
                 activity.type.getLabel(it.metric)
             }
 
             MetricWidgetData(
-                label = { it.from.month.getDisplayName(TextStyle.SHORT, Locale.getDefault()) },
+                label = { "asdads" },
                 value = metric,
                 color = color
             )
@@ -226,7 +212,7 @@ class TrackedActivityViewModel @dagger.assisted.AssistedInject constructor(
         rep.activityDAO.update(activity)
     }
 
-    fun setAskForNotification() = viewModelScope.launch{
+    fun setAskForNotification() = viewModelScope.launch {
         appSettings.dataStore.edit {
             it[ASK_FOR_NOTIFICATION] = false
         }
@@ -258,19 +244,25 @@ class MonthsPagingSource(
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, RepositoryTrackedActivity.Month> {
-        val month = params.key ?: 0
+        val pageIndex = params.key ?: 0
+
+        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        val currentMonthStart = LocalDate(now.year, now.monthNumber, 1)
 
         val months = List(PAGE_SIZE) {
+            val targetMonth =
+                currentMonthStart.minus((pageIndex * PAGE_SIZE + it).toLong(), DateTimeUnit.MONTH)
             rep.getMonthData(
                 activityId,
-                YearMonth.now().minusMonths((month * PAGE_SIZE + it).toLong())
+                targetMonth.year,
+                targetMonth.monthNumber
             )
         }
 
         return LoadResult.Page(
             data = months,
             prevKey = null,
-            nextKey = month + 1
+            nextKey = pageIndex + 1
         )
     }
 

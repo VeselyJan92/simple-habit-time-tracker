@@ -2,7 +2,11 @@ package com.imfibit.activitytracker.database.embedable
 
 import androidx.room.ColumnInfo
 import com.imfibit.activitytracker.database.entities.TrackedActivity
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 
 data class TrackedActivityChallenge(
@@ -19,7 +23,13 @@ data class TrackedActivityChallenge(
     val to: LocalDate
 ){
     companion object{
-        val empty = TrackedActivityChallenge("", 0, LocalDate.now(), LocalDate.now())
+        
+        val empty = TrackedActivityChallenge(
+            name = "",
+            target = 0,
+            from = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
+            to = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        )
     }
 
     fun format(type: TrackedActivity.Type) = when (type){

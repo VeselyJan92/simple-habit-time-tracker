@@ -29,12 +29,17 @@ import com.imfibit.activitytracker.core.TimeUtils
 import com.imfibit.activitytracker.ui.AppTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import java.time.LocalDateTime
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
 
 @Preview
 @Composable
 fun Timer_Preview() = AppTheme {
-    LiveTimer(LocalDateTime.now().minusMinutes(30))
+    LiveTimer(Clock.System.now().minus(30, DateTimeUnit.MINUTE).toLocalDateTime(TimeZone.currentSystemDefault()))
 }
 
 
@@ -44,16 +49,16 @@ fun LiveTimer(
 ) {
     val startTime = when {
         startTime == null -> null
-        startTime > LocalDateTime.now() -> null
+        startTime > Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()) -> null
         else -> startTime
     }
 
-    var time by remember { mutableStateOf(LocalDateTime.now()) }
+    var time by remember { mutableStateOf(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())) }
 
 
     LaunchedEffect(Unit) {
         while (this.coroutineContext.isActive) {
-            time = LocalDateTime.now()
+            time = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
             delay(1000)
         }
     }

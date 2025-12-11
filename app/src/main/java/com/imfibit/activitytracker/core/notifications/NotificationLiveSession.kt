@@ -12,7 +12,8 @@ import androidx.core.app.NotificationManagerCompat
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.MainActivity
-import java.time.OffsetDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 
 
 object NotificationLiveSession{
@@ -31,7 +32,7 @@ object NotificationLiveSession{
         remoteViews.setTextViewText(R.id.tracked_task_notification_tv_name, trackedActivity.name)
 
 
-        val lastSuccess: Long = trackedActivity.inSessionSince!!.toEpochSecond(OffsetDateTime.now().offset) * 1000
+        val lastSuccess: Long = trackedActivity.inSessionSince!!.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
         val elapsedRealtimeOffset = System.currentTimeMillis() - SystemClock.elapsedRealtime()
 
         remoteViews.setChronometer(

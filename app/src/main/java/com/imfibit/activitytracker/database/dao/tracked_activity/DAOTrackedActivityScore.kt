@@ -4,7 +4,10 @@ import androidx.room.Dao
 import androidx.room.Query
 import com.imfibit.activitytracker.database.dao.BaseEditableDAO
 import com.imfibit.activitytracker.database.entities.TrackedActivityScore
-import java.time.LocalDateTime
+import kotlin.time.Clock
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @Dao
 interface DAOTrackedActivityScore : BaseEditableDAO<TrackedActivityScore>, DAOTrackedActivityMetric{
@@ -16,7 +19,7 @@ interface DAOTrackedActivityScore : BaseEditableDAO<TrackedActivityScore>, DAOTr
     """)
     suspend fun getAll(
         from: LocalDateTime,
-        to: LocalDateTime = LocalDateTime.now()
+        to: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     ): List<TrackedActivityScore>
 
 
@@ -37,7 +40,7 @@ interface DAOTrackedActivityScore : BaseEditableDAO<TrackedActivityScore>, DAOTr
     suspend fun getAll(
         activityId:Long,
         from: LocalDateTime,
-        to: LocalDateTime = LocalDateTime.now()
+        to: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     ): List<TrackedActivityScore>
 
 
@@ -58,4 +61,3 @@ interface DAOTrackedActivityScore : BaseEditableDAO<TrackedActivityScore>, DAOTr
         insert(TrackedActivityScore(0, activityId, datetime, score))
     }
 }
-

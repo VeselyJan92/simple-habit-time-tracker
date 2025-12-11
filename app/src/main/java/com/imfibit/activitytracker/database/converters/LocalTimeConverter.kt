@@ -1,21 +1,18 @@
 package com.imfibit.activitytracker.database.converters
 
-import android.annotation.SuppressLint
 import androidx.room.TypeConverter
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter.ISO_TIME
+import kotlinx.datetime.LocalTime
 
-@SuppressLint("SimpleDateFormat")
-object LocalTimeConverter {
+class LocalTimeConverter {
 
     @TypeConverter
     fun from(datetime: LocalTime?): String? {
-        return datetime?.format(ISO_TIME)
+        return datetime?.toString()
     }
 
     @TypeConverter
     fun to(date: String?): LocalTime? {
-        return if (date != null) LocalTime.parse(date, ISO_TIME) else null
+        return if (date != null) LocalTime.parse(date) else null
     }
 
 }

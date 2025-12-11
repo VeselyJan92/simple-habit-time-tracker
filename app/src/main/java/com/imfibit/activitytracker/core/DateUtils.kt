@@ -1,33 +1,36 @@
 package com.imfibit.activitytracker.core
 
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.YearMonth
-import java.time.temporal.TemporalAdjusters
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
 
 object DateUtils {
 
-    fun getWeeksInMonth(yearMonth: YearMonth): List<List<LocalDate>> {
+    fun getWeeksInMonth(year: Int, month: Int): List<List<LocalDate>> {
         val weeks = mutableListOf<List<LocalDate>>()
-        var currentDate = yearMonth.atDay(1)
-        val lastDayOfMonth = yearMonth.atEndOfMonth()
+        var currentDate = LocalDate(year, month, 1)
+        val firstDayOfMonth = currentDate
+        val lastDayOfMonth = firstDayOfMonth.plus(1, DateTimeUnit.MONTH).minus(1, DateTimeUnit.DAY)
 
         // Adjust to the start of the first week (Monday)
-        currentDate = currentDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+        val daysBefore = (currentDate.dayOfWeek.ordinal + 1 - (DayOfWeek.MONDAY.ordinal + 1) + 7) % 7
+        currentDate = currentDate.minus(daysBefore, DateTimeUnit.DAY)
 
-        while (currentDate.isBefore(lastDayOfMonth) || currentDate.isEqual(lastDayOfMonth) || currentDate.month == yearMonth.month) {
+        while (currentDate < lastDayOfMonth || currentDate == lastDayOfMonth || currentDate.monthNumber == month) {
             val week = mutableListOf<LocalDate>()
             for (i in 0..6) {
                 week.add(currentDate)
-                currentDate = currentDate.plusDays(1)
+                currentDate = currentDate.plus(1, DateTimeUnit.DAY)
             }
             weeks.add(week)
             // Ensure we don't go into the next month unless the last day was part of that week
-            if (currentDate.month != yearMonth.month && currentDate.isAfter(lastDayOfMonth)) {
+            if (currentDate.monthNumber != month && currentDate > lastDayOfMonth) {
                 break
             }
         }
         return weeks
     }
-
 }

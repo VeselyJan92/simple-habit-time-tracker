@@ -37,15 +37,20 @@ import com.imfibit.activitytracker.ui.viewmodels.RecordNavigatorImpl
 import com.imfibit.activitytracker.ui.viewmodels.RecordViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
-import java.time.LocalDate
-import java.time.YearMonth
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun BottomSheetActivityHistory_Preview() = AppTheme {
     val data = (0..10).map {
-        DevSeeder.getMonthData(YearMonth.now().minusMonths(it.toLong()))
+        val date = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.minus(it, DateTimeUnit.MONTH)
+        DevSeeder.getMonthData(date.year, date.monthNumber)
     }
 
     BottomSheetActivityHistory(
@@ -122,7 +127,7 @@ fun BottomSheetActivityHistory(
         ) {
             items(
                 count = monthsData.itemCount,
-                key = monthsData.itemKey { it.month },
+                key = monthsData.itemKey { "${it.year}-${it.month}" },
             ) { lazyItem ->
                 val item = monthsData[lazyItem]
 

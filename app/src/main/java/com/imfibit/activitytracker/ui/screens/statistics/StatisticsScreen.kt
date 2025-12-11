@@ -40,7 +40,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -61,7 +60,13 @@ import com.imfibit.activitytracker.ui.components.SimpleTopBar
 import com.imfibit.activitytracker.ui.components.dialogs.system.DatePickerDialog
 import com.imfibit.activitytracker.ui.screens.activity_list.Goal
 import kotlinx.coroutines.launch
-import java.time.LocalDate
+import kotlin.time.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.toLocalDateTime
+import androidx.compose.ui.graphics.Color
 
 
 @Composable
@@ -92,9 +97,11 @@ private fun ScreenBody() = Column {
 
     val vm = hiltViewModel<StatisticsViewModel>()
 
-    val origin = remember { mutableStateOf(LocalDate.now()) }
+    val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+
+    val origin = remember { mutableStateOf(now) }
     val range = remember { mutableStateOf(TimeRange.WEEKLY) }
-    val date = remember { mutableStateOf(LocalDate.now()) }
+    val date = remember { mutableStateOf(now) }
 
     val pagerState = rememberPagerState(
         initialPage = 51,
@@ -116,8 +123,9 @@ private fun ScreenBody() = Column {
         },
         setRange = {
             scope.launch {
-                origin.value = LocalDate.now()
-                date.value = LocalDate.now()
+                val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+                origin.value = today
+                date.value = today
                 range.value = it
                 pagerState.scrollToPage(51)
             }
@@ -136,9 +144,9 @@ private fun ScreenBody() = Column {
 
         val interval = range.value.getBoundaries(
             when (range.value) {
-                TimeRange.DAILY -> origin.value.minusDays(relativePage)
-                TimeRange.WEEKLY -> origin.value.minusWeeks(relativePage)
-                TimeRange.MONTHLY -> origin.value.minusMonths(relativePage)
+                TimeRange.DAILY -> origin.value.minus(relativePage, DateTimeUnit.DAY)
+                TimeRange.WEEKLY -> origin.value.minus(relativePage, DateTimeUnit.WEEK)
+                TimeRange.MONTHLY -> origin.value.minus(relativePage, DateTimeUnit.MONTH)
             }
         )
 
@@ -298,7 +306,7 @@ private fun Navigation(
                     onDismissRequest = { showDatePicker = false },
                     date = date,
                     onDatePicked = {
-                        goTo(it ?: LocalDate.now())
+                        goTo(it ?: Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
                     }
                 )
             }

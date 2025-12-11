@@ -16,8 +16,9 @@ import dagger.hilt.android.AndroidEntryPoint
 
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
-import java.time.LocalDateTime
-import java.time.ZoneId
+import kotlin.time.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -89,7 +90,7 @@ class WidgetUpdateService @Inject constructor(
             add(Calendar.DATE, 1);
         }
 
-        Log.e(TAG, "setAlarmManager: ${LocalDateTime.ofInstant(calendar.toInstant(), ZoneId.of("ECT"))}")
+        Log.e(TAG, "setAlarmManager: ${Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())}")
 
         alarmMgr.setInexactRepeating(
             AlarmManager.RTC,

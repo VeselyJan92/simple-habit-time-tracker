@@ -1,7 +1,7 @@
 package com.imfibit.activitytracker.database.composed
 
 import androidx.room.ColumnInfo
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 data class MetricAggregation(
     @ColumnInfo(name = "from_date")

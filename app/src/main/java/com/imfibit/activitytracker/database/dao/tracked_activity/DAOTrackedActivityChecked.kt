@@ -5,8 +5,12 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.imfibit.activitytracker.database.dao.BaseEditableDAO
 import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
-import java.time.LocalDate
-import java.time.LocalDateTime
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
 
 @Dao
 interface DAOTrackedActivityChecked: BaseEditableDAO<TrackedActivityCompletion> {
@@ -28,7 +32,7 @@ interface DAOTrackedActivityChecked: BaseEditableDAO<TrackedActivityCompletion> 
     suspend fun getAll(
         activityId:Long,
         from: LocalDateTime,
-        to: LocalDateTime = LocalDateTime.now()
+        to: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     ): List<TrackedActivityCompletion>
 
 
@@ -54,12 +58,12 @@ interface DAOTrackedActivityChecked: BaseEditableDAO<TrackedActivityCompletion> 
 
     @Transaction
     suspend fun toggle(activityId: Long, date: LocalDateTime){
-        val record = getRecord(activityId, date.toLocalDate())
+        val record = getRecord(activityId, date.date)
 
         if (record != null)
             delete(record)
         else
-            insert(TrackedActivityCompletion(0L, activityId, date.toLocalDate(), date.toLocalTime()))
+            insert(TrackedActivityCompletion(0L, activityId, date.date, date.time))
     }
 
 }

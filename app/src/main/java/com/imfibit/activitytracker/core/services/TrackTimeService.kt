@@ -15,8 +15,12 @@ import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.time.LocalDateTime
+
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
+import kotlin.time.Clock
 
 
 class TrackTimeService @Inject constructor(
@@ -25,7 +29,7 @@ class TrackTimeService @Inject constructor(
     private val sessionService: TimeActivityService
 ){
 
-    suspend fun startSession(activity: TrackedActivity, start: LocalDateTime = LocalDateTime.now()) {
+    suspend fun startSession(activity: TrackedActivity, start: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())) {
         repository.activityDAO.update(activity.apply { inSessionSince = start })
 
         NotificationLiveSession.show(context, activity)
@@ -33,7 +37,7 @@ class TrackTimeService @Inject constructor(
 
     suspend fun commitSession(activity: TrackedActivity){
         if (activity.inSessionSince != null){
-            sessionService.insertSession(TrackedActivityTime(0, activity.id, activity.inSessionSince!!, LocalDateTime.now()))
+            sessionService.insertSession(TrackedActivityTime(0, activity.id, activity.inSessionSince!!, Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())))
             repository.activityDAO.update(activity.apply { activity.inSessionSince = null });
         }else {
             FirebaseCrashlytics.getInstance().recordException(IllegalArgumentException("Committing already committed session"))

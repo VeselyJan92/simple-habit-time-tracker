@@ -18,7 +18,9 @@ import com.imfibit.activitytracker.database.repository.tracked_activity.Reposito
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.time.LocalDate
+import kotlin.time.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,10 +39,11 @@ class ActivitiesViewModel @Inject constructor(
 
     val data = invalidationStateFlow(db, Data(), *activityTables){
         Log.e("ActivitiesViewModel", "getActivitiesOverview")
+        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
         return@invalidationStateFlow Data(
             rep.getActivitiesOverview(rep.activityDAO.getActivitiesWithoutCategory()).toMutableList(),
             rep.getActivitiesOverview(rep.activityDAO.liveActive().filter { it.groupId != null }),
-            rep.metricDAO.getActivitiesWithMetric(LocalDate.now(), LocalDate.now()).filter {
+            rep.metricDAO.getActivitiesWithMetric(today, today).filter {
                 (it.activity.goal.range == TimeRange.DAILY && it.activity.goal.isSet()) || it.metric > 0
             },
             db.groupDAO().getAll()

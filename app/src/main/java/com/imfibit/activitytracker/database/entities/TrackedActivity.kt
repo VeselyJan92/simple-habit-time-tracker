@@ -12,9 +12,15 @@ import com.imfibit.activitytracker.core.ContextString
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
+import kotlin.time.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.daysUntil
+import kotlinx.datetime.plus
+import kotlinx.datetime.minus
+import kotlinx.datetime.toLocalDateTime
 
 @Entity(
     tableName = TrackedActivity.TABLE,
@@ -105,7 +111,7 @@ data class TrackedActivity(
             return when(range){
                 TimeRange.DAILY -> null
                 TimeRange.WEEKLY -> 7
-                TimeRange.MONTHLY -> from.lengthOfMonth().toLong()
+                TimeRange.MONTHLY -> from.plus(1, DateTimeUnit.MONTH).minus(1, DateTimeUnit.DAY).dayOfMonth.toLong()
             }
         }
 
@@ -117,11 +123,11 @@ data class TrackedActivity(
         return  ((challenge.target - metric) / goal.metricPerDay()).toInt()
     }
     fun getChallengeEstimatedCompletionDate(metric: Long): LocalDate {
-        return LocalDate.now().plusDays(getChallengeRemainingDays(metric).toLong())
+        return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.plus(getChallengeRemainingDays(metric), DateTimeUnit.DAY)
     }
 
     fun getChallengeAheadDays(metric: Long): Int {
-        return ChronoUnit.DAYS.between(getChallengeEstimatedCompletionDate(metric), challenge.to).toInt()
+        return getChallengeEstimatedCompletionDate(metric).daysUntil(challenge.to)
     }
 
     fun formatGoal() : String{
@@ -134,5 +140,3 @@ data class TrackedActivity(
 
 
 }
-
-

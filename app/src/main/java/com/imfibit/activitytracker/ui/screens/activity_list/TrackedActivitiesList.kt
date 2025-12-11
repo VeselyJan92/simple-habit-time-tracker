@@ -63,7 +63,11 @@ import com.imfibit.activitytracker.ui.components.GoalProgressBar
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import java.time.LocalDateTime
+import kotlin.time.Clock
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toJavaLocalDateTime
+import kotlinx.datetime.toLocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.random.Random
 
@@ -138,13 +142,13 @@ fun TrackedActivity(
                         val record = when (activity.type) {
                             Type.TIME -> TrackedActivityTime(
                                 activity_id = activity.id,
-                                datetime_start = LocalDateTime.now(),
-                                datetime_end = LocalDateTime.now()
+                                datetime_start = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+                                datetime_end = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                             )
 
                             Type.SCORE -> TrackedActivityScore(
                                 activity_id = activity.id,
-                                datetime_completed = LocalDateTime.now(),
+                                datetime_completed = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
                                 score = 1
                             )
 
@@ -221,7 +225,7 @@ fun TrackedActivity(
                                         )
                                     } else {
                                         Text(
-                                            text = stringResource(id = R.string.activity_in_session) + " " + item.activity.inSessionSince!!.format(
+                                            text = stringResource(id = R.string.activity_in_session) + " " + item.activity.inSessionSince!!.toJavaLocalDateTime().format(
                                                 DateTimeFormatter.ofPattern("HH:mm")
                                             )
                                         )
@@ -333,6 +337,3 @@ fun Goal(label: String) {
     }
 
 }
-
-
-

@@ -2,9 +2,11 @@ package com.imfibit.activitytracker.core
 
 import android.util.Range
 import androidx.core.util.rangeTo
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.temporal.TemporalAdjusters
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
 
 //from exclusive
 infix fun LocalDate.iter(date: LocalDate) = DateIterator(this, date, 1)
@@ -22,7 +24,7 @@ class DateIterator(
 
     override fun next(): LocalDate {
         val next = currentDate
-        currentDate = currentDate.plusDays(stepDays)
+        currentDate = currentDate.plus(stepDays.toInt(), DateTimeUnit.DAY)
         return next
     }
 }
@@ -40,7 +42,7 @@ class DateIteratorReversed(
 
     override fun next(): LocalDate {
         val next = currentDate
-        currentDate = currentDate.minusDays(stepDays)
+        currentDate = currentDate.minus(stepDays.toInt(), DateTimeUnit.DAY)
         return next
     }
 }
@@ -53,7 +55,7 @@ fun dateIteratorSequence(
     var currentDate = startDateInclusive
     while (currentDate <= endDateInclusive) {
         yield(currentDate)
-        currentDate = currentDate.plusDays(1)
+        currentDate = currentDate.plus(1, DateTimeUnit.DAY)
     }
 }
 
@@ -66,16 +68,14 @@ fun getFullMonthBlockDays(
     month: Int,
     firstDayOfWeek: DayOfWeek = DayOfWeek.MONDAY
 ): Range<LocalDate> {
-    val firstDayOfMonth = LocalDate.of(year, month, 1)
-    val lastDayOfMonth = firstDayOfMonth.with(TemporalAdjusters.lastDayOfMonth())
+    val firstDayOfMonth = LocalDate(year, month, 1)
+    val lastDayOfMonth = firstDayOfMonth.plus(1, DateTimeUnit.MONTH).minus(1, DateTimeUnit.DAY)
 
-    val daysBefore = (firstDayOfMonth.dayOfWeek.value - firstDayOfWeek.value + 7) % 7
-    val daysAfter = (firstDayOfWeek.value - lastDayOfMonth.dayOfWeek.value + 6) % 7
+    val daysBefore = (firstDayOfMonth.dayOfWeek.ordinal + 1 - (firstDayOfWeek.ordinal + 1) + 7) % 7
+    val daysAfter = ((firstDayOfWeek.ordinal + 1) - (lastDayOfMonth.dayOfWeek.ordinal + 1) + 6) % 7
 
-    val startDate = firstDayOfMonth.minusDays(daysBefore.toLong())
-    val endDate = lastDayOfMonth.plusDays(daysAfter.toLong())
+    val startDate = firstDayOfMonth.minus(daysBefore, DateTimeUnit.DAY)
+    val endDate = lastDayOfMonth.plus(daysAfter, DateTimeUnit.DAY)
 
     return startDate rangeTo endDate
 }
-
-

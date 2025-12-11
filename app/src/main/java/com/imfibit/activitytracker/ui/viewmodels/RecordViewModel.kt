@@ -15,8 +15,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 @HiltViewModel
 class RecordViewModel @Inject constructor(
@@ -63,6 +67,7 @@ class RecordViewModel @Inject constructor(
         toggleService.toggleActivity(activityId, datetime)
     }
 
+    
     fun activityTriggered(activity: TrackedActivity) = launchIO {
         when (activity.type) {
             TrackedActivity.Type.TIME -> {
@@ -72,8 +77,8 @@ class RecordViewModel @Inject constructor(
                     timerService.startSession(activity)
                 }
             }
-            TrackedActivity.Type.SCORE -> rep.scoreDAO.commitScore(activity.id, LocalDateTime.now(), 1)
-            TrackedActivity.Type.CHECKED -> toggleService.toggleActivity(activity.id, LocalDateTime.now())
+            TrackedActivity.Type.SCORE -> rep.scoreDAO.commitScore(activity.id, Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()), 1)
+            TrackedActivity.Type.CHECKED -> toggleService.toggleActivity(activity.id, Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
         }
     }
 

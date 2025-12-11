@@ -4,7 +4,10 @@ import androidx.room.Dao
 import androidx.room.Query
 import com.imfibit.activitytracker.database.dao.BaseEditableDAO
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
-import java.time.LocalDateTime
+import kotlin.time.Clock
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 
 @Dao
@@ -16,7 +19,7 @@ interface DAOTrackedActivityTime : BaseEditableDAO<TrackedActivityTime> {
     """)
     suspend fun getAll(
         from: LocalDateTime,
-        to: LocalDateTime = LocalDateTime.now()
+        to: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     ): List<TrackedActivityTime>
 
 
@@ -27,7 +30,7 @@ interface DAOTrackedActivityTime : BaseEditableDAO<TrackedActivityTime> {
     suspend fun getAll(
         activityId: Long,
         from: LocalDateTime,
-        to: LocalDateTime = LocalDateTime.now()
+        to: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     ): List<TrackedActivityTime>
 
     @Query("""
@@ -52,4 +55,3 @@ interface DAOTrackedActivityTime : BaseEditableDAO<TrackedActivityTime> {
     suspend fun getById(recordId: Long): TrackedActivityTime
 
 }
-

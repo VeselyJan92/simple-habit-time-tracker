@@ -13,6 +13,7 @@ abstract class DAOFocusBoardItem : BaseEditableDAO<FocusBoardItem> {
    """)
     abstract suspend fun getAll(): List<FocusBoardItem>
 
+    @Transaction
     @Query("""
         SELECT i.*
         FROM focus_board_items i
