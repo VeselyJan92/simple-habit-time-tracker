@@ -106,19 +106,14 @@ fun AppNavHost() {
         }
     }
 
-    BackHandler(enabled = backStack.size > 1) {
-        backStack.removeAt(backStack.lastIndex)
-    }
-
     NavDisplay(
+        backStack = backStack,
+        onBack = { if (backStack.size > 1) backStack.removeAt(backStack.lastIndex) },
         entryDecorators = listOf(
-            // Add the default decorators for managing scenes and saving state
             rememberSaveableStateHolderNavEntryDecorator(),
-            // Then add the view model store decorator
             rememberViewModelStoreNavEntryDecorator()
         ),
-        backStack = backStack,
         entryProvider = entryProvider,
-        sceneStrategy = remember { DialogSceneStrategy() }
+        sceneStrategies = listOf(remember { DialogSceneStrategy() })
     )
 }

@@ -151,7 +151,7 @@ private fun ScreenBody() = Column {
         )
 
         Column {
-            val keys = arrayOf(range.value, origin.value, date.value, page)
+            val keys = arrayOf<Any>(range.value, origin.value, date.value, page)
 
             val data = remember(*keys) {
                 mutableStateOf(mapOf<TrackedActivity.Type, List<ActivityWithMetric>>())
