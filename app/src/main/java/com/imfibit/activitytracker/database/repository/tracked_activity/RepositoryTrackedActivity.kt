@@ -1,25 +1,25 @@
 package com.imfibit.activitytracker.database.repository.tracked_activity
 
-import androidx.compose.ui.graphics.Color
 import androidx.room.withTransaction
 import com.imfibit.activitytracker.core.ContextString
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.composed.RecordWithActivity
-import com.imfibit.activitytracker.database.dao.tracked_activity.DAOPresetTimers
-import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivity
-import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivityChecked
-import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivityMetric
-import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivityScore
-import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivityTime
+import com.imfibit.activitytracker.database.dao.DAOTrackedActivityPresetTimers
+import com.imfibit.activitytracker.database.dao.DAOTrackedActivity
+import com.imfibit.activitytracker.database.dao.DAOTrackedActivityChecked
+import com.imfibit.activitytracker.database.dao.DAOTrackedActivityMetric
+import com.imfibit.activitytracker.database.dao.DAOTrackedActivityScore
+import com.imfibit.activitytracker.database.dao.DAOTrackedActivityTime
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivityRecord
-import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.MetricWidgetData
-import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview
-import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.ActionButton.CHECKED
-import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.ActionButton.DEFAULT
-import com.imfibit.activitytracker.ui.screens.activity_list.TrackedActivityRecentOverview.ActionButton.IN_SESSION
+import com.imfibit.activitytracker.core.enums.MetricStatus
+import com.imfibit.activitytracker.core.getMetricStatus
+import com.imfibit.activitytracker.ui.screens.tracked_activities.activity_list.components.TrackedActivityRecentOverview
+import com.imfibit.activitytracker.ui.screens.tracked_activities.activity_list.components.TrackedActivityRecentOverview.ActionButton.CHECKED
+import com.imfibit.activitytracker.ui.screens.tracked_activities.activity_list.components.TrackedActivityRecentOverview.ActionButton.DEFAULT
+import com.imfibit.activitytracker.ui.screens.tracked_activities.activity_list.components.TrackedActivityRecentOverview.ActionButton.IN_SESSION
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -44,7 +44,7 @@ class RepositoryTrackedActivity @Inject constructor(
     data class Day(
         val label: ContextString,
         val metric: Long,
-        val color: Color,
+        val status: MetricStatus,
         val date: LocalDate
     )
 
@@ -66,7 +66,7 @@ class RepositoryTrackedActivity @Inject constructor(
     val scoreDAO: DAOTrackedActivityScore = db.scoreDAO()
     val sessionDAO: DAOTrackedActivityTime = db.sessionDAO()
     val metricDAO: DAOTrackedActivityMetric = db.metricDAO()
-    val timers: DAOPresetTimers = db.presetTimersDAO()
+    val timers: DAOTrackedActivityPresetTimers = db.presetTimersDAO()
 
 
     suspend fun getActivityOverview(activity: TrackedActivity): TrackedActivityRecentOverview {
@@ -97,11 +97,10 @@ class RepositoryTrackedActivity @Inject constructor(
         }
 
         val groupedMetric = data.reversed().map {
-            val color = Colors.getMetricColor(
+            val status = getMetricStatus(
                 activity.goal,
                 it.metric,
-                activity.goal.range,
-                Colors.ChipGray
+                activity.goal.range
             )
 
             val metric = activity.type.getLabel(
@@ -110,9 +109,9 @@ class RepositoryTrackedActivity @Inject constructor(
             )
 
             MetricWidgetData(
-                metric,
-                color,
-                activity.goal.range.getShortLabel(it.from),
+                value = metric,
+                status = status,
+                label = activity.goal.range.getShortLabel(it.from),
             )
         }
 
@@ -162,7 +161,7 @@ class RepositoryTrackedActivity @Inject constructor(
                 Day(
                     label = {it.from.dayOfMonth.toString()},
                     metric = it.metric,
-                    color = Colors.getMetricColor(activity.goal, it.metric, TimeRange.DAILY, Colors.ChipGray),
+                    status = getMetricStatus(activity.goal, it.metric, TimeRange.DAILY),
                     date = it.from,
                 )
             }

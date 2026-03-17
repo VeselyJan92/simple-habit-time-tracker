@@ -24,6 +24,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import com.imfibit.activitytracker.ui.AppTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,9 +47,9 @@ fun rememberAppBottomSheetState(): SheetState {
 fun BaseBottomSheet(
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit,
-    state: SheetState,
+    state: SheetState = rememberAppBottomSheetState(),
     paddingValues: PaddingValues = PaddingValues(horizontal = 16.dp),
-    content: @Composable ColumnScope.(onDismissRequest: (action: (() -> Unit)?) -> Unit, ) -> Unit,
+    content: @Composable ColumnScope.(onDismissRequest: (action: (() -> Unit)?) -> Unit) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
 
@@ -71,10 +72,15 @@ fun BaseBottomSheet(
             .displayCutoutPadding()
             .statusBarsPadding()
             .padding(top = 8.dp),
+
         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+        containerColor = AppTheme.colors.surface,
+        contentColor = AppTheme.colors.onSurface,
         content = {
             Column(
-                modifier = Modifier.padding(paddingValues).navigationBarsPadding()
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .navigationBarsPadding()
             ) {
                 content(animateToDismiss)
             }
@@ -87,7 +93,7 @@ fun BaseBottomSheet(
 fun ScrollBottomSheet(
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit,
-    state: SheetState,
+    state: SheetState = rememberAppBottomSheetState(),
     paddingValues: PaddingValues = PaddingValues(horizontal = 16.dp),
     content: @Composable ColumnScope.(
         onDismissRequest: (action: (() -> Unit)?) -> Unit,
@@ -113,7 +119,7 @@ fun ScrollBottomSheet(
 fun LazyScrollBottomSheet(
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit,
-    state: SheetState,
+    state: SheetState = rememberAppBottomSheetState(),
     paddingValues: PaddingValues = PaddingValues(horizontal = 16.dp),
     content: LazyListScope.(
         onDismissRequest: (action: (() -> Unit)?) -> Unit,

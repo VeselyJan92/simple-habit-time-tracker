@@ -80,13 +80,15 @@ fun DialogAskForNotifications(
     DialogBaseHeader(title = stringResource(R.string.dialog_ask_for_notifications_title))
 
     Text(
-        text = "We need notification permission:",
-        modifier = Modifier.padding(8.dp)
+        text = stringResource(id = R.string.dialog_ask_notifications_permission),
+        modifier = Modifier.padding(8.dp),
+        color = AppTheme.colors.onSurface
     )
 
     Text(
         text = stringArrayResource(id = R.array.dialog_ask_for_notifications_list).joinToString("\n"),
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier.padding(8.dp),
+        color = AppTheme.colors.onSurfaceVariant
     )
 
     DialogButtons {

@@ -10,6 +10,7 @@ import com.imfibit.activitytracker.database.entities.DailyChecklistTimelineItem
 import com.imfibit.activitytracker.database.entities.FocusBoardItem
 import com.imfibit.activitytracker.database.entities.FocusBoardItemTag
 import com.imfibit.activitytracker.database.entities.FocusBoardItemTagRelation
+import com.imfibit.activitytracker.database.entities.FocusBundle
 import com.imfibit.activitytracker.database.entities.PresetTimer
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
@@ -38,7 +39,8 @@ val activityTables = arrayOf(
 val focusBoardTables = arrayOf(
     FocusBoardItem.TABLE,
     FocusBoardItemTag.TABLE,
-    FocusBoardItemTagRelation.TABLE
+    FocusBoardItemTagRelation.TABLE,
+    FocusBundle.TABLE
 )
 
 val dailyChecklistTables = arrayOf(
@@ -105,4 +107,3 @@ fun ViewModel.observerDBAsFlow(
         emit(Unit)
     }
 }
-

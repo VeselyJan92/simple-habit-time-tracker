@@ -14,18 +14,20 @@ import com.imfibit.activitytracker.database.dao.DAODailyChecklistTimeline
 import com.imfibit.activitytracker.database.dao.DAOFocusBoardItem
 import com.imfibit.activitytracker.database.dao.DAOFocusBoardItemTagRelation
 import com.imfibit.activitytracker.database.dao.DAOFocusBoardItemTags
-import com.imfibit.activitytracker.database.dao.tracked_activity.DAOActivityGroup
-import com.imfibit.activitytracker.database.dao.tracked_activity.DAOPresetTimers
-import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivity
-import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivityChecked
-import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivityMetric
-import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivityScore
-import com.imfibit.activitytracker.database.dao.tracked_activity.DAOTrackedActivityTime
+import com.imfibit.activitytracker.database.dao.DAOFocusBundle
+import com.imfibit.activitytracker.database.dao.DAOTrackedActivityGroup
+import com.imfibit.activitytracker.database.dao.DAOTrackedActivityPresetTimers
+import com.imfibit.activitytracker.database.dao.DAOTrackedActivity
+import com.imfibit.activitytracker.database.dao.DAOTrackedActivityChecked
+import com.imfibit.activitytracker.database.dao.DAOTrackedActivityMetric
+import com.imfibit.activitytracker.database.dao.DAOTrackedActivityScore
+import com.imfibit.activitytracker.database.dao.DAOTrackedActivityTime
 import com.imfibit.activitytracker.database.entities.DailyChecklistItem
 import com.imfibit.activitytracker.database.entities.DailyChecklistTimelineItem
 import com.imfibit.activitytracker.database.entities.FocusBoardItem
 import com.imfibit.activitytracker.database.entities.FocusBoardItemTag
 import com.imfibit.activitytracker.database.entities.FocusBoardItemTagRelation
+import com.imfibit.activitytracker.database.entities.FocusBundle
 import com.imfibit.activitytracker.database.entities.PresetTimer
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
@@ -76,11 +78,12 @@ object DatabaseModule {
         FocusBoardItemTagRelation::class,
         DailyChecklistItem::class,
         DailyChecklistTimelineItem::class,
+        FocusBundle::class
     ],
     views = [
         TrackedActivityMetric::class
     ],
-    version = 11,
+    version = 12,
     exportSchema = false
 )
 @TypeConverters(
@@ -95,14 +98,15 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun sessionDAO(): DAOTrackedActivityTime
     abstract fun completionDAO(): DAOTrackedActivityChecked
     abstract fun metricDAO(): DAOTrackedActivityMetric
-    abstract fun presetTimersDAO(): DAOPresetTimers
-    abstract fun groupDAO(): DAOActivityGroup
+    abstract fun presetTimersDAO(): DAOTrackedActivityPresetTimers
+    abstract fun groupDAO(): DAOTrackedActivityGroup
     abstract fun dailyCheckListTimelineDAO(): DAODailyChecklistTimeline
     abstract fun dailyCheckListItemsDao(): DAODailyChecklistItem
 
     abstract fun focusBoardItemDAO(): DAOFocusBoardItem
     abstract fun focusBoardItemTagDAO(): DAOFocusBoardItemTags
     abstract fun focusBoardItemTagRelationDAO(): DAOFocusBoardItemTagRelation
+    abstract fun focusBundleDAO(): DAOFocusBundle
 
     companion object {
         const val DB_NAME ="activity_tracker.db"
@@ -116,7 +120,7 @@ abstract class AppDatabase : RoomDatabase() {
                 db
             }
             "debug", "stage" -> {
-               // context.deleteDatabase(DB_NAME)
+                context.deleteDatabase(DB_NAME)
 
                 val db = Room
                     //.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
@@ -125,7 +129,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(*migrations)
                     .build()
 
-                //runBlocking(Dispatchers.IO) { DebugTestSeeder.seed(db) }
+                runBlocking(Dispatchers.IO) { DebugTestSeeder.seed(db) }
 
                 db
             }

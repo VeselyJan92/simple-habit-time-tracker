@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlusOne
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -37,13 +38,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.imfibit.activitytracker.ui.components.Colors
+import com.imfibit.activitytracker.ui.AppTheme
 import com.imfibit.activitytracker.ui.components.icons.MinusOne
 
 @OptIn(ExperimentalFoundationApi::class)
 @Preview
 @Composable
-fun NumberSelectorPreview() {
+fun NumberSelectorPreview() = AppTheme {
     NumberSelector(
         label = "label",
         number = 1,
@@ -66,8 +67,9 @@ fun NumberSelector(
 
         IconButton(
             modifier = Modifier
-                .weight(1f).height(IntrinsicSize.Max)
-                .background(Colors.ChipGray, RoundedCornerShape(50)),
+                .weight(1f)
+                .height(IntrinsicSize.Max)
+                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(50)),
             onClick = {
                 focusManager.clearFocus()
 
@@ -76,7 +78,7 @@ fun NumberSelector(
                 }
             },
         ) {
-            Icon(Icons.Filled.MinusOne, contentDescription = null)
+            Icon(Icons.Filled.MinusOne, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
         }
 
 
@@ -92,7 +94,11 @@ fun NumberSelector(
                 text = label,
                 modifier = Modifier.height(15.dp),
                 textAlign = TextAlign.Center,
-                style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp)
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold, 
+                    fontSize = 10.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             )
 
 
@@ -128,10 +134,11 @@ fun NumberSelector(
                 textStyle = TextStyle(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onPrimary
                 ),
                 keyboardType = KeyboardType.Number,
-                color = Colors.AppAccent
+                color = AppTheme.colors.appAccent
             )
         }
 
@@ -140,7 +147,7 @@ fun NumberSelector(
             modifier = Modifier
                 .weight(1f)
                 .height(IntrinsicSize.Max)
-                .background(Colors.ChipGray, RoundedCornerShape(50)),
+                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(50)),
             onClick = {
                 focusManager.clearFocus()
 
@@ -150,7 +157,7 @@ fun NumberSelector(
             },
 
             ) {
-            Icon(Icons.Filled.PlusOne, contentDescription = null)
+            Icon(Icons.Filled.PlusOne, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
         }
 
 
@@ -169,21 +176,19 @@ private fun EditText(
         fontWeight = FontWeight.Bold
     ),
     keyboardType: KeyboardType = KeyboardType.Text,
-    color: Color = Colors.ChipGray,
+    color: Color,
 ) {
-
-
     val valid = validate(text)
 
-    val color = if (valid) color else Colors.NotCompleted
+    val finalColor = if (valid) color else color
 
     Box(
-        modifier.background(color, shape = RoundedCornerShape(50)),
+        modifier.background(finalColor, shape = RoundedCornerShape(50)),
         contentAlignment = Alignment.Center
     ) {
 
         if (text.text.isEmpty())
-            Text(label)
+            Text(label, color = textStyle.color.copy(alpha = 0.5f))
 
         BasicTextField(
             singleLine = true,
@@ -198,4 +203,3 @@ private fun EditText(
         )
     }
 }
-

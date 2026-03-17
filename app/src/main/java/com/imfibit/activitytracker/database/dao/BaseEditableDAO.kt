@@ -1,11 +1,10 @@
 package com.imfibit.activitytracker.database.dao
 
 import androidx.room.*
+import kotlin.collections.toTypedArray
 
 
 interface BaseEditableDAO<T>{
-    @Insert(onConflict = OnConflictStrategy.ABORT)
-    fun insertSync(item: T): Long
 
     @Update
     suspend fun update(item: T)
@@ -16,6 +15,9 @@ interface BaseEditableDAO<T>{
     @Delete
     suspend fun delete(item: T)
 
+    @Delete
+    suspend fun deleteAll(vararg entity: T)
+
     @Insert
     suspend fun insert(vararg users: T)
 
@@ -25,4 +27,12 @@ interface BaseEditableDAO<T>{
     @Upsert
     suspend fun upsert(item: T): Long
 
+    @Upsert
+    suspend fun upsertAll(vararg entity: T)
+
 }
+
+suspend inline fun <reified T> BaseEditableDAO<T>.upsertAll(items: List<T>) = upsertAll(*items.toTypedArray<T>())
+
+suspend inline fun <reified T> BaseEditableDAO<T>.updateAll(items: List<T>) = updateAll(*items.toTypedArray<T>())
+

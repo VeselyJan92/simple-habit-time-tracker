@@ -1,11 +1,13 @@
 package com.imfibit.activitytracker.ui
 
-import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.listSaver
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.toMutableStateList
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
@@ -13,52 +15,39 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import com.imfibit.activitytracker.core.AppViewModel
+import com.imfibit.activitytracker.core.navigation.BackstackViewModel
+import com.imfibit.activitytracker.core.navigation.BottomSheetSceneStrategy
 import com.imfibit.activitytracker.ui.Destinations.ScreenActivityGroupRoute
 import com.imfibit.activitytracker.ui.components.dialogs.DialogRecords
 import com.imfibit.activitytracker.ui.navigation.EditRecord
-import com.imfibit.activitytracker.ui.screens.activity.ScreenTrackedActivity
-import com.imfibit.activitytracker.ui.screens.dashboard.Dashboard
-import com.imfibit.activitytracker.ui.screens.group.ScreenActivityGroup
+import com.imfibit.activitytracker.ui.screens.dashboard.DashboardScreen
+import com.imfibit.activitytracker.ui.screens.focus_board.ScreenEditFocusBoardItem
+import com.imfibit.activitytracker.ui.screens.focus_board.ScreenFocusBundle
 import com.imfibit.activitytracker.ui.screens.onboarding.ScreenOnboarding
 import com.imfibit.activitytracker.ui.screens.settings.ScreenSetting
-import com.imfibit.activitytracker.ui.screens.statistics.ScreenStatistics
+import com.imfibit.activitytracker.ui.screens.tracked_activities.activity.ScreenTrackedActivity
+import com.imfibit.activitytracker.ui.screens.tracked_activities.group.ScreenActivityGroup
+import com.imfibit.activitytracker.ui.screens.tracked_activities.statistics.ScreenStatistics
 import kotlinx.coroutines.runBlocking
 
 @Composable
 fun AppNavHost() {
     val vm = hiltViewModel<AppViewModel>()
-    val onboarded = runBlocking { vm.settings.getOnboarded() ?: false }
 
-    val startDestination: AppDestination =
-        if (onboarded) Destinations.ScreenActivities else Destinations.ScreenOnboarding
+    val navigation = hiltViewModel<BackstackViewModel>()
 
-    val backStack = rememberSaveable(
-        saver = listSaver(
-            save = { it.toList() },
-            restore = { it.toMutableStateList() }
-        )
-    ) {
-        mutableListOf<AppDestination>(startDestination).toMutableStateList()
-    }
+    val backStack by navigation.backStack.collectAsState()
 
     val entryProvider = remember(backStack) {
         entryProvider {
             entry<Destinations.ScreenStatistics> {
-                ScreenStatistics(
-                    navigate = { backStack.add(it) },
-                    popBack = { if (backStack.size > 1) backStack.removeAt(backStack.lastIndex) }
-                )
+                ScreenStatistics()
             }
             entry<Destinations.ScreenActivities> {
-                Dashboard(
-                    navigate = { backStack.add(it) }
-                )
+                DashboardScreen()
             }
             entry<Destinations.ScreenSettings> {
-                ScreenSetting(
-                    navigate = { backStack.add(it) },
-                    popBack = { if (backStack.size > 1) backStack.removeAt(backStack.lastIndex) }
-                )
+                ScreenSetting()
             }
             entry<Destinations.ScreenOnboarding> {
                 ScreenOnboarding(
@@ -66,30 +55,33 @@ fun AppNavHost() {
                         runBlocking {
                             vm.settings.setOnboarded(true)
                         }
-                        backStack.add(Destinations.ScreenActivities)
+                        navigation.navigate(Destinations.ScreenActivities)
                     }
                 )
             }
             entry<ScreenActivityGroupRoute> { destination ->
                 ScreenActivityGroup(
-                    navigate = { backStack.add(it) },
-                    popBack = { if (backStack.size > 1) backStack.removeAt(backStack.lastIndex) },
                     groupId = destination.groupId
                 )
             }
             entry<Destinations.ScreenActivity> { destination ->
                 ScreenTrackedActivity(
-                    navigate = { backStack.add(it) },
-                    popBack = { if (backStack.size > 1) backStack.removeAt(backStack.lastIndex) },
                     activityId = destination.activityId
+                )
+            }
+            entry<Destinations.ScreenFocusBundleDetail> { destination ->
+                ScreenFocusBundle(bundleId = destination.bundleId)
+            }
+            entry<Destinations.ScreemEditFocusBoardItem> { destination ->
+                ScreenEditFocusBoardItem(
+                    bundleId = destination.bundleId,
+                    noteId = destination.noteId,
                 )
             }
             entry<Destinations.DialogActivityDayHistory>(
                 metadata = DialogSceneStrategy.dialog()
             ) { destination ->
                 DialogRecords(
-                    navigate = { backStack.add(it) },
-                    popBack = { if (backStack.size > 1) backStack.removeAt(backStack.lastIndex) },
                     activityId = destination.activityId,
                     date = destination.getDate()
                 )
@@ -98,8 +90,6 @@ fun AppNavHost() {
                 metadata = DialogSceneStrategy.dialog()
             ) { destination ->
                 EditRecord(
-                    navigate = { backStack.add(it) },
-                    popBack = { if (backStack.size > 1) backStack.removeAt(backStack.lastIndex) },
                     record = destination.item
                 )
             }
@@ -108,12 +98,25 @@ fun AppNavHost() {
 
     NavDisplay(
         backStack = backStack,
-        onBack = { if (backStack.size > 1) backStack.removeAt(backStack.lastIndex) },
+        onBack = { navigation.popBackStack() },
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator()
         ),
         entryProvider = entryProvider,
-        sceneStrategies = listOf(remember { DialogSceneStrategy() })
+        transitionSpec = {
+            fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
+        },
+        predictivePopTransitionSpec = {
+            fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
+        },
+        popTransitionSpec = {
+            fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
+        },
+
+        sceneStrategies = listOf(
+            remember { DialogSceneStrategy() },
+            remember { BottomSheetSceneStrategy() },
+        ),
     )
 }

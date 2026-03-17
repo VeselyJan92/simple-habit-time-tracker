@@ -11,17 +11,15 @@ import androidx.room.*
 data class TrackerActivityGroup(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "activity_group_id")
-    var id: Long,
+    var id: Long = 0,
 
     @ColumnInfo(name = "name")
     var name: String,
 
     @ColumnInfo(name = "position")
-    var position: Int
+    var position: Int = 0
 ) {
     companion object{
         const val TABLE = "tracked_activity_group"
     }
 }
-
-

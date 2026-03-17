@@ -78,47 +78,46 @@ fun DialogSession(
 }
 
 @Composable
-fun DialogSessionContent(
+fun ColumnScope.DialogSessionContent(
     allowDelete: Boolean,
     from: LocalDateTime,
     to: LocalDateTime,
     onUpdate: ((LocalDateTime, LocalDateTime) -> Unit),
     onDismissRequest: (() -> Unit),
     onDelete: (() -> Unit)? = null,
-) = BaseDialog(
-    onDismissRequest = onDismissRequest,
 ) {
-    var from by remember { mutableStateOf(from) }
-    var to by remember { mutableStateOf(to) }
+    var fromState by remember { mutableStateOf(from) }
+    var toState by remember { mutableStateOf(to) }
 
     DialogBaseHeader(title = stringResource(id = if (allowDelete) R.string.dialog_session_title_edit else R.string.dialog_session_title_add))
 
     Row(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(top = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
 
         LabeledColumn(text = stringResource(id = R.string.session_start)) {
             EditableDatetime(
-                datetime = from,
+                datetime = fromState,
                 onDatetimeEdit = {
-                    from = it
+                    fromState = it
                 }
             )
         }
 
         LabeledColumn(text = stringResource(id = R.string.session_end)) {
             EditableDatetime(
-                datetime = to,
+                datetime = toState,
                 onDatetimeEdit = {
-                    to = it
+                    toState = it
                 }
             )
         }
     }
 
-    val minutes = abs((from.toInstant(TimeZone.UTC) - to.toInstant(TimeZone.UTC)).inWholeMinutes)
+    val minutes = abs((fromState.toInstant(TimeZone.UTC) - toState.toInstant(TimeZone.UTC)).inWholeMinutes)
 
     DurationText(minutes)
 
@@ -130,7 +129,7 @@ fun DialogSessionContent(
                     onDelete!!.invoke()
                 }
             ) {
-                Text(text = stringResource(id = R.string.dialog_action_delete))
+                Text(text = stringResource(id = R.string.dialog_action_delete), color = AppTheme.colors.error)
             }
         }
 
@@ -139,10 +138,10 @@ fun DialogSessionContent(
         }
 
         TextButton(
-            enabled = from < to && minutes <= 60 * 24,
+            enabled = fromState < toState && minutes <= 60 * 24,
             onClick = {
                 onDismissRequest()
-                onUpdate.invoke(from, to)
+                onUpdate.invoke(fromState, toState)
             }
         ) {
             Text(text = stringResource(id = if (allowDelete) R.string.dialog_action_edit else R.string.dialog_action_add))
@@ -177,8 +176,9 @@ private fun ColumnScope.DurationText(minutes: Long) {
     Text(
         text = text,
         modifier = Modifier
-            .padding(top = 8.dp)
-            .align(Alignment.CenterHorizontally)
+            .padding(top = 16.dp)
+            .align(Alignment.CenterHorizontally),
+        color = AppTheme.colors.onSurface
     )
 }
 
@@ -187,12 +187,14 @@ private fun LabeledColumn(
     text: String,
     body: @Composable ColumnScope.() -> Unit,
 ) = Column(
-    horizontalAlignment = Alignment.CenterHorizontally
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.spacedBy(4.dp)
 ) {
     Text(
         textAlign = TextAlign.Center,
         text = text,
-        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp)
+        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp),
+        color = AppTheme.colors.onSurfaceVariant
     )
 
     body.invoke(this)

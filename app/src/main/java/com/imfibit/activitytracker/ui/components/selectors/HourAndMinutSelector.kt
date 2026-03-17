@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -23,7 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.imfibit.activitytracker.R
-import com.imfibit.activitytracker.ui.components.Colors
+import com.imfibit.activitytracker.ui.AppTheme
 
 
 private data class State(
@@ -58,9 +59,9 @@ fun MinuteAndHourSelector(
 
         Column(Modifier.padding(horizontal = 8.dp)){
             Spacer(modifier = Modifier.height(22.dp))
-            Box(Modifier.size(5.dp).background(Color.Black, RoundedCornerShape(50)))
+            Box(Modifier.size(5.dp).background(MaterialTheme.colorScheme.onSurface, RoundedCornerShape(50)))
             Spacer(modifier = Modifier.height(4.dp))
-            Box(Modifier.size(5.dp).background(Color.Black, RoundedCornerShape(50)))
+            Box(Modifier.size(5.dp).background(MaterialTheme.colorScheme.onSurface, RoundedCornerShape(50)))
         }
 
         TimeEntry(state, stringResource(id = R.string.minutes), state.minutes, 0..59, onSelectionChanged)
@@ -85,13 +86,17 @@ private fun TimeEntry(
         Text(
             textAlign = TextAlign.Center,
             text = label,
-            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp)
+            style = TextStyle(
+                fontWeight = FontWeight.Bold, 
+                fontSize = 10.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         )
 
         Box(
             modifier = Modifier
                     .height(30.dp)
-                    .background(Colors.ChipGray, RoundedCornerShape(50))
+                    .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(50))
                     .fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
@@ -119,7 +124,12 @@ private fun TimeEntry(
                     )
 
                 },
-                textStyle = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center),
+                textStyle = TextStyle(
+                    fontSize = 16.sp, 
+                    fontWeight = FontWeight.Bold, 
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
 

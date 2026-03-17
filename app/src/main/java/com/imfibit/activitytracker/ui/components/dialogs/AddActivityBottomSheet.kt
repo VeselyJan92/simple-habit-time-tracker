@@ -1,7 +1,5 @@
 package com.imfibit.activitytracker.ui.components.dialogs
 
-import androidx.compose.animation.core.copy
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,17 +27,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.TestTag
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.AppTheme
 import com.imfibit.activitytracker.ui.components.ScrollBottomSheet
-import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.rememberTestBottomSheetState
 
 
@@ -78,7 +73,7 @@ fun AddActivityBottomSheet(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
 
-            SectionTitle(text = "Habit")
+            SectionTitle(text = stringResource(id = R.string.habits))
 
             TrackedActivities(
                 modifier = Modifier.testTag(TestTag.DIALOG_ADD_ACTIVITY_TIME),
@@ -111,7 +106,7 @@ fun AddActivityBottomSheet(
             // Added Divider and spacing for better visual separation
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-            SectionTitle(text = "Focus board")
+            SectionTitle(text = stringResource(id = R.string.focus_board_title))
 
             TrackedActivities(
                 modifier = Modifier.testTag(TestTag.DIALOG_ADD_ACTIVITY_FOCUS_ITEM),
@@ -123,7 +118,7 @@ fun AddActivityBottomSheet(
             // Added Divider and spacing for better visual separation
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-            SectionTitle(text = "Daily Checklist")
+            SectionTitle(text = stringResource(id = R.string.daily_checklist))
 
             TrackedActivities(
                 modifier = Modifier.testTag(TestTag.DIALOG_ADD_CHECKLIST_ITEM),
@@ -157,7 +152,7 @@ private fun TrackedActivities(
             .fillMaxWidth()
             .clickable(onClick = clickable),
         shape = RoundedCornerShape(10.dp),
-        color = Colors.ChipGray
+        color = AppTheme.colors.chipGrayUnselected
     ) {
         Row(
             modifier = Modifier

@@ -60,7 +60,7 @@ fun DialogScore(
     onDelete: (() -> Unit)? = null,
 ) = BaseDialog(onDismissRequest = onDismissRequest) {
 
-    var score by remember { mutableStateOf(score.toInt()) }
+    var score by remember { mutableIntStateOf(score.toInt()) }
     var datetime by remember { mutableStateOf(datetime) }
 
     DialogBaseHeader(title = stringResource(id = if (allowDelete) R.string.dialo_score_title_edit else R.string.dialo_score_title_add))
@@ -80,8 +80,9 @@ fun DialogScore(
         Text(
             modifier = Modifier.height(15.dp),
             textAlign = TextAlign.Center,
-            text = "time",
-            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp)
+            text = stringResource(id = R.string.time),
+            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp),
+            color = AppTheme.colors.onSurfaceVariant
         )
 
         EditableDatetime(
@@ -100,7 +101,7 @@ fun DialogScore(
                     onDelete.invoke()
                 }
             ) {
-                Text(text = stringResource(id = R.string.dialog_action_delete))
+                Text(text = stringResource(id = R.string.dialog_action_delete), color = AppTheme.colors.error)
             }
         }
 
@@ -116,6 +117,3 @@ fun DialogScore(
         }
     }
 }
-
-
-

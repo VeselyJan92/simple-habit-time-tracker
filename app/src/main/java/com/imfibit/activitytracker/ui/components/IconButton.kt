@@ -10,8 +10,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.ui.AppTheme
 
 
@@ -19,7 +21,7 @@ import com.imfibit.activitytracker.ui.AppTheme
 @Composable
 private fun IconButton_Preview() = AppTheme {
     IconButton(
-        text = "Add",
+        text = stringResource(id = R.string.action_add),
         icon = Icons.Filled.Add,
         onClick = {}
     )
@@ -32,7 +34,7 @@ fun IconButton(text: String, icon: ImageVector, onClick: ()->Unit ){
     ) {
         Icon(
             imageVector = icon,
-            contentDescription = "Favorite" // Provide a meaningful description
+            contentDescription = text
         )
 
         Spacer(modifier = Modifier.padding(8.dp))

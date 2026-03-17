@@ -78,7 +78,7 @@ fun EditableDatetime(
     Row(
         modifier = modifier
             .height(30.dp)
-            .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(50))
+            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(50))
             .padding(start = 8.dp, end = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -86,6 +86,7 @@ fun EditableDatetime(
         Text(
             textAlign = TextAlign.Center,
             text = datetime.toJavaLocalDateTime().format(DateTimeFormatter.ofPattern("dd. MM.")),     //TODO Local format
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.clickable(
                 onClick = {
                     showDatePicker = true
@@ -96,13 +97,14 @@ fun EditableDatetime(
         Box(
             Modifier
                 .padding(start = 8.dp, end = 8.dp)
-                .size(5.dp)
-                .background(Color.Black, RoundedCornerShape(50))
+                .size(4.dp)
+                .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f), RoundedCornerShape(50))
         )
 
         Text(
             textAlign = TextAlign.Center,
             text = datetime.toJavaLocalDateTime().format(DateTimeFormatter.ofPattern("HH:mm")),     //TODO Local format
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.clickable(
                 onClick = {

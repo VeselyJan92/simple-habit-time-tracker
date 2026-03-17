@@ -1,10 +1,10 @@
+import com.android.build.api.dsl.ApplicationExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.konan.properties.Properties
 
 plugins {
     id("com.android.application")
     id("com.github.triplet.play") version "4.0.0"
-    id("kotlin-android")
     id("dagger.hilt.android.plugin")
 
     id("com.google.gms.google-services")
@@ -19,16 +19,11 @@ plugins {
 kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_17)
-    }
-
-    sourceSets {
-        all {
-            languageSettings.optIn("kotlin.time.ExperimentalTime")
-        }
+        freeCompilerArgs.add("-opt-in=kotlin.time.ExperimentalTime")
     }
 }
 
-android {
+configure<ApplicationExtension> {
     namespace = "com.imfibit.activitytracker"
 
     compileOptions {
@@ -119,11 +114,11 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
 
 
-    implementation(platform("com.google.firebase:firebase-bom:34.10.0"))
+    implementation(platform("com.google.firebase:firebase-bom:34.11.0"))
     implementation("com.google.firebase:firebase-crashlytics")
 
 
-    val COMPOSE_VERSION = "1.10.5"
+    val COMPOSE_VERSION = "1.10.6"
     implementation("androidx.compose.animation:animation:$COMPOSE_VERSION")
     implementation("androidx.compose.foundation:foundation:$COMPOSE_VERSION")
     implementation("androidx.activity:activity-compose:1.13.0")
@@ -141,8 +136,8 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.2.1")
 
     // Navigation 3
-    implementation("androidx.navigation3:navigation3-runtime:1.1.0-beta01")
-    implementation("androidx.navigation3:navigation3-ui:1.1.0-beta01")
+    implementation("androidx.navigation3:navigation3-runtime:1.1.0-rc01")
+    implementation("androidx.navigation3:navigation3-ui:1.1.0-rc01")
     implementation("androidx.lifecycle:lifecycle-viewmodel-navigation3:2.10.0")
     implementation("androidx.compose.material3.adaptive:adaptive-navigation3:1.3.0-alpha09")
 

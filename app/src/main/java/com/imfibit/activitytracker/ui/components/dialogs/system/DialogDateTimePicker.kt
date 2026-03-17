@@ -11,7 +11,9 @@ import androidx.compose.material3.getSelectedDate
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.ui.AppTheme
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -59,7 +61,7 @@ fun DialogTimePicker(
                     onTimePicked(timePickerState.hour, timePickerState.minute)
                 }
             ) {
-                Text(text = "SET")
+                Text(text = stringResource(id = R.string.action_set))
             }
         },
         title = { }
@@ -88,7 +90,7 @@ fun DatePickerDialog(
                     onDatePicked(datePickerState.getSelectedDate()?.toKotlinLocalDate())
                 }
             ) {
-                Text(text = "SET")
+                Text(text = stringResource(id = R.string.action_set))
             }
         }
     ) {

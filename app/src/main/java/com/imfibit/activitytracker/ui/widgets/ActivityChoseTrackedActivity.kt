@@ -1,6 +1,5 @@
 package com.imfibit.activitytracker.ui.widgets
 
-import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,7 +22,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -31,23 +29,23 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.view.WindowCompat
 import androidx.glance.GlanceId
 import androidx.glance.appwidget.GlanceAppWidgetManager
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.BaseViewModel
 import com.imfibit.activitytracker.database.AppDatabase
+import com.imfibit.activitytracker.database.DevSeeder
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.AppTheme
-import com.imfibit.activitytracker.ui.components.SimpleTopBar
+import com.imfibit.activitytracker.ui.components.topBar.TopBarTitle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 abstract class WidgetPickerVM constructor(
@@ -77,52 +75,62 @@ abstract class ActivityChoseTrackedActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
 
         setResult(RESULT_CANCELED)
 
         setContent {
-            val vm = getViewModel()
-            val activities by vm.data.collectAsState()
-            val context = LocalContext.current
-            val glanceId = remember(intent) {
-                GlanceAppWidgetManager(context).getGlanceIdBy(intent)
+            AppTheme {
+                val vm = getViewModel()
+                val activities by vm.data.collectAsStateWithLifecycle()
+                val context = LocalContext.current
+                val glanceId = remember(intent) {
+                    GlanceAppWidgetManager(context).getGlanceIdBy(intent)
+                }
+
+                ActivityChoseTrackedActivityContent(
+                    activities = activities,
+                    onSetResult = {
+                        if (glanceId != null) {
+                            vm.setupWidget(glanceId, it)
+                        }
+
+                        setResult(RESULT_OK)
+                        finish()
+                    }
+                )
             }
 
-            Content(
-                activities = activities,
-                onSetResult = {
-                    if (glanceId != null) {
-                        vm.setupWidget(glanceId, it)
-                    }
-
-                    setResult(RESULT_OK)
-                    finish()
-                }
-            )
         }
     }
 }
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun Content(
+private fun ActivityChoseTrackedActivityContent(
     activities: List<TrackedActivity>,
     onSetResult: (Long) -> Unit,
-) = AppTheme {
+) {
     Scaffold(
-        modifier = Modifier.safeDrawingPadding(),
+        modifier = Modifier,
         topBar = {
-            SimpleTopBar(
-                title = stringResource(R.string.widget_picker_title)
+            TopAppBar(
+                title = {
+                    TopBarTitle(title = stringResource(R.string.widget_picker_title))
+                }
             )
         },
         content = { paddingValues ->
             if (activities.isEmpty()) {
-                NoActivitiesMessage(Modifier.padding(paddingValues))
+                NoActivitiesMessage(
+                    Modifier
+                        .safeDrawingPadding()
+                        .padding(paddingValues)
+                )
             } else {
                 ActivityList(
-                    modifier = Modifier.padding(paddingValues),
+                    modifier = Modifier
+                        .safeDrawingPadding()
+                        .padding(paddingValues),
                     activities = activities,
                     onActivityClick = { activityId ->
                         onSetResult(activityId)
@@ -188,5 +196,17 @@ fun NoActivitiesMessage(modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp)
+    )
+}
+
+@Preview
+@Composable
+fun ActivityChoseTrackedActivityContentPreview() = AppTheme {
+    ActivityChoseTrackedActivityContent(
+        activities = listOf(
+            DevSeeder.getTrackedActivityTime().copy(id = 1),
+            DevSeeder.getTrackedActivityScore().copy(id = 2)
+        ),
+        onSetResult = {}
     )
 }

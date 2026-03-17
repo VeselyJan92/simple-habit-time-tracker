@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.ui.AppTheme
-import com.imfibit.activitytracker.ui.components.Colors
 
 @Preview
 @Composable
@@ -60,7 +59,7 @@ fun DialogTimeRange(
                 modifier = Modifier
                     .weight(1f)
                     .background(
-                        if (selected.value == timeRange) Colors.ChipGraySelected else Colors.ChipGray,
+                        if (selected.value == timeRange) AppTheme.colors.chipGraySelected else AppTheme.colors.chipGrayUnselected,
                         RoundedCornerShape(8.dp)
                     )
                     .padding(8.dp)
@@ -80,7 +79,7 @@ fun DialogTimeRange(
         TextButton(
             onClick = onDismissRequest
         ) {
-            Text(text = "OK")
+            Text(text = stringResource(id = R.string.action_ok))
         }
     }
 }

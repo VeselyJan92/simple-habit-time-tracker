@@ -6,22 +6,21 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavHostController
 import com.imfibit.activitytracker.core.notifications.NotificationLiveSession
 import com.imfibit.activitytracker.core.notifications.NotificationTimerOver
 import com.imfibit.activitytracker.database.AppDatabase
-import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.widgets.WidgetOverviewReceiver
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +29,7 @@ import javax.inject.Inject
 
 const val SCREEN_FOCUS_BOARD_PAGER_ID = 0
 const val SCREEN_ACTIVITIES_PAGER_ID = 1
-const val SCREEN_MIND_BOOT_ID = 2
+const val SCREEN_DAILY_CEHCKLIST_ID = 2
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -46,8 +45,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
-
-        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
 
         NotificationTimerOver.createChannel(this)
         NotificationLiveSession.createChannel(this)
@@ -68,25 +65,6 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AppTheme(content: @Composable () -> Unit) {
-    MaterialTheme(
-        colorScheme = MaterialTheme.colorScheme.copy(
-            background = Colors.AppBackground,
-            surface = Color.White,
-            surfaceContainerLow = Color.White
-        )
-    ) {
-        content()
-    }
-}
-
-val LocalNavController = compositionLocalOf<NavHostController> {
-    error("No LocalNavController provided")
-}
-
-@Composable
 fun DashboardBody(content: @Composable (ColumnScope.() -> Unit)) {
     Column(modifier = Modifier.fillMaxSize(), content = content)
 }
-
-

@@ -38,7 +38,7 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.services.OverviewWidgetService
@@ -175,6 +175,7 @@ private fun WidgetContent(
     today: String,
 ) {
     val size = LocalSize.current
+    val context = LocalContext.current
 
     Column(
         modifier = GlanceModifier
@@ -200,7 +201,7 @@ private fun WidgetContent(
                 Spacer(modifier = GlanceModifier.defaultWeight())
 
                 Text(
-                    text = "Today:",
+                    text = context.getString(R.string.widget_overview_today),
                     style = TextStyle(
                         fontSize = 15.sp,
                         textAlign = TextAlign.Start,

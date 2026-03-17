@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.imfibit.activitytracker.ui.AppTheme
 
 
 @Composable
@@ -34,6 +35,8 @@ fun BaseDialog(
         Surface(
             shape = RoundedCornerShape(20.dp),
             shadowElevation = 2.dp,
+            color = AppTheme.colors.surface,
+            contentColor = AppTheme.colors.onSurface
         ) {
             Column(
                 modifier = Modifier.padding(paddingValues),
@@ -54,7 +57,7 @@ fun DialogBaseHeader(title: String, modifier: Modifier = Modifier) {
             style = TextStyle(
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
-                color = Color.Black
+                color = AppTheme.colors.onSurface
             )
         )
     }

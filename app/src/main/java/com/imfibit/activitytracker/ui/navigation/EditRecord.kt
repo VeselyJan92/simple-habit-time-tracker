@@ -2,8 +2,9 @@ package com.imfibit.activitytracker.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.imfibit.activitytracker.core.BaseViewModel
+import com.imfibit.activitytracker.core.navigation.BackstackViewModel
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
 import com.imfibit.activitytracker.database.entities.TrackedActivityRecord
@@ -20,10 +21,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun EditRecord(
-    navigate: (AppDestination) -> Unit,
-    popBack: () -> Unit,
     record: TrackedActivityRecord
 ) {
+    val navigation = hiltViewModel<BackstackViewModel>()
+
     val vm = hiltViewModel<DialogEditRecordVM, DialogEditRecordVM.Factory> { factory ->
         factory.create(record)
     }
@@ -45,7 +46,7 @@ fun EditRecord(
                     );
                 },
                 onDelete = { vm.onDelete(currentRecord) },
-                onDismissRequest = { popBack() }
+                onDismissRequest = { navigation.popBackStack() }
             )
 
             is TrackedActivityTime -> DialogSession(
@@ -59,7 +60,7 @@ fun EditRecord(
                     )
                 },
                 onDelete = { vm.onDelete(currentRecord) },
-                onDismissRequest = { popBack() }
+                onDismissRequest = { navigation.popBackStack() }
             )
         }
     }

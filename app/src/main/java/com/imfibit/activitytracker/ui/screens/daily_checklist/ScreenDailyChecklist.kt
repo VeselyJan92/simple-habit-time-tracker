@@ -6,10 +6,10 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,18 +20,22 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Checklist
-import androidx.compose.material3.Checkbox
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,20 +56,24 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.TestTag
 import com.imfibit.activitytracker.database.entities.DailyChecklistItem
 import com.imfibit.activitytracker.database.entities.DailyChecklistTimelineItemValue
 import com.imfibit.activitytracker.ui.AppTheme
 import com.imfibit.activitytracker.ui.DashboardBody
-import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.Colors.chooseableColors
 import com.imfibit.activitytracker.ui.components.darker
+import com.imfibit.activitytracker.core.extensions.toThemeColor
+import com.imfibit.activitytracker.ui.components.EmptyState
+import com.imfibit.activitytracker.ui.components.EmptyStateHint
 import kotlin.time.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -76,77 +84,14 @@ import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import kotlin.math.max
 
-val items = buildList {
-    add(
-        DailyChecklistItem(
-            title = "Random thing",
-            description = "Random thing",
-            color = chooseableColors.random().toArgb(),
-            id = 1
-        )
-    )
-    add(
-        DailyChecklistItem(
-            title = "Most important things first",
-            description = "Most important things first, Customize Toolbar…, Customize Toolbar…",
-            color = chooseableColors.random().toArgb(),
-            id = 2
-        )
-    )
-    add(
-        DailyChecklistItem(
-            title = "Make time for workout",
-            description = "Make time for workout",
-            color = chooseableColors.random().toArgb(),
-            id = 3
-        )
-    )
-    add(
-        DailyChecklistItem(
-            title = "This random shit",
-            description = "",
-            id = 4,
-            color = chooseableColors.random().toArgb(),
-        )
-    )
-}
-
-
-@Preview
 @Composable
-private fun Preview() = AppTheme {
-    Body(
-        items = items,
-        days = buildList {
-            repeat(30) {
-                add(DailyChecklistTimelineItemValue(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.minus(it.toLong(), DateTimeUnit.DAY), true))
-            }
-        },
-        history = listOf(),
-        strike = 7,
-        onCheckItem = { checked, item -> },
-        onToggleDay = { checked, item -> },
-        onItemEdit = {},
-        onItemDelete = {},
-        onSwap = { x, y -> }
-    )
-}
-
-
-@Composable
-fun ScreenMindBoot() {
+fun ScreenDailyChecklist() {
     val viewModel = hiltViewModel<DailyChecklistViewModel>()
 
-    val items by viewModel.items.collectAsState()
-    val days by viewModel.days.collectAsState()
-    val strike by viewModel.strike.collectAsState()
-    val history by viewModel.history.collectAsState()
+    val data by viewModel.data.collectAsStateWithLifecycle()
 
-    Body(
-        items = items,
-        days = days,
-        history = history,
-        strike = strike,
+    ScreenDailyChecklistContent(
+        data = data,
         onCheckItem = viewModel::onCheck,
         onToggleDay = viewModel::onToggleDay,
         onItemEdit = viewModel::onEdit,
@@ -157,11 +102,8 @@ fun ScreenMindBoot() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun Body(
-    items: List<DailyChecklistItem>,
-    days: List<DailyChecklistTimelineItemValue>,
-    history: List<DailyChecklistTimelineItemValue>,
-    strike: Int,
+private fun ScreenDailyChecklistContent(
+    data: DailyChecklistViewModel.Data?,
     onCheckItem: (checked: Boolean, item: DailyChecklistItem) -> Unit,
     onToggleDay: (checked: Boolean, date: LocalDate) -> Unit,
     onItemEdit: (DailyChecklistItem) -> Unit,
@@ -170,11 +112,9 @@ private fun Body(
 ) {
     var showHistoryBottomSheet by remember { mutableStateOf(false) }
 
-
-
     if (showHistoryBottomSheet) {
         DailyChecklistHistoryBottomSheet(
-            history = history,
+            history = data?.history ?: emptyList(),
             onToggleDay = onToggleDay,
             onDismissRequest = {
                 showHistoryBottomSheet = false
@@ -182,56 +122,35 @@ private fun Body(
         )
     }
 
-
-    DashboardBody {
-        TopBar(
-            onCalendarClicked = {
-                showHistoryBottomSheet = true
-            }
-        )
-
-        if (items.isEmpty()) {
-            Column(
-                modifier = Modifier
-                    .testTag(TestTag.DAILY_CHECKLIST_EMPTY_SECTION)
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .padding(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-
-                Icon(
-                    modifier = Modifier
-                        .size(80.dp)
-                        .padding(bottom = 8.dp),
-                    imageVector = Icons.Default.Checklist,
-                    contentDescription = null
-                )
-
-                Text(
-                    modifier = Modifier.padding(bottom = 4.dp),
-                    text = stringResource(R.string.daily_checklist_empty_title),
-                    fontWeight = FontWeight.Bold, fontSize = 18.sp
-                )
-
-                Text(
-                    text = stringResource(R.string.daily_checklist_empty_message),
-                    textAlign = TextAlign.Center
-                )
-
-            }
-        } else {
-            DailyChecklist(
-                items,
-                days,
-                strike,
-                onCheckItem,
-                onToggleDay,
-                onItemEdit,
-                onItemDelete,
-                onSwap,
+    Surface(color = Color.Transparent) {
+        DashboardBody {
+            TopBar(
+                onCalendarClicked = {
+                    showHistoryBottomSheet = true
+                }
             )
+
+            if (data != null) {
+                if (data.items.isEmpty()) {
+                    EmptyState(
+                        modifier = Modifier.testTag(TestTag.DAILY_CHECKLIST_EMPTY_SECTION),
+                        icon = Icons.Default.Checklist,
+                        title = stringResource(id = R.string.daily_checklist_empty_title),
+                        description = stringResource(id = R.string.daily_checklist_empty_message),
+                    )
+                } else {
+                    DailyChecklist(
+                        data.items,
+                        data.days,
+                        data.strike,
+                        onCheckItem,
+                        onToggleDay,
+                        onItemEdit,
+                        onItemDelete,
+                        onSwap,
+                    )
+                }
+            }
         }
     }
 }
@@ -243,14 +162,12 @@ fun TopOverview(
     onToggleDay: (checked: Boolean, date: LocalDate) -> Unit,
 ) {
     Surface(
-        shape = RoundedCornerShape(15.dp),
-        shadowElevation = 2.dp,
-        color = Colors.SuperLight
+        shape = RoundedCornerShape(12.dp), // Smaller corners for the indicator card
     ) {
         Column(
-            modifier = Modifier
+            modifier = Modifier.background(color = AppTheme.colors.surfaceContainerLow.copy(alpha = 0.75f))
                 .fillMaxWidth()
-                .padding(12.dp) // Increased padding for more breathing room
+                .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -263,17 +180,26 @@ fun TopOverview(
                         withStyle(
                             SpanStyle(
                                 fontWeight = FontWeight.Black,
-                                fontSize = 20.sp
+                                fontSize = 18.sp,
+                                color = AppTheme.colors.onSurface
                             )
-                        ) { // Larger font for strike
+                        ) {
                             append("$strike")
                         }
-                        append(" ")
-                        append(stringResource(R.string.days))
+                        withStyle(
+                            SpanStyle(
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                                color = AppTheme.colors.outline
+                            )
+                        ) {
+                            append(" ")
+                            append(stringResource(R.string.days))
+                        }
                     },
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
-                        .padding(end = 48.dp)
+                        .padding(end = 16.dp)
                 )
 
                 TruncatingBoxRow(days, onToggleDay)
@@ -296,7 +222,7 @@ fun TruncatingBoxRow(
                     modifier = Modifier
                         .size(16.dp)
                         .clip(RoundedCornerShape(4.dp))
-                        .background(if (it.completed) Colors.ButtonGreen else Colors.ChipGray)
+                        .background(if (it.completed) AppTheme.colors.success else AppTheme.colors.surfaceVariant)
                         .clickable {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             onToggleDay(!it.completed, it.date_completed)
@@ -306,7 +232,7 @@ fun TruncatingBoxRow(
         }
     ) { measurables, constraints ->
         val boxSize = 16.dp.roundToPx()
-        val spacing = 4.dp.roundToPx()
+        val spacing = 6.dp.roundToPx()
 
         val placeables = measurables.map { it.measure(constraints.copy(minWidth = 0)) }
 
@@ -314,12 +240,11 @@ fun TruncatingBoxRow(
         val itemsToPlace = mutableListOf<Placeable>()
 
         for (placeable in placeables) {
-            // Check if adding the current item exceeds the max width
             if (currentWidth + placeable.width <= constraints.maxWidth) {
-                itemsToPlace.add(0, placeable) // Add to the beginning to maintain the order
+                itemsToPlace.add(0, placeable)
                 currentWidth += placeable.width + spacing
             } else {
-                break // Stop when adding the next item would exceed the width
+                break
             }
         }
 
@@ -350,20 +275,26 @@ fun DailyChecklist(
         onSwap(from, to)
     }
 
+    val now = remember { Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date }
+    val completedItems = items.filter { it.date_checked == now }
+    val activeItems = items.filter { it.date_checked != now }
+
     LazyColumn(
         state = lazyListState,
         modifier = Modifier
             .testTag(TestTag.DAILY_CHECKLIST_LIST)
             .fillMaxHeight(),
-        contentPadding = PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
 
         item(key = "header") {
             TopOverview(days, strike, onToggleDay)
+            Spacer(modifier = Modifier.height(8.dp))
         }
 
-        items(items, key = { it.id }) { item ->
+        // Active Items
+        items(activeItems, key = { it.id }) { item ->
             ReorderableItem(
                 state = reorderableLazyListState,
                 key = item.id
@@ -371,7 +302,59 @@ fun DailyChecklist(
                 DailyChecklistItem(
                     modifier = Modifier.longPressDraggableHandle(),
                     item = item,
+                    isChecked = false,
                     dragging = isDragging,
+                    onCheckItem = onCheckItem,
+                    onItemEdit = onItemEdit,
+                    onItemDelete = onItemDelete
+                )
+            }
+        }
+
+        // Completed Section
+        if (completedItems.isNotEmpty()) {
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, bottom = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.daily_checklist_completed),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        color = AppTheme.colors.onSurfaceVariant,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Surface(
+                        shape = CircleShape,
+                        color = AppTheme.colors.surfaceContainerLow,
+                        shadowElevation = 1.dp
+                    ) {
+                        Text(
+                            text = completedItems.size.toString(),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = AppTheme.colors.onSurface, // Very dark
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = stringResource(id = R.string.daily_checklist_reset),
+                        tint = AppTheme.colors.outline,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+
+            items(completedItems, key = { it.id }) { item ->
+                DailyChecklistItem(
+                    item = item,
+                    isChecked = true,
+                    dragging = false,
                     onCheckItem = onCheckItem,
                     onItemEdit = onItemEdit,
                     onItemDelete = onItemDelete
@@ -385,28 +368,40 @@ fun DailyChecklist(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopBar(onCalendarClicked: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "Daily checklist",
-            fontWeight = FontWeight.Black, fontSize = 25.sp
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        IconButton(
-            onClick = onCalendarClicked
-        ) {
-            Icon(imageVector = Icons.Default.CalendarMonth, contentDescription = null )
+    TopAppBar(
+        windowInsets = WindowInsets(0.dp),
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+        title = {
+            Text(
+                text = stringResource(id = R.string.daily_checklist),
+                fontWeight = FontWeight.Black,
+                fontSize = 24.sp,
+                color = AppTheme.colors.onSurface // Strongest contrast
+            )
+        },
+        actions = {
+            Surface(
+                shape = CircleShape,
+                color = AppTheme.colors.surfaceContainerLow,
+                shadowElevation = 1.dp,
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .size(40.dp)
+            ) {
+                IconButton(onClick = onCalendarClicked) {
+                    Icon(
+                        imageVector = Icons.Default.CalendarMonth,
+                        contentDescription = stringResource(id = R.string.screen_title_record_history),
+                        tint = AppTheme.colors.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
         }
-    }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -414,6 +409,7 @@ private fun TopBar(onCalendarClicked: () -> Unit) {
 private fun DailyChecklistItem(
     modifier: Modifier = Modifier,
     item: DailyChecklistItem,
+    isChecked: Boolean,
     dragging: Boolean,
     onCheckItem: (checked: Boolean, item: DailyChecklistItem) -> Unit,
     onItemEdit: (DailyChecklistItem) -> Unit,
@@ -433,6 +429,16 @@ private fun DailyChecklistItem(
         )
     }
 
+    val baseColor = item.color.toThemeColor()
+    val haptic = LocalHapticFeedback.current
+
+    // Make the entire card heavily saturated like the user requested.
+    val backgroundColor = when {
+        dragging -> baseColor.darker(0.1f)
+        isChecked -> baseColor.copy(alpha = 0.6f)
+        else -> baseColor.copy(alpha = 0.6f)
+    }
+
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -443,62 +449,125 @@ private fun DailyChecklistItem(
                 dialogDailyChecklist = true
             }
             .testTag(TestTag.DAILY_CHECKLIST_LIST_ITEM),
-        shape = RoundedCornerShape(15.dp),
-        color = Color(item.color).let { if (dragging) it.darker(0.25f) else it },
-        shadowElevation = 2.dp
+        shape = RoundedCornerShape(16.dp),
+        color = backgroundColor,
+        shadowElevation = if (dragging) 4.dp else 0.dp
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.height(IntrinsicSize.Min)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 8.dp)
         ) {
+            
             Column(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .weight(1f),
+                modifier = Modifier.weight(1f),
             ) {
-
-                if (item.title.isNotBlank()) {
-                    Text(
-                        style = TextStyle.Default.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
-                        ),
-                        text = item.title
-                    )
-                }
+                Text(
+                    text = item.title,
+                    style = TextStyle.Default.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 17.sp,
+                        color = AppTheme.colors.onSurface,
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
 
                 if (item.description.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
+                        text = item.description,
                         style = TextStyle.Default.copy(
-                            fontSize = 15.sp
+                            fontSize = 14.sp,
+                            color = AppTheme.colors.onSurfaceVariant,
                         ),
-                        modifier = Modifier,
-                        text = item.description
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
-
             }
 
-            val now = remember { Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date }
+            Spacer(modifier = Modifier.width(16.dp))
 
-            val haptic = LocalHapticFeedback.current
-
+            // Simple transparent click box on the right
             Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .width(50.dp)
-                    .fillMaxHeight(),
-                contentAlignment = Alignment.Center
-            ) {
-                Checkbox(
-                    modifier = Modifier.testTag(TestTag.CHECKBOX),
-                    checked = item.date_checked == now,
-                    onCheckedChange = {
+                    .size(46.dp)
+                    .clip(CircleShape)
+                    .clickable {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onCheckItem(it, item)
+                        onCheckItem(!isChecked, item)
                     }
+            ) {
+                Icon(
+                    imageVector = if (isChecked) Icons.Default.CheckCircle else Icons.Outlined.RadioButtonUnchecked,
+                    contentDescription = "Complete",
+                    tint = if (isChecked) AppTheme.colors.outline else baseColor.darker(0.5f),
+                    modifier = Modifier.size(24.dp)
                 )
             }
 
         }
     }
+}
+
+@Preview
+@Composable
+private fun ScreenDailyChecklistPreview() = AppTheme {
+    val items = buildList {
+        add(
+            DailyChecklistItem(
+                title = "Random thing",
+                description = "Random thing",
+                color = chooseableColors.random().toArgb(),
+                id = 1
+            )
+        )
+        add(
+            DailyChecklistItem(
+                title = "Most important things first",
+                description = "Most important things first, Customize Toolbar…, Customize Toolbar…",
+                color = chooseableColors.random().toArgb(),
+                id = 2
+            )
+        )
+    }
+
+    ScreenDailyChecklistContent(
+        data = DailyChecklistViewModel.Data(
+            items = items,
+            days = buildList {
+                repeat(30) {
+                    add(DailyChecklistTimelineItemValue(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.minus(it.toLong(), DateTimeUnit.DAY), true))
+                }
+            },
+            history = listOf(),
+            strike = 7
+        ),
+        onCheckItem = { checked, item -> },
+        onToggleDay = { checked, item -> },
+        onItemEdit = {},
+        onItemDelete = {},
+        onSwap = { x, y -> }
+    )
+}
+
+@Preview
+@Composable
+private fun ScreenDailyChecklistEmptyPreview() = AppTheme {
+    ScreenDailyChecklistContent(
+        data = DailyChecklistViewModel.Data(
+            items = emptyList(),
+            days = emptyList(),
+            history = emptyList(),
+            strike = 0
+        ),
+        onCheckItem = { _, _ -> },
+        onToggleDay = { _, _ -> },
+        onItemEdit = {},
+        onItemDelete = {},
+        onSwap = { _, _ -> }
+    )
 }

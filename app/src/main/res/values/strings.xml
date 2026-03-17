@@ -104,17 +104,17 @@
     <string name="screen_activities_new_group">New Group</string>
 
 
-    <string name="screen_onboarding_page_habits_title">Track habits</string>
-    <string name="screen_onboarding_page_habits_text">Track: completion, time, score.\nAdd record easily by long pressing on any date.</string>
-    <string name="screen_onboarding_page_focus_board_title">Focus board</string>
-    <string name="screen_onboarding_page_focus_board_text">Keep goals that don\'t require tracking.</string>
-    <string name="screen_onboarding_page_activity_overview_title">Activity overview</string>
-    <string name="screen_onboarding_page_activity_overview_text">See your progress, set up daily, weekly goal.</string>
-    <string name="screen_onboarding_page_daily_checklist_title">Daily checklist</string>
-    <string name="screen_onboarding_page_daily_checklist_text">Track daily micro habits.</string>
+    <string name="screen_onboarding_page_habits_title">Track Habits</string>
+    <string name="screen_onboarding_page_habits_text">Log habit completions with a single tap or start a live timer for deep work sessions.</string>
+    <string name="screen_onboarding_page_focus_board_title">Stay Focused</string>
+    <string name="screen_onboarding_page_focus_board_text">Group ideas you want to focus on, organize your thoughts into bundles.</string>
+    <string name="screen_onboarding_page_activity_overview_title">Understand Your Time</string>
+    <string name="screen_onboarding_page_activity_overview_text">Visualize your progress, view rich statistics, and celebrate your consistency.</string>
+    <string name="screen_onboarding_page_daily_checklist_title">Win Your Day</string>
+    <string name="screen_onboarding_page_daily_checklist_text">Organize your daily routines and check tasks off as you build unstoppable momentum.</string>
 
     <string name="screen_onboarding_skip">Skip</string>
-    <string name="screen_onboarding_track">Go to activities</string>
+    <string name="screen_onboarding_track">Start tracking</string>
 
 
     <string name="screen_group_title">Group settings</string>
@@ -198,18 +198,25 @@
     <string name="dialog_edit_tag_title">Edit tag</string>
     <string name="dialog_create_tag_title">Create tag</string>
     <string name="focus_board_no_focus_items">No focus items</string>
+    <string name="focus_board_empty_title">Focus Notes</string>
+    <string name="focus_board_empty_desc">Group your tasks, habits, and ideas into bundles. Pin important notes so they are always in sight.</string>
+    <string name="focus_board_pinned">Pinned</string>
+    <string name="focus_board_bundles">Bundles</string>
+    <string name="focus_board_add_inside_bundle">Add inside bundle</string>
     <string name="focus_board_title">Focus Board</string>
     <string name="focus_board_edit_focus_item_title">Focus item</string>
-    <string name="focus_board_edit_focus_item_title_placeholder">Title</string>
+    <string name="focus_board_edit_focus_item_title_placeholder">Title...</string>
     <string name="focus_board_edit_focus_item_content_placeholder">Content</string>
     <string name="focus_board_edit_tag_name_placeholder">Tag name</string>
 
 
     <string name="daily_checklist_edit_item_sheet_title">Daily checklist item</string>
     <string name="daily_checklist_edit_item_title_create">Create daily task</string>
-    <string name="daily_checklist_empty_title">No items in your daily checklist</string>
-    <string name="daily_checklist_empty_message">Add items you want to do every day.</string>
+    <string name="daily_checklist_empty_title">Daily Checklist</string>
+    <string name="daily_checklist_empty_message">Build small daily routines. Add simple tasks you want to check off every single day.</string>
     <string name="daily_checklist">Daily checklist</string>
+    <string name="daily_checklist_completed">Completed</string>
+    <string name="daily_checklist_reset">Reset</string>
 
     <string name="daily_checklist_edit_item_title_placeholder">Title</string>
     <string name="daily_checklist_edit_item_title_label">Title</string>
@@ -222,6 +229,9 @@
 
     <string name="no_activities_to_display">No activities</string>
     <string name="widget_picker_title">Choose activity</string>
+
+    <string name="delete_confirmation_title">Delete confirmation</string>
+    <string name="delete_confirmation_message">Are you sure you want to delete this?</string>
 
 
     <string-array name="months">
@@ -245,5 +255,45 @@
         <item>weekly</item>
         <item>monthly</item>
     </string-array>
+
+    <string name="dashboard_fab_time">Time</string>
+    <string name="dashboard_fab_score">Score</string>
+    <string name="dashboard_fab_check">Check</string>
+    <string name="dashboard_fab_folder">Folder</string>
+    <string name="dashboard_fab_add">Add</string>
+
+    <string name="dialog_edit_tag_hint">Notes with this tag will become completable tasks</string>
+    <string name="dialog_edit_tag_task_tag">Task tag</string>
+
+    <string name="widget_overview_today">Today:</string>
+    <string name="screen_activities_swipe_explore">Swipe left or right to explore</string>
+
+    <string name="screen_activities_stats">Stats</string>
+    <string name="screen_activities_folders">Folders</string>
+    <string name="screen_activities_tracked_habits">Tracked Habits</string>
+
+    <string name="dialog_ask_notifications_permission">We need notification permission:</string>
+    <string name="action_add">Add</string>
+    <string name="action_set">SET</string>
+    <string name="action_ok">OK</string>
+    <string name="action_next">Next</string>
+
+    <string name="screen_activity_edit_session">Edit session length</string>
+    <string name="screen_activity_start_timer">Start timer</string>
+    <string name="screen_activity_challenge">Challenge</string>
+
+    <string name="focus_bundle_settings_labels">Labels</string>
+    <string name="focus_bundle_settings_no_labels">No labels added</string>
+    <string name="focus_bundle_settings_use_labels">Use labels to organize items in your bundle</string>
+
+    <string name="focus_item_delete_confirm">Are you sure you want to delete this item? This action cannot be undone.</string>
+    <string name="focus_item_title_placeholder">Title…</string>
+    <string name="focus_item_edited_just_now">Edited just now</string>
+
+    <string name="statistics_swipe">Swipe left or right.</string>
+
+    <string name="focus_bundle_settings_title">Bundle settings</string>
+    <string name="focus_bundle_create_title">Create Bundle</string>
+    <string name="focus_bundle_title_label">Bundle Title</string>
 
 </resources>

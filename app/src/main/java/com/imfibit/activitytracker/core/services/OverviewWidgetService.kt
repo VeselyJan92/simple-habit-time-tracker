@@ -13,6 +13,9 @@ import com.imfibit.activitytracker.database.repository.tracked_activity.Reposito
 import com.imfibit.activitytracker.ui.widgets.WidgetOverview
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import androidx.compose.ui.graphics.Color
+import com.imfibit.activitytracker.core.enums.MetricStatus
+import com.imfibit.activitytracker.ui.lightAppColors
 
 class OverviewWidgetService @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -62,10 +65,18 @@ class OverviewWidgetService @Inject constructor(
                 activity.type.getLabel(overview.today.metric).value(context)
 
             for ((index, past) in overview.past.withIndex()) {
+                val color = when (past.status) {
+                    MetricStatus.COMPLETED -> lightAppColors.statusCompleted
+                    MetricStatus.NOT_COMPLETED -> lightAppColors.statusNotCompleted
+                    MetricStatus.ACCENT -> lightAppColors.appAccent
+                    MetricStatus.DEFAULT -> lightAppColors.statusNeutral
+                    MetricStatus.NONE -> Color.Transparent
+                }
+
                 pref[WidgetOverview.keyValue(index)] = past.value.value(context)
                 pref[WidgetOverview.keyLabel(index)] = past.label?.value(context) ?: ""
                 pref[WidgetOverview.keyColor(index)] =
-                    String.format("#%06X", 0xFFFFFF and past.color.toArgb()).uppercase()
+                    String.format("#%06X", 0xFFFFFF and color.toArgb()).uppercase()
             }
         } else {
             pref[WidgetOverview.DELETED] = true

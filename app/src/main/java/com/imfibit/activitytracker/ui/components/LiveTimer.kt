@@ -74,7 +74,8 @@ fun LiveTimer(
         textAlign = TextAlign.Center,
         style = TextStyle(
             fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = AppTheme.colors.onSurface
         )
     )
 }
@@ -88,14 +89,14 @@ fun TimerBlock(
 ) {
     Row(
         modifier = modifier
-            .background(Colors.ChipGray, RoundedCornerShape(10.dp))
+            .background(AppTheme.colors.surfaceVariant, RoundedCornerShape(10.dp))
             .padding(4.dp)
             .clickable(onClick = {
                 onClick?.invoke()
             }),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(Icons.Default.Timer, contentDescription = null)
+        Icon(Icons.Default.Timer, contentDescription = null, tint = AppTheme.colors.onSurfaceVariant)
 
         Spacer(modifier = Modifier.width(4.dp))
 

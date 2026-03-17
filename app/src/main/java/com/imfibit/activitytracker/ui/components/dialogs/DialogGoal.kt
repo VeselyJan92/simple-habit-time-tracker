@@ -108,7 +108,7 @@ fun DialogGoal(
                 onGoalSet.invoke(0L)
             }
         ) {
-            Text(text = stringResource(id = R.string.dialog_action_delete))
+            Text(text = stringResource(id = R.string.dialog_action_delete), color = AppTheme.colors.error)
         }
 
         TextButton(

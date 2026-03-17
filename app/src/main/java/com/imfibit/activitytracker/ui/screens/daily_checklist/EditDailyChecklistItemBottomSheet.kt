@@ -33,9 +33,10 @@ import androidx.compose.ui.unit.sp
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.TestTag
 import com.imfibit.activitytracker.core.TestTag.DAILY_CHECKLIST_EDIT_CONTINUE
-import com.imfibit.activitytracker.core.toColor
+import com.imfibit.activitytracker.core.extensions.toColor
 import com.imfibit.activitytracker.database.DevSeeder
 import com.imfibit.activitytracker.database.entities.DailyChecklistItem
+import com.imfibit.activitytracker.ui.AppTheme
 import com.imfibit.activitytracker.ui.components.ScrollBottomSheet
 import com.imfibit.activitytracker.ui.components.rememberTestBottomSheetState
 import com.imfibit.activitytracker.ui.components.selectors.ColorPickerComponent
@@ -43,7 +44,7 @@ import com.imfibit.activitytracker.ui.components.selectors.ColorPickerComponent
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-private fun PreviewBottomSheet() {
+private fun PreviewBottomSheet() = AppTheme {
     EditDailyChecklistItemBottomSheet(
         state = rememberTestBottomSheetState(),
         onDismissRequest = { },
@@ -84,7 +85,7 @@ fun EditDailyChecklistItemBottomSheet(
             style = TextStyle(
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
-                color = Color.Black
+                color = AppTheme.colors.onSurface
             )
         )
 
@@ -149,7 +150,7 @@ fun EditDailyChecklistItemBottomSheet(
                         }
                     }
                 ) {
-                    Text(text = stringResource(id = R.string.dialog_action_delete))
+                    Text(text = stringResource(id = R.string.dialog_action_delete), color = AppTheme.colors.error)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
             }
@@ -181,6 +182,6 @@ fun EditDailyChecklistItemBottomSheet(
                 Text(text = stringResource(id = R.string.dialog_action_continue))
             }
         }
-        
+
     }
 )

@@ -32,7 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.imfibit.activitytracker.core.DateUtils
+import com.imfibit.activitytracker.core.extensions.DateUtils
 import com.imfibit.activitytracker.database.entities.DailyChecklistTimelineItemValue
 import com.imfibit.activitytracker.ui.AppTheme
 import com.imfibit.activitytracker.ui.components.BaseBottomSheet
@@ -54,7 +54,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun PreviewDailyChecklistHistoryBottomSheet() {
+fun PreviewDailyChecklistHistoryBottomSheet() = AppTheme {
     val sampleHistory = buildList {
         val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
         add(DailyChecklistTimelineItemValue(today, true))
@@ -106,10 +106,11 @@ private fun DailyChecklistHistoryContent(
         DayOfWeek.entries.forEach {
             Box(Modifier.size(40.dp, 30.dp), contentAlignment = Alignment.Center) {
                 Text(
-                    text = "NAME",
+                    text = it.name.take(1),
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.W600,
-                    fontSize = 10.sp
+                    fontSize = 10.sp,
+                    color = AppTheme.colors.outline
                 )
             }
         }
@@ -162,13 +163,13 @@ private fun Month(
                     if (day.monthNumber == month.monthNumber) {
                         val dayModifier = if (day == Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
                             Modifier
-                                .border(width = 2.dp, Color.Black, shape = RoundedCornerShape(8.dp))
+                                .border(width = 2.dp, AppTheme.colors.primary, shape = RoundedCornerShape(8.dp))
                         else
                             Modifier
 
                         val color = if (items[day]?.completed
                                 ?: false
-                        ) Colors.ButtonGreen else Colors.ChipGray
+                        ) AppTheme.colors.success else AppTheme.colors.surfaceVariant
 
                         Box(
                             modifier = dayModifier
@@ -188,7 +189,7 @@ private fun Month(
                             Text(
                                 text = day.dayOfMonth.toString(),
                                 modifier = Modifier.align(Alignment.Center),
-                                style = metricTextStyle
+                                style = metricTextStyle.copy(color = AppTheme.colors.onSurface)
                             )
                         }
                     } else {

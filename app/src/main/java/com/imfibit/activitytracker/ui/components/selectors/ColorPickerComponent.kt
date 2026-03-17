@@ -14,6 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.imfibit.activitytracker.ui.AppTheme
 import com.imfibit.activitytracker.ui.components.Colors
+import com.imfibit.activitytracker.ui.components.harmonizeWithTheme
 import kotlin.math.ceil
 
 @Preview
@@ -35,8 +36,9 @@ fun ColorPickerComponent(
         modifier = modifier,
         content = {
             Colors.chooseableColors.forEach { color ->
+                val displayColor = color.harmonizeWithTheme()
                 val colorBoxModifier = if (color == selected) {
-                    Modifier.border(2.dp, Color.Black, RoundedCornerShape(5.dp))
+                    Modifier.border(2.dp, AppTheme.colors.onSurface, RoundedCornerShape(5.dp))
                 } else {
                     Modifier
                 }
@@ -44,7 +46,7 @@ fun ColorPickerComponent(
                 Box(
                     modifier = colorBoxModifier
                         .size(50.dp)
-                        .background(color, RoundedCornerShape(5.dp))
+                        .background(displayColor, RoundedCornerShape(5.dp))
                         .clickable {
                             onChoose(color)
                         },

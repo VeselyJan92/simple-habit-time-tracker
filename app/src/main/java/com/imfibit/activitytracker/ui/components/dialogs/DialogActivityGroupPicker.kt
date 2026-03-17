@@ -22,7 +22,6 @@ import com.imfibit.activitytracker.database.DevSeeder
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.AppTheme
-import com.imfibit.activitytracker.ui.components.Colors
 
 
 @Preview
@@ -68,7 +67,7 @@ fun DialogActivityGroupPicker(
         TextButton(
             onClick = onDismissRequest
         ) {
-            Text(text = "OK")
+            Text(text = stringResource(id = R.string.action_ok))
         }
     }
 }
@@ -79,7 +78,7 @@ private fun Group(
     group: TrackerActivityGroup?,
     select: ((group: TrackerActivityGroup?) -> Unit),
 ) {
-    val color = if (activity.groupId == group?.id) Colors.ChipGraySelected else Colors.ChipGray
+    val color = if (activity.groupId == group?.id) AppTheme.colors.chipGraySelected else AppTheme.colors.chipGrayUnselected
 
     Text(
         modifier = Modifier

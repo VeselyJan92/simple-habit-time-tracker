@@ -30,7 +30,6 @@ import com.imfibit.activitytracker.database.DevSeeder
 import com.imfibit.activitytracker.database.entities.PresetTimer
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.ui.AppTheme
-import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.IconButton
 import com.imfibit.activitytracker.ui.components.dialogs.system.DialogTimePicker
 import sh.calvin.reorderable.ReorderableItem
@@ -124,14 +123,14 @@ fun DialogTimers(
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Colors.SuperLight, RoundedCornerShape(30))
+                    .background(AppTheme.colors.superLight, RoundedCornerShape(30))
                     .padding(16.dp)
                     .clickable {
                         show = true
                     },
                 text = stringResource(R.string.dialog_preset_timers_single),
                 style = TextStyle(
-                    fontSize = 14.sp, fontWeight = FontWeight.Bold
+                    fontSize = 14.sp, fontWeight = FontWeight.Bold, color = AppTheme.colors.onSurface
                 )
             )
         }
@@ -161,12 +160,12 @@ fun DialogTimers(
                         Text(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(Colors.SuperLight, RoundedCornerShape(30))
+                                .background(AppTheme.colors.superLight, RoundedCornerShape(30))
                                 .padding(16.dp),
                             text = TimeUtils.secondsToMetric(item.seconds.toLong())
                                 .removeSuffix(":00"),
                             style = TextStyle(
-                                fontSize = 14.sp, fontWeight = FontWeight.Bold
+                                fontSize = 14.sp, fontWeight = FontWeight.Bold, color = AppTheme.colors.onSurface
                             )
                         )
                     }
@@ -179,8 +178,7 @@ fun DialogTimers(
         TextButton(
             onClick = onDismissRequest
         ) {
-            Text(text = "OK")
+            Text(text = stringResource(id = R.string.action_ok))
         }
     }
 }
-

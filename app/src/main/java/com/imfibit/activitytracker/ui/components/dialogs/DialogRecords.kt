@@ -17,11 +17,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -31,10 +29,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.TestTag
+import com.imfibit.activitytracker.core.navigation.BackstackViewModel
 import com.imfibit.activitytracker.core.value
 import com.imfibit.activitytracker.database.AppDatabase
 import com.imfibit.activitytracker.database.DevSeeder
@@ -47,10 +47,8 @@ import com.imfibit.activitytracker.database.entities.TrackedActivityScore
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
 import com.imfibit.activitytracker.database.invalidationStateFlow
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.imfibit.activitytracker.ui.AppDestination
 import com.imfibit.activitytracker.ui.AppTheme
 import com.imfibit.activitytracker.ui.Destinations
-import com.imfibit.activitytracker.ui.components.Colors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.DateTimeUnit
@@ -89,22 +87,22 @@ fun DialogRecords_PreviewNoItems() = AppTheme {
 
 @Composable
 fun DialogRecords(
-    navigate: (AppDestination) -> Unit,
-    popBack: () -> Unit,
     activityId: Long,
     date: LocalDate
 ) {
+    val navigation = hiltViewModel<BackstackViewModel>()
+
     val vm = hiltViewModel<DayRecordsVM, DayRecordsVM.Factory> { factory ->
         factory.create(activityId, date.toString())
     }
 
-    val data by vm.data.collectAsState()
+    val data by vm.data.collectAsStateWithLifecycle()
 
     DialogRecords(
-        onDismissRequest = { popBack() },
+        onDismissRequest = { navigation.popBackStack()},
         data = data,
         onNavigate = {
-            navigate(
+            navigation.navigate(
                 Destinations.DialogEditRecord(it)
             )
         }
@@ -128,7 +126,8 @@ fun DialogRecords(
             text = stringResource(id = R.string.no_records),
             fontWeight = FontWeight.W600,
             textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            color = AppTheme.colors.onSurface
         )
     } else {
         LazyColumn(
@@ -170,7 +169,7 @@ fun Record(
                 onCLick(record)
             }),
         shape = RoundedCornerShape(8.dp),
-        color = Colors.SuperLight
+        color = AppTheme.colors.superLight
     ) {
         val time = with(AnnotatedString.Builder()) {
             append(stringResource(id = R.string.time) + ": ")
@@ -223,14 +222,14 @@ fun Record(
             Text(
                 text = time,
                 modifier = Modifier.weight(1f),
-                style = TextStyle.Default.copy(color = Color.Black.copy(alpha = 0.6f)),
+                style = TextStyle.Default.copy(color = AppTheme.colors.onSurfaceVariant),
             )
 
 
             Box(
                 modifier = Modifier
                     .size(60.dp, 25.dp)
-                    .background(Colors.ChipGray, RoundedCornerShape(50)),
+                    .background(AppTheme.colors.chipGrayUnselected, RoundedCornerShape(50)),
                 contentAlignment = Alignment.Center
             ) {
 
@@ -238,7 +237,8 @@ fun Record(
                     text = metric,
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
-                        fontSize = 13.sp
+                        fontSize = 13.sp,
+                        color = AppTheme.colors.onSurface
                     )
                 )
             }

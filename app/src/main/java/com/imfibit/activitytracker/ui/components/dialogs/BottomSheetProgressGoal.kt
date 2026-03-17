@@ -98,7 +98,7 @@ fun BottomSheetProgressGoal(
         style = TextStyle(
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp,
-            color = Color.Black
+            color = AppTheme.colors.onSurface
         )
     )
 
@@ -192,7 +192,7 @@ fun BottomSheetProgressGoal(
                 .padding(horizontal = 8.dp)
                 .fillMaxWidth(),
             text = stringResource(R.string.dialog_challenge_not_set),
-            style = TextStyle(textAlign = TextAlign.Center)
+            style = TextStyle(textAlign = TextAlign.Center, color = AppTheme.colors.onSurfaceVariant)
         )
     } else if (challenge.target > metric) {
         Column(
@@ -231,8 +231,8 @@ fun BottomSheetProgressGoal(
                 )
             }
 
-            Text(text = stringResource(R.string.dialog_challenge_estimated_prefix))
-            Text(text = estimatedString)
+            Text(text = stringResource(R.string.dialog_challenge_estimated_prefix), color = AppTheme.colors.onSurfaceVariant)
+            Text(text = estimatedString, color = AppTheme.colors.onSurface)
 
             Spacer(modifier = Modifier.padding(vertical = 8.dp))
 
@@ -241,7 +241,7 @@ fun BottomSheetProgressGoal(
             if (estimatedEndDate > challenge.to) {
                 Text(
                     text = stringResource(R.string.dialog_challenge_impossible),
-                    style = TextStyle(color = Color.Red, textAlign = TextAlign.Center)
+                    style = TextStyle(color = AppTheme.colors.error, textAlign = TextAlign.Center)
                 )
             } else {
                 Text(
@@ -249,7 +249,7 @@ fun BottomSheetProgressGoal(
                         R.string.ahead_of_challenge_deadline_note,
                         aheadInDays
                     ),
-                    style = TextStyle(color = Color.DarkGray, textAlign = TextAlign.Center)
+                    style = TextStyle(color = AppTheme.colors.onSurfaceVariant, textAlign = TextAlign.Center)
                 )
             }
 
@@ -257,13 +257,6 @@ fun BottomSheetProgressGoal(
     }
 
     DialogButtons {
-        TextButton(
-            onClick = {
-                onDismissRequest(null)
-            }
-        ) {
-            Text(text = stringResource(id = R.string.dialog_action_cancel))
-        }
 
         TextButton(
             onClick = {
@@ -272,8 +265,17 @@ fun BottomSheetProgressGoal(
                 }
             }
         ) {
-            Text(text = stringResource(id = R.string.dialog_action_delete))
+            Text(text = stringResource(id = R.string.dialog_action_delete), color = AppTheme.colors.error)
         }
+
+        TextButton(
+            onClick = {
+                onDismissRequest(null)
+            }
+        ) {
+            Text(text = stringResource(id = R.string.dialog_action_cancel))
+        }
+
 
         TextButton(
             onClick = {
@@ -346,7 +348,7 @@ private fun RangeItem(
         trailingIcon = {
             Icon(
                 imageVector = Icons.Default.DateRange,
-                contentDescription = "Select date"
+                contentDescription = stringResource(id = R.string.browse)
             )
         }
     )

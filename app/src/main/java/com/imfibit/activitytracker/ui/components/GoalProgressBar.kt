@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
 import com.imfibit.activitytracker.database.entities.TrackedActivity
+import com.imfibit.activitytracker.ui.AppTheme
 
 @Composable
 fun GoalProgressBar(challenge: TrackedActivityChallenge, actual: Long, type: TrackedActivity.Type) =
@@ -67,6 +68,9 @@ fun GoalProgressBar(
             .height(32.dp),
     ) {
 
+        val outlineColor = AppTheme.colors.outlineVariant
+        val progressColor = if (actual >= target && target != 0L) AppTheme.colors.success else AppTheme.colors.surfaceVariant
+        
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()
@@ -74,7 +78,7 @@ fun GoalProgressBar(
         ) {
             drawRoundRect(
                 size = Size(size.width, size.height),
-                color = Color.LightGray,
+                color = outlineColor,
                 cornerRadius = CornerRadius(size.height, size.height),
                 style = Stroke(5f)
             )
@@ -84,7 +88,7 @@ fun GoalProgressBar(
 
             drawRoundRect(
                 size = Size(clamped, size.height),
-                color = if (actual >= target && target != 0L) Colors.Completed else Color(0xFFE0E0E0),
+                color = progressColor,
                 cornerRadius = CornerRadius(size.width, size.width)
             )
         }
@@ -97,9 +101,9 @@ fun GoalProgressBar(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
 
-            Text(name, fontWeight = FontWeight.W600, fontSize = 15.sp)
+            Text(name, fontWeight = FontWeight.W600, fontSize = 15.sp, color = AppTheme.colors.onSurface)
 
-            val fractionLabel = if (actual > target && target != 0L) {
+            val fractionLabel = if (actual >= target && target != 0L) {
                 stringResource(R.string.dialog_challenge_estimated_completed)
             } else {
                 when (type) {
@@ -107,9 +111,8 @@ fun GoalProgressBar(
                     TrackedActivity.Type.SCORE, TrackedActivity.Type.CHECKED -> "$actual / ${target}"
                 }
             }
-
-            Text(fractionLabel, fontWeight = FontWeight.W600, fontSize = 17.sp)
-
+            
+            Text(fractionLabel, fontSize = 14.sp, color = AppTheme.colors.onSurfaceVariant)
         }
     }
 }

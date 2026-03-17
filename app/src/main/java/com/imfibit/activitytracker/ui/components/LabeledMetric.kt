@@ -1,11 +1,13 @@
 package com.imfibit.activitytracker.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,17 +22,18 @@ import androidx.compose.ui.unit.sp
 import com.imfibit.activitytracker.core.ContextString
 import com.imfibit.activitytracker.core.value
 import com.imfibit.activitytracker.database.entities.*
+import com.imfibit.activitytracker.ui.AppTheme
+import com.imfibit.activitytracker.core.enums.MetricStatus
 import java.time.LocalDateTime
 
-
 val labelHeight = 13.dp
-val metricHeight = 20.dp
-val metricTextStyle = TextStyle(fontSize = 10.sp, fontWeight = FontWeight.W600)
+val metricHeight = 24.dp // Slightly taller for the new pill shape
+val metricTextStyle = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.Bold)
 
-class MetricWidgetData(
+data class MetricWidgetData(
     val value: ContextString,
-    val color: Color,
     val label: ContextString? = null,
+    val status: MetricStatus = MetricStatus.DEFAULT,
 )
 
 
@@ -46,29 +49,39 @@ fun BaseMetricBlock(
     onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
 ) {
-    val boxModifier = Modifier
-        .padding(top = if (labelOffset) labelHeight else 0.dp)
-        .then(
-            if (width == 0.dp) Modifier.height(metricHeight) else Modifier.size(width, metricHeight)
-        )
-        .clip(RoundedCornerShape(8.dp))
-        .background(color)
-        .then(modifier)
-        .then(
-            if (onClick != null) Modifier.combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick
-            ) else Modifier
-        )
-        .wrapContentHeight(align = Alignment.CenterVertically)
+    // If the color is transparent (alpha < 1f), we want the text to cleanly contrast against the white card, so we derive a darker tint for the text.
+    // Enhanced darker factor for significantly better legibility on soft pastels
+    val isDark = isSystemInDarkTheme()
+    val textColor = if (color.alpha < 1f) {
+        if (isDark) color.copy(alpha = 1f) else color.copy(alpha = 1f).darker(0.5f)
+    } else Color.White
 
-    Text(
-        textAlign = TextAlign.Center,
-        modifier = boxModifier,
-        text = metric,
-        style = metricStyle
-    )
+    val clickableMod = if (onClick != null || onLongClick != null) Modifier.combinedClickable(
+        onClick = onClick ?: {},
+        onLongClick = onLongClick
+    ) else Modifier
 
+    Surface(
+        shape = RoundedCornerShape(50), // Makes them perfect little horizontal pills
+        color = color,
+        modifier = modifier
+            .padding(top = if (labelOffset) labelHeight else 0.dp)
+            .then(if (width == 0.dp) Modifier.height(metricHeight) else Modifier.size(width, metricHeight))
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .then(clickableMod)
+        ) {
+            Text(
+                text = metric,
+                textAlign = TextAlign.Center,
+                color = textColor,
+                style = metricStyle
+            )
+        }
+    }
 }
 
 
@@ -77,37 +90,25 @@ fun BaseMetricBlock(
 fun LabeledMetricBlock(
     metric: String,
     label: String,
+    modifier: Modifier = Modifier,
     color: Color, width: Dp = 40.dp,
     onLongClick: (() -> Unit)? = null,
-    modifier: Modifier = Modifier,
     metricStyle: TextStyle = metricTextStyle,
     onClick: (() -> Unit)? = null,
 ) {
-
-    val clickable = if (onLongClick != null)
-        Modifier.combinedClickable(onClick = {}, onLongClick = onLongClick)
-    else
-        Modifier
-
-    val width = if (width == 0.dp) {
-        Modifier.fillMaxWidth(1f)
-    } else {
-        Modifier.width(width)
-    }
-
     Column(
         modifier = Modifier
-            .then(width)
-            .height(metricHeight + labelHeight)
-            .then(clickable),
-
+            .width(width)
+            .height(metricHeight + labelHeight),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = label,
             style = TextStyle(fontSize = 10.sp),
+            color = AppTheme.colors.onSurfaceVariant,
             modifier = Modifier.height(labelHeight)
         )
+
         BaseMetricBlock(
             metric = metric,
             color = color,
@@ -118,7 +119,6 @@ fun LabeledMetricBlock(
             onClick = onClick
         )
     }
-
 }
 
 
@@ -127,16 +127,18 @@ fun LabeledMetricBlock(
 fun MetricBlock(
     data: MetricWidgetData,
     modifier: Modifier = Modifier,
+    alpha: Float = 1f,
     width: Dp = 40.dp,
     metricStyle: TextStyle = metricTextStyle,
     onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
 ) {
+    val blockColor = data.status.color.copy(alpha = alpha)
 
     if (data.label == null) {
         BaseMetricBlock(
             metric = data.value.value(),
-            color = data.color,
+            color = blockColor,
             onLongClick = onLongClick,
             modifier = modifier,
             width = width,
@@ -147,7 +149,7 @@ fun MetricBlock(
         LabeledMetricBlock(
             metric = data.value.value(),
             label = data.label.value(),
-            color = data.color,
+            color = blockColor,
             onLongClick = onLongClick,
             modifier = modifier,
             width = width,
@@ -155,9 +157,4 @@ fun MetricBlock(
             onClick = onClick
         )
     }
-
 }
-
-
-
-

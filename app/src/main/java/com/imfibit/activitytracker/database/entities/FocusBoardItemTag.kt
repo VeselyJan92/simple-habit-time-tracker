@@ -10,12 +10,24 @@ import com.imfibit.activitytracker.ui.components.Colors.chooseableColors
     tableName = FocusBoardItemTag.TABLE,
     indices = [
         Index(value = ["focus_board_item_tag_id"], name = "focus_board_item_tag_id_pk"),
+        Index(value = ["bundle_id"], name = "focus_board_item_tag_bundle_id_idx"),
     ],
+    foreignKeys = [
+        ForeignKey(
+            entity = FocusBundle::class,
+            parentColumns = ["focus_bundle_id"],
+            childColumns = ["bundle_id"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
 )
 data class FocusBoardItemTag(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "focus_board_item_tag_id")
     val id: Long = 0,
+
+    @ColumnInfo(name = "bundle_id")
+    val bundleId: Long = 0,
 
     @ColumnInfo(name = "title")
     val name: String = "",
@@ -27,7 +39,10 @@ data class FocusBoardItemTag(
     val position: Int = 0,
 
     @ColumnInfo(name = "is_checked")
-    val isChecked: Boolean = true
+    val isChecked: Boolean = true,
+
+    @ColumnInfo(name = "is_task_tag")
+    val isTaskTag: Boolean = false
 ) {
     companion object{
         const val TABLE = "focus_board_item_tags"
@@ -37,8 +52,3 @@ data class FocusBoardItemTag(
     fun getUIColor() =  Color(color)
 
 }
-
-
-
-
-

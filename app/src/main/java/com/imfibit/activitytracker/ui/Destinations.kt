@@ -39,6 +39,19 @@ object Destinations {
 
     @Serializable
     @kotlinx.parcelize.Parcelize
+    data class ScreenFocusBundleDetail(
+        val bundleId: Long,
+    ) : AppDestination
+
+    @Serializable
+    @kotlinx.parcelize.Parcelize
+    data class ScreemEditFocusBoardItem(
+        val bundleId: Long,
+        val noteId: Long
+    ) : AppDestination
+
+    @Serializable
+    @kotlinx.parcelize.Parcelize
     data class DialogActivityDayHistory(
         val activityId: Long,
         val date: String,

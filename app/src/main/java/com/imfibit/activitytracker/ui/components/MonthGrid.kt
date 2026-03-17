@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.imfibit.activitytracker.R
 import com.imfibit.activitytracker.core.ContextString
 import com.imfibit.activitytracker.core.TestTag
+import com.imfibit.activitytracker.core.enums.MetricStatus
 import com.imfibit.activitytracker.database.DevSeeder
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
@@ -34,11 +35,12 @@ import kotlinx.datetime.Month
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import java.util.Locale
+import com.imfibit.activitytracker.ui.AppTheme
 
 
 @Preview
 @Composable
-private fun MonthPreview() {
+private fun MonthPreview() = AppTheme {
     val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     TrackedActivityMonth(
         modifier = Modifier,
@@ -71,9 +73,10 @@ fun TrackedActivityMonth(
         MetricBlock(
             data = MetricWidgetData(
                 value = metric,
-                color = activity.goal.color(week.total),
+                status = activity.goal.status(week.total),
                 label = { resources.getString(R.string.week) }
-            )
+            ),
+            alpha = 0.5f
         )
     },
     noWeekSum = {
@@ -89,7 +92,12 @@ fun TrackedActivityMonth(
             Modifier.testTag(TestTag.MONTH_GRID_DATE + day.date.toString())
 
         MetricBlock(
-            data = MetricWidgetData(activity.type.getLabel(day.metric), day.color, day.label),
+            data = MetricWidgetData(
+                value = activity.type.getLabel(day.metric),
+                status = day.status,
+                label = day.label
+            ),
+            alpha = 0.5f,
             onClick = { onDayClicked(activity, day.date) },
             onLongClick = { onDayLongClicked(activity, day.date) },
             modifier = dayModifier
@@ -104,7 +112,7 @@ fun MonthGridImpl(
     month: RepositoryTrackedActivity.Month,
     weekSum: @Composable (week: RepositoryTrackedActivity.Week) -> Unit,
     noWeekSum: @Composable () -> Unit = {
-        MetricBlock(MetricWidgetData({ "-" }, Color.LightGray, { "" }))
+        MetricBlock(MetricWidgetData(value = { "-" }, status = MetricStatus.DEFAULT, label = { "" }))
     },
     day: @Composable (RepositoryTrackedActivity.Day) -> Unit,
 ) = Layout(
@@ -129,7 +137,7 @@ fun MonthGridImpl(
             // Separator
             Box(modifier = Modifier
                 .size(1.dp, 30.dp)
-                .background(Colors.ChipGray))
+                .background(AppTheme.colors.chipGrayUnselected))
 
             // Week sum content
             val showMetricForCurrentWeek =
@@ -201,7 +209,7 @@ fun MonthSplitter(year: Int, month: Int) {
                 .padding(8.dp)
                 .weight(1f)
         )
-        Text(text = value, fontWeight = FontWeight.W600)
+        Text(text = value, fontWeight = FontWeight.W600,  color = AppTheme.colors.onSurface)
         HorizontalDivider(
             Modifier
                 .padding(8.dp)

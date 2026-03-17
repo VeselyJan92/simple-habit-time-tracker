@@ -13,6 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.imfibit.activitytracker.R
+import com.imfibit.activitytracker.ui.AppTheme
 
 @Preview
 @Composable
@@ -33,7 +34,8 @@ fun DialogAskForExactAlarm(
 
     Text(
         text = stringResource(R.string.dialog_exact_alarm_body),
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier.padding(8.dp),
+        color = AppTheme.colors.onSurfaceVariant
     )
 
     DialogButtons {

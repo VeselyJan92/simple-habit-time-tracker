@@ -1,69 +1,37 @@
 package com.imfibit.activitytracker.ui.screens.dashboard
 
-import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.automirrored.filled.ListAlt
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
-import com.imfibit.activitytracker.ui.screens.activity_list.ActivitiesViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.imfibit.activitytracker.R
-import com.imfibit.activitytracker.core.TestTag
-import com.imfibit.activitytracker.database.composed.FocusBoardItemWithTags
-import com.imfibit.activitytracker.database.entities.DailyChecklistItem
-import com.imfibit.activitytracker.database.entities.FocusBoardItem
-import com.imfibit.activitytracker.ui.AppDestination
-import com.imfibit.activitytracker.ui.Destinations
+import com.imfibit.activitytracker.database.entities.*
 import com.imfibit.activitytracker.ui.SCREEN_ACTIVITIES_PAGER_ID
 import com.imfibit.activitytracker.ui.SCREEN_FOCUS_BOARD_PAGER_ID
-import com.imfibit.activitytracker.ui.SCREEN_MIND_BOOT_ID
+import com.imfibit.activitytracker.ui.SCREEN_DAILY_CEHCKLIST_ID
+import com.imfibit.activitytracker.ui.components.ActivityFab
 import com.imfibit.activitytracker.ui.components.Colors
-import com.imfibit.activitytracker.ui.components.dialogs.AddActivityBottomSheet
-import com.imfibit.activitytracker.ui.components.rememberAppBottomSheetState
-import com.imfibit.activitytracker.ui.screens.activity_list.ScreenActivities
-import com.imfibit.activitytracker.ui.screens.daily_checklist.DailyChecklistViewModel
+import com.imfibit.activitytracker.ui.screens.tracked_activities.activity_list.ScreenTrackedActivities
 import com.imfibit.activitytracker.ui.screens.daily_checklist.EditDailyChecklistItemBottomSheet
-import com.imfibit.activitytracker.ui.screens.daily_checklist.ScreenMindBoot
-import com.imfibit.activitytracker.ui.screens.focus_board.BottomSheetEditFocusItem
-import com.imfibit.activitytracker.ui.screens.focus_board.FocusBoardViewModel
+import com.imfibit.activitytracker.ui.screens.daily_checklist.ScreenDailyChecklist
+import com.imfibit.activitytracker.ui.screens.focus_board.components.BottomSheetBundleSettings
 import com.imfibit.activitytracker.ui.screens.focus_board.ScreenFocusBoard
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Dashboard(navigate: (AppDestination) -> Unit) {
-
-    var dialogNewActivity by remember { mutableStateOf(false) }
-    var editDailyChecklist by remember { mutableStateOf(false) }
-
-    val scope = rememberCoroutineScope()
-
-    val name = stringResource(id = R.string.new_activity_name)
-
-    val newGroup =
-        TrackerActivityGroup(0, stringResource(id = R.string.screen_activities_new_group), 0)
-
-    val vm = hiltViewModel<ActivitiesViewModel>()
+fun DashboardScreen() {
+    val dashboardViewModel = hiltViewModel<DashboardViewModel>()
 
     val pagerState = rememberPagerState(
         initialPage = 1,
@@ -71,129 +39,96 @@ fun Dashboard(navigate: (AppDestination) -> Unit) {
         pageCount = { 3 }
     )
 
-    val dailyChecklistItemViewModel = hiltViewModel<DailyChecklistViewModel>()
-
-
-    if (editDailyChecklist) {
+    var addDailyChecklist by remember { mutableStateOf(false) }
+    if (addDailyChecklist) {
         EditDailyChecklistItemBottomSheet(
-            onDismissRequest = {
-                editDailyChecklist = false
-            },
+            onDismissRequest = { addDailyChecklist = false },
             isEdit = false,
             item = DailyChecklistItem(
                 title = "",
                 color = Colors.chooseableColors[0].toArgb(),
                 description = ""
             ),
-            onItemEdit = {
-                dailyChecklistItemViewModel.onAdd(item = it)
+            onItemEdit = { item -> dashboardViewModel.addDailyChecklistItem(item = item) }
+        )
+    }
+
+    var addBundle by remember { mutableStateOf(false) }
+    if (addBundle) {
+        BottomSheetBundleSettings(
+            onDismissRequest = { addBundle = false },
+            bundle = FocusBundle(title = "", color = Colors.chooseableColors.first().toArgb().toLong()),
+            onBundleSave = { bundle, tags ->
+                dashboardViewModel.createNewBundle(bundle, tags)
             }
         )
     }
 
-    val focusBoardViewModel = hiltViewModel<FocusBoardViewModel>()
-    val tags by focusBoardViewModel.tags.collectAsStateWithLifecycle()
-
-    var editFocusItem by remember { mutableStateOf(false) }
-
-    if (editFocusItem){
-        BottomSheetEditFocusItem(
-            onDismissRequest = {
-                editFocusItem = false
-            },
-            isEdit = false,
-            item = FocusBoardItemWithTags(FocusBoardItem(title = "", content = ""), listOf()),
-            tags = tags,
-            onFocusItemEdit = {
-                focusBoardViewModel.createNewFocusItem(it)
-            }
-        )
-    }
-
-    if (dialogNewActivity) {
-        AddActivityBottomSheet(
-            state = rememberAppBottomSheetState(),
-            onDismissRequest = {
-                dialogNewActivity = false
-            },
-            onAddFolder = {
-                dialogNewActivity = false
-
-                scope.launch {
-                    if (pagerState.currentPage != SCREEN_ACTIVITIES_PAGER_ID) {
-                        pagerState.animateScrollToPage(SCREEN_ACTIVITIES_PAGER_ID)
-                        delay(100)
-                    }
-                    vm.addGroup(newGroup)
-                }
-            },
-            onAddActivity = {
-                dialogNewActivity = false
-
-                scope.launch(Dispatchers.Main) {
-                    if (pagerState.currentPage != SCREEN_ACTIVITIES_PAGER_ID) {
-                        pagerState.animateScrollToPage(SCREEN_ACTIVITIES_PAGER_ID)
-                        delay(100)
-                    }
-
-                    val activityId = withContext(Dispatchers.IO) {
-                        vm.createNewActivity(name, it)
-                    }
-
-                    navigate(Destinations.ScreenActivity(activityId))
-                }
-            },
-
-            onAddFocusItem = {
-                dialogNewActivity = false
-
-                scope.launch {
-                    if (pagerState.currentPage != SCREEN_FOCUS_BOARD_PAGER_ID) {
-                        pagerState.animateScrollToPage(SCREEN_FOCUS_BOARD_PAGER_ID)
-                        delay(100)
-                    }
-
-                    editFocusItem = true
-                }
-            },
-
-            onAddDailyChecklist = {
-                dialogNewActivity = false
-
-                scope.launch {
-                    if (pagerState.currentPage != SCREEN_MIND_BOOT_ID) {
-                        pagerState.animateScrollToPage(SCREEN_MIND_BOOT_ID)
-                        delay(100)
-                    }
-
-                    editDailyChecklist = true
-                }
-            }
-        )
-    }
+    var fabExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
-        modifier = Modifier.safeDrawingPadding(),
+        modifier = Modifier.fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.background, // Match global theme background
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { dialogNewActivity = true },
-                modifier = Modifier.testTag(TestTag.DASHBOARD_ADD_ACTIVITY)
-            ) {
-                Icon(Icons.Filled.Add, null)
+            LaunchedEffect(Unit) {
+                snapshotFlow { pagerState.currentPage }.collect { fabExpanded = false }
             }
-        },
-        content = {
-            HorizontalPager(
-                contentPadding = it,
-                state = pagerState,
-            ) { page ->
-                when (page) {
-                    SCREEN_ACTIVITIES_PAGER_ID -> ScreenActivities(navigate = navigate)
-                    SCREEN_FOCUS_BOARD_PAGER_ID -> ScreenFocusBoard()
-                    SCREEN_MIND_BOOT_ID -> ScreenMindBoot()
+
+            if (pagerState.currentPage == SCREEN_ACTIVITIES_PAGER_ID) {
+                ActivityFab(
+                    expanded = fabExpanded,
+                    onExpandedChanged = { fabExpanded = it },
+                    onOptionSelected = { type ->
+                        dashboardViewModel.createNewActivity("\uD83C\uDFAF Name", type)
+                    },
+                    onGroupSelected = {
+                        dashboardViewModel.addGroup(TrackerActivityGroup(0, "New Group", 0))
+                    }
+                )
+            } else {
+                FloatingActionButton(
+                    onClick = {
+                        when (pagerState.currentPage) {
+                            SCREEN_FOCUS_BOARD_PAGER_ID -> addBundle = true
+                            SCREEN_DAILY_CEHCKLIST_ID -> addDailyChecklist = true
+                        }
+                    },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ) {
+                    val icon = when (pagerState.currentPage) {
+                        SCREEN_FOCUS_BOARD_PAGER_ID -> Icons.Default.Add
+                        SCREEN_DAILY_CEHCKLIST_ID -> Icons.AutoMirrored.Filled.ListAlt
+                        else -> Icons.Default.Add
+                    }
+                    Icon(icon, contentDescription = stringResource(id = R.string.dashboard_fab_add))
                 }
             }
-        },
-        containerColor = Colors.AppBackground
-    )
+        }
+    ) { padding ->
+        Box(Modifier.fillMaxSize()) {
+            HorizontalPager(
+                contentPadding = padding,
+                state = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                when (page) {
+                    SCREEN_ACTIVITIES_PAGER_ID -> ScreenTrackedActivities()
+                    SCREEN_FOCUS_BOARD_PAGER_ID -> ScreenFocusBoard()
+                    SCREEN_DAILY_CEHCKLIST_ID -> ScreenDailyChecklist()
+                }
+            }
+
+            if (fabExpanded) {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) { fabExpanded = false }
+                )
+            }
+        }
+    }
 }

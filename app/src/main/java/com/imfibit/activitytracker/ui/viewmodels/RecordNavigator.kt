@@ -2,10 +2,10 @@ package com.imfibit.activitytracker.ui.viewmodels
 
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import com.imfibit.activitytracker.core.navigation.AppNavigator
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivityScore
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
-import com.imfibit.activitytracker.ui.AppDestination
 import com.imfibit.activitytracker.ui.Destinations
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.atTime
@@ -13,14 +13,14 @@ import kotlinx.datetime.atTime
 
 object RecordNavigatorImpl {
 
-    public fun onDayClicked(navigate: (AppDestination) -> Unit, activity: TrackedActivity, date: LocalDate){
+    public fun onDayClicked(navigation: AppNavigator, activity: TrackedActivity, date: LocalDate){
         if (activity.type != TrackedActivity.Type.CHECKED) {
-            navigate(Destinations.DialogActivityDayHistory(activity.id, date))
+            navigation.navigate(Destinations.DialogActivityDayHistory(activity.id, date))
         }
     }
 
     public fun onDaylongClicked(
-        navigate: (AppDestination) -> Unit,
+        navigation: AppNavigator,
         recordViewModel: RecordViewModel,
         activity: TrackedActivity,
         date: LocalDate,
@@ -28,14 +28,14 @@ object RecordNavigatorImpl {
     ){
         when (activity.type) {
             TrackedActivity.Type.TIME ->{
-                navigate(
+                navigation.navigate(
                     Destinations.DialogEditRecord(
                         TrackedActivityTime(activity_id = activity.id, datetime_start = date.atTime(12, 0), datetime_end = date.atTime(12, 0))
                     )
                 )
             }
             TrackedActivity.Type.SCORE -> {
-                navigate(
+                navigation.navigate(
                     Destinations.DialogEditRecord(
                          TrackedActivityScore(activity_id = activity.id, datetime_completed = date.atTime(12, 0), score = 1)
                     )

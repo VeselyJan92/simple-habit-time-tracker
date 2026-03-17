@@ -1,35 +1,12 @@
 package com.imfibit.activitytracker.ui.components
 
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.imfibit.activitytracker.database.embedable.TimeRange
-import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
+import androidx.compose.ui.graphics.toArgb
+import androidx.core.graphics.ColorUtils
 
 object Colors{
-   val Completed = Color(0xFF59BF2D)
-   val NotCompleted = Color(0xFFFF9800)
-
-   val ChipGray = Color(0xFFE0E0E0)
-   val SuperLight = Color(0xFFF3F3F3)
-   val ChipGraySelected = Color(0xFFBDBDBD)
-
-   val ButtonGreen = Color(0xFF41C300)
-   val AppBackground = Color(0xFFe4eaee)
-
-   val AppAccent = Color(0xFF4DB6AC)
-
-   fun getMetricColor(goal: TrackedActivityGoal, metric: Long, metricRange: TimeRange, default: Color): Color {
-      return if ((goal.range == metricRange) && goal.isSet())
-         if (goal.value <= metric)
-            Completed
-         else
-            NotCompleted
-      else
-         if (metric != 0L)
-            Completed
-         else
-            default
-   }
-
 
    val chooseableColors = listOf(
       Color(0xFFFFCDD2),
@@ -65,3 +42,17 @@ fun Color.darker(factor: Float) = copy(
    green = green - factor,
    blue = blue - factor
 )
+
+@Composable
+fun Color.harmonizeWithTheme(isDarkTheme: Boolean = isSystemInDarkTheme()): Color {
+   if (!isDarkTheme) return this
+   
+   val hsl = FloatArray(3)
+   ColorUtils.colorToHSL(this.toArgb(), hsl)
+   
+   // Reduce lightness and adjust saturation for dark mode
+   hsl[2] = (hsl[2] * 0.6f).coerceIn(0.2f, 0.4f) // Making it darker
+   hsl[1] = (hsl[1] * 0.8f).coerceAtMost(0.6f)   // Desaturating slightly
+   
+   return Color(ColorUtils.HSLToColor(hsl))
+}

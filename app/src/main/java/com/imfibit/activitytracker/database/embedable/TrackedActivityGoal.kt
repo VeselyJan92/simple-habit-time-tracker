@@ -2,7 +2,7 @@ package com.imfibit.activitytracker.database.embedable
 
 import androidx.room.ColumnInfo
 import com.imfibit.activitytracker.database.entities.TrackedActivity
-import com.imfibit.activitytracker.ui.components.Colors
+import com.imfibit.activitytracker.core.enums.MetricStatus
 
 
 data class TrackedActivityGoal(
@@ -15,19 +15,19 @@ data class TrackedActivityGoal(
 ){
     fun isSet() = value != 0L
 
-    fun color(metric: Long) = when {
+    fun status(metric: Long) = when {
         range == TimeRange.WEEKLY -> {
             if (value != 0L) {
                 if (value <= metric)
-                    Colors.Completed
+                    MetricStatus.COMPLETED
                 else
-                    Colors.NotCompleted
+                    MetricStatus.NOT_COMPLETED
             } else  {
-                Colors.AppAccent
+                MetricStatus.ACCENT
             }
         }
         else -> {
-            Colors.AppAccent
+            MetricStatus.ACCENT
         }
     }
 

@@ -2,10 +2,11 @@ package com.imfibit.activitytracker.database
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.imfibit.activitytracker.core.getFullMonthBlockDays
-import com.imfibit.activitytracker.core.iter
-import com.imfibit.activitytracker.core.toSequence
+import com.imfibit.activitytracker.core.extensions.getFullMonthBlockDays
+import com.imfibit.activitytracker.core.extensions.iter
+import com.imfibit.activitytracker.core.extensions.toSequence
 import com.imfibit.activitytracker.database.composed.FocusBoardItemWithTags
+import com.imfibit.activitytracker.database.embedable.Markdown
 import com.imfibit.activitytracker.database.embedable.TimeRange
 import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
 import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
@@ -13,6 +14,7 @@ import com.imfibit.activitytracker.database.entities.DailyChecklistItem
 import com.imfibit.activitytracker.database.entities.DailyChecklistTimelineItem
 import com.imfibit.activitytracker.database.entities.FocusBoardItem
 import com.imfibit.activitytracker.database.entities.FocusBoardItemTag
+import com.imfibit.activitytracker.database.entities.FocusBundle
 import com.imfibit.activitytracker.database.entities.PresetTimer
 import com.imfibit.activitytracker.database.entities.TrackedActivity
 import com.imfibit.activitytracker.database.entities.TrackedActivityCompletion
@@ -20,8 +22,8 @@ import com.imfibit.activitytracker.database.entities.TrackedActivityScore
 import com.imfibit.activitytracker.database.entities.TrackedActivityTime
 import com.imfibit.activitytracker.database.entities.TrackerActivityGroup
 import com.imfibit.activitytracker.database.repository.tracked_activity.RepositoryTrackedActivity
-import com.imfibit.activitytracker.ui.components.Colors
 import com.imfibit.activitytracker.ui.components.Colors.chooseableColors
+import com.imfibit.activitytracker.core.enums.MetricStatus
 import kotlin.time.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -67,7 +69,7 @@ object DevSeeder {
                     RepositoryTrackedActivity.Day(
                         label = { if (ok) "YES" else "NO" },
                         metric = 1,
-                        color = if (ok) Colors.ButtonGreen else Color.LightGray,
+                        status = if (ok) MetricStatus.COMPLETED else MetricStatus.DEFAULT,
                         date = it,
                     )
                 },
@@ -167,36 +169,108 @@ object DevSeeder {
 
     public fun getFocusBoardItemTag() = getTags()[0]
 
+    fun getFocusBundle(
+        id: Long = 1,
+        title: String = "Backlog",
+        color: Long = chooseableColors[7].toArgb().toLong(),
+        position: Int = 0
+    ) = FocusBundle(id, title, color, position)
+
+    fun getFocusBundles() = listOf(
+        getFocusBundle(id = 1, title = "Personal Life", color = chooseableColors[0].toArgb().toLong(), position = 0),
+        getFocusBundle(id = 2, title = "Work Projects", color = chooseableColors[3].toArgb().toLong(), position = 1),
+        getFocusBundle(id = 3, title = "Fitness Goals", color = chooseableColors[6].toArgb().toLong(), position = 2),
+        getFocusBundle(id = 4, title = "Learning & Courses", color = chooseableColors[7].toArgb().toLong(), position = 3)
+    )
+
+    public fun getMarkdownSample(): String {
+        return "# Research topics\n" +
+        "**Market Trends**\n" +
+                "- Competitor analysis\n" +
+                "- Tech innovation\n" +
+                "- /Future predictions/\n\n" +
+                "### Business Models\n" +
+                "1. SaaS\n" +
+                "2. Marketplace\n" +
+                "3. E-commerce"
+    }
+
     public fun getFocusBoardItems() = listOf(
-
-        FocusBoardItem(
+        getFocusBoardItem(
             id = 3,
-            title = "Business and trends research",
-            content = "Google doc of business research: \n" + "• Trends, industry, research" + "\n" + "• Technology" + "\n" + "• Understanding business models",
+            bundleId = 1,
+            title = "Business research",
+            content = Markdown("# Research topics\n" +
+                    "**Market Trends**\n" +
+                    "- Competitor analysis\n" +
+                    "- Tech innovation\n" +
+                    "- /Future predictions/\n\n" +
+                    "### Business Models\n" +
+                    "1. SaaS\n" +
+                    "2. Marketplace\n" +
+                    "3. E-commerce"),
         ),
-
-        FocusBoardItem(
+        getFocusBoardItem(
             id = 1,
-            title = "Working out"
+            bundleId = 1,
+            title = "Working out",
+            content = Markdown("## Weekly plan\n" +
+                    "- **Monday**: Push day\n" +
+                    "- **Tuesday**: Pull day\n" +
+                    "- ~~Wednesday~~: Rest\n" +
+                    "- **Thursday**: Leg day"),
         ),
-
-        FocusBoardItem(
+        getFocusBoardItem(
             id = 2,
-            title = "Learning spanish"
+            bundleId = 1,
+            title = "Learning spanish",
+            content = Markdown("### Important phrases\n" +
+                    "- /Hola, ¿cómo estás?/\n" +
+                    "- Me llamo...\n" +
+                    "- ¿Dónde está el baño?\n" +
+                    "- ~~Hasta luego~~"),
         ),
-
-        FocusBoardItem(
+        getFocusBoardItem(
             id = 4,
+            bundleId = 1,
             title = "My book list",
-            content = "Atomic habits: \n" + "• The 7 Habits of Highly Effective People" + "\n" + "• The Richest Man in Babylon",
+            content = Markdown("# Must read\n" +
+                    "- **Atomic Habits** by James Clear\n" +
+                    "- **The 7 Habits** of Highly Effective People\n" +
+                    "- /The Richest Man in Babylon/\n" +
+                    "- ~~Bad books list~~"),
         ),
     )
 
-    public fun getFocusBoardItem() = getFocusBoardItems()[0]
+    public fun getFocusBoardItem(
+        id: Long = 3,
+        bundleId: Long = 1,
+        title: String = "Business research",
+        content: Markdown = Markdown("# Research topics...")
+    ) = FocusBoardItem(id, bundleId, title, content)
 
 
     public fun getFocusItemWithTags() =
-        FocusBoardItemWithTags(getFocusBoardItem(), getTags().take(2))
+        FocusBoardItemWithTags(getFocusBoardItems()[0], getTags().take(2))
+
+    fun getPinnedNotes(): List<FocusBoardItemWithTags> {
+        val items = getFocusBoardItems()
+        val tags = getTags()
+        return listOf(
+            FocusBoardItemWithTags(
+                item = items[0].copy(title = "Buy groceries", content = Markdown("- Milk\n- Eggs\n- Bread\n- Chicken")), 
+                tags = listOf(tags[0])
+            ),
+            FocusBoardItemWithTags(
+                item = items[1].copy(title = "App ideas", content = Markdown("1. Habit tracker\n2. AI planner\n3. Note taking")), 
+                tags = listOf(tags[1], tags[2])
+            ),
+            FocusBoardItemWithTags(
+                item = items[2].copy(title = "Quick reminder", content = Markdown("Call mom tomorrow at 6 PM")), 
+                tags = emptyList()
+            )
+        )
+    }
 
 
     private fun randomWord(): String {
