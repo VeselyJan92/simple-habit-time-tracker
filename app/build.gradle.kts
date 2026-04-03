@@ -43,8 +43,8 @@ configure<ApplicationExtension> {
         applicationId = "com.imfibit.activitytracker"
         minSdk = 26
         targetSdk = 36
-        versionCode = 57
-        versionName = "1.4.3"
+        versionCode = 58
+        versionName = "1.5.0"
         testInstrumentationRunner = "com.imfibit.activitytracker.HiltRunner"
     }
 
