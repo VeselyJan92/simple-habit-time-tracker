@@ -78,6 +78,45 @@ import com.imfibit.activitytracker.ui.screens.focus_board.components.BottomSheet
 import com.imfibit.activitytracker.ui.screens.focus_board.components.FocusItemTag
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
+import com.imfibit.activitytracker.ui.screens.tracked_activities.activity_list.components.TrackedActivity
+import com.imfibit.activitytracker.ui.screens.tracked_activities.activity_list.components.TrackedActivityRecentOverview
+import com.imfibit.activitytracker.database.entities.TrackedActivityRecord
+import com.imfibit.activitytracker.database.entities.TrackedActivity as TrackedActivityEntity
+import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
+import com.imfibit.activitytracker.database.embedable.TimeRange
+import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import com.imfibit.activitytracker.ui.components.MetricWidgetData
+import com.imfibit.activitytracker.core.enums.MetricStatus
+import com.imfibit.activitytracker.database.composed.MetricAggregation
+
+
+val mockTrackedActivity = TrackedActivityRecentOverview(
+    activity = TrackedActivityEntity(
+        id = 1L,
+        name = "Reading",
+        type = TrackedActivityEntity.Type.TIME,
+        goal = TrackedActivityGoal(3600L, TimeRange.DAILY),
+        challenge = TrackedActivityChallenge.empty,
+        inSessionSince = null
+    ),
+    challengeMetric = 0L,
+    past = listOf(
+        MetricWidgetData({ "01:00" }, status = MetricStatus.COMPLETED),
+        MetricWidgetData({ "01:00" }, status = MetricStatus.DEFAULT),
+        MetricWidgetData({ "01:00" }, status = MetricStatus.DEFAULT),
+        MetricWidgetData({ "01:00" }, status = MetricStatus.COMPLETED),
+        MetricWidgetData({ "01:00" }, status = MetricStatus.COMPLETED)
+    ),
+    actionButton = TrackedActivityRecentOverview.ActionButton.DEFAULT,
+    today = MetricAggregation(
+        from = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
+        to = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
+        metric = 3600L
+    )
+)
 
 @Preview(showBackground = true)
 @Composable
@@ -155,10 +194,13 @@ private fun ScreenFocusBundlePreview() = AppTheme {
         )
     )
 
+
+
     ScreenFocusBundleContent(
         bundle = mockBundle,
         focusItems = mockItems,
         tags = mockTags,
+        trackedActivities = listOf(mockTrackedActivity),
         onBack = {},
         onTagToggle = {},
         onFocusItemClick = {},
@@ -180,6 +222,7 @@ private fun ScreenFocusBundleEmptyPreview() = AppTheme {
         bundle = mockBundle,
         focusItems = emptyList(),
         tags = emptyList(),
+        trackedActivities = emptyList(),
         onBack = {},
         onTagToggle = {},
         onFocusItemClick = {},
@@ -208,6 +251,7 @@ fun ScreenFocusBundle(bundleId: Long) {
             bundle = it.bundle,
             focusItems = it.focusItems,
             tags = it.tags,
+            trackedActivities = listOf(mockTrackedActivity), // TODO: populate from viewmodel later
             onBack = { navigation.popBackStack() },
             onTagToggle = viewModel::onTagToggle,
             onFocusItemClick = { item ->
@@ -233,6 +277,7 @@ private fun ScreenFocusBundleContent(
     bundle: FocusBundle,
     focusItems: List<FocusBoardItemWithTags>,
     tags: List<FocusBoardItemTag>,
+    trackedActivities: List<TrackedActivityRecentOverview> = emptyList(),
     onBack: () -> Unit,
     onTagToggle: (FocusBoardItemTag) -> Unit,
     onFocusItemClick: (FocusBoardItemWithTags) -> Unit,
@@ -262,13 +307,11 @@ private fun ScreenFocusBundleContent(
                 .padding(padding)
                 .fillMaxSize()
         ) {
-            HeaderWithTags(
-                onToggle = onTagToggle,
-                tags = tags,
-            )
-
             FocusBoardItems(
                 focusItems = focusItems,
+                trackedActivities = trackedActivities,
+                tags = tags,
+                onTagToggle = onTagToggle,
                 swapFocusItems = onSwapFocusItems,
                 onFocusItemClick = onFocusItemClick,
                 onCompleteToggle = onCompleteToggle
@@ -332,7 +375,7 @@ private fun HeaderWithTags(
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
+        contentPadding = PaddingValues(vertical = 12.dp)
     ) {
 
         items(tags, { item -> item.id }) { item ->
@@ -351,6 +394,9 @@ private fun HeaderWithTags(
 private fun FocusBoardItems(
     onFocusItemClick: (FocusBoardItemWithTags) -> Unit,
     focusItems: List<FocusBoardItemWithTags>,
+    trackedActivities: List<TrackedActivityRecentOverview> = emptyList(),
+    tags: List<FocusBoardItemTag>,
+    onTagToggle: (FocusBoardItemTag) -> Unit,
     swapFocusItems: (LazyListItemInfo, LazyListItemInfo) -> Unit,
     onCompleteToggle: (FocusBoardItemWithTags) -> Unit,
 ) {
@@ -359,7 +405,7 @@ private fun FocusBoardItems(
         swapFocusItems(from, to)
     }
 
-    if (focusItems.isEmpty()) {
+    if (focusItems.isEmpty() && trackedActivities.isEmpty()) {
         EmptyState(
             icon = Icons.AutoMirrored.Outlined.FactCheck,
             title = stringResource(id = R.string.focus_board_no_focus_items),
@@ -375,6 +421,27 @@ private fun FocusBoardItems(
             state = lazyListState,
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
         ) {
+
+            if (trackedActivities.isNotEmpty()) {
+                items(trackedActivities, key = { "activity_${it.activity.id}" }) { activity ->
+                    TrackedActivity(
+                        item = activity,
+                        onNavigate = {},
+                        onActionButtonClick = {},
+                        onAddRecord = {}
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+
+            if (tags.isNotEmpty()) {
+                item(key = "tags_header") {
+                    HeaderWithTags(
+                        onToggle = onTagToggle,
+                        tags = tags,
+                    )
+                }
+            }
 
             if (pinned.isNotEmpty()) {
                 item(key = "pinned_header") {
@@ -406,15 +473,19 @@ private fun FocusBoardItems(
                                 modifier = Modifier.longPressDraggableHandle()
                             )
                             if (index < pinned.size - 1) {
-                                Spacer(modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(2.dp))
+                                Spacer(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(2.dp)
+                                )
                             }
                         }
                     }
                 }
 
-                item(key = "pinned_spacer") { Spacer(modifier = Modifier.height(24.dp).animateItem()) }
+                item(key = "pinned_spacer") { Spacer(modifier = Modifier
+                    .height(24.dp)
+                    .animateItem()) }
             }
 
             itemsIndexed(active, { _, item -> item.item.id }) { index, item ->
@@ -432,9 +503,11 @@ private fun FocusBoardItems(
                             modifier = Modifier.longPressDraggableHandle()
                         )
                         if (index < active.size - 1) {
-                            Spacer(modifier = Modifier
-                                .fillMaxWidth()
-                                .height(2.dp))
+                            Spacer(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(2.dp)
+                            )
                         }
                     }
                 }
@@ -480,9 +553,11 @@ private fun FocusBoardItems(
                                 modifier = Modifier.longPressDraggableHandle()
                             )
                             if (index < completed.size - 1) {
-                                Spacer(modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(2.dp))
+                                Spacer(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(2.dp)
+                                )
                             }
                         }
                     }

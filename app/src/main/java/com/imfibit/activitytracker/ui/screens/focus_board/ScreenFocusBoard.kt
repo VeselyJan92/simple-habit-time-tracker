@@ -42,6 +42,19 @@ import com.imfibit.activitytracker.ui.DashboardBody
 import com.imfibit.activitytracker.core.extensions.toThemeColor
 import com.imfibit.activitytracker.ui.components.EmptyState
 import com.imfibit.activitytracker.ui.components.EmptyStateButton
+import com.imfibit.activitytracker.ui.screens.tracked_activities.activity_list.components.TrackedActivity
+import com.imfibit.activitytracker.ui.screens.tracked_activities.activity_list.components.TrackedActivityRecentOverview
+import com.imfibit.activitytracker.database.entities.TrackedActivityRecord
+import com.imfibit.activitytracker.database.entities.TrackedActivity as TrackedActivityEntity
+import com.imfibit.activitytracker.database.embedable.TrackedActivityGoal
+import com.imfibit.activitytracker.database.embedable.TimeRange
+import com.imfibit.activitytracker.database.embedable.TrackedActivityChallenge
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import com.imfibit.activitytracker.ui.components.MetricWidgetData
+import com.imfibit.activitytracker.core.enums.MetricStatus
+import com.imfibit.activitytracker.database.composed.MetricAggregation
 
 @Composable
 fun ScreenFocusBoard() {
@@ -52,6 +65,7 @@ fun ScreenFocusBoard() {
 
     ScreenFocusBoardContent(
         data = data,
+        trackedActivities = listOf(mockTrackedActivity), // TODO: connect to viewModel
         onBundleClick = { bundleId ->
             navigation.navigate(Destinations.ScreenFocusBundleDetail(bundleId))
         },
@@ -92,6 +106,7 @@ private fun TopBar() {
 @Composable
 fun ScreenFocusBoardContent(
     data: ScreenFocusBoardViewModel.Data?,
+    trackedActivities: List<TrackedActivityRecentOverview> = emptyList(),
     onBundleClick: (Long) -> Unit,
     onNoteClick: (bundleId: Long, noteId: Long) -> Unit,
     onSwapStarredItems: (fromNoteId: Long, toNoteId: Long) -> Unit,
@@ -123,7 +138,7 @@ fun ScreenFocusBoardContent(
             TopBar()
 
             if (data != null) {
-                if (data.bundles.isEmpty() && data.staredItems.isEmpty()) {
+                if (data.bundles.isEmpty() && data.staredItems.isEmpty() && trackedActivities.isEmpty()) {
                     EmptyState(
                         icon = Icons.Default.Assignment,
                         title = stringResource(id = R.string.focus_board_empty_title),
@@ -169,6 +184,18 @@ fun ScreenFocusBoardContent(
                             }
 
                             item { Spacer(modifier = Modifier.height(24.dp)) }
+                        }
+                        
+                        if (trackedActivities.isNotEmpty()) {
+                            items(trackedActivities, key = { "activity_${it.activity.id}" }) { activity ->
+                                TrackedActivity(
+                                    item = activity,
+                                    onNavigate = {},
+                                    onActionButtonClick = {},
+                                    onAddRecord = {}
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                            }
                         }
 
                         // --- Bundles List ---
@@ -272,11 +299,14 @@ private fun BundleCard(
 @Preview(showBackground = true)
 @Composable
 fun PreviewScreenFocusBoard() = AppTheme {
+
+
     ScreenFocusBoardContent(
         data = ScreenFocusBoardViewModel.Data(
             bundles = DevSeeder.getFocusBundles(),
             staredItems = DevSeeder.getPinnedNotes(),
         ),
+        trackedActivities = listOf(mockTrackedActivity),
         onBundleClick = {},
         onNoteClick = { _, _ -> },
         onSwapStarredItems = { _, _ -> },
@@ -295,6 +325,7 @@ fun PreviewScreenFocusBoardEmpty() = AppTheme {
             bundles = emptyList(),
             staredItems = emptyList(),
         ),
+        trackedActivities = emptyList(),
         onBundleClick = {},
         onNoteClick = { _, _ -> },
         onSwapStarredItems = { _, _ -> },
