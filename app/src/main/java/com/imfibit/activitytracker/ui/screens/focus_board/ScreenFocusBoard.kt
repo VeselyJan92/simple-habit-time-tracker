@@ -54,7 +54,24 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import com.imfibit.activitytracker.ui.components.MetricWidgetData
 import com.imfibit.activitytracker.core.enums.MetricStatus
+import com.imfibit.activitytracker.database.composed.ActivityWithMetric
 import com.imfibit.activitytracker.database.composed.MetricAggregation
+import com.imfibit.activitytracker.ui.screens.tracked_activities.activity_list.Today
+import kotlinx.datetime.LocalDate
+
+
+val mockActivityWithMetric = ActivityWithMetric(activity = com.imfibit.activitytracker.database.entities.TrackedActivity(
+    id = 1,
+    name = "Read Book",
+    position = 0,
+    type = TrackedActivityEntity.Type.TIME,
+    inSessionSince = null,
+    goal = TrackedActivityGoal(3600L, TimeRange.DAILY),
+    challenge = TrackedActivityChallenge.empty
+), metric = 1800L)
+
+val xx = listOf(mockActivityWithMetric)
+
 
 @Composable
 fun ScreenFocusBoard() {
@@ -129,98 +146,102 @@ fun ScreenFocusBoardContent(
 
 
 
-    Surface(
-        color = Color.Transparent, // Let the global DashboardScreen background bleed through
-        modifier = Modifier.fillMaxSize()
-    ) {
-        DashboardBody {
 
-            TopBar()
+    DashboardBody {
 
-            if (data != null) {
-                if (data.bundles.isEmpty() && data.staredItems.isEmpty() && trackedActivities.isEmpty()) {
-                    EmptyState(
-                        icon = Icons.Default.Assignment,
-                        title = stringResource(id = R.string.focus_board_empty_title),
-                        description = stringResource(id = R.string.focus_board_empty_desc),
-                    )
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        state = lazyListState,
-                        contentPadding = PaddingValues(top = 8.dp, bottom = 100.dp, start = 12.dp, end = 12.dp)
-                    ) {
-                        // --- Global Pinned Items ---
-                        if (data.staredItems.isNotEmpty()) {
-                            item {
-                                Text(
-                                    text = stringResource(id = R.string.focus_board_pinned),
-                                    style = MaterialTheme.typography.titleSmall, color = AppTheme.colors.onSurfaceVariant,
-                                    modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
-                                )
-                            }
+        TopBar()
 
-                            itemsIndexed(items = data.staredItems, key = { index, item -> "note_${item.item.id}" }) { index, item ->
-                                ReorderableItem(
-                                    state = reorderableState,
-                                    key = "note_${item.item.id}"
-                                ) { isDragging ->
-                                    Column {
-                                        FocusBoardItem(
-                                            item = item,
-                                            onClick = { onNoteClick(item.item.bundleId, item.item.id) },
-                                            onCompleteToggle = { onCompleteToggle(item.item) },
-                                            isDragging = isDragging,
-                                            shape = getGroupedShape(index, data.staredItems.size),
-                                            modifier = Modifier.longPressDraggableHandle()
-                                        )
-                                        if (index < data.staredItems.size - 1) {
-                                            Spacer(modifier = Modifier.height(2.dp))
-                                        }
+        if (data != null) {
+            if (data.bundles.isEmpty() && data.staredItems.isEmpty() && trackedActivities.isEmpty()) {
+                EmptyState(
+                    icon = Icons.Default.Assignment,
+                    title = stringResource(id = R.string.focus_board_empty_title),
+                    description = stringResource(id = R.string.focus_board_empty_desc),
+                )
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    state = lazyListState,
+                    contentPadding = PaddingValues(top = 8.dp, bottom = 100.dp, start = 12.dp, end = 12.dp)
+                ) {
+
+                    item {
+                        Today(xx) { }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+
+
+                    // --- Global Pinned Items ---
+                    if (data.staredItems.isNotEmpty()) {
+                        item {
+                            Text(
+                                text = stringResource(id = R.string.focus_board_pinned),
+                                style = MaterialTheme.typography.titleSmall, color = AppTheme.colors.onSurfaceVariant,
+                                modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
+                            )
+                        }
+
+                        itemsIndexed(items = data.staredItems, key = { index, item -> "note_${item.item.id}" }) { index, item ->
+                            ReorderableItem(
+                                state = reorderableState,
+                                key = "note_${item.item.id}"
+                            ) { isDragging ->
+                                Column {
+                                    FocusBoardItem(
+                                        item = item,
+                                        onClick = { onNoteClick(item.item.bundleId, item.item.id) },
+                                        onCompleteToggle = { onCompleteToggle(item.item) },
+                                        isDragging = isDragging,
+                                        shape = getGroupedShape(index, data.staredItems.size),
+                                        modifier = Modifier.longPressDraggableHandle()
+                                    )
+                                    if (index < data.staredItems.size - 1) {
+                                        Spacer(modifier = Modifier.height(2.dp))
                                     }
-
                                 }
 
                             }
 
-                            item { Spacer(modifier = Modifier.height(24.dp)) }
-                        }
-                        
-                        if (trackedActivities.isNotEmpty()) {
-                            items(trackedActivities, key = { "activity_${it.activity.id}" }) { activity ->
-                                TrackedActivity(
-                                    item = activity,
-                                    onNavigate = {},
-                                    onActionButtonClick = {},
-                                    onAddRecord = {}
-                                )
-                                Spacer(modifier = Modifier.height(16.dp))
-                            }
                         }
 
-                        // --- Bundles List ---
-                        if (data.bundles.isNotEmpty()) {
-                            item {
-                                Text(
-                                    text = stringResource(id = R.string.focus_board_bundles),
-                                    style = MaterialTheme.typography.titleSmall, color = AppTheme.colors.onSurfaceVariant,
-                                    modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
-                                )
-                            }
-                        }
+                        item { Spacer(modifier = Modifier.height(24.dp)) }
+                    }
 
-                        items(data.bundles, key = { "bundle_${it.id}" }) { bundle ->
-                            ReorderableItem(reorderableState, "bundle_${bundle.id}") { isDragging ->
-                                BundleCard(
-                                    bundle = bundle,
-                                    onClick = { onBundleClick(bundle.id) },
-                                    onAddClick = { onAddNote(bundle.id) },
-                                    isDragging = isDragging,
-                                    modifier = Modifier
-                                        .longPressDraggableHandle()
-                                        .padding(bottom = 8.dp)
-                                )
-                            }
+                    if (trackedActivities.isNotEmpty()) {
+                        items(trackedActivities, key = { "activity_${it.activity.id}" }) { activity ->
+                            TrackedActivity(
+                                item = activity,
+                                onNavigate = {},
+                                onActionButtonClick = {},
+                                onAddRecord = {}
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+                    }
+
+                    // --- Bundles List ---
+                    if (data.bundles.isNotEmpty()) {
+                        item {
+                            Text(
+                                text = stringResource(id = R.string.focus_board_bundles),
+                                style = MaterialTheme.typography.titleSmall, color = AppTheme.colors.onSurfaceVariant,
+                                modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
+                            )
+                        }
+                    }
+
+                    items(data.bundles, key = { "bundle_${it.id}" }) { bundle ->
+                        ReorderableItem(reorderableState, "bundle_${bundle.id}") { isDragging ->
+                            BundleCard(
+                                bundle = bundle,
+                                onClick = { onBundleClick(bundle.id) },
+                                onAddClick = { onAddNote(bundle.id) },
+                                isDragging = isDragging,
+                                modifier = Modifier
+                                    .longPressDraggableHandle()
+                                    .padding(bottom = 8.dp)
+                            )
                         }
                     }
                 }
@@ -228,6 +249,7 @@ fun ScreenFocusBoardContent(
         }
     }
 }
+
 
 @Composable
 private fun BundleCard(

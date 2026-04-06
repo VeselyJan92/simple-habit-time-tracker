@@ -96,7 +96,7 @@ fun ScreenTrackedActivities(
         onGoToActivity = { navigation.navigate(Destinations.ScreenActivity(it.id)) },
         onActionButtonClicked = { recordVM.activityTriggered(it) },
         onAddRecord = {
-            when(it) {
+            when (it) {
                 is TrackedActivityCompletion -> throw IllegalStateException("Completion not supported")
                 is TrackedActivityScore -> navigation.navigate(
                     Destinations.DialogEditRecord(
@@ -107,6 +107,7 @@ fun ScreenTrackedActivities(
                         )
                     )
                 )
+
                 is TrackedActivityTime -> navigation.navigate(
                     Destinations.DialogEditRecord(
                         TrackedActivityTime(
@@ -133,28 +134,52 @@ fun ScreenActivitiesContent(
     onActionButtonClicked: (TrackedActivity) -> Unit,
     onAddRecord: (TrackedActivityRecord) -> Unit,
     onMoveActivity: (Int, Int) -> Unit,
-    onMoveGroup: (Int, Int) -> Unit
+    onMoveGroup: (Int, Int) -> Unit,
 ) {
-    Surface(
-        color = Color.Transparent, // Let the global DashboardScreen background bleed through
-        modifier = Modifier.fillMaxSize()
-    ) {
-        DashboardBody {
-            TopBar(onGoToSettings = onGoToSettings)
-            if (data != null) {
-                ScreenBody(
-                    data = data,
-                    onNavigateToStatistics = onNavigateToStatistics,
-                    onGoToActivityGroup = onGoToActivityGroup,
-                    onGoToActivity = onGoToActivity,
-                    onActionButtonClicked = onActionButtonClicked,
-                    onAddRecord = onAddRecord,
-                    onMoveActivity = onMoveActivity,
-                    onMoveGroup = onMoveGroup
-                )
+    DashboardBody {
+        TopBar(onGoToSettings = onGoToSettings)
+
+        if (data != null) {
+            Box {
+                if (data.activities.isEmpty() && data.live.isEmpty() && data.groups.isEmpty()) {
+                    EmptyState(
+                        icon = Icons.Outlined.AssignmentTurnedIn,
+                        title = stringResource(id = R.string.screen_activities_tracked_habits),
+                        description = stringResource(id = R.string.screen_onboarding_page_habits_text),
+                        footer = {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                        .padding(bottom = 8.dp),
+                                    imageVector = Icons.Outlined.Swipe,
+                                    tint = AppTheme.colors.outlineVariant,
+                                    contentDescription = null
+                                )
+
+                                Text(
+                                    text = stringResource(id = R.string.screen_activities_swipe_explore),
+                                    color = AppTheme.colors.outline
+                                )
+                            }
+                        }
+                    )
+                } else {
+                    Activities(
+                        data = data,
+                        onNavigateToStatistics = onNavigateToStatistics,
+                        onGoToActivityGroup = onGoToActivityGroup,
+                        onGoToActivity = onGoToActivity,
+                        onActionButtonClick = onActionButtonClicked,
+                        onAddRecord = onAddRecord,
+                        onMoveActivity = onMoveActivity,
+                        onMoveGroup = onMoveGroup
+                    )
+                }
             }
         }
     }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -196,56 +221,6 @@ private fun Any?.type() = (this as String).split("_").first()
 private fun Any?.id() = (this as String).split("_").getOrNull(1)?.toLongOrNull()
 
 @Composable
-private fun ScreenBody(
-    data: ScreenTrackedActivitiesViewModel.Data,
-    onNavigateToStatistics: () -> Unit,
-    onGoToActivityGroup: (Long) -> Unit,
-    onGoToActivity: (TrackedActivity) -> Unit,
-    onActionButtonClicked: (TrackedActivity) -> Unit,
-    onAddRecord: (TrackedActivityRecord) -> Unit,
-    onMoveActivity: (Int, Int) -> Unit,
-    onMoveGroup: (Int, Int) -> Unit
-) {
-    Box {
-        if (data.activities.isEmpty() && data.live.isEmpty() && data.groups.isEmpty()) {
-            EmptyState(
-                icon = Icons.Outlined.AssignmentTurnedIn,
-                title = stringResource(id = R.string.screen_activities_tracked_habits),
-                description = stringResource(id = R.string.screen_onboarding_page_habits_text),
-                footer = {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            modifier = Modifier
-                                .size(50.dp)
-                                .padding(bottom = 8.dp),
-                            imageVector = Icons.Outlined.Swipe,
-                            tint = AppTheme.colors.outlineVariant,
-                            contentDescription = null
-                        )
-
-                        Text(
-                            text = stringResource(id = R.string.screen_activities_swipe_explore),
-                            color = AppTheme.colors.outline
-                        )
-                    }
-                }
-            )
-        } else {
-            Activities(
-                data = data,
-                onNavigateToStatistics = onNavigateToStatistics,
-                onGoToActivityGroup = onGoToActivityGroup,
-                onGoToActivity = onGoToActivity,
-                onActionButtonClick = onActionButtonClicked,
-                onAddRecord = onAddRecord,
-                onMoveActivity = onMoveActivity,
-                onMoveGroup = onMoveGroup
-            )
-        }
-    }
-}
-
-@Composable
 private fun Activities(
     data: ScreenTrackedActivitiesViewModel.Data,
     onNavigateToStatistics: () -> Unit,
@@ -254,10 +229,10 @@ private fun Activities(
     onActionButtonClick: (TrackedActivity) -> Unit,
     onAddRecord: (TrackedActivityRecord) -> Unit,
     onMoveActivity: (Int, Int) -> Unit,
-    onMoveGroup: (Int, Int) -> Unit
+    onMoveGroup: (Int, Int) -> Unit,
 ) {
     val lazyListState = rememberLazyGridState()
-    
+
     // Safer Reorder Logic based on actual item IDs instead of index math
     val reorderableLazyListState = rememberReorderableLazyGridState(lazyListState) { from, to ->
         when {
@@ -268,6 +243,7 @@ private fun Activities(
                 val toIndex = data.activities.indexOfFirst { it.activity.id == toId }
                 if (fromIndex != -1 && toIndex != -1) onMoveActivity(fromIndex, toIndex)
             }
+
             from.key.type() == "group" && to.key.type() == "group" -> {
                 val fromId = from.key.id() ?: return@rememberReorderableLazyGridState
                 val toId = to.key.id() ?: return@rememberReorderableLazyGridState
@@ -366,7 +342,7 @@ private fun Activities(
 }
 
 @Composable
-private fun Today(
+fun Today(
     today: List<ActivityWithMetric>,
     onNavigateToStatistics: () -> Unit,
 ) {
@@ -406,12 +382,14 @@ private fun Today(
                     )
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(8.dp))
 
             if (today.isEmpty()) {
                 Box(
-                    modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .padding(vertical = 8.dp)
+                        .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -426,12 +404,14 @@ private fun Today(
                     val isGoalMissed = item.activity.goal.range == TimeRange.DAILY && item.metric < item.activity.goal.value;
 
                     Row(
-                        modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth(),
+                        modifier = Modifier
+                            .padding(vertical = 4.dp)
+                            .fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = item.activity.name, 
-                            fontSize = 14.sp, 
+                            text = item.activity.name,
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = AppTheme.colors.onSurface
                         )
@@ -460,7 +440,7 @@ private fun Today(
 
                     if (index != today.size - 1) {
                         HorizontalDivider(
-                            modifier = Modifier.padding(vertical = 2.dp), 
+                            modifier = Modifier.padding(vertical = 2.dp),
                             color = AppTheme.colors.surfaceVariant.copy(alpha = 0.5f)
                         )
                     }
@@ -492,7 +472,9 @@ private fun ActivityGroup(
             horizontalArrangement = Arrangement.Start
         ) {
             Icon(
-                modifier = Modifier.padding(end = 12.dp).size(20.dp),
+                modifier = Modifier
+                    .padding(end = 12.dp)
+                    .size(20.dp),
                 imageVector = Icons.Outlined.Folder,
                 tint = AppTheme.colors.primary, // Deep purple folder icon
                 contentDescription = null
@@ -509,7 +491,7 @@ private fun ActivityGroup(
                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f)
             )
-            
+
             Icon(
                 imageVector = Icons.Outlined.Swipe,
                 contentDescription = stringResource(id = R.string.screen_group_reorder),
